@@ -1,0 +1,8 @@
+{
+    "migrationDirectory": "migrations",
+    "driver": "pg",
+    "host": "localhost",
+    "port": 5432,
+    "database": "breadcrumb",
+    "username": "bret"
+}

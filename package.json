@@ -1,0 +1,55 @@
+{
+  "name": "breadcrumb",
+  "description": "WIP - nothing to see here",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "import": "./index.js"
+  },
+  "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
+  "bugs": {
+    "url": "https://github.com/bcomnes/breadcrumb/issues"
+  },
+  "dependencies": {
+    "pg": "^8.5.1"
+  },
+  "devDependencies": {
+    "auto-changelog": "^2.0.0",
+    "dependency-check": "^4.1.0",
+    "gh-release": "^4.0.5-beta.0",
+    "npm-run-all2": "^5.0.0",
+    "postgrator": "^4.1.1",
+    "postgrator-cli": "^4.0.0",
+    "standard": "^16.0.0",
+    "tap": "^14.10.8"
+  },
+  "homepage": "https://github.com/bcomnes/breadcrumb",
+  "keywords": [],
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcomnes/breadcrumb.git"
+  },
+  "scripts": {
+    "prepublishOnly": "git push --follow-tags && gh-releas -y",
+    "test": "run-s test:*",
+    "test:deps": "dependency-check package.json --no-dev --no-peer",
+    "test:standard": "standard",
+    "test:tap": "tap --no-esm --jobs=1",
+    "version": "run-s version:*",
+    "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
+    "version:git": "git add CHANGELOG.md",
+    "migrate": "postgrator"
+  },
+  "standard": {
+    "ignore": [
+      "dist",
+      "cjs"
+    ]
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/bcomnes"
+  }
+}
