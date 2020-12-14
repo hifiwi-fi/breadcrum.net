@@ -1,27 +1,42 @@
 
-CREATE EXTENSION citext;
-
-CREATE DOMAIN email_address AS citext
-CHECK (
-  value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
-);
+CREATE EXTENSION IF NOT EXISTS citext;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE users (
-  id        INT GENERATED ALWAYS AS IDENTITY primary key,
-  username  citext CHECK(char_length(username)<=50) NOT NULL UNIQUE,
-  password  text CHECK(char_length(password)>=50) NOT NULL,
-  email email_address UNIQUE NOT NULL
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
+  username  citext UNIQUE NOT NULL,
+  email citext UNIQUE NOT NULL,
+  email_confirmed BOOLEAN NOT NULL DEFAULT false,
+  password text
 );
 
+CREATE TYPE auth_service AS ENUM ('github-oauth');
+
+CREATE TABLE credentials (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
+  user_id UUID NOT NULL,
+  auth_service_name auth_service NOT NULL,
+  auth_service_user_id text,
+  additional_auth_service_data jsonb,
+
+  UNIQUE(auth_service_name, auth_service_user_id),
+
+  CONSTRAINT fk_user
+    FOREIGN KEY(user_id)
+      REFERENCES users(id)
+      ON DELETE CASCADE
+);
+CREATE INDEX idx_credentials_owner ON credentials(user_id);
+
 CREATE TABLE bookmarks (
-  id   INT GENERATED ALWAYS AS IDENTITY primary key,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
   url text NOT NULL,
-  title text CHECK(char_length(title)>=255),
+  title text,
   description text,
   time timestamptz NOT NULL DEFAULT now(),
-  owner_id INT NOT NULL,
   public BOOLEAN NOT NULL DEFAULT false,
   toread BOOLEAN NOT NULL DEFAULT false,
+  owner_id UUID NOT NULL,
   UNIQUE (owner_id, url),
 
   CONSTRAINT fk_owner
@@ -32,9 +47,9 @@ CREATE TABLE bookmarks (
 CREATE INDEX idx_bookmarks_owner ON bookmarks(owner_id);
 
 CREATE TABLE tags (
-  id  INT GENERATED ALWAYS AS IDENTITY primary key,
-  name citext CHECK(char_length(name)>=255) NOT NULL,
-  owner_id INT NOT NULL,
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
+  name citext NOT NULL,
+  owner_id UUID NOT NULL,
   UNIQUE (owner_id, name),
 
   CONSTRAINT fk_owner
@@ -45,8 +60,8 @@ CREATE TABLE tags (
 CREATE INDEX idx_tags_owner ON tags(owner_id);
 
 CREATE TABLE bookmarks_tags (
-  bookmark_id INT NOT NULL,
-  tag_id INT NOT NULL,
+  bookmark_id UUID NOT NULL,
+  tag_id UUID NOT NULL,
   CONSTRAINT pkey_bookmarks_tags PRIMARY KEY (bookmark_id, tag_id),
 
   CONSTRAINT fk_bookmark
