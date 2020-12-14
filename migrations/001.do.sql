@@ -1,4 +1,3 @@
-
 CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -9,24 +8,6 @@ CREATE TABLE users (
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
   password text
 );
-
-CREATE TYPE auth_service AS ENUM ('github-oauth');
-
-CREATE TABLE credentials (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
-  user_id UUID NOT NULL,
-  auth_service_name auth_service NOT NULL,
-  auth_service_user_id text,
-  additional_auth_service_data jsonb,
-
-  UNIQUE(auth_service_name, auth_service_user_id),
-
-  CONSTRAINT fk_user
-    FOREIGN KEY(user_id)
-      REFERENCES users(id)
-      ON DELETE CASCADE
-);
-CREATE INDEX idx_credentials_owner ON credentials(user_id);
 
 CREATE TABLE bookmarks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
