@@ -12,6 +12,12 @@
     "url": "https://github.com/bcomnes/breadcrumb/issues"
   },
   "dependencies": {
+    "@nearform/sql": "^1.5.0",
+    "fastify": "^3.0.0",
+    "fastify-plugin": "^3.0.0",
+    "fastify-autoload": "^3.0.2",
+    "fastify-cli": "^2.5.1",
+    "fastify-postgres": "^3.3.0",
     "pg": "^8.5.1"
   },
   "devDependencies": {
@@ -36,11 +42,13 @@
     "test": "run-s test:*",
     "test:deps": "dependency-check package.json --no-dev --no-peer",
     "test:standard": "standard",
-    "test:tap": "tap --no-esm --jobs=1",
+    "test:tap": "tap test/**/*.test.js --no-esm --jobs=1",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
-    "migrate": "postgrator"
+    "migrate": "postgrator",
+    "start": "fastify start -l info app.js",
+    "dev": "fastify start -w -l info -P app.js"
   },
   "standard": {
     "ignore": [
