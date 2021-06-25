@@ -1,20 +1,18 @@
-'use strict'
-
 // This file contains code that we reuse
 // between our tests.
 
-const Fastify = require('fastify')
-const fp = require('fastify-plugin')
-const App = require('../app')
+import Fastify from 'fastify'
+import fp from 'fastify-plugin'
+import App from '../app.js'
 
 // Fill in this config with all the configurations
 // needed for testing the application
-function config () {
+export function config () {
   return {}
 }
 
 // automatically build and tear down our instance
-function build (t) {
+export function build (t) {
   const app = Fastify()
 
   // fastify-plugin ensures that all decorators
@@ -23,12 +21,7 @@ function build (t) {
   app.register(fp(App), config())
 
   // tear down our app after we are done
-  t.tearDown(app.close.bind(app))
+  t.teardown(app.close.bind(app))
 
   return app
-}
-
-module.exports = {
-  config,
-  build
 }
