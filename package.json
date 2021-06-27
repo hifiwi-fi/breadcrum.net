@@ -14,11 +14,12 @@
   "dependencies": {
     "@nearform/sql": "^1.5.0",
     "fastify": "^3.0.0",
-    "fastify-plugin": "^3.0.0",
     "fastify-autoload": "^3.0.2",
     "fastify-cli": "^2.5.1",
-    "fastify-sensible": "^3.1.0",
+    "fastify-env": "^2.1.1",
+    "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.3.0",
+    "fastify-sensible": "^3.1.0",
     "pg": "^8.5.1"
   },
   "devDependencies": {
@@ -27,8 +28,8 @@
     "npm-run-all2": "^5.0.0",
     "postgrator": "^4.1.1",
     "postgrator-cli": "^4.0.0",
-    "standard": "^16.0.0",
-    "tap": "^15.0.9"
+    "tap": "^15.0.9",
+    "ustandard": "^1.0.0"
   },
   "homepage": "https://github.com/bcomnes/memevault.net",
   "keywords": [],
