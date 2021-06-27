@@ -16,9 +16,11 @@
     "fastify": "^3.0.0",
     "fastify-autoload": "^3.0.2",
     "fastify-cli": "^2.5.1",
+    "fastify-csrf": "^3.1.0",
     "fastify-env": "^2.1.1",
     "fastify-plugin": "^3.0.0",
     "fastify-postgres": "^3.3.0",
+    "fastify-secure-session": "^2.3.1",
     "fastify-sensible": "^3.1.0",
     "pg": "^8.5.1"
   },
@@ -28,8 +30,9 @@
     "npm-run-all2": "^5.0.0",
     "postgrator": "^4.1.1",
     "postgrator-cli": "^4.0.0",
+    "sodium-native": "^3.2.1",
     "tap": "^15.0.9",
-    "ustandard": "^1.0.0"
+    "standard": "^16.0.3"
   },
   "homepage": "https://github.com/bcomnes/memevault.net",
   "keywords": [],

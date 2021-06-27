@@ -2,11 +2,20 @@ import fp from 'fastify-plugin'
 
 const schema = {
   type: 'object',
-  required: [ ],
+  required: [],
   properties: {
-    FOO: {
+    ENV: {
       type: 'string',
-      default: 'bar'
+      default: 'development'
+    },
+    COOKIE_SECRET: {
+      type: 'string',
+      // THIS IS JUST A DEV SECRET
+      default: '08b7ee661730c8a0c8638f260a6b5e7dda40155dc27a416ad87470ad813250f9'
+    },
+    APP_NAME: {
+      type: 'string',
+      default: 'memevault'
     }
   }
 }
@@ -21,4 +30,6 @@ export default fp(async function (fastify, opts) {
     schema: schema,
     dotenv: true
   })
+}, {
+  name: 'env'
 })
