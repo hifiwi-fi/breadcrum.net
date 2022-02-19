@@ -2,18 +2,23 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+CREATE DOMAIN email_address AS citext
+CHECK (
+  value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
+);
+
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
-  username  citext UNIQUE NOT NULL,
-  email citext UNIQUE NOT NULL,
+  username  citext CHECK(char_length(username)<=50) NOT NULL UNIQUE,
+  email email_address UNIQUE NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
-  password text
+  password text CHECK(char_length(password)>=50) NOT NULL,
 );
 
 CREATE TABLE bookmarks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
   url text NOT NULL,
-  title text,
+  title text CHECK(char_length(title)>=255),
   note text,
   time timestamptz NOT NULL DEFAULT now(),
   toread BOOLEAN NOT NULL DEFAULT false,
@@ -29,7 +34,7 @@ CREATE INDEX idx_bookmarks_owner ON bookmarks(owner_id);
 
 CREATE TABLE tags (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
-  name citext NOT NULL,
+  name citext CHECK(char_length(name)>=255) NOT NULL,
   owner_id UUID NOT NULL,
   UNIQUE (owner_id, name),
 
