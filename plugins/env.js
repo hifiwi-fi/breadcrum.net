@@ -16,6 +16,10 @@ const schema = {
     APP_NAME: {
       type: 'string',
       default: 'memevault'
+    },
+    PG_CONNECTION_STRING: {
+      type: 'string',
+      default: 'postgres://postgres@localhost/memevault'
     }
   }
 }
