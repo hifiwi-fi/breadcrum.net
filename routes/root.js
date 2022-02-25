@@ -1,6 +1,6 @@
 
-export default async function (fastify, opts) {
-  fastify.get('/', async function (request, reply) {
+export default async function rootRoutes (fastify, opts) {
+  fastify.get('/', async (request, reply) => {
     return { root: true }
   })
 }
