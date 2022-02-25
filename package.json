@@ -24,7 +24,7 @@
     "dependency-cruiser": "^11.0.0",
     "gh-release": "^6.0.0",
     "npm-run-all2": "^5.0.0",
-    "postgrator": "^6.0.0",
+    "postgrator": "^7.0.0",
     "postgrator-cli": "^5.0.0",
     "standard": "^16.0.0",
     "snazzy": "^9.0.0",
