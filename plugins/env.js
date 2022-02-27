@@ -19,7 +19,7 @@ const schema = {
     },
     PG_CONNECTION_STRING: {
       type: 'string',
-      default: 'postgres://postgres@localhost/memevault'
+      default: 'postgres://postgres@localhost/breadcrum'
     }
   }
 }
