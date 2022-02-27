@@ -1,9 +1,8 @@
 import AutoLoad from 'fastify-autoload'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import { join } from 'path'
+import desm from 'desm'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const __dirname = desm(import.meta.url)
 
 export default async function App (fastify, opts) {
   // Place here your custom code!
