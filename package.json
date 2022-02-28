@@ -2,8 +2,6 @@
   "name": "api.breadcrum.net",
   "description": "The api for breadcrum.net",
   "version": "0.0.0",
-  "type": "module",
-  "private": true,
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
     "url": "https://github.com/hifiwi-fi/api.breadcrum.net/issues"
@@ -43,37 +41,39 @@
     "standard": "^16.0.3",
     "tap": "^15.0.9"
   },
-  "homepage": "https://github.com/hifiwi-fi/api.breadcrum.net",
-  "keywords": [],
-  "license": "UNLICENSED",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hifiwi-fi/api.breadcrum.net.git"
-  },
-  "scripts": {
-    "prepublishOnly": "git push --follow-tags && gh-releas -y",
-    "test": "run-s test:*",
-    "test:standard": "standard --verbose | snazzy",
-    "test:tap": "c8 tap --no-coverage",
-    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js",
-    "version": "run-s version:*",
-    "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
-    "version:git": "git add CHANGELOG.md",
-    "release": "git push --follow-tags && gh-release -y",
-    "migrate": "postgrator",
-    "start": "fastify start -l info app.js",
-    "deps": "depcruise --exclude '^node_modules|^[a-zA-Z0-9\\_]+$' --output-type dot . | dot -T svg > dependencygraph.svg",
-    "dev": "fastify start -w -l info -P app.js"
-  },
-  "standard": {
-    "ignore": []
+  "engines": {
+    "node": "^17.5.0",
+    "npm": "^8.4.1"
   },
   "funding": {
     "type": "individual",
     "url": "https://github.com/sponsors/bcomnes"
   },
-  "engines": {
-    "node": "^17.5.0",
-    "npm": "^8.4.1"
-  }
+  "homepage": "https://github.com/hifiwi-fi/api.breadcrum.net",
+  "keywords": [],
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hifiwi-fi/api.breadcrum.net.git"
+  },
+  "scripts": {
+    "deps": "depcruise --exclude '^node_modules|^[a-zA-Z0-9\\_]+$' --output-type dot . | dot -T svg > dependencygraph.svg",
+    "migrate": "postgrator",
+    "prepublishOnly": "git push --follow-tags && gh-releas -y",
+    "prod-sim": "fastify start -l info app.js",
+    "release": "git push --follow-tags && gh-release -y",
+    "start": "fastify start -w -l info -P app.js",
+    "test": "run-s test:*",
+    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js",
+    "test:standard": "standard --verbose | snazzy",
+    "test:tap": "c8 tap --no-coverage",
+    "version": "run-s version:*",
+    "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
+    "version:git": "git add CHANGELOG.md"
+  },
+  "standard": {
+    "ignore": []
+  },
+  "type": "module"
 }
