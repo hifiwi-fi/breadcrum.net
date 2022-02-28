@@ -23,7 +23,7 @@
     "fastify-postgres": "^3.5.0",
     "fastify-rate-limit": "^5.7.2",
     "fastify-request-context": "^2.2.0",
-    "fastify-secure-session": "^2.3.1",
+    "fastify-secure-session": "^3.0.0",
     "fastify-sensible": "^3.1.0",
     "fluent-json-schema": "^3.0.1",
     "pg": "^8.6.0"
