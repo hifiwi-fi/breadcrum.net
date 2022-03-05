@@ -18,7 +18,9 @@ Breadcrum.net's backend API. What is it?
 	- Save media
 	- Save metadata
 - Full text search. Since bookmarks are stored with a consistent archive of the contents, full text search is a lot more useful than the notes or metadata usually associated with bookmarking tools.
-- Podcast anything. Inspired by [huffduff-video](https://snarfed.org/2015-03-07_huffduff-video), when you save a bookmark to breadcrum, you can optionally request that the page be hit with youtube-dl (or yt-dlp) and have the results inserted into your private podcast feed. It let's you queue media and consume a private collage of media from around the web. Podcast media will live for 2 weeks before getting garbage collected. Media can be marked as archived indefinitely but will add to your storage budget.
+- Podcast anything. Inspired by [huffduff-video](https://snarfed.org/2015-03-07_huffduff-video), when you save a bookmark to breadcrum, you can optionally request that the page be hit with [youtube-dl](https://yt-dl.org) (or [yt-dlp](https://github.com/yt-dlp/yt-dlp)) and have the results inserted into your private podcast feed. It let's you queue media and consume a private collage of media from around the web. Podcast media will live for 2 weeks before getting garbage collected. Media can be marked as archived indefinitely but will add to your storage budget.
+	- Support audio or video.
+	- Support re-publish action for timed-out content.
 - Read it later.
 	- A on-site reading queue that actually unmarks read items as you read them.
 	- Print queue. Unread articles can be queued up into a single print job, and marked as 'read' when you print.
