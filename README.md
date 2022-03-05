@@ -5,9 +5,10 @@ Breadcrum.net's backend API.
 
 Breadcrum is a swiss army knife for the web. It combines a few ideas together:
 
-- Bookmarking storage and organization. This is the primary 'atom' of the service. Everything hangs off of saving a 'bookmark' of a URL. It should replcae my useage of pinboard.
-- Content archival. Instead of saving a janky web page archive, breacrum saves the 'reader mode' view of a webpage, as well as images it can find. Shortcuts to stash and retrieve copies in http://archive.today will also be provided.
-- Different reader mode algorithms should be provided (metior or firefix etc)
+- Bookmarking storage and organization. This is the primary 'atom' of the service. Everything hangs off of saving a 'bookmark' of a URL. Its probably one of the most basic CRUD app concepts, so it shouldn't be too difficult to acheive.-
+- Lightweight content archival. Breacrum saves the 'reader mode' view of a webpage, as well as images it can find. Image archival requires a paid account. Full text archival provides a more automatic and completel solution to messy hand-organized titles, descriptions and tags.
+- Shortcuts to stash and retrieve copies in http://archive.today will also be provided via http://mementoweb.org/guide/quick-intro/
+- Different reader mode algorithms should be provided (metior or firefix etc)2
 - Special content extractors should be provided for 'popular' hubs, like twitter.
 - Twitter thread unroller. You should be able to bookmark a thread, and read it back like an article, with content in it. Twitter censors. A lot. You should have a system for saving this content for your own use.
 - Full text search. Since bookmarks are stored with a consistent archive of the contents, full text search is a lot more useful than the notes or metadata usually associated with bookmarking tools.
