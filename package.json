@@ -75,5 +75,11 @@
   "standard": {
     "ignore": []
   },
-  "type": "module"
+  "type": "module",
+  "c8": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
+  }
 }
