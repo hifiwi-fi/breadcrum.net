@@ -6,7 +6,7 @@ Breadcrum.net's backend API. What is it?
 
 - Bookmarking storage and organization. This is the primary 'atom' of the service. Everything hangs off of saving a 'bookmark' of a URL. 
 - Bookmarks have a title, description and tags.
-- Lightweight content archival. Breacrum saves the 'reader mode' view of a webpage, as well as images it can find. Full text archival provides a more automatic and complete solution to messy hand-organized titles, descriptions and tags. Content archival requires a paid account. Image storage may be subject to additional storage fees. These storage fees should be at cost from b2.
+- Lightweight content archival. Breacrum saves the 'reader mode' view of a webpage, as well as images it can find. Full text archives provide a more automatic and complete solution to messy hand-organized titles, descriptions and tags. Content archival requires a paid account. Image storage may be subject to additional storage fees. These storage fees should be at cost from b2.
 - Shortcuts to stash and retrieve copies in http://archive.today will also be provided via http://mementoweb.org/guide/quick-intro/
 - Content archival should provide different extraction methods
 	- https://github.com/feedbin/extract
@@ -46,3 +46,7 @@ Breadcrum.net's backend API. What is it?
 - PDF storage with content extraction. 
 - Collections mode / folders
 - Recording mode.. Browser extension. Click record. Save bookmarks as you nav. 
+
+## License
+
+GPL-3.0-or-later

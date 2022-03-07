@@ -51,7 +51,7 @@
   },
   "homepage": "https://github.com/hifiwi-fi/api.breadcrum.net",
   "keywords": [],
-  "license": "UNLICENSED",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "repository": {
     "type": "git",
