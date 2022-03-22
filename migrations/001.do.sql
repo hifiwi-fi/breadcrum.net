@@ -2,30 +2,31 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
-# Valid email
+-- Valid email
 CREATE DOMAIN email_address AS citext
 CHECK (
   value ~ '^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
 )
 CHECK ( char_length(value) <= 200 );
 
-# Alphanumeric ASCII, with internal, non-repeating separators
+-- Alphanumeric ASCII, with internal, non-repeating separators
 CREATE DOMAIN valid_username AS citext
 CHECK ( value ~ '^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$')
-CHECK ( 0 < char_length(value) <= 50 );
+CHECK ( char_length(value) > 0 )
+CHECK ( char_length(value) <= 50 );
 
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
   username valid_username UNIQUE NOT NULL,
   email email_address UNIQUE NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
-  password text CHECK(char_length(password)<=50) CHECK(char_length(username)>=8) NOT NULL,
+  password text CHECK(char_length(password) <= 50) CHECK(char_length(username) >= 8) NOT NULL
 );
 
 CREATE TABLE bookmarks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
   url text NOT NULL,
-  title text CHECK(char_length(title)>=255),
+  title text CHECK(char_length(title) >= 255),
   note text,
   time timestamptz NOT NULL DEFAULT now(),
   toread BOOLEAN NOT NULL DEFAULT false,
@@ -41,7 +42,7 @@ CREATE INDEX idx_bookmarks_owner ON bookmarks(owner_id);
 
 CREATE TABLE tags (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
-  name citext CHECK(char_length(name)>=255) NOT NULL,
+  name citext CHECK(char_length(name) >= 255) NOT NULL,
   owner_id UUID NOT NULL,
   UNIQUE (owner_id, name),
 
