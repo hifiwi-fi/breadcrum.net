@@ -41,22 +41,29 @@ export default async function loginRoutes (fastify, opts) {
       SELECT id, email, username, email_confirmed
       FROM users
       WHERE email = ${user}
-      AND password = crypt(${password}, password);
+      AND password = crypt(${password}, password)
+      LIMIT 1;
       `
         : SQL`
       SELECT id, email, username, email_confirmed
       FROM users
       WHERE username = ${user}
-      AND password = crypt(${password}, password);
+      AND password = crypt(${password}, password)
+      LIMIT 1;
     `
 
-      const results = await fastify.pg.query(query)
+      console.log(query)
 
-      const foundUser = results.length > 0
+      const { rows } = await fastify.pg.query(query)
+
+      console.log(rows)
+
+      const foundUser = rows.length > 0
 
       if (foundUser) {
-        const user = results.pop()
+        const user = rows.pop()
         request.session.set('userId', user.id)
+        reply.statusCode = 201
         return user
       } else {
         return fastify.httpErrors.unauthorized()

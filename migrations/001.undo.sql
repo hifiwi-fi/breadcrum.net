@@ -5,6 +5,7 @@ DROP INDEX IF EXISTS idx_tags_owner;
 DROP TABLE IF EXISTS tags;
 DROP INDEX IF EXISTS idx_bookmarks_owner;
 DROP TABLE IF EXISTS bookmarks;
+DROP TABLE IF EXISTS auth_tokens;
 DROP TABLE IF EXISTS users;
 DROP DOMAIN IF EXISTS email_address;
 DROP DOMAIN IF EXISTS valid_username;

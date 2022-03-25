@@ -19,6 +19,7 @@ export default fp(async function (fastify, opts) {
     // TODO: inject auth token ID into the context
     const sessionUserId = req.session.get('userId')
     if (sessionUserId) {
+      console.log({ req: req.requestContext, fast: fastify.requestContext })
       req.requestContext.set('user', {
         id: sessionUserId
       })

@@ -6,7 +6,11 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-cors
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('fastify-cors'))
+  fastify.register(import('fastify-cors'), {
+    origin: ['http://localhost:3000', 'https://breadcrum.net'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
 }, {
   name: 'cors',
   dependencies: ['env']

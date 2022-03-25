@@ -15,7 +15,7 @@ const schema = {
     },
     APP_NAME: {
       type: 'string',
-      default: 'memevault'
+      default: 'breadcrum'
     },
     PG_CONNECTION_STRING: {
       type: 'string',

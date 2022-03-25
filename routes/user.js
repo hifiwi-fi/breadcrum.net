@@ -27,7 +27,13 @@ export default async function userRoutes (fastify, opts) {
         WHERE id = ${id}
       `
 
-      return fastify.pg.query(query)
+      const results = await fastify.pg.query(query)
+      const user = results.rows.pop()
+
+      if (user) return user
+      else {
+        reply.statusCode = 404
+      }
     }
   )
 }
