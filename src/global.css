@@ -1,0 +1,59 @@
+@import 'mine.css';
+@import 'highlight.js/styles/github-dark-dimmed.css';
+@import 'fragmentions';
+
+:root {
+  --body-padding: 2px;
+}
+
+/* style.css site specific stuff */
+.serif { font-family: var(--system-serif); }
+.sans { font-family: var(--system-sans); }
+.round { font-family: var(--system-round); }
+
+.bc-page-container {
+  /* https://dev-tips.com/css/overlapping-bottom-navigation-bar-despite-100vh-in-ios-safari */
+  min-height: 100vh; /* Fallback */
+  /* min-height: fill-available; */
+  /* min-height: stretch; /* Latest specification */
+  display: flex;
+  flex-direction: column;
+}
+
+_::-webkit-full-page-media, _:future, :root .bc-page-container {
+  /* Safari min height hack  */
+  min-height: -webkit-fill-available;
+}
+
+.bc-header {
+  padding-left: max(var(--body-padding), env(safe-area-inset-left));
+  padding-right: max(var(--body-padding), env(safe-area-inset-right));
+  padding-top: max(var(--body-padding), env(safe-area-inset-top));
+  padding-bottom: var(--body-padding);
+  border-bottom: dotted 1px var(--accent-midground);
+}
+
+.bc-main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 46em;
+  margin: 2em auto;
+  padding: 0 1em;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.bc-main > *:first-child { margin-top: 0 !important; }
+.bc-main > *:last-child { margin-bottom: 0 !important; }
+
+.bc-footer {
+  padding-top: var(--body-padding);
+  padding-left: max(var(--body-padding), env(safe-area-inset-left));
+  padding-right: max(var(--body-padding), env(safe-area-inset-right));
+  padding-bottom: max(var(--body-padding), env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  font-size: 0.8em;
+  border-top: dotted 1px var(--accent-midground);
+}

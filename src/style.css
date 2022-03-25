@@ -1,0 +1,11 @@
+.bc-placeholder {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.bc-big-bread {
+	font-size: 10em;
+}

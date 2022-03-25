@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@nearform/sql": "^1.5.0",
+    "@siteup/cli": "^1.3.5",
     "desm": "^1.2.0",
     "fastify": "^3.0.0",
     "fastify-auth": "^1.1.0",
@@ -25,8 +26,15 @@
     "fastify-request-context": "^2.2.0",
     "fastify-secure-session": "^3.0.0",
     "fastify-sensible": "^3.1.0",
+    "fastify-static": "^4.6.1",
+    "fetch-undici": "^1.1.0",
     "fluent-json-schema": "^3.0.1",
-    "pg": "^8.6.0"
+    "fragmentions": "^1.1.3",
+    "highlight.js": "^11.5.0",
+    "local-storage-proxy": "^4.0.2",
+    "mine.css": "^5.0.2",
+    "pg": "^8.6.0",
+    "uland-isomorphic": "^1.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
@@ -58,19 +66,25 @@
     "url": "https://github.com/hifiwi-fi/api.breadcrum.net.git"
   },
   "scripts": {
+    "build": "npm run clean && run-p build:*",
+    "build:siteup": "siteup",
+    "clean": "rimraf public && mkdirp public",
     "deps": "depcruise --exclude '^node_modules|^[a-zA-Z0-9\\_]+$' --output-type dot . | dot -T svg > dependencygraph.svg",
     "migrate": "postgrator",
     "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prod-sim": "fastify start -l info app.js",
     "release": "git push --follow-tags && gh-release -y",
-    "start": "fastify start -w -l info -P app.js",
+    "start": "npm run watch",
     "test": "run-s test:*",
-    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js",
+    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js src",
     "test:standard": "standard --verbose | snazzy",
     "test:tap": "c8 tap --no-coverage",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
-    "version:git": "git add CHANGELOG.md"
+    "version:git": "git add CHANGELOG.md",
+    "watch": "npm run clean && run-p watch:*",
+    "watch:siteup": "npm run build:siteup -- --watch",
+    "watch:server": "fastify start -w -l info -P -p 3050 app.js"
   },
   "standard": {
     "ignore": []
