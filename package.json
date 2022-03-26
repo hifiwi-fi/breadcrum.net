@@ -2,6 +2,7 @@
   "name": "breadcrum.net",
   "description": "Breadcrum internet newspaper clippigns",
   "version": "0.0.0",
+  "type": "module",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
     "url": "https://github.com/hifiwi-fi/breadcrum.net/issues"
@@ -71,8 +72,8 @@
     "clean": "rimraf public && mkdirp public",
     "deps": "depcruise --exclude '^node_modules|^[a-zA-Z0-9\\_]+$' --output-type dot . | dot -T svg > dependencygraph.svg",
     "migrate": "postgrator",
-    "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prepare": "npm run build",
+    "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prod-sim": "fastify start -l info app.js",
     "release": "git push --follow-tags && gh-release -y",
     "start": "npm run watch",
@@ -84,13 +85,12 @@
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
-    "watch:siteup": "npm run build:siteup -- --watch",
-    "watch:server": "fastify start -w -l info -P -p 3050 app.js"
+    "watch:server": "fastify start -w -l info -P -p 3050 app.js",
+    "watch:siteup": "npm run build:siteup -- --watch"
   },
   "standard": {
     "ignore": []
   },
-  "type": "module",
   "c8": {
     "reporter": [
       "lcov",
