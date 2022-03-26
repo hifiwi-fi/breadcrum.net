@@ -1,8 +1,8 @@
-# api.breadcrumb.net
+# breadcrumb.net
 [![Actions Status](https://github.com/hifiwi-fi/api.breadcrum.net/workflows/tests/badge.svg)](https://github.com/hifiwi-fi/api.breadcrum.net/actions)
 [![Coverage Status](https://coveralls.io/repos/github/hifiwi-fi/api.breadcrum.net/badge.svg?branch=master)](https://coveralls.io/github/hifiwi-fi/api.breadcrum.net?branch=master)
 
-Breadcrum.net's backend API. What is it?
+Breadcrum.net. What is it?
 
 - Bookmarking storage and organization. This is the primary 'atom' of the service. Everything hangs off of saving a 'bookmark' of a URL. 
 - Bookmarks have a title, description and tags.
