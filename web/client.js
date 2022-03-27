@@ -8,7 +8,8 @@ export function homepage () {
   const { user, loading, error: userError } = useUser()
   const [loggingOut, setLoggingOut] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
-  console.log({ state, user, loading, userError })
+
+  // console.log({ state, user, loading, userError })
 
   async function logout (ev) {
     ev.preventDefault()
@@ -100,6 +101,11 @@ export function homepage () {
     ${userError
       ? html`<div>${JSON.stringify(userError, null, ' ')}</div>`
       : null
+    }
+    ${
+      loading
+        ? html`<div>loading</div>`
+        : null
     }
 `
 }

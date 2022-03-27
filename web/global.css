@@ -54,6 +54,6 @@ _::-webkit-full-page-media, _:future, :root .bc-page-container {
   display: flex;
   justify-content: center;
   gap: 1em;
-  font-size: 0.8em;
+  font-size: 0.6em;
   border-top: dotted 1px var(--accent-midground);
 }

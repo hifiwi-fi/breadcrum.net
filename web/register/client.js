@@ -3,7 +3,7 @@ import { html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export function homepage () {
+export function register () {
   const { user, loading, error: userError } = useUser()
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
@@ -82,7 +82,7 @@ export function homepage () {
 }
 
 try {
-  render(document.querySelector('.bc-main'), homepage)
+  render(document.querySelector('.bc-main'), register)
 } catch {
   // swallow
 }
