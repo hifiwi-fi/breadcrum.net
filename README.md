@@ -6,4 +6,4 @@ Breadcrum.net internet newspaper clippings. Coming soon.
 
 ## License
 
-GPL-3.0-or-later
+AGPL-3.0-or-later

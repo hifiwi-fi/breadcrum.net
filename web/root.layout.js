@@ -43,7 +43,7 @@ export default function defaultRootLayout ({
           </div>
           <div>
             <a href="https://github.com/hifiwi-fi/breadcrum.net/">
-              GPL-3.0-or-later
+              AGPL-3.0-or-later
             </a>
         </div>
         </footer>
