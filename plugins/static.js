@@ -12,7 +12,8 @@ const __dirname = desm(import.meta.url)
 export default fp(async function (fastify, opts) {
   fastify.register(import('fastify-static'), {
     root: path.join(__dirname, '../public'),
-    prefix: '/'
+    prefix: '/',
+    redirect: true
   })
 }, {
   name: 'static',

@@ -28,9 +28,9 @@ CREATE TABLE users (
   username valid_username UNIQUE NOT NULL,
   email email_address UNIQUE NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
-  password text NOT NULL -- Encrypted passwords are 60+ chars
+  password text NOT NULL, -- Encrypted passwords are 60+ chars
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz,
+  updated_at timestamptz
 );
 
 CREATE TRIGGER set_timestamp_users
@@ -38,10 +38,13 @@ BEFORE UPDATE ON users
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 
+-- auth_tokens never update so we don't need an id
 CREATE TABLE auth_tokens (
   token text PRIMARY KEY,
   owner_id UUID NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
+  user_agent text,
+  ip inet,
   UNIQUE (owner_id, token),
 
   CONSTRAINT fk_owner
