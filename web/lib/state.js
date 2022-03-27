@@ -8,8 +8,6 @@ export const state = lsp('breadcrum', {
   lspReset: 1
 })
 
-console.log('setting state')
 if (typeof window !== 'undefined') {
-  console.log('setting state')
   window.state = state
 }

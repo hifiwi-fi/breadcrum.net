@@ -104,8 +104,6 @@ export function homepage () {
 `
 }
 
-try {
+if (typeof window !== 'undefined') {
   render(document.querySelector('.bc-main'), homepage)
-} catch {
-  // swallow
 }

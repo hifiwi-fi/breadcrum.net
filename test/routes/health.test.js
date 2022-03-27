@@ -1,11 +1,11 @@
 import { test } from 'tap'
 import { build } from '../helper.js'
 
-test('default root route', async (t) => {
+test('healthcheck baseline test', async (t) => {
   const app = build(t)
 
   const res = await app.inject({
-    url: '/'
+    url: '/health'
   })
-  t.same(JSON.parse(res.payload), { root: true })
+  t.equal(res.payload, '{"statusCode":200,"status":"ok"}')
 })

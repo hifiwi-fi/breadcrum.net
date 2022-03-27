@@ -67,7 +67,7 @@
       "comment": "Don't allow dependencies from src/app/lib to a development only package",
       "from": {
         "path": "^(src|app|lib)",
-        "pathNot": "\\.spec\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$"
+        "pathNot": "\\.(spec|test)\\.(js|ts|ls|coffee|litcoffee|coffee\\.md)$"
       },
       "to": {
         "dependencyTypes": [
