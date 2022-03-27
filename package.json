@@ -79,7 +79,7 @@
     "release": "git push --follow-tags && gh-release -y",
     "start": "npm run watch",
     "test": "run-s test:*",
-    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js src",
+    "test:deptree": "depcruise --validate .dependency-cruiser.json app.js web routes plugins",
     "test:standard": "standard --verbose | snazzy",
     "test:tap": "c8 tap --no-coverage",
     "version": "run-s version:*",
