@@ -53,11 +53,12 @@ export default async function registerRoutes (fastify, opts) {
       RETURNING id, email, username, email_confirmed;
       `
 
-      const user = await fastify.pg.query(query)
-
-      console.log(user)
+      const results = await fastify.pg.query(query)
+      const user = results.rows[0]
 
       const token = await reply.createJWTToken(user)
+      reply.setJWTCookie(token)
+
       reply.code(201)
       // TODO: ensure this user matches login/user object
       return {

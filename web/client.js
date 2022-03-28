@@ -47,8 +47,8 @@ export function homepage () {
       })
 
       if (response.ok && response.status === 201) {
-        const user = await response.json()
-        state.user = user
+        const body = await response.json()
+        state.user = body?.user
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }

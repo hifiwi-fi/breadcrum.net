@@ -87,7 +87,7 @@
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
-    "watch:server": "fastify start -w -l info -P -p 3000 app.js",
+    "watch:server": "fastify start -w -l info -P -p 3000 app.js --options",
     "watch:siteup": "npm run build:siteup -- --watch"
   },
   "standard": {

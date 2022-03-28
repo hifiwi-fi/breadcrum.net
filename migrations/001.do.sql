@@ -40,12 +40,11 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 
 -- auth_tokens never update so we don't need an id
 CREATE TABLE auth_tokens (
-  token text PRIMARY KEY,
+  jti UUID PRIMARY KEY NOT NULL,
   owner_id UUID NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   user_agent text,
   ip inet,
-  UNIQUE (owner_id, token),
 
   CONSTRAINT fk_owner
     FOREIGN KEY(owner_id)

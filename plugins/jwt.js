@@ -1,5 +1,6 @@
 import fp from 'fastify-plugin'
 import SQL from '@nearform/sql'
+import { randomUUID } from 'crypto'
 
 /**
  * This plugins adds jwt token support
@@ -12,14 +13,28 @@ export default fp(async function (fastify, opts) {
     cookie: {
       cookieName: fastify.config.COOKIE_NAME,
       signed: true
+    },
+    trusted: async (request, decodedToken) => {
+      const query = SQL`
+      SELECT jti, owner_id, created_at, user_agent, ip
+        FROM auth_tokens
+        WHERE jti = ${decodedToken.jti}
+      `
+      const results = await fastify.pg.query(query)
+      return results.rowCount === 1
     }
   })
 
   /**
    * verifyJWT used in fastify-auth to verify jwt tokens
    */
-  fastify.decorate('verifyJWT', async function (req, reply) {
-    await req.jwtVerify()
+  fastify.decorate('verifyJWT', async function (request, reply) {
+    try {
+      await request.jwtVerify()
+    } catch (err) {
+      reply.deleteJWTCookie()
+      throw err
+    }
   })
 
   /**
@@ -27,30 +42,27 @@ export default fp(async function (fastify, opts) {
    * @param  {[type]} user) {               const token [description]
    * @return {[type]}       [description]
    */
-  fastify.decorateReply('createToken', async function (user) {
+  fastify.decorateReply('createJWTToken', async function (user) {
+    const uuid = randomUUID()
     const token = await this.jwtSign({
-      ...user
+      ...user,
+      jti: uuid
     })
 
-    const userAgent = this.headers['user-agent']
-    const ip = [...this.ips].pop()
-
-    console.log({ userAgent, token, ip, owner_id: user.id })
+    const userAgent = this.request.headers['user-agent']
+    const ip = Array.isArray(this.request.ips) ? [...this.request.ips].pop() : this.request.ip
 
     const query = SQL`
-        INSERT INTO auth_tokens (token, owner_id, user_agent, ip) VALUES (
-          ${token},
+        INSERT INTO auth_tokens (jti, owner_id, user_agent, ip) VALUES (
+          ${uuid},
           ${user.id},
-          ${userAgent},
-          ${ip}
+          ${userAgent || null},
+          ${ip || null}
         );`
 
     const results = await fastify.pg.query(query)
 
-    // TODO: Delete
-    console.log(results)
-
-    this.setJWTCookie(token)
+    this.log.info(`Deleted ${results.rowCount} auth_tokens rows`)
 
     return token
   })
@@ -80,7 +92,10 @@ export default fp(async function (fastify, opts) {
   fastify.decorateReply('deleteJWTCookie', function () {
     this.clearCookie(
       fastify.config.COOKIE_NAME,
-      { path: '/' }
+      {
+        path: '/',
+        domain: fastify.config.DOMAIN
+      }
     )
   })
 }, {

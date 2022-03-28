@@ -23,12 +23,17 @@ export function useUser () {
         signal: controller.signal,
         credentials: 'include'
       })
-      window.response = response
+
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        if (body?.username !== state.user?.username || body?.email !== state.user?.email) state.user = body
+        if (body?.username !== state.user?.username || body?.email !== state.user?.email) {
+          console.log('Updating user state')
+          state.user = body
+        }
       } else {
-        if (response.status !== 401) {
+        if (response.status === 401) {
+          if (state.user) state.user = null
+        } else {
           throw new Error(`${(await response).status} ${(await response).statusText}: ${await response.text()}`)
         }
       }

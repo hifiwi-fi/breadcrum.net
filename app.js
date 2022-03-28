@@ -24,3 +24,7 @@ export default async function App (fastify, opts) {
     options: Object.assign({}, opts)
   })
 }
+
+export const options = {
+  trustProxy: true
+}
