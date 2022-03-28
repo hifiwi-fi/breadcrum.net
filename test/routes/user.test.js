@@ -10,6 +10,6 @@ test('default root route', async (t) => {
   t.same(res.payload, JSON.stringify({
     statusCode: 401,
     error: 'Unauthorized',
-    message: 'No user session found.'
+    message: 'No Authorization was found in request.cookies'
   }))
 })

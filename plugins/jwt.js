@@ -19,8 +19,8 @@ export default fp(async function (fastify, opts) {
    * verifyJWT used in fastify-auth to verify jwt tokens
    */
   fastify.decorate('verifyJWT', async function (req, reply) {
-    req.jwtVerify()
-  }, ['jwtVerify'])
+    await req.jwtVerify()
+  })
 
   /**
    * createToken creates a token for a user, sets the cookie and returns the token
@@ -53,7 +53,7 @@ export default fp(async function (fastify, opts) {
     this.setJWTCookie(token)
 
     return token
-  }, ['setJWTCookie', 'jwtSign', 'pg'])
+  })
 
   /**
    * Set a JWT cookie from a token.
@@ -72,7 +72,7 @@ export default fp(async function (fastify, opts) {
         signed: true
       }
     )
-  }, ['setCookie', 'config'])
+  })
 
   /**
    * deleteJWTCookie clears a JWT cookie
@@ -82,7 +82,7 @@ export default fp(async function (fastify, opts) {
       fastify.config.COOKIE_NAME,
       { path: '/' }
     )
-  }, ['clearCookie', 'config'])
+  })
 }, {
   name: 'jwt',
   dependencies: ['env', 'cookie', 'pg']

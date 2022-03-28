@@ -7,13 +7,7 @@ import fp from 'fastify-plugin'
  */
 export default fp(async function (fastify, opts) {
   fastify.register(import('fastify-auth'))
-
-  // Used when checking for a user session
-  fastify.decorate('verifySession', async (req, reply) => {
-    const userId = req.session.get('userId')
-    if (!userId) throw new Error('No user session found.')
-  })
 }, {
   name: 'auth',
-  dependencies: ['env', 'session']
+  dependencies: ['env', 'jwt']
 })
