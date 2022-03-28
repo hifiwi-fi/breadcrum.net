@@ -11,7 +11,7 @@ export default async function userRoutes (fastify, opts) {
   fastify.get(
     '/user',
     {
-      preHandler: fastify.auth([fastify.verifySession]),
+      preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         response: {
           200: userJsonSchema
@@ -19,7 +19,7 @@ export default async function userRoutes (fastify, opts) {
       }
     },
     async (request, reply) => {
-      const id = request.session.get('userId')
+      const id = request.user.id
 
       const query = SQL`
       SELECT id, email, username, email_confirmed
@@ -30,8 +30,10 @@ export default async function userRoutes (fastify, opts) {
       const results = await fastify.pg.query(query)
       const user = results.rows.pop()
 
-      if (user) return user
-      else {
+      if (user) {
+        // TODO refresh token
+        return user
+      } else {
         reply.statusCode = 404
       }
     }

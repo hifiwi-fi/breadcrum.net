@@ -20,9 +20,13 @@ const newUserJsonSchema = S.object()
   ).required()
 
 const createdUserJsonSchema = S.object()
-  .prop('id', S.string().format('uuid'))
-  .prop('email', S.string().format('email'))
-  .prop('username', S.string())
+  .prop('token', S.string())
+  .prop('user', S.object()
+    .prop('id', S.string().format('uuid'))
+    .prop('email', S.string().format('email'))
+    .prop('email_confirmed', S.boolean())
+    .prop('username', S.string())
+  )
 
 export default async function registerRoutes (fastify, opts) {
   fastify.post(
@@ -38,22 +42,27 @@ export default async function registerRoutes (fastify, opts) {
     async (request, reply) => {
       const { username, email, password } = request.body
 
+      // TODO: ensure not a duplicate user
+
       const query = SQL`
       INSERT INTO users (username, email, password) VALUES (
         ${username},
         ${email},
         crypt(${password}, gen_salt('bf'))
-      );
+      )
+      RETURNING id, email, username, email_confirmed;
       `
 
-      const { id } = await fastify.pg.query(query)
+      const user = await fastify.pg.query(query)
 
-      request.session.set('userId', id)
+      console.log(user)
+
+      const token = await reply.createJWTToken(user)
       reply.code(201)
+      // TODO: ensure this user matches login/user object
       return {
-        id,
-        email,
-        username
+        token,
+        user
       }
     }
   )

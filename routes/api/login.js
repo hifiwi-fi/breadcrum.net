@@ -14,10 +14,12 @@ const credentialsSchema = S.object()
   ).required()
 
 const userInfoSchema = S.object()
-  .prop('id', S.string().format('uuid'))
-  .prop('email', S.string().format('email'))
-  .prop('username', S.string())
-  .prop('email_confirmed', S.boolean())
+  .prop('user', S.object()
+    .prop('id', S.string().format('uuid'))
+    .prop('email', S.string().format('email'))
+    .prop('username', S.string())
+    .prop('email_confirmed', S.boolean()))
+  .prop('token', S.string())
 
 export default async function loginRoutes (fastify, opts) {
   fastify.post(
@@ -31,6 +33,7 @@ export default async function loginRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
+      // TODO: fail if logged in
       const user = request.body.user
       const password = request.body.password
 
@@ -52,19 +55,17 @@ export default async function loginRoutes (fastify, opts) {
       LIMIT 1;
     `
 
-      console.log(query)
-
       const { rows } = await fastify.pg.query(query)
-
-      console.log(rows)
 
       const foundUser = rows.length > 0
 
       if (foundUser) {
         const user = rows.pop()
-        request.session.set('userId', user.id)
+
+        const token = await reply.createJWTToken(user)
+
         reply.statusCode = 201
-        return user
+        return { user, token }
       } else {
         return fastify.httpErrors.unauthorized()
       }

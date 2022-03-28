@@ -11,7 +11,7 @@ export default fp(async function (fastify, opts) {
     key: Buffer.from(fastify.config.COOKIE_SECRET, 'hex'),
     cookie: {
       expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      domain: 'localhost',
+      // domain: 'localhost',
       secure: fastify.config.ENV === 'production',
       sameSite: fastify.config.ENV === 'production' ? 'none' : undefined,
       httpOnly: true

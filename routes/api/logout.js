@@ -14,13 +14,17 @@ export default async function logoutRoute (fastify, opts) {
       }
     },
     async function (request, reply) {
-      if (request.session.get('userId')) {
-        request.session.delete()
+      const hasUser = Boolean(request?.user?.id)
+      reply.deleteJWTCookie()
+      // TODO: delete auth_token in db
+      if (hasUser) {
         return {
           logged_out: true
         }
       } else {
-        return fastify.httpErrors.unauthorized()
+        return {
+          logged_out: false
+        }
       }
     }
   )
