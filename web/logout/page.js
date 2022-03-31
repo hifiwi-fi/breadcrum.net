@@ -1,6 +1,6 @@
 import { html } from 'uland-isomorphic'
-import { register } from './client.js'
+import { logout } from './client.js'
 
 export default async function () {
-  return html`${register()}`
+  return html`${logout()}`
 }

@@ -33,6 +33,16 @@ _::-webkit-full-page-media, _:future, :root .bc-page-container {
   border-bottom: dotted 1px var(--accent-midground);
 }
 
+.bc-header-nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bc-header-start,.bc-header-end {
+  display: flex;
+  gap: 0.2em;
+}
+
 .bc-main {
   flex-grow: 1;
   width: 100%;

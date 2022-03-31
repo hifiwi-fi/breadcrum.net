@@ -1,5 +1,6 @@
 export default async () => {
   return {
-    siteName: 'breadcrum.net'
+    siteName: 'breadcrum.net',
+    disableRegistration: true
   }
 }

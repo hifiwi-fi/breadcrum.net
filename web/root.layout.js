@@ -1,4 +1,5 @@
 import { html, render } from 'uland-isomorphic'
+import { header } from './components/header.js'
 
 export default function defaultRootLayout ({
   title,
@@ -24,12 +25,7 @@ export default function defaultRootLayout ({
     <body class="bc-body">
       <div class="bc-page-container">
         <header class="bc-header">
-          <nav>
-            <div class="round">
-              <span>🥖 </span>
-              <a href="/">Breadcrum</a>
-            </div>
-          </nav>
+          ${header()}
         </header>
         <main class="bc-main">
           ${typeof children === 'string' ? html([children]) : children /* Support both uhtml and string children. Optional. */}

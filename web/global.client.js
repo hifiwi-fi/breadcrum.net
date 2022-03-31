@@ -1,5 +1,7 @@
 import { toggleTheme } from 'mine.css'
 import 'fragmentions'
+import { render } from 'uland-isomorphic'
+import { header } from './components/header.js'
 
 window.toggleTheme = toggleTheme
 
@@ -13,3 +15,7 @@ async function requestStorageAccess () {
 }
 
 requestStorageAccess()
+
+if (typeof window !== 'undefined') {
+  render(document.querySelector('.bc-header'), header)
+}

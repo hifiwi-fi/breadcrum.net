@@ -9,7 +9,7 @@ export function register () {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (user && !loading) window.location.replace('/')
+    if ((user && !loading) || state.disableRegistration) window.location.replace('/')
   }, [user])
 
   async function onRegister (ev) {
@@ -38,8 +38,6 @@ export function register () {
       setSubmitting(false)
     }
   }
-
-  console.log({ user, hasUser: Boolean(user) })
 
   return html`
     <div>
@@ -70,9 +68,6 @@ export function register () {
         <div class="error-box"></div>
       </fieldset>
     </form>
-  </div>
-  <div>
-    <a href='/'>Log in</a>
   </div>
   ${userError
     ? html`<div>${userError?.message}</div>`
