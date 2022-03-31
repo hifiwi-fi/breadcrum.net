@@ -28,7 +28,7 @@ const schema = {
       type: 'string',
       default: 'breadcrum'
     },
-    PG_CONNECTION_STRING: {
+    DATABASE_URL: {
       type: 'string',
       default: 'postgres://postgres@localhost/breadcrum'
     },

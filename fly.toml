@@ -1,0 +1,59 @@
+# fly.toml file generated for breadcrum on 2022-03-30T19:41:08-07:00
+
+app = "breadcrum"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[build]
+  builder = "heroku/buildpacks:20"
+
+[env]
+  PORT = "8080"
+  FASTIFY_ADDRESS = '0.0.0.0'
+  FASTIFY_LOG_LEVEL = 'info'
+  FASTIFY_OPTIONS = 'true'
+
+[deploy]
+  release_command = "npm run migrate -- --database=$DB_NAME --host=$DB_HOSTNAME --port=$DB_PORT --username=$DB_USERNAME --password=$DB_PASSWORD --no-config"
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  http_checks = []
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
+
+  [[services.http_checks]]
+    interval = 10000
+    grace_period = "5s"
+    method = "get"
+    path = "/health"
+    protocol = "http"
+    timeout = 2000
+    tls_skip_verify = false

@@ -37,7 +37,9 @@
     "local-storage-proxy": "^4.0.2",
     "mine.css": "^5.0.2",
     "pg": "^8.6.0",
-    "uland-isomorphic": "^1.0.0"
+    "uland-isomorphic": "^1.0.0",
+    "postgrator": "^7.0.0",
+    "postgrator-cli": "^5.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
@@ -45,8 +47,6 @@
     "dependency-cruiser": "^11.0.0",
     "gh-release": "^6.0.0",
     "npm-run-all2": "^5.0.0",
-    "postgrator": "^7.0.0",
-    "postgrator-cli": "^5.0.0",
     "snazzy": "^9.0.0",
     "sodium-native": "^3.2.1",
     "standard": "^16.0.3",
@@ -87,7 +87,7 @@
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
-    "watch:server": "fastify start -w -l info -P -p 3000 app.js --options",
+    "watch:server": "fastify start -w -l info -P -p 3000 --options --address localhost app.js",
     "watch:siteup": "npm run build:siteup -- --watch"
   },
   "standard": {

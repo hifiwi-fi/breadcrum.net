@@ -1,7 +1,7 @@
 import { html } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useLSP } from '../hooks/useLSP'
+import { useLSP } from '../hooks/useLSP.js'
 
 export function header () {
   const { user, loading } = useUser()
