@@ -41,7 +41,6 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
         publish_cmd: npm run release
     - uses: superfly/flyctl-actions/setup-flyctl@master
-    - run: which fly
     - run: flyctl deploy --remote-only
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
