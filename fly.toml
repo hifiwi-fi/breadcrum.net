@@ -14,9 +14,12 @@ processes = []
   FASTIFY_ADDRESS = '0.0.0.0'
   FASTIFY_LOG_LEVEL = 'info'
   FASTIFY_OPTIONS = 'true'
+  ENV = 'production'
+  NODE_ENV = 'production'
+  DOMAIN = 'bredcrum.net'
 
 [deploy]
-  release_command = "npm run migrate"
+  release_command = "npm run migrate -- --no-config"
 
 [experimental]
   allowed_public_ports = []

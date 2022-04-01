@@ -76,10 +76,9 @@ export default fp(async function (fastify, opts) {
       token,
       {
         expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-        domain: fastify.config.DOMAIN,
         path: '/',
-        secure: fastify.config.DOMAIN !== 'localhost',
-        sameSite: fastify.config.DOMAIN !== 'localhost',
+        secure: fastify.config.ENV !== 'development',
+        sameSite: fastify.config.ENV !== 'development',
         httpOnly: true,
         signed: true
       }
@@ -93,8 +92,7 @@ export default fp(async function (fastify, opts) {
     this.clearCookie(
       fastify.config.COOKIE_NAME,
       {
-        path: '/',
-        domain: fastify.config.DOMAIN
+        path: '/'
       }
     )
   })
