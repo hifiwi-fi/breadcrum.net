@@ -25,6 +25,14 @@ processes = []
   allowed_public_ports = []
   auto_rollback = true
 
+[metrics]
+  port = 9091 # default for most prometheus clients
+  path = "/metrics" # default for most prometheus clients
+
+[[statics]]
+  guest_path = "/app/public"
+  url_prefix = "/"
+
 [[services]]
   internal_port = 8080
   processes = ["app"]
