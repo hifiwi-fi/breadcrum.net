@@ -17,6 +17,7 @@ processes = []
   ENV = 'production'
   NODE_ENV = 'production'
   DOMAIN = 'bredcrum.net'
+  REGISTRATION = 'disabled'
 
 [deploy]
   release_command = "npm run migrate -- --no-config"

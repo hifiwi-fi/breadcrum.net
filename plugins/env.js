@@ -35,6 +35,10 @@ const schema = {
     DOMAIN: {
       type: 'string',
       default: 'localhost'
+    },
+    REGISTRATION: {
+      type: 'string',
+      default: 'enabled'
     }
   }
 }

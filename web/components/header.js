@@ -4,7 +4,7 @@ import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
 
 export function header () {
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
 
@@ -18,9 +18,7 @@ export function header () {
       ${user ? html`<div>(${user.username})</div>` : null}
     </div>
     <div class="bc-header-end">
-      ${loading
-        ? html`<div>...</div>`
-        : !user
+      ${!user
           ? html`
             ${
               window?.location?.pathname !== '/login/'

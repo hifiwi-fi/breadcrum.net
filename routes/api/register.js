@@ -40,6 +40,12 @@ export default async function registerRoutes (fastify, opts) {
       }
     },
     async (request, reply) => {
+      if (fastify.config.REGISTRATION !== 'enabled') {
+        reply.code(403)
+        return {
+          error: 'Registration is closed. Please try again later.'
+        }
+      }
       const { username, email, password } = request.body
 
       // TODO: ensure not a duplicate user

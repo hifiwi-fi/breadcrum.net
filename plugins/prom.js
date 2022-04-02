@@ -34,7 +34,11 @@ export default fp(async function (fastify, opts) {
       process.exit(1)
     }
   }
-  await start()
+
+  fastify.addHook('onClose', async (instance) => {
+    await promServer.close()
+  })
+  if (fastify.config.ENV === 'production') { await start() }
 },
 {
   name: 'prom',
