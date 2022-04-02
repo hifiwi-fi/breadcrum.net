@@ -9,7 +9,11 @@ export function register () {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if ((user && !loading) || state.disableRegistration) window.location.replace('/')
+    if (state.disableRegistration) window.location.replace('/')
+  }, [state.disableRegistration])
+
+  useEffect(() => {
+    if ((user && !loading)) window.location.replace('/bookmarks')
   }, [user])
 
   async function onRegister (ev) {

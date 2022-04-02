@@ -9,7 +9,7 @@ export function loginPage () {
   const [loggingIn, setLoggingIn] = useState(false)
 
   useEffect(() => {
-    if (user && !loading) window.location.replace('/')
+    if (user && !loading) window.location.replace('/bookmarks')
   }, [user])
 
   async function login (ev) {
@@ -77,11 +77,6 @@ export function loginPage () {
     ${userError
       ? html`<div>${JSON.stringify(userError, null, ' ')}</div>`
       : null
-    }
-    ${
-      loading
-        ? html`<div>loading</div>`
-        : null
     }
 `
 }

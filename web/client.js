@@ -1,9 +1,13 @@
 /* eslint-env browser */
-import { html, render } from 'uland-isomorphic'
+import { html, render, useEffect } from 'uland-isomorphic'
 import { useUser } from './hooks/useUser.js'
 
 export function homepage () {
-  const { user } = useUser()
+  const { user, loading } = useUser()
+
+  useEffect(() => {
+    if (user && !loading) window.location.replace('/bookmarks')
+  }, [user])
 
   return html`
     <div class="bc-placeholder">

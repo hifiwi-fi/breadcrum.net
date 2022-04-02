@@ -6,7 +6,8 @@ export default function defaultRootLayout ({
   siteName = 'breadcrum.net',
   scripts,
   styles,
-  children
+  children,
+  version
 }) {
   return render(String, html`
     <!DOCTYPE html>
@@ -41,7 +42,12 @@ export default function defaultRootLayout ({
             <a href="https://github.com/hifiwi-fi/breadcrum.net/">
               AGPL-3.0-or-later
             </a>
-        </div>
+          </div>
+          <div>
+            <a href="https://github.com/hifiwi-fi/breadcrum.net/releases/tag/v${version}">
+              v${version}
+            </a>
+          </div>
         </footer>
       </div>
     </body>

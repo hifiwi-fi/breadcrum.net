@@ -4,6 +4,7 @@
 
 :root {
   --body-padding: 2px;
+  --small-font-size: 13px;
 }
 
 /* style.css site specific stuff */
@@ -36,10 +37,16 @@ _::-webkit-full-page-media, _:future, :root .bc-page-container {
 .bc-header-nav {
   display: flex;
   justify-content: space-between;
+  font-size: var(--small-font-size);
+}
+
+.bc-logo {
+  font-size: calc(var(--font-size-body) + var(--font-size-scale));
 }
 
 .bc-header-start,.bc-header-end {
   display: flex;
+  align-items: center;
   gap: 0.2em;
 }
 
@@ -64,6 +71,6 @@ _::-webkit-full-page-media, _:future, :root .bc-page-container {
   display: flex;
   justify-content: center;
   gap: 1em;
-  font-size: 0.6em;
+  font-size: var(--small-font-size);
   border-top: dotted 1px var(--accent-midground);
 }

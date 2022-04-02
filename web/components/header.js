@@ -11,7 +11,7 @@ export function header () {
   return html`
   <nav class="bc-header-nav">
     <div class="bc-header-start">
-      <div class="round">
+      <div class="bc-logo round">
         <span>🥖 </span>
         <a href="/">Breadcrum</a>
       </div>
@@ -46,6 +46,7 @@ export function header () {
                 : null
             }`
           : html`
+            <div><a href='/bookmarks'>bookmarks</a></div>
             <div><a href='/logout'>logout</a></div>`
       }
 
