@@ -1,76 +1,169 @@
 import SQL from '@nearform/sql'
-import S from 'fluent-json-schema'
 
-const newUserJsonSchema = S.object()
-  .prop('username',
-    S.string()
-      .minLength(1)
-      .maxLength(50)
-      .pattern('^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$')
-  ).required()
-  .prop('email',
-    S.string()
-      .format('email')
-      .pattern("^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$") // eslint-disable-line no-useless-escape
-  ).required()
-  .prop('password',
-    S.string()
-      .minLength(8)
-      .maxLength(50)
-  ).required()
+const commnonBookmarkProps = {
+  url: { type: 'string', format: 'uri' },
+  title: { type: 'string' },
+  note: { type: 'string' },
+  starred: { type: 'boolean' },
+  toread: { type: 'boolean' },
+  sensitive: { type: 'boolean' }
+}
 
-const createdUserJsonSchema = S.object()
-  .prop('token', S.string())
-  .prop('user', S.object()
-    .prop('id', S.string().format('uuid'))
-    .prop('email', S.string().format('email'))
-    .prop('email_confirmed', S.boolean())
-    .prop('username', S.string())
-  )
+const fullBookmarkProps = {
+  id: { type: 'string', format: 'uuid' },
+  ...commnonBookmarkProps,
+  created_at: { type: 'string', format: 'date-time' },
+  updated_at: { type: 'string', format: 'date-time' }
+}
 
 export default async function registerRoutes (fastify, opts) {
-  fastify.post(
-    '/register',
+  fastify.get(
+    '/bookmarks',
     {
+      preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
-        body: newUserJsonSchema,
         response: {
-          201: createdUserJsonSchema
+          200: {
+            type: 'object',
+            properties: {
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    ...fullBookmarkProps
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+    },
+    async (request, reply) => {
+      const id = request.user.id
+
+      const query = SQL`
+      SELECT id, url, title, note, created_at, updated_at, toread, sensitive
+        FROM bookmarks
+        WHERE owner_id = ${id}
+      `
+
+      const results = await fastify.pg.query(query)
+
+      return {
+        data: results.rows
+      }
+    }
+  )
+
+  // Create (update?) bookmark
+  fastify.put(
+    '/bookmarks',
+    {
+      preHandler: fastify.auth([fastify.verifyJWT]),
+      schema: {
+        body: {
+          type: 'object',
+          properties: {
+            ...commnonBookmarkProps
+          },
+          required: ['url']
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string' },
+              site_url: { type: 'string' }
+            }
+          }
         }
       }
     },
     async (request, reply) => {
-      if (fastify.config.REGISTRATION !== 'enabled') {
-        reply.code(403)
-        return {
-          error: 'Registration is closed. Please try again later.'
-        }
-      }
-      const { username, email, password } = request.body
-
-      // TODO: ensure not a duplicate user
+      const userId = request.user.id
+      const { url, title, note, toread, sensitive } = request.body
 
       const query = SQL`
-      INSERT INTO users (username, email, password) VALUES (
-        ${username},
-        ${email},
-        crypt(${password}, gen_salt('bf'))
+      INSERT INTO bookmarks (url, title, toread, sensitive, owner_id) VALUES (
+        ${url},
+        ${title},
+        ${note},
+        ${toread},
+        ${sensitive}
+        ${userId}
       )
-      RETURNING id, email, username, email_confirmed;
-      `
+      RETURNING id;`
 
       const results = await fastify.pg.query(query)
-      const user = results.rows[0]
+      const bookmark = results.rows[0]
 
-      const token = await reply.createJWTToken(user)
-      reply.setJWTCookie(token)
-
-      reply.code(201)
-      // TODO: ensure this user matches login/user object
       return {
-        token,
-        user
+        status: 'ok',
+        site_url: `https://${fastify.config.domain}/bookmarks/b?id=${bookmark.id}`
       }
     }
   )
+
+  fastify.get('/bookmarks/:id', {
+    preHandler: fastify.auth([fastify.verifyJWT]),
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' }
+        },
+        required: ['id']
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            ...fullBookmarkProps
+          }
+        }
+      }
+    }
+  },
+  async (request, reply) => {
+    const userId = request.user.id
+    const { id: bookmarkId } = request.parms
+
+    const query = SQL`
+      SELECT id, url, title, note, toread, sensitive, created_at, updated_at
+        FROM bookmarks
+        WHERE owner_id = ${userId}
+          AND id = ${bookmarkId}
+        LIMIT 1;
+      `
+
+    const results = await fastify.pg.query(query)
+    const bookmark = results.rows[0]
+
+    return {
+      ...bookmark
+    }
+  })
+
+  fastify.put('/bookmarks/:id', {
+    preHandler: fastify.auth([fastify.verifyJWT]),
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' }
+        },
+        required: ['id']
+      },
+      body: {
+        type: 'object',
+        properties: {
+          ...commnonBookmarkProps
+        },
+        required: ['url']
+      }
+    }
+  })
 }

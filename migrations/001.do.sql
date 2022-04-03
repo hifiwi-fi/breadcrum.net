@@ -65,7 +65,9 @@ CREATE TABLE bookmarks (
   note text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz,
+  starred BOOLEAN NOT NULL DEFAULT false,
   toread BOOLEAN NOT NULL DEFAULT false,
+  sensitive BOOLEAN NOT NULL DEFAULT false,
   owner_id UUID NOT NULL,
   UNIQUE (owner_id, url),
 
