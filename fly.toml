@@ -16,7 +16,7 @@ processes = []
   FASTIFY_OPTIONS = 'true'
   ENV = 'production'
   NODE_ENV = 'production'
-  DOMAIN = 'bredcrum.net'
+  DOMAIN = 'breadcrum.net'
   REGISTRATION = 'disabled'
 
 [deploy]
