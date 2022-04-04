@@ -73,7 +73,7 @@
     "clean": "rimraf public && mkdirp public",
     "deps": "depcruise --exclude '^node_modules|^[a-zA-Z0-9\\_]+$' --output-type dot . | dot -T svg > dependencygraph.svg",
     "migrate": "postgrator",
-    "prod-migrate": "postgrator 0 --no-config && postgrator --no-config",
+    "prod-migrate": "postgrator --no-config",
     "prepare": "npm run build",
     "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prod-sim": "fastify start -l info app.js --address 0.0.0.0",
