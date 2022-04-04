@@ -34,6 +34,8 @@ export function addBookmarkPage () {
         credentials: 'include'
       })
 
+      console.log(response)
+
       window.location.replace('/bookmarks')
     } catch (err) {
       console.log(err)
