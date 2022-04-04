@@ -15,15 +15,18 @@
 .bc-page-container {
   /* https://dev-tips.com/css/overlapping-bottom-navigation-bar-despite-100vh-in-ios-safari */
   min-height: 100vh; /* Fallback */
+  min-height: 100dvh;
   /* min-height: fill-available; */
   /* min-height: stretch; /* Latest specification */
   display: flex;
   flex-direction: column;
 }
 
-_::-webkit-full-page-media, _:future, :root .bc-page-container {
-  /* Safari min height hack  */
-  min-height: -webkit-fill-available;
+@supports not (min-height: 100dvh) {
+  _::-webkit-full-page-media, _:future, :root .bc-page-container {
+    /* Safari min height hack  */
+    min-height: -webkit-fill-available;
+  }
 }
 
 .bc-header {
