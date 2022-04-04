@@ -43,6 +43,7 @@ CREATE TABLE auth_tokens (
   jti UUID PRIMARY KEY NOT NULL,
   owner_id UUID NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
+  last_seen timestamptz NOT NULL DEFAULT now(),
   user_agent text,
   ip inet,
 
@@ -61,7 +62,7 @@ EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TABLE bookmarks (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v1mc(),
   url text NOT NULL,
-  title text CHECK(char_length(title) <= 255),
+  title text CHECK ( char_length(title) > 0 ) CHECK(char_length(title) <= 255),
   note text,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz,

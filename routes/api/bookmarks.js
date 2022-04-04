@@ -6,7 +6,18 @@ const commnonBookmarkProps = {
   note: { type: 'string' },
   starred: { type: 'boolean' },
   toread: { type: 'boolean' },
-  sensitive: { type: 'boolean' }
+  sensitive: { type: 'boolean' },
+  tags: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', format: 'uuid' },
+        name: { type: 'string', minLength: 1, maxLength: 255 }
+      },
+      required: ['name']
+    }
+  }
 }
 
 const fullBookmarkProps = {
@@ -58,7 +69,7 @@ export default async function registerRoutes (fastify, opts) {
     }
   )
 
-  // Create (update?) bookmark
+  // Create bookmark
   fastify.put(
     '/bookmarks',
     {
@@ -72,7 +83,7 @@ export default async function registerRoutes (fastify, opts) {
           required: ['url']
         },
         response: {
-          200: {
+          201: {
             type: 'object',
             properties: {
               status: { type: 'string' },
@@ -83,27 +94,62 @@ export default async function registerRoutes (fastify, opts) {
       }
     },
     async (request, reply) => {
-      const userId = request.user.id
-      const { url, title, note, toread, sensitive } = request.body
+      return fastify.pg.transact(async client => {
+        const userId = request.user.id
+        const { url, title, note, toread, sensitive, tags = [] } = request.body
 
-      const query = SQL`
-      INSERT INTO bookmarks (url, title, toread, sensitive, owner_id) VALUES (
-        ${url},
-        ${title},
-        ${note},
-        ${toread},
-        ${sensitive}
-        ${userId}
-      )
-      RETURNING id;`
+        console.log(url, title, note, toread, sensitive, tags)
 
-      const results = await fastify.pg.query(query)
-      const bookmark = results.rows[0]
+        const createBookmark = SQL`
+        INSERT INTO bookmarks (url, title, note, toread, sensitive, owner_id) VALUES (
+          ${url},
+          ${title},
+          ${note},
+          ${toread || false},
+          ${sensitive || false},
+          ${userId}
+        )
+        RETURNING id, url, title, toread, sensitive, owner_id;`
 
-      return {
-        status: 'ok',
-        site_url: `https://${fastify.config.domain}/bookmarks/b?id=${bookmark.id}`
-      }
+        const results = await client.query(createBookmark)
+        const bookmark = results.rows[0]
+
+        if (tags.length > 0) {
+          const createTags = SQL`
+          INSERT INTO tags (name, owner_id)
+          VALUES
+             ${SQL.glue(
+                tags.map(tag => SQL`(${tag.name},${userId})`),
+                ' , '
+              )}
+          ON CONFLICT (name, owner_id)
+          DO NOTHING
+          returning id, name, created_at, updated_at;
+          `
+
+          console.log(createTags)
+
+          const tagsResults = await client.query(createTags)
+
+          const applyTags = SQL`
+          INSERT INTO bookmarks_tags (bookmark_id, tag_id)
+          VALUES
+            ${SQL.glue(
+              tagsResults.rows.map(tag => SQL`(${bookmark.id},${tag.id})`),
+              ' , '
+            )};
+          `
+
+          console.log(applyTags)
+
+          await client.query(applyTags)
+        }
+
+        return {
+          status: 'ok',
+          site_url: `https://${fastify.config.domain}/bookmarks/b?id=${bookmark.id}`
+        }
+      })
     }
   )
 
@@ -165,5 +211,8 @@ export default async function registerRoutes (fastify, opts) {
         required: ['url']
       }
     }
+  },
+  async (request, reply) => {
+    throw new Error('Not implemented')
   })
 }
