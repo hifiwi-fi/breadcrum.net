@@ -60,6 +60,8 @@ export default async function bookmarkRoutes (fastify, opts) {
           GROUP BY bt.bookmark_id
         ) t using (id)
         WHERE owner_id = ${id}
+        ORDER BY
+          created_at DESC;
       `
 
       const results = await fastify.pg.query(query)

@@ -1,13 +1,22 @@
 /* eslint-env browser */
-import { html, render, useEffect, useState } from 'uland-isomorphic'
+import { html, render, useEffect, useState, useRef } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useQuery } from '../../hooks/useQuery.js'
 
 export function addBookmarkPage () {
   const state = useLSP()
   const { user, loading } = useUser()
   const [saving, setSaving] = useState(false)
+  const query = useQuery()
+  const formRef = useRef()
+
+  useEffect(() => {
+    formRef.current.url.value = query.get('url')
+    formRef.current.title.value = query.get('title')
+    formRef.current.note.value = query.get('description')
+  }, [])
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
@@ -47,7 +56,7 @@ export function addBookmarkPage () {
 
   return html`
     <div>
-      <form class="add-bookmark-form" id="add-bookmark-form" onsubmit=${addBookmark}>
+      <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onsubmit=${addBookmark}>
         <fieldset ?disabled=${saving}>
           <legend>New bookmark:</legend>
           <div>
