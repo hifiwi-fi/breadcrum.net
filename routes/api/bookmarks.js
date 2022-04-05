@@ -8,7 +8,7 @@ const commnonBookmarkProps = {
   toread: { type: 'boolean' },
   sensitive: { type: 'boolean' },
   tags: {
-    type: 'array',
+    type: ['array', 'null'],
     items: {
       type: 'string', minLength: 1, maxLength: 255
     }
