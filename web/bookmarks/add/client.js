@@ -22,7 +22,7 @@ export function addBookmarkPage () {
     const note = ev.currentTarget.note.value
     const rawTags = ev.currentTarget.tags.value
 
-    const tags = rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t)).map(t => ({ name: t }))
+    const tags = rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))
 
     try {
       const response = await fetch(`${state.apiUrl}/bookmarks`, {
@@ -34,9 +34,10 @@ export function addBookmarkPage () {
         credentials: 'include'
       })
 
-      console.log(response)
-
-      window.location.replace('/bookmarks')
+      console.log(await response.text())
+      if (response.ok) {
+        window.location.replace('/bookmarks')
+      }
     } catch (err) {
       console.log(err)
     } finally {

@@ -10,6 +10,7 @@ export function bookmarksPage () {
   const [bookmarks, setBookmarks] = useState()
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(null)
+  const [dataReload, setDataReload] = useState(0)
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
@@ -45,7 +46,22 @@ export function bookmarksPage () {
         .catch(err => { console.error(err); setBookmarksError(err) })
         .finally(() => { setBookmarksLoading(false) })
     }
-  }, [])
+  }, [dataReload])
+
+  async function deleteBookmark (id, ev) {
+    console.log(id, ev)
+    const controller = new AbortController()
+    const response = await fetch(`${state.apiUrl}/bookmarks/${id}`, {
+      method: 'delete',
+      headers: {
+        'accept-encoding': 'application/json'
+      },
+      signal: controller.signal,
+      credentials: 'include'
+    })
+    setDataReload(dataReload + 1)
+    console.log(await response.json())
+  }
 
   return html`
     <div>
@@ -64,6 +80,8 @@ export function bookmarksPage () {
         <div>starred: ${b.starred}</div>
         <div>toread: ${b.toread}</div>
         <div>sensitive: ${b.sensitive}</div>
+        <div>tags: ${b.tags}</div>
+        <div><button onClick=${deleteBookmark.bind(null, b.id)}>delete</button></div>
       </div>
     `)
 : null}
