@@ -16,6 +16,7 @@ export function addBookmarkPage () {
     formRef.current.url.value = query.get('url')
     formRef.current.title.value = query.get('title')
     formRef.current.note.value = query.get('description')
+    formRef.current.tags.value = query.getAll('tags').join(' ')
   }, [])
 
   useEffect(() => {
