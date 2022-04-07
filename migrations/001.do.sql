@@ -121,3 +121,26 @@ CREATE TABLE bookmarks_tags (
 );
 CREATE INDEX idx_bookmarks_tags_bookmarks_id ON bookmarks_tags(bookmark_id);
 CREATE INDEX idx_bookmarks_tags_tags_id ON bookmarks_tags(tag_id);
+
+CREATE OR REPLACE FUNCTION prune_tags()
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM tags
+    WHERE id IN (
+      SELECT id FROM tags
+      LEFT OUTER JOIN bookmarks_tags on tags.id = bookmarks_tags.tag_id
+      WHERE bookmarks_tags.tag_id is null
+        AND owner_id = (
+          SELECT owner_id
+          FROM tags
+          WHERE OLD.tag_id = id
+        )
+      );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prune_tags
+  AFTER DELETE on bookmarks_tags
+  FOR EACH ROW
+  EXECUTE PROCEDURE prune_tags();
