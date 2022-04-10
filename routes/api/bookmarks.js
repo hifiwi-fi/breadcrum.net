@@ -42,6 +42,7 @@ export default async function bookmarkRoutes (fastify, opts) {
             per_page: {
               type: 'integer',
               minimum: 1,
+              maximum: 200,
               default: 20
             }
           },
