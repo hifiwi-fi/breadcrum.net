@@ -101,7 +101,7 @@ export function bookmarksPage () {
   : null}
   <div>
     ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before}`)}>earlier</a>` : null}
-    ${after ? html`<span href=${'./?' + new URLSearchParams(`after=${after}`)}>later</span>` : null}
+    ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after}`)}>later</span>` : null}
   <div>
 `
 }

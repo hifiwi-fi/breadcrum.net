@@ -38,6 +38,11 @@ export default async function bookmarkRoutes (fastify, opts) {
             after: {
               type: 'string',
               format: 'date-time'
+            },
+            per_page: {
+              type: 'integer',
+              minimum: 1,
+              default: 20
             }
           },
           dependencies: {
@@ -62,7 +67,9 @@ export default async function bookmarkRoutes (fastify, opts) {
                 type: 'object',
                 properties: {
                   before: { type: 'string', format: 'date-time' },
-                  after: { type: 'string', format: 'date-time' }
+                  after: { type: 'string', format: 'date-time' },
+                  top: { type: 'boolean' },
+                  bottom: { type: 'boolean' }
                 }
               }
             }
@@ -73,21 +80,42 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async (request, reply) => {
       const id = request.user.id
-      let { before, after } = request.query
-      let top = false
+      let { before, after, per_page: perPage } = request.query
 
-      if (after) { throw new Error('after not yet implemented') }
-      if (!before) {
+      let top = false
+      let bottom = false
+
+      if (after) {
+        // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
+        // and we need to get the item before the next 'before' set.
+        const perPageAfterOffset = perPage + 2
+
+        const afterCalcQuery = SQL`
+          SELECT id, url, title, created_at
+          FROM bookmarks
+          WHERE owner_id = ${id}
+            AND created_at > ${after}
+          ORDER BY
+            created_at ASC, title ASC, url ASC
+          FETCH FIRST ${perPageAfterOffset} ROWS ONLY;
+        `
+        const results = await fastify.pg.query(afterCalcQuery)
+
+        if (results.rows.length !== perPageAfterOffset) {
+          top = true
+          before = (new Date()).toISOString()
+        } else {
+          before = results.rows.at(-1)?.created_at
+        }
+      }
+
+      if (!before && !after) {
         top = true
         before = (new Date()).toISOString()
       }
 
-      console.log({ after, before })
-
-      const perPage = 40
-
       const query = SQL`
-      SELECT id, url, title, note, created_at, updated_at, toread, sensitive, t.tag_array as tags
+        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, t.tag_array as tags
         FROM bookmarks
         LEFT OUTER JOIN(
           SELECT bt.bookmark_id as id, jsonb_agg(t.name) as tag_array
@@ -104,13 +132,18 @@ export default async function bookmarkRoutes (fastify, opts) {
 
       const results = await fastify.pg.query(query)
 
-      const nextPage = results.rows.length === perPage ? results.rows.at(-1).created_at : null
+      if (results.rows.length !== perPage) bottom = true
+
+      const nextPage = bottom ? null : results.rows.at(-1).created_at
+      const prevPage = top ? null : results.rows[0]?.created_at || before
 
       return {
         data: results.rows,
         pagination: {
           before: nextPage,
-          after: !top && results.rows[0]?.created_at ? results.rows[0]?.created_at : null
+          after: prevPage,
+          top,
+          bottom
         }
       }
     }
