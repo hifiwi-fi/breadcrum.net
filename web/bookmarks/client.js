@@ -3,6 +3,7 @@ import { html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
+import { useWindow } from '../hooks/useWindow.js'
 
 export function bookmarksPage () {
   const state = useLSP()
@@ -11,6 +12,9 @@ export function bookmarksPage () {
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(null)
   const [dataReload, setDataReload] = useState(0)
+  const [before, setBefore] = useState()
+  const [after, setAfter] = useState()
+  const window = useWindow()
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
@@ -23,7 +27,15 @@ export function bookmarksPage () {
       console.log('getting bookmarks')
       setBookmarksLoading(true)
       setBookmarksError(null)
-      const response = await fetch(`${state.apiUrl}/bookmarks`, {
+      const pageParams = new URLSearchParams(window.location.search)
+      const requestParams = new URLSearchParams()
+
+      if (pageParams.get('before')) {
+        requestParams.set('before', pageParams.get('before'))
+      } else if (pageParams.get('after')) {
+        requestParams.set('after', pageParams.get('after'))
+      }
+      const response = await fetch(`${state.apiUrl}/bookmarks?${requestParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
@@ -35,6 +47,8 @@ export function bookmarksPage () {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
         setBookmarks(body?.data)
+        setBefore(body?.pagination?.before)
+        setAfter(body?.pagination?.after)
       } else {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
@@ -84,7 +98,11 @@ export function bookmarksPage () {
         <div><button onClick=${deleteBookmark.bind(null, b.id)}>delete</button></div>
       </div>
     `)
-: null}
+  : null}
+  <div>
+    ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before}`)}>earlier</a>` : null}
+    ${after ? html`<span href=${'./?' + new URLSearchParams(`after=${after}`)}>later</span>` : null}
+  <div>
 `
 }
 

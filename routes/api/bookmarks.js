@@ -28,6 +28,23 @@ export default async function bookmarkRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        querystring: {
+          type: 'object',
+          properties: {
+            before: {
+              type: 'string',
+              format: 'date-time'
+            },
+            after: {
+              type: 'string',
+              format: 'date-time'
+            }
+          },
+          dependencies: {
+            before: { allOf: [{ not: { required: ['after'] } }] },
+            after: { allOf: [{ not: { required: ['before'] } }] }
+          }
+        },
         response: {
           200: {
             type: 'object',
@@ -40,6 +57,13 @@ export default async function bookmarkRoutes (fastify, opts) {
                     ...fullBookmarkProps
                   }
                 }
+              },
+              pagination: {
+                type: 'object',
+                properties: {
+                  before: { type: 'string', format: 'date-time' },
+                  after: { type: 'string', format: 'date-time' }
+                }
               }
             }
           }
@@ -49,6 +73,18 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async (request, reply) => {
       const id = request.user.id
+      let { before, after } = request.query
+      let top = false
+
+      if (after) { throw new Error('after not yet implemented') }
+      if (!before) {
+        top = true
+        before = (new Date()).toISOString()
+      }
+
+      console.log({ after, before })
+
+      const perPage = 40
 
       const query = SQL`
       SELECT id, url, title, note, created_at, updated_at, toread, sensitive, t.tag_array as tags
@@ -60,14 +96,22 @@ export default async function bookmarkRoutes (fastify, opts) {
           GROUP BY bt.bookmark_id
         ) t using (id)
         WHERE owner_id = ${id}
+          AND created_at < ${before}
         ORDER BY
-          created_at DESC;
+          created_at DESC, title DESC, url DESC
+        FETCH FIRST ${perPage} ROWS ONLY;
       `
 
       const results = await fastify.pg.query(query)
 
+      const nextPage = results.rows.length === perPage ? results.rows.at(-1).created_at : null
+
       return {
-        data: results.rows
+        data: results.rows,
+        pagination: {
+          before: nextPage,
+          after: !top && results.rows[0]?.created_at ? results.rows[0]?.created_at : null
+        }
       }
     }
   )
