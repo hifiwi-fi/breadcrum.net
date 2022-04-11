@@ -28,14 +28,8 @@ export function bookmarksPage () {
       setBookmarksLoading(true)
       setBookmarksError(null)
       const pageParams = new URLSearchParams(window.location.search)
-      const requestParams = new URLSearchParams()
 
-      if (pageParams.get('before')) {
-        requestParams.set('before', pageParams.get('before'))
-      } else if (pageParams.get('after')) {
-        requestParams.set('after', pageParams.get('after'))
-      }
-      const response = await fetch(`${state.apiUrl}/bookmarks?${requestParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
