@@ -92,21 +92,38 @@ export default async function bookmarkRoutes (fastify, opts) {
         const perPageAfterOffset = perPage + 2
 
         const afterCalcQuery = SQL`
-          SELECT id, url, title, created_at
-          FROM bookmarks
-          WHERE owner_id = ${id}
-            AND created_at > ${after}
-          ORDER BY
-            created_at ASC, title ASC, url ASC
-          FETCH FIRST ${perPageAfterOffset} ROWS ONLY;
+          WITH page as (
+            SELECT id, url, title, created_at
+            FROM bookmarks
+                WHERE owner_id = ${id}
+                  AND created_at >= ${after}
+                ORDER BY
+                  created_at ASC, title ASC, url ASC
+                FETCH FIRST ${perPageAfterOffset} ROWS ONLY
+          )
+
+          SELECT COUNT(*)::int as bookmark_count, last_created_at
+          FROM (
+            SELECT LAST_VALUE(page.created_at) OVER (
+                  ORDER BY page.created_at
+                  RANGE BETWEEN
+                      UNBOUNDED PRECEDING AND
+                      UNBOUNDED FOLLOWING
+              ) last_created_at
+            FROM page
+          ) as bookmark_with_last_row_date
+          GROUP BY last_created_at
         `
+
         const results = await fastify.pg.query(afterCalcQuery)
 
-        if (results.rows.length !== perPageAfterOffset) {
+        const { bookmark_count: bookmarkCount, last_created_at: lastCreatedAt } = results.rows.pop()
+
+        if (bookmarkCount !== perPageAfterOffset) {
           top = true
           before = (new Date()).toISOString()
         } else {
-          before = results.rows.at(-1)?.created_at
+          before = lastCreatedAt
         }
       }
 
