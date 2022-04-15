@@ -49,8 +49,15 @@
 
 .bc-header-start,.bc-header-end {
   display: flex;
-  align-items: center;
   gap: 0.2em;
+}
+
+.bc-header-start {
+  align-items: baseline;
+}
+
+.bc-header-end {
+  align-items: center;
 }
 
 .bc-main {

@@ -100,10 +100,8 @@ export default async function bookmarkRoutes (fastify, opts) {
                 ORDER BY
                   created_at ASC, title ASC, url ASC
                 FETCH FIRST ${perPageAfterOffset} ROWS ONLY
-          )
-
-          SELECT COUNT(*)::int as bookmark_count, last_created_at
-          FROM (
+          ),
+          bookmark_with_last_row_date as (
             SELECT LAST_VALUE(page.created_at) OVER (
                   ORDER BY page.created_at
                   RANGE BETWEEN
@@ -111,7 +109,9 @@ export default async function bookmarkRoutes (fastify, opts) {
                       UNBOUNDED FOLLOWING
               ) last_created_at
             FROM page
-          ) as bookmark_with_last_row_date
+          )
+          SELECT COUNT(*)::int as bookmark_count, last_created_at
+          FROM bookmark_with_last_row_date
           GROUP BY last_created_at
         `
 

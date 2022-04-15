@@ -11,11 +11,11 @@ export function header () {
   return html`
   <nav class="bc-header-nav">
     <div class="bc-header-start">
-      <div class="bc-logo round">
+      <span class="bc-logo round">
         <span>🥖 </span>
         <a href="/">Breadcrum</a>
-      </div>
-      ${user ? html`<div>(${user.username})</div>` : null}
+      </span>
+      ${user ? html`<span>(<a href='/account'>${user.username}</a>)</span>` : null}
     </div>
     <div class="bc-header-end">
       ${!user
@@ -46,8 +46,9 @@ export function header () {
                 : null
             }`
           : html`
-            <div><a href='/bookmarks'>bookmarks</a></div>
-            <div><a href='/logout'>logout</a></div>`
+            <div>🔖 <a href='/bookmarks'>bookmarks</a></div>
+            <div>🏷 <a href='/tags'>tags</a></div>
+            <div>· <a href='/logout'>logout</a></div>`
       }
 
     </div>
