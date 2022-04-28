@@ -38,7 +38,7 @@
     "mine.css": "^5.0.2",
     "pg": "^8.6.0",
     "postgrator": "^7.0.0",
-    "postgrator-cli": "^5.0.0",
+    "postgrator-cli": "^6.0.0",
     "uland-isomorphic": "^1.0.0"
   },
   "devDependencies": {
