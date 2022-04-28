@@ -50,7 +50,7 @@ const schema = {
  */
 export default fp(async function (fastify, opts) {
   fastify.register(import('fastify-env'), {
-    schema: schema,
+    schema,
     dotenv: true
   })
 }, {
