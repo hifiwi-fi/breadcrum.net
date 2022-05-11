@@ -39,7 +39,7 @@
     "pg": "^8.6.0",
     "postgrator": "^7.0.0",
     "postgrator-cli": "^6.0.0",
-    "uland-isomorphic": "^1.0.0"
+    "uland-isomorphic": "^2.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
