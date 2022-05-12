@@ -49,7 +49,7 @@ const schema = {
  * @see https://github.com/fastify/fastify-env
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('fastify-env'), {
+  fastify.register(import('@fastify/env'), {
     schema,
     dotenv: true
   })
