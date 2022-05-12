@@ -53,8 +53,8 @@
     "tap": "^16.0.0"
   },
   "engines": {
-    "node": "^17.5.0",
-    "npm": "^8.4.1"
+    "node": "^18.1.0",
+    "npm": "^8.10.0"
   },
   "funding": {
     "type": "individual",
