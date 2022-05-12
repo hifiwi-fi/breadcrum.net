@@ -8,7 +8,7 @@ import { randomUUID } from 'crypto'
  * @see https://github.com/fastify/fastify-jwt
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('fastify-jwt'), {
+  fastify.register(import('@fastify/jwt'), {
     secret: fastify.config.JWT_SECRET,
     cookie: {
       cookieName: fastify.config.COOKIE_NAME,

@@ -6,7 +6,7 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-compress
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('fastify-compress'))
+  fastify.register(import('@fastify/compress'))
 }, {
   name: 'compress'
 })
