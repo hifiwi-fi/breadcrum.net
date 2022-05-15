@@ -35,7 +35,7 @@
     "fragmentions": "^1.1.3",
     "highlight.js": "^11.5.0",
     "local-storage-proxy": "^4.0.2",
-    "mine.css": "^5.0.2",
+    "mine.css": "^6.0.1",
     "pg": "^8.6.0",
     "postgrator": "^7.0.0",
     "postgrator-cli": "^6.0.0",
