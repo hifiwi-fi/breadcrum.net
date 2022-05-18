@@ -4,6 +4,7 @@ import { useUser } from '../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
+import { bookmark } from '../components/bookmark.js'
 
 export function bookmarksPage () {
   const state = useLSP()
@@ -11,7 +12,7 @@ export function bookmarksPage () {
   const [bookmarks, setBookmarks] = useState()
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(null)
-  const [dataReload, setDataReload] = useState(0)
+  const [dataReload] = useState(0)
   const [before, setBefore] = useState()
   const [after, setAfter] = useState()
   const window = useWindow()
@@ -76,21 +77,6 @@ export function bookmarksPage () {
     }
   }, [dataReload])
 
-  async function deleteBookmark (id, ev) {
-    console.log(id, ev)
-    const controller = new AbortController()
-    const response = await fetch(`${state.apiUrl}/bookmarks/${id}`, {
-      method: 'delete',
-      headers: {
-        'accept-encoding': 'application/json'
-      },
-      signal: controller.signal,
-      credentials: 'include'
-    })
-    setDataReload(dataReload + 1)
-    console.log(await response.json())
-  }
-
   return html`
     <div>
       <a href="./add">add +</a>
@@ -98,23 +84,7 @@ export function bookmarksPage () {
     ${bookmarksLoading ? html`<div>Loading...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b)`
-      <div>
-        <div>
-          ${b.toread ? '⏀' : ''}
-          ${b.starred ? '★' : '☆'}
-          <a href="${b.url}" target="_blank">${b.title}</a>
-        </div>
-        <div><small><a href="${b.url}">${b.url}</a></small></div>
-        <div>note: ${b.note}</div>
-        <div>
-          <small>c: <time datetime="${b.created_at}">${(new Date(b.created_at)).toLocaleString()}</time></small>
-          ${b.updated_at ? html`<small>u: <time datetime="${b.updated_at}">${b.updated_at}</time>$}</small></div>` : null}
-        ${b.sensitive ? html`<div>'🤫'</div>` : null}
-        <div>tags: ${b.tags}</div>
-        <div><button onClick=${deleteBookmark.bind(null, b.id)}>delete</button></div>
-      </div>
-    `)
+      ? bookmarks.map(b => html.for(b, b.id)`${bookmark({ bookmark: b })}`)
   : null}
   <div>
     ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before.valueOf()}`)}>earlier</a>` : null}
