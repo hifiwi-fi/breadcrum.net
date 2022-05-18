@@ -29,6 +29,9 @@ export function bookmarksPage () {
       setBookmarksError(null)
       const pageParams = new URLSearchParams(window.location.search)
 
+      if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
+      if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+
       const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
         method: 'get',
         headers: {
@@ -41,8 +44,25 @@ export function bookmarksPage () {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
         setBookmarks(body?.data)
-        setBefore(body?.pagination?.before)
-        setAfter(body?.pagination?.after)
+        setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
+        setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
+        if (body?.pagination?.top) {
+          const newParams = new URLSearchParams(window.location.search)
+          let modified = false
+          if (newParams.get('before')) {
+            newParams.delete('before')
+            modified = true
+          }
+          if (newParams.get('after')) {
+            newParams.delete('after')
+            modified = true
+          }
+
+          if (modified) {
+            const qs = newParams.toString()
+            window.history.replaceState(null, null, qs ? `.?${qs}` : '.')
+          }
+        }
       } else {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
@@ -94,8 +114,8 @@ export function bookmarksPage () {
     `)
   : null}
   <div>
-    ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before}`)}>earlier</a>` : null}
-    ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after}`)}>later</span>` : null}
+    ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before.valueOf()}`)}>earlier</a>` : null}
+    ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after.valueOf()}`)}>later</span>` : null}
   <div>
 `
 }
