@@ -100,14 +100,17 @@ export function bookmarksPage () {
     ${Array.isArray(bookmarks)
       ? bookmarks.map(b => html.for(b)`
       <div>
-        <div>url: ${b.url}</div>
-        <div>title: ${b.title}</div>
+        <div>
+          ${b.toread ? '⏀' : ''}
+          ${b.starred ? '★' : '☆'}
+          <a href="${b.url}" target="_blank">${b.title}</a>
+        </div>
+        <div><small><a href="${b.url}">${b.url}</a></small></div>
         <div>note: ${b.note}</div>
-        <div>created at: ${b.created_at}</div>
-        <div>updated at: ${b.updated_at}</div>
-        <div>starred: ${b.starred}</div>
-        <div>toread: ${b.toread}</div>
-        <div>sensitive: ${b.sensitive}</div>
+        <div>
+          <small>c: <time datetime="${b.created_at}">${(new Date(b.created_at)).toLocaleString()}</time></small>
+          ${b.updated_at ? html`<small>u: <time datetime="${b.updated_at}">${b.updated_at}</time>$}</small></div>` : null}
+        ${b.sensitive ? html`<div>'🤫'</div>` : null}
         <div>tags: ${b.tags}</div>
         <div><button onClick=${deleteBookmark.bind(null, b.id)}>delete</button></div>
       </div>
