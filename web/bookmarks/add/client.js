@@ -46,7 +46,11 @@ export function addBookmarkPage () {
 
       console.log(await response.text())
       if (response.ok) {
-        window.location.replace('/bookmarks')
+        if (query.get('jump') === 'close') {
+          window.close()
+        } else {
+          window.location.replace('/bookmarks')
+        }
       }
     } catch (err) {
       console.log(err)
@@ -57,7 +61,7 @@ export function addBookmarkPage () {
 
   return html`
     <div>
-      <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onsubmit=${addBookmark}>
+      <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${addBookmark}>
         <fieldset ?disabled=${saving}>
           <legend>New bookmark:</legend>
           <div>
