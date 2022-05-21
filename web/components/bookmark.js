@@ -1,6 +1,8 @@
 /* eslint-env browser */
 import { html, useState, useRef } from 'uland-isomorphic'
 import { useLSP } from '../hooks/useLSP.js'
+import { unreadIcon } from './unread.js'
+import { star } from './star.js'
 
 export function bookmark ({ bookmark: b }) {
   const [editing, setEditing] = useState(false)
@@ -48,6 +50,7 @@ export function bookmark ({ bookmark: b }) {
   }
 
   return html`
+  <div class="bc-bookmark">
     ${deleted
       ? null
       : html`
@@ -56,30 +59,53 @@ export function bookmark ({ bookmark: b }) {
           <div>
             <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
             <fieldset ?disabled=${saving}>
-              <legend>New bookmark:</legend>
+              <legend class="bc-bookmark-legend">edit: <code>${b.id}</code></legend>
               <div>
-                <label>
+                <label class='block'>
                   url:
-                  <input type="url" name="url" />
+                  <input class='block bc-bookmark-url-edit' type="url" name="url" value="${b.url}"/>
                 </label>
               </div>
               <div>
-                <label>
+                <label class="block">
                   Title:
-                  <input type="text" name="title">
+                  <input class="block" type="text" name="title" value="${b.title}">
                 </label>
               </div>
               <div>
-                <label>
-                  Note:
-                  <textarea name="note"></textarea>
+                <label class="block">
+                  note:
+                  <textarea class="bc-bookmark-note" rows="6" name="note">${b.note}</textarea>
                 </label>
               </div>
               <div>
-                <label>
+                <label class="block">
                   tags:
-                  <input type="text" name="tags">
+                  <input class="block" type="text" name="tags" value="${b.tags?.join(' ')}">
                 </label>
+              </div>
+              <div>
+                <label>
+                  to read:
+                  <input type="checkbox" name="toread" ?checked="${b.toread}">
+                </label>
+                <label>
+                  starred:
+                  <input type="checkbox" name="starred" ?checked="${b.starred}">
+                </label>
+                <label>
+                  sensitive:
+                  <input type="checkbox" name="toread" ?checked="${b.sensitive}">
+                </label>
+              </div>
+              <div>
+                ${
+                  deleteConfirm
+                    ? html`
+                      <button onClick=${cancelDelete}>cancel</button>
+                      <button onClick=${deleteBookmark}>destroy</button>`
+                    : html`<button onClick=${initiateDelete}>delete</button>`
+                }
               </div>
               <div class="button-cluster">
                 <button onClick=${handleCancelEdit}>cancel</button>
@@ -92,28 +118,34 @@ export function bookmark ({ bookmark: b }) {
         : html`
           <div>
             <div>
-              ${b.toread ? '⏀' : ''}
-              ${b.starred ? '★' : '☆'}
+              ${unreadIcon(b.toread)}
+              ${star(b.starred)}
               <a href="${b.url}" target="_blank">${b.title}</a>
             </div>
-            <div><small><a href="${b.url}">${b.url}</a></small></div>
-            <div>note: ${b.note}</div>
+            <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
+            ${b.note ? html`<div>${b.note}</div>` : null}
             <div>
-              <small>c: <time datetime="${b.created_at}">${(new Date(b.created_at)).toLocaleString()}</time></small>
-              ${b.updated_at ? html`<small>u: <time datetime="${b.updated_at}">${b.updated_at}</time>$}</small></div>` : null}
+            ${b.tags?.length > 0
+              ? html`
+                <div class="bc-tags-display">
+                  ${b.tags.map(tag => html`<a href=${`/tags/t/?tag=${tag}`}>${tag}</a> `)}
+                </div>`
+              : null
+            }
+            <div class="bc-date">
+              <a href="${`./b/?id=${b.id}`}">
+                <time datetime="${b.created_at}">
+                  ${(new Date(b.created_at)).toLocaleString()}
+                </time>
+              </a>
+            </div>
             ${b.sensitive ? html`<div>'🤫'</div>` : null}
-            <div>tags: ${b.tags}</div>
-            <div>${
-              deleteConfirm
-                ? html`
-                  <button onClick=${cancelDelete}>cancel</button>
-                  <button onClick=${deleteBookmark}>destroy</button>`
-                : html`<button onClick=${initiateDelete}>delete</button>`
-              }
+            <div>
               <button onClick=${handleEdit}>edit</button>
             </div>
           </div>`
       }
+    </div>
       `
     }`
 }

@@ -1,0 +1,54 @@
+@import './unread.css';
+@import './star.css';
+
+.bc-bookmark input[type="date"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"] {
+  width: 100%;
+}
+
+.bc-bookmark-note {
+  display: block;
+  width: 100%;
+  resize: vertical;
+}
+
+.bc-bookmark-legend {
+  font-size: var(--small-font-size);
+}
+
+.bc-bookmark-url-edit {
+  font-family: var(--font-code);
+}
+
+.bc-bookmark-url-display {
+  top: -2px;
+  line-height: 12px;
+  margin-bottom: 5px;
+}
+
+.bc-tags-display,
+.bc-date,
+.bc-bookmark-url-display {
+  font-size: 0.8em;
+}
+
+.bc-tags-display a,
+.bc-date a,
+.bc-bookmark-url-display a {
+  color: var(--accent-foreground);
+}
+
+.bc-tags-display {
+  display: flex;
+  gap: 4px;
+}

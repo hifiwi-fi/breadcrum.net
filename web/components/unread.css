@@ -1,0 +1,7 @@
+.bc-unread {
+  color: rgb(58,130,247)
+}
+
+.bc-read {
+  color: var(--accent-foreground);
+}
