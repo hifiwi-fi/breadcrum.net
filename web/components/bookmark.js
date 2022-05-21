@@ -116,7 +116,7 @@ export function bookmark ({ bookmark: b }) {
           </form>
           </div>`
         : html`
-          <div>
+          <div class="bc-bookmark-display">
             <div>
               ${unreadIcon(b.toread)}
               ${star(b.starred)}

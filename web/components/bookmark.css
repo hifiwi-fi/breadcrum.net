@@ -1,6 +1,12 @@
 @import './unread.css';
 @import './star.css';
 
+.bc-bookmark-display {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
 .bc-bookmark input[type="date"],
 input[type="datetime-local"],
 input[type="email"],
@@ -31,8 +37,7 @@ input[type="week"] {
 }
 
 .bc-bookmark-url-display {
-  top: -2px;
-  line-height: 12px;
+  margin-top: -0.5em;
   margin-bottom: 5px;
 }
 
