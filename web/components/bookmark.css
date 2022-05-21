@@ -22,6 +22,10 @@ input[type="week"] {
   width: 100%;
 }
 
+.bc-bookmark-title-toread {
+  font-weight: bold;
+}
+
 .bc-bookmark-note {
   display: block;
   width: 100%;

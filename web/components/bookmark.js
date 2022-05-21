@@ -120,7 +120,7 @@ export function bookmark ({ bookmark: b }) {
             <div>
               ${unreadIcon(b.toread)}
               ${star(b.starred)}
-              <a href="${b.url}" target="_blank">${b.title}</a>
+              <a class="${b.toread ? 'bc-bookmark-title-toread' : null}" href="${b.url}" target="_blank">${b.title}</a>
             </div>
             <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
             ${b.note ? html`<div>${b.note}</div>` : null}
