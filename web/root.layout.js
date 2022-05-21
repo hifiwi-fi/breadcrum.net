@@ -33,10 +33,10 @@ export default function defaultRootLayout ({
         </main>
         <footer class="bc-footer">
           <div>
-            © <a href="https://hifiwi.fi">HifiWi.fi</a>
+            <a href="https://twitter.com/breadcrum_">@breadcrum_</a>
           </div>
           <div>
-            <a href="https://twitter.com/breadcrum_">@breadcrum_</a>
+            © <a href="https://hifiwi.fi">HifiWi.fi</a>
           </div>
           <div>
             <a href="https://github.com/hifiwi-fi/breadcrum.net/">

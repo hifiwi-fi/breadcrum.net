@@ -13,9 +13,9 @@ export function header () {
     <div class="bc-header-start">
       <span class="bc-logo round">
         <span>🥖 </span>
-        <a href="/">Breadcrum</a>
+        ${user ? null : html`<a href="/">Breadcrum</a>`}
       </span>
-      ${user ? html`<span>(<a href='/account'>${user.username}</a>)</span>` : null}
+      ${user ? html`<span><a href='/account'>${user.username}</a></span>` : null}
     </div>
     <div class="bc-header-end">
       ${!user
