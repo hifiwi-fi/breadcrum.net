@@ -15,7 +15,7 @@ export default function defaultRootLayout ({
     <head>
       <meta charset="utf-8">
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
-      <meta name='viewport' content='initial-scale=1, viewport-fit=cover'>
+      <meta name='viewport' content='initial-scale=1, viewport-fit=cover, maximum-scale=1'>
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
         : null}

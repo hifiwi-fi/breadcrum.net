@@ -44,26 +44,26 @@ export function register () {
   }
 
   return html`
-    <div>
+    <div class="bc-register">
       <form class="register-form" id="register-form" onsubmit=${onRegister}>
       <fieldset ?disabled="${Boolean(user) || submitting}">
         <legend>Register:</legend>
         <div>
-          <label>
+          <label class="block">
             Email:
-            <input type="email" name="email" />
+            <input class="block" type="email" name="email" />
           </label>
         </div>
         <div>
-          <label>
+          <label class="block">
             Username:
-            <input pattern="^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" />
+            <input class="block" pattern="^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" />
           </label>
         </div>
         <div>
-          <label>
+          <label class="block">
             Password:
-            <input type="password" name="password">
+            <input class="block" type="password" name="password">
           </label>
         </div>
         <div class="button-cluster">

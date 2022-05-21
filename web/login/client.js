@@ -45,20 +45,20 @@ export function loginPage () {
   return html`
     ${!user
       ? html`
-        <div>
+        <div class="bc-login">
         <form class="login-form" id="login-form" onsubmit=${login}>
         <fieldset ?disabled=${loggingIn}>
           <legend>Log in:</legend>
           <div>
-            <label>
+            <label class="block">
               Email or Username:
-              <input type="text" name="user" />
+              <input class="block" type="text" name="user" />
             </label>
           </div>
           <div>
-            <label>
+            <label class="block">
               Password:
-              <input type="password" name="password">
+              <input class="block" type="password" name="password">
             </label>
           </div>
           <div class="button-cluster">
