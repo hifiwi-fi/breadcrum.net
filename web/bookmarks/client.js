@@ -79,7 +79,7 @@ export function bookmarksPage () {
 
   return html`
     <div>
-      <a href="./add">add +</a>
+      🔖 <a href="./add">add +</a>
     </div>
     ${bookmarksLoading ? html`<div>Loading...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
