@@ -1,24 +1,58 @@
 /* eslint-env browser */
-import { html, useState, useRef } from 'uland-isomorphic'
+import { Component, html, useState, useRef } from 'uland-isomorphic'
 import { useLSP } from '../hooks/useLSP.js'
 import { unreadIcon } from './unread.js'
 import { star } from './star.js'
 
-export function bookmarkEdit ({
+export const bookmarkEdit = Component(({
   bookmark: b,
-  handleSave = () => {},
-  deleteConfirm = false,
-  formRef,
-  saving = false,
-  cancelDelete = () => {},
-  deleteBookmark = () => {},
-  initiateDelete = () => {},
-  handleCancelEdit = () => {}
-} = {}) {
+  onSave = () => {},
+  onDeleteBookmark = () => {},
+  onCancelEdit = () => {}
+} = {}) => {
+  const [error, setError] = useState(null)
+  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [disabled, setDisabled] = useState(false)
+  const formRef = useRef()
+
+  function handleInitiateDelete (ev) {
+    setDeleteConfirm(true)
+  }
+
+  function hanldeCancelDelete (ev) {
+    setDeleteConfirm(false)
+  }
+
+  async function handleDeleteBookmark () {
+    setDisabled(true)
+    setError(null)
+    try {
+      await onDeleteBookmark()
+    } catch (err) {
+      setDisabled(false)
+      setError(err)
+    }
+  }
+
+  async function handleSave (ev) {
+    ev.preventDefault()
+    setDisabled(true)
+    setError(null)
+    const form = formRef.current
+    console.log(form)
+    const saveData = {}
+    try {
+      await onSave(saveData)
+    } catch (err) {
+      setDisabled(false)
+      setError(err)
+    }
+  }
+
   return html`
     <div>
       <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
-      <fieldset ?disabled=${saving}>
+      <fieldset ?disabled=${disabled}>
         <legend class="bc-bookmark-legend">edit: <code>${b.id}</code></legend>
         <div>
           <label class='block'>
@@ -62,25 +96,25 @@ export function bookmarkEdit ({
           ${
             deleteConfirm
               ? html`
-                <button onClick=${cancelDelete}>cancel</button>
-                <button onClick=${deleteBookmark}>destroy</button>`
-              : html`<button onClick=${initiateDelete}>delete</button>`
+                <button onClick=${hanldeCancelDelete}>cancel</button>
+                <button onClick=${handleDeleteBookmark}>destroy</button>`
+              : html`<button onClick=${handleInitiateDelete}>delete</button>`
           }
         </div>
         <div class="button-cluster">
-          <button onClick=${handleCancelEdit}>cancel</button>
+          <button onClick=${onCancelEdit}>cancel</button>
           <input name="submit-button" type="submit">
         </div>
-        <div class="error-box"></div>
+        ${error ? html`<div class="error-box">${error.message}</div>` : null}
       </fieldset>
     </form>
     </div>`
-}
+})
 
-export function bookmarkView ({
+export const bookmarkView = Component(({
   bookmark: b,
   handleEdit = () => {}
-} = {}) {
+} = {}) => {
   return html`
     <div class="bc-bookmark-display">
       <div>
@@ -111,15 +145,13 @@ export function bookmarkView ({
         <button onClick=${handleEdit}>edit</button>
       </div>
     </div>`
-}
+})
 
-export function bookmark ({ bookmark: b }) {
-  const [editing, setEditing] = useState(false)
+export const bookmark = Component(({ bookmark }) => {
   const state = useLSP()
-  const [deleteConfirm, setDeleteCobnfirm] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const formRef = useRef()
-  const [saving, setSaving] = useState(false)
 
   function handleEdit () {
     setEditing(true)
@@ -131,14 +163,12 @@ export function bookmark ({ bookmark: b }) {
 
   async function handleSave () {
     // handle save here
-    setSaving(true)
     setEditing(false)
-    setSaving(false)
   }
 
-  async function deleteBookmark (ev) {
+  async function handleDeleteBookmark (ev) {
     const controller = new AbortController()
-    const response = await fetch(`${state.apiUrl}/bookmarks/${b.id}`, {
+    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
         'accept-encoding': 'application/json'
@@ -150,14 +180,6 @@ export function bookmark ({ bookmark: b }) {
     setDeleted(true)
   }
 
-  function initiateDelete (ev) {
-    setDeleteCobnfirm(true)
-  }
-
-  function cancelDelete (ev) {
-    setDeleteCobnfirm(false)
-  }
-
   return html`
   <div class="bc-bookmark">
     ${deleted
@@ -165,18 +187,14 @@ export function bookmark ({ bookmark: b }) {
       : html`
       ${editing
         ? bookmarkEdit({
-          bookmark: b,
+          bookmark,
           handleSave,
-          deleteConfirm,
           formRef,
-          saving,
-          cancelDelete,
-          deleteBookmark,
-          initiateDelete,
-          handleCancelEdit
+          onDeleteBookmark: handleDeleteBookmark,
+          onCancelEdit: handleCancelEdit
         })
-        : bookmarkView({ bookmark: b, handleEdit })
+        : bookmarkView({ bookmark, handleEdit })
       }
     </div>`
     }`
-}
+})

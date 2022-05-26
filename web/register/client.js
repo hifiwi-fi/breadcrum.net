@@ -1,9 +1,9 @@
 /* eslint-env browser */
-import { html, render, useEffect, useState } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export function register () {
+export const page = Component(() => {
   const { user, loading, error: userError } = useUser()
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
@@ -78,10 +78,10 @@ export function register () {
     : null
   }
 `
-}
+})
 
 try {
-  render(document.querySelector('.bc-main'), register)
+  render(document.querySelector('.bc-main'), page)
 } catch {
   // swallow
 }

@@ -1,6 +1,6 @@
-import { html } from 'uland-isomorphic'
+import { Component, html } from 'uland-isomorphic'
 
-export function star (starred = false, onClick = () => {}) {
+export const star = Component((starred = false, onClick = () => {}) => {
   return html`
     <span onClick=${onClick} class="${starred ? 'bc-starred' : 'bc-unstarred'}" onClick=${onClick}>
       ${starred
@@ -8,4 +8,4 @@ export function star (starred = false, onClick = () => {}) {
         : '☆'
         }
     </span>`
-}
+})

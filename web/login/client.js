@@ -1,9 +1,9 @@
 /* eslint-env browser */
-import { html, render, useState, useEffect } from 'uland-isomorphic'
+import { Component, html, render, useState, useEffect } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export function loginPage () {
+export const page = Component(() => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser()
   const [loggingIn, setLoggingIn] = useState(false)
@@ -79,8 +79,8 @@ export function loginPage () {
       : null
     }
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), loginPage)
+  render(document.querySelector('.bc-main'), page)
 }

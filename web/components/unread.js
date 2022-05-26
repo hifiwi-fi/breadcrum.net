@@ -1,6 +1,6 @@
-import { svg, html } from 'uland-isomorphic'
+import { Component, svg, html } from 'uland-isomorphic'
 
-export function unreadIcon (toread = false, onClick = () => {}) {
+export const unreadIcon = Component((toread = false, onClick = () => {}) => {
   return html`
     <span class="${toread ? 'bc-unread' : 'bc-read'}" onClick=${onClick}>
       ${toread
@@ -15,4 +15,4 @@ export function unreadIcon (toread = false, onClick = () => {}) {
           </svg>`
         }
     </span>`
-}
+})
