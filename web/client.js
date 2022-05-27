@@ -1,8 +1,8 @@
 /* eslint-env browser */
-import { html, render, useEffect } from 'uland-isomorphic'
+import { Component, html, render, useEffect } from 'uland-isomorphic'
 import { useUser } from './hooks/useUser.js'
 
-export function homepage () {
+export const page = Component(() => {
   const { user, loading } = useUser()
 
   useEffect(() => {
@@ -15,8 +15,8 @@ export function homepage () {
       <div class="bc-big-bread">🥖</div>
     </div>
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), homepage)
+  render(document.querySelector('.bc-main'), page)
 }

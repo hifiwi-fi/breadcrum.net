@@ -1,9 +1,9 @@
-import { html } from 'uland-isomorphic'
+import { Component, html } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export function header () {
+export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
@@ -54,4 +54,4 @@ export function header () {
     </div>
   </nav>
   `
-}
+})

@@ -1,9 +1,9 @@
 /* eslint-env browser */
-import { html, render, useEffect } from 'uland-isomorphic'
+import { Component, html, render, useEffect } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export function logout () {
+export const page = Component(() => {
   const state = useLSP()
   const { user } = useUser()
 
@@ -39,8 +39,8 @@ export function logout () {
       `
     }
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), logout)
+  render(document.querySelector('.bc-main'), page)
 }

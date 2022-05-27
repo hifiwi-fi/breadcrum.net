@@ -1,6 +1,6 @@
 import { html } from 'uland-isomorphic'
-import { homepage } from './client.js'
+import { page } from './client.js'
 
-export default function indexPage () {
-  return html`${homepage()}`
+export default () => {
+  return html`${page()}`
 }

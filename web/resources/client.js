@@ -1,8 +1,8 @@
 /* eslint-env browser */
-import { html, render, useEffect } from 'uland-isomorphic'
+import { Component, html, render, useEffect } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 
-export function addBookmarkPage () {
+export const page = Component(() => {
   const { user, loading } = useUser()
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export function addBookmarkPage () {
       </a> is a slightly larger bookmarklet that shows a clickable tag cloud.
     </li>
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), addBookmarkPage)
+  render(document.querySelector('.bc-main'), page)
 }

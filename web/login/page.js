@@ -1,8 +1,6 @@
 import { html } from 'uland-isomorphic'
-import { loginPage } from './client.js'
+import { page } from './client.js'
 
-export default async function () {
-  return html`
-  ${loginPage()}
-  `
+export default () => {
+  return html`${page()}`
 }

@@ -1,11 +1,11 @@
 /* eslint-env browser */
-import { html, render, useEffect, useState, useRef } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState, useRef } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 
-export function addBookmarkPage () {
+export const page = Component(() => {
   const state = useLSP()
   const { user, loading } = useUser()
   const [saving, setSaving] = useState(false)
@@ -96,8 +96,8 @@ export function addBookmarkPage () {
       </form>
     </div>
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), addBookmarkPage)
+  render(document.querySelector('.bc-main'), page)
 }

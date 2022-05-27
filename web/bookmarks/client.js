@@ -1,12 +1,12 @@
 /* eslint-env browser */
-import { html, render, useEffect, useState } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { bookmark } from '../components/bookmark.js'
 
-export function bookmarksPage () {
+export const page = Component(() => {
   const state = useLSP()
   const { user, loading } = useUser()
   const [bookmarks, setBookmarks] = useState()
@@ -79,7 +79,7 @@ export function bookmarksPage () {
 
   return html`
     <div>
-      <a href="./add">add +</a>
+      🔖 <a href="./add">add +</a>
     </div>
     ${bookmarksLoading ? html`<div>Loading...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
@@ -91,8 +91,8 @@ export function bookmarksPage () {
     ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after.valueOf()}`)}>later</span>` : null}
   <div>
 `
-}
+})
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), bookmarksPage)
+  render(document.querySelector('.bc-main'), page)
 }
