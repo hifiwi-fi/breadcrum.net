@@ -1,0 +1,33 @@
+@import '../unread';
+@import '../star';
+
+.bc-bookmark-view {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-bookmark-title-toread {
+  font-weight: bold;
+}
+
+.bc-bookmark-url-display {
+  margin-top: -0.5em;
+  margin-bottom: 5px;
+}
+
+.bc-tags-display,
+.bc-date,
+.bc-bookmark-url-display {
+  font-size: 0.8em;
+}
+
+.bc-tags-display a,
+.bc-date a,
+.bc-bookmark-url-display a {
+  color: var(--accent-foreground);
+}
+
+.bc-tags-display a {
+  margin-right: 5px;
+}

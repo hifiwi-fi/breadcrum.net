@@ -4,7 +4,7 @@ import { useUser } from '../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { bookmark } from '../components/bookmark.js'
+import { bookmark } from '../components/bookmark/bookmark-list.js'
 
 export const page = Component(() => {
   const state = useLSP()

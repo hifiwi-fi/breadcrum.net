@@ -1,8 +1,5 @@
 /* eslint-env browser */
 import { Component, html, useState, useRef } from 'uland-isomorphic'
-import { useLSP } from '../hooks/useLSP.js'
-import { unreadIcon } from './unread.js'
-import { star } from './star.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -50,7 +47,7 @@ export const bookmarkEdit = Component(({
   }
 
   return html`
-    <div>
+    <div class='bc-bookmark-edit'>
       <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
       <fieldset ?disabled=${disabled}>
         <legend class="bc-bookmark-legend">edit: <code>${b.id}</code></legend>
@@ -109,92 +106,4 @@ export const bookmarkEdit = Component(({
       </fieldset>
     </form>
     </div>`
-})
-
-export const bookmarkView = Component(({
-  bookmark: b,
-  handleEdit = () => {}
-} = {}) => {
-  return html`
-    <div class="bc-bookmark-display">
-      <div>
-        ${unreadIcon(b.toread)}
-        ${star(b.starred)}
-        <a class="${b.toread ? 'bc-bookmark-title-toread' : null}" href="${b.url}" target="_blank">${b.title}</a>
-      </div>
-      <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
-      ${b.note ? html`<div>${b.note}</div>` : null}
-      <div>
-      ${b.tags?.length > 0
-        ? html`
-          <div class="bc-tags-display">
-            🏷
-            ${b.tags.map(tag => html`<a href=${`/tags/t/?tag=${tag}`}>${tag}</a> `)}
-          </div>`
-        : null
-      }
-      <div class="bc-date">
-        <a href="${`./b/?id=${b.id}`}">
-          <time datetime="${b.created_at}">
-            ${(new Date(b.created_at)).toLocaleString()}
-          </time>
-        </a>
-      </div>
-      ${b.sensitive ? html`<div>'🤫'</div>` : null}
-      <div>
-        <button onClick=${handleEdit}>edit</button>
-      </div>
-    </div>`
-})
-
-export const bookmark = Component(({ bookmark }) => {
-  const state = useLSP()
-  const [editing, setEditing] = useState(false)
-  const [deleted, setDeleted] = useState(false)
-  const formRef = useRef()
-
-  function handleEdit () {
-    setEditing(true)
-  }
-
-  function handleCancelEdit () {
-    setEditing(false)
-  }
-
-  async function handleSave () {
-    // handle save here
-    setEditing(false)
-  }
-
-  async function handleDeleteBookmark (ev) {
-    const controller = new AbortController()
-    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
-      method: 'delete',
-      headers: {
-        'accept-encoding': 'application/json'
-      },
-      signal: controller.signal,
-      credentials: 'include'
-    })
-    console.log(await response.json())
-    setDeleted(true)
-  }
-
-  return html`
-  <div class="bc-bookmark">
-    ${deleted
-      ? null
-      : html`
-      ${editing
-        ? bookmarkEdit({
-          bookmark,
-          handleSave,
-          formRef,
-          onDeleteBookmark: handleDeleteBookmark,
-          onCancelEdit: handleCancelEdit
-        })
-        : bookmarkView({ bookmark, handleEdit })
-      }
-    </div>`
-    }`
 })
