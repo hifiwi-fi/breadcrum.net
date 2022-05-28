@@ -1,0 +1,24 @@
+/* header/index.css  */
+
+.bc-header-nav {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--small-font-size);
+}
+
+.bc-logo {
+  font-size: calc(var(--font-size-body) + var(--font-size-scale));
+}
+
+.bc-header-start,.bc-header-end {
+  display: flex;
+  gap: 0.2em;
+}
+
+.bc-header-start {
+  align-items: baseline;
+}
+
+.bc-header-end {
+  align-items: center;
+}
