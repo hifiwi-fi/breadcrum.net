@@ -1,10 +1,10 @@
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { bookmark } from '../components/bookmark/bookmark-list.js'
+import { bookmarkList } from '../components/bookmark/bookmark-list.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -12,10 +12,14 @@ export const page = Component(() => {
   const [bookmarks, setBookmarks] = useState()
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(null)
-  const [dataReload] = useState(0)
+  const [dataReload, setDataReload] = useState(0)
   const [before, setBefore] = useState()
   const [after, setAfter] = useState()
   const window = useWindow()
+
+  const reload = useCallback(() => {
+    setDataReload(dataReload + 1)
+  }, [dataReload, setDataReload])
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
@@ -81,10 +85,10 @@ export const page = Component(() => {
     <div>
       🔖 <a href="./add">add +</a>
     </div>
-    ${bookmarksLoading ? html`<div>Loading...</div>` : null}
+    ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>Loading...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b, b.id)`${bookmark({ bookmark: b })}`)
+      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload })}`)
   : null}
   <div>
     ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before.valueOf()}`)}>earlier</a>` : null}

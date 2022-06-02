@@ -1,101 +1,103 @@
+// @ts-check
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState, useRef } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
+import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
+import { diffUpdate } from '../../lib/bookmark-diff.js'
 
 export const page = Component(() => {
   const state = useLSP()
   const { user, loading } = useUser()
-  const [saving, setSaving] = useState(false)
   const query = useQuery()
-  const formRef = useRef()
+  const [bookmark, setBookmark] = useState(null)
 
   useEffect(() => {
-    formRef.current.url.value = query.get('url')
-    formRef.current.title.value = query.get('title')
-    formRef.current.note.value = query.get('description')
-    formRef.current.tags.value = query.getAll('tags').join(' ')
+    const setFallbackBookmark = () => {
+      setBookmark({
+        url: query.get('url'),
+        title: query.get('title'),
+        description: query.get('description'),
+        tags: query.getAll('tags')
+      })
+    }
+
+    const init = async () => {
+      const queryUrl = query.get('url')
+      if (!queryUrl) return setFallbackBookmark()
+      const response = await fetch(`${state.apiUrl}/bookmarks?url=${queryUrl}`, {
+        headers: {
+          'content-type': 'application/json'
+        },
+        credentials: 'include'
+      })
+
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        const body = await response.json()
+        console.log(body)
+        const maybeBookmark = body?.data?.[0]
+        if (maybeBookmark) {
+          setBookmark(maybeBookmark)
+        } else {
+          setFallbackBookmark()
+        }
+      } else {
+        setFallbackBookmark()
+      }
+    }
+
+    init().catch(err => {
+      console.error(err)
+      setFallbackBookmark()
+    })
   }, [])
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
   }, [user, loading])
 
-  async function addBookmark (ev) {
-    ev.preventDefault()
-    setSaving(true)
+  const existingBookmark = Boolean(bookmark?.id)
 
-    const url = ev.currentTarget.url.value
-    const title = ev.currentTarget.title.value
-    const note = ev.currentTarget.note.value
-    const rawTags = ev.currentTarget.tags.value
+  async function handleSaveBookmark (newBookmark) {
+    // Clean request for updates
+    const payload = existingBookmark
+      ? diffUpdate(bookmark, newBookmark)
+      : newBookmark
 
-    const tags = rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))
+    const endpoint = existingBookmark
+      ? `${state.apiUrl}/bookmarks/${bookmark.id}`
+      : `${state.apiUrl}/bookmarks`
 
-    try {
-      const response = await fetch(`${state.apiUrl}/bookmarks`, {
-        method: 'put',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({ url, title, note, tags }),
-        credentials: 'include'
-      })
+    const response = await fetch(endpoint, {
+      method: 'put',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    })
 
-      console.log(await response.text())
-      if (response.ok) {
-        if (query.get('jump') === 'close') {
-          window.close()
-        } else {
-          window.location.replace('/bookmarks')
-        }
+    if (response.ok) {
+      if (query.get('jump') === 'close') {
+        window.close()
+      } else {
+        // TODO: go to permalink?
+        window.location.replace('/bookmarks')
       }
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setSaving(false)
     }
   }
 
   return html`
-    <div>
-      <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${addBookmark}>
-        <fieldset ?disabled=${saving}>
-          <legend>New bookmark:</legend>
-          <div>
-            <label>
-              url:
-              <input type="url" name="url" />
-            </label>
-          </div>
-          <div>
-            <label>
-              Title:
-              <input type="text" name="title">
-            </label>
-          </div>
-          <div>
-            <label>
-              Note:
-              <textarea name="note"></textarea>
-            </label>
-          </div>
-          <div>
-            <label>
-              tags:
-              <input type="text" name="tags">
-            </label>
-          </div>
-          <div class="button-cluster">
-            <input name="submit-button" type="submit">
-          </div>
-          <div class="error-box"></div>
-        </fieldset>
-      </form>
-    </div>
-`
+    ${bookmarkEdit({
+      bookmark,
+      onSave: handleSaveBookmark,
+      legend: existingBookmark
+        ? html`edit: <code>${bookmark?.id}</code>`
+        : 'New bookmark'
+    })}
+  `
 })
 
 if (typeof window !== 'undefined') {

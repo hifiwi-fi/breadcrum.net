@@ -44,6 +44,10 @@ export default async function bookmarkRoutes (fastify, opts) {
               minimum: 1,
               maximum: 200,
               default: 20
+            },
+            url: {
+              type: 'string',
+              format: 'uri'
             }
           },
           dependencies: {
@@ -81,7 +85,7 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async (request, reply) => {
       const id = request.user.id
-      let { before, after, per_page: perPage } = request.query
+      let { before, after, per_page: perPage, url } = request.query
 
       let top = false
       let bottom = false
@@ -133,7 +137,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
 
       const query = SQL`
-        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, t.tag_array as tags
+        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, t.tag_array as tags
         FROM bookmarks
         LEFT OUTER JOIN(
           SELECT bt.bookmark_id as id, jsonb_agg(t.name) as tag_array
@@ -142,7 +146,8 @@ export default async function bookmarkRoutes (fastify, opts) {
           GROUP BY bt.bookmark_id
         ) t using (id)
         WHERE owner_id = ${id}
-          AND created_at < ${before}
+          ${before ? SQL`AND created_at < ${before}` : SQL``}
+          ${url ? SQL`AND url = ${url}` : SQL``}
         ORDER BY
           created_at DESC, title DESC, url DESC
         FETCH FIRST ${perPage} ROWS ONLY;
@@ -179,6 +184,7 @@ export default async function bookmarkRoutes (fastify, opts) {
             ...commnonBookmarkProps
             // TODO: allow arrays of tag names
           },
+          additionalProperties: false,
           required: ['url']
         },
         response: {
@@ -194,8 +200,25 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async (request, reply) => {
       return fastify.pg.transact(async client => {
-        const userId = request.user.id
+        const id = request.user.id
         const { url, title, note, toread, sensitive, tags = [] } = request.body
+
+        const checkForExistingQuery = SQL`
+        SELECT id, url
+        FROM bookmarks
+        WHERE owner_id = ${id}
+          AND url = ${url};
+        `
+
+        const existingResults = await client.query(checkForExistingQuery)
+        const maybeResult = existingResults.rows[0]
+
+        if (existingResults.rows.length > 0) {
+          reply.redirect(301, `/api/bookmarks/${maybeResult.id}`)
+          return {
+            status: 'bookmark exists'
+          }
+        }
 
         const createBookmark = SQL`
         INSERT INTO bookmarks (url, title, note, toread, sensitive, owner_id) VALUES (
@@ -204,7 +227,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           ${note},
           ${toread || false},
           ${sensitive || false},
-          ${userId}
+          ${id}
         )
         RETURNING id, url, title, toread, sensitive, owner_id;`
 
@@ -216,7 +239,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           INSERT INTO tags (name, owner_id)
           VALUES
              ${SQL.glue(
-                tags.map(tag => SQL`(${tag},${userId})`),
+                tags.map(tag => SQL`(${tag},${id})`),
                 ' , '
               )}
           ON CONFLICT (name, owner_id)
@@ -302,30 +325,38 @@ export default async function bookmarkRoutes (fastify, opts) {
         properties: {
           ...commnonBookmarkProps
         },
-        required: ['url']
+        minProperties: 1,
+        additionalProperties: false
       }
     }
   },
   async (request, reply) => {
     return fastify.pg.transact(async client => {
       const userId = request.user.id
+      const bookmarkId = request.params.id
       const bookmark = request.body
 
-      const query = SQL`
-      UPDATE bookmarks
-      SET url = ${bookmark.url},
-          title = ${bookmark.title || null},
-          note = ${bookmark.note || null},
-          starred = ${bookmark.starred},
-          toread = ${bookmark.toread},
-          sensitive = ${bookmark.sensitive},
-      WHERE id = ${bookmark.id}
-        AND owner_id =${userId};
-      `
+      const updates = []
 
-      await client.query(query)
+      if (bookmark.url != null) updates.push(SQL`url = ${bookmark.url}`)
+      if (bookmark.title != null) updates.push(SQL`title = ${bookmark.title}`)
+      if (bookmark.note != null) updates.push(SQL`note = ${bookmark.note}`)
+      if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
+      if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
+      if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
 
-      if (bookmark.tags.length > 0) {
+      if (updates.length > 0) {
+        const query = SQL`
+          UPDATE bookmarks
+          SET ${SQL.glue(updates, ' , ')}
+          WHERE id = ${bookmarkId}
+            AND owner_id =${userId};
+          `
+
+        await client.query(query)
+      }
+
+      if (bookmark.tags?.length > 0) {
         const createTags = SQL`
           INSERT INTO tags (name, owner_id)
           VALUES
@@ -345,16 +376,18 @@ export default async function bookmarkRoutes (fastify, opts) {
           INSERT INTO bookmarks_tags (bookmark_id, tag_id)
           VALUES
             ${SQL.glue(
-              tagsResults.rows.map(tag => SQL`(${bookmark.id},${tag.id})`),
+              tagsResults.rows.map(tag => SQL`(${bookmarkId},${tag.id})`),
               ' , '
-            )};
+            )}
+          ON CONFLICT (bookmark_id, tag_id)
+          DO NOTHING;
           `
 
         await client.query(applyTags)
 
         const removeOldTags = SQL`
           DELETE FROM bookmarks_tags
-          WHERE bookmark_id = bookmark.id
+          WHERE bookmark_id = ${bookmarkId}
             AND tag_id NOT IN (${SQL.glue(tagsResults.rows.map(tag => SQL`${tag.id}`), ', ')})
         `
 

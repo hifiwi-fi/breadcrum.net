@@ -1,14 +1,15 @@
+// @ts-check
 /* eslint-env browser */
-import { Component, html, useState, useRef } from 'uland-isomorphic'
+import { Component, html, useState } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkEdit } from './bookmark-edit.js'
 import { bookmarkView } from './bookmark-view.js'
+import { diffUpdate } from '../../lib/bookmark-diff.js'
 
-export const bookmark = Component(({ bookmark }) => {
+export const bookmarkList = Component(({ bookmark, reload }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
-  const formRef = useRef()
 
   function handleEdit () {
     setEditing(true)
@@ -18,40 +19,49 @@ export const bookmark = Component(({ bookmark }) => {
     setEditing(false)
   }
 
-  async function handleSave () {
-    // handle save here
+  async function handleSave (newBookmark) {
+    const payload = diffUpdate(bookmark, newBookmark)
+    console.log({ payload, bookmark })
+    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
+    await fetch(endpoint, {
+      method: 'put',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(payload),
+      credentials: 'include'
+    })
+    // TODO: update dataset
+    reload()
     setEditing(false)
   }
 
   async function handleDeleteBookmark (ev) {
-    const controller = new AbortController()
     const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
         'accept-encoding': 'application/json'
       },
-      signal: controller.signal,
       credentials: 'include'
     })
-    console.log(await response.json())
+    console.log({ json: await response.json(), foo: 'bar' })
     setDeleted(true)
+    reload()
   }
 
   return html`
   <div class="bc-bookmark">
     ${deleted
       ? null
-      : html`
-      ${editing
+      : editing
         ? bookmarkEdit({
-          bookmark,
-          handleSave,
-          formRef,
-          onDeleteBookmark: handleDeleteBookmark,
-          onCancelEdit: handleCancelEdit
-        })
+            bookmark,
+            onSave: handleSave,
+            onDeleteBookmark: handleDeleteBookmark,
+            onCancelEdit: handleCancelEdit,
+            legend: html`edit: <code>${bookmark?.id}</code>`
+          })
         : bookmarkView({ bookmark, handleEdit })
-      }
-    </div>`
-    }`
+    }
+  </div>`
 })

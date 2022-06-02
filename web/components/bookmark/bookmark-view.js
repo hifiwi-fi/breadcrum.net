@@ -32,7 +32,7 @@ export const bookmarkView = Component(({
           </time>
         </a>
       </div>
-      ${b.sensitive ? html`<div>'🤫'</div>` : null}
+      ${b.sensitive ? html`<div>🤫</div>` : null}
       <div>
         <button onClick=${handleEdit}>edit</button>
       </div>
