@@ -13,7 +13,8 @@ export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/static'), {
     root: path.join(__dirname, '../public'),
     prefix: '/',
-    redirect: true
+    redirect: true,
+    lastModified: false // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
   })
 }, {
   name: 'static',
