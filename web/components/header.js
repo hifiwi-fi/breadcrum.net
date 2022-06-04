@@ -3,8 +3,6 @@ import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-console.log('Remove me')
-
 export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
