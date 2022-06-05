@@ -14,6 +14,11 @@
 .bc-bookmark-url-display {
   margin-top: -0.5em;
   margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .bc-tags-display,
