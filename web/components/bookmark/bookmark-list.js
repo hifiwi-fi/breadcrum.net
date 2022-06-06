@@ -1,6 +1,5 @@
-// @ts-check
 /* eslint-env browser */
-import { Component, html, useState } from 'uland-isomorphic'
+import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkEdit } from './bookmark-edit.js'
 import { bookmarkView } from './bookmark-view.js'
@@ -11,17 +10,17 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
-  function handleEdit () {
+  const handleEdit = useCallback(() => {
     setEditing(true)
-  }
+  }, [setEditing])
 
-  function handleCancelEdit () {
+  const handleCancelEdit = useCallback(() => {
     setEditing(false)
-  }
+  }, [setEditing])
 
-  async function handleSave (newBookmark) {
+  const handleSave = useCallback(async (newBookmark) => {
     const payload = diffUpdate(bookmark, newBookmark)
-    console.log({ payload, bookmark })
+
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
@@ -31,12 +30,12 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
       body: JSON.stringify(payload),
       credentials: 'include'
     })
-    // TODO: update dataset
+
     reload()
     setEditing(false)
-  }
+  }, [bookmark, state.apiUrl, reload, setEditing])
 
-  async function handleDeleteBookmark (ev) {
+  const handleDeleteBookmark = useCallback(async (ev) => {
     const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
@@ -47,7 +46,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
     console.log({ json: await response.json(), foo: 'bar' })
     setDeleted(true)
     reload()
-  }
+  }, [state.apiUrl, bookmark, setDeleted, reload])
 
   return html`
   <div class="bc-bookmark">

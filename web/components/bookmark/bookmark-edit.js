@@ -1,6 +1,5 @@
-// @ts-check
 /* eslint-env browser */
-import { Component, html, useState, useRef } from 'uland-isomorphic'
+import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -14,15 +13,15 @@ export const bookmarkEdit = Component(({
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
-  function handleInitiateDelete (ev) {
+  const handleInitiateDelete = useCallback((ev) => {
     setDeleteConfirm(true)
-  }
+  }, [setDeleteConfirm])
 
-  function hanldeCancelDelete (ev) {
+  const hanldeCancelDelete = useCallback((ev) => {
     setDeleteConfirm(false)
-  }
+  }, [setDeleteConfirm])
 
-  async function handleDeleteBookmark (ev) {
+  const handleDeleteBookmark = useCallback(async (ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
@@ -32,9 +31,9 @@ export const bookmarkEdit = Component(({
       setDisabled(false)
       setError(err)
     }
-  }
+  }, [setDisabled, setError, onDeleteBookmark])
 
-  async function handleSave (ev) {
+  const handleSave = useCallback(async (ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
@@ -66,7 +65,7 @@ export const bookmarkEdit = Component(({
       setDisabled(false)
       setError(err)
     }
-  }
+  }, [setDisabled, setError, formRef?.current, onSave])
 
   // Parent can delay passing a bookmark to disable the form.
   const initializing = b == null

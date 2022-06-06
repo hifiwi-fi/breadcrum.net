@@ -7,10 +7,14 @@ window.toggleTheme = toggleTheme
 
 async function requestStorageAccess () {
   try {
-    await document.requestStorageAccess()
-    console.log('has storage access')
+    if (document.requestStorageAccess) {
+      await document.requestStorageAccess()
+      console.log('has storage access')
+    } else {
+      console.log('requestStorageAccess not supported')
+    }
   } catch (err) {
-    console.err(err)
+    console.error(err)
   }
 }
 
