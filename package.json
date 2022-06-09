@@ -29,7 +29,7 @@
     "@fastify/postgres": "^4.0.0",
     "@fastify/rate-limit": "^6.0.0",
     "@fastify/sensible": "^4.0.0",
-    "@fastify/static": "^5.0.0",
+    "@fastify/static": "^6.4.0",
     "fetch-undici": "^3.0.0",
     "fluent-json-schema": "^3.0.1",
     "fragmentions": "^1.1.3",
