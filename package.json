@@ -17,7 +17,7 @@
     "@fastify/autoload": "^4.0.0",
     "@fastify/caching": "^7.0.0",
     "@fastify/circuit-breaker": "^2.0.0",
-    "fastify-cli": "^3.0.0",
+    "fastify-cli": "^4.0.0",
     "@fastify/compress": "^5.0.0",
     "@fastify/cookie": "^6.0.0",
     "@fastify/cors": "^7.0.0",
