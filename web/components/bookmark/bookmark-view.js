@@ -1,7 +1,8 @@
 /* eslint-env browser */
 import { Component, html } from 'uland-isomorphic'
-import { unreadIcon } from '../unread/index.js'
+import { toread } from '../toread/index.js'
 import { star } from '../star/index.js'
+import { sensitive } from '../sensitive/index.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -10,8 +11,9 @@ export const bookmarkView = Component(({
   return html`
     <div class="bc-bookmark-view">
       <div>
-        ${unreadIcon(b.toread)}
-        ${star(b.starred)}
+        ${toread({ toread: b.toread })}
+        ${star({ starred: b.starred })}
+        ${sensitive({ sensitive: b.sensitive })}
         <a class="${b.toread ? 'bc-bookmark-title-toread' : null}" href="${b.url}" target="_blank">${b.title}</a>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
@@ -32,7 +34,6 @@ export const bookmarkView = Component(({
           </time>
         </a>
       </div>
-      ${b.sensitive ? html`<div>🤫</div>` : null}
       <div>
         <button onClick=${handleEdit}>edit</button>
       </div>

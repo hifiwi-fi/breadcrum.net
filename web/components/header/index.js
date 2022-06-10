@@ -2,6 +2,7 @@ import { Component, html } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { sensitive } from '../sensitive/index.js'
 
 export const header = Component(() => {
   const { user } = useUser()
@@ -48,6 +49,7 @@ export const header = Component(() => {
           : html`
             <div>🔖 <a href='/bookmarks'>bookmarks</a></div>
             <div>🏷 <a href='/tags'>tags</a></div>
+            <div>${sensitive({ sensitive: false })}</div>
             <div>· <a href='/logout'>logout</a></div>`
       }
 

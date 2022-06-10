@@ -1,5 +1,6 @@
-@import '../unread';
+@import '../toread';
 @import '../star';
+@import '../sensitive';
 
 .bc-bookmark-view {
   padding-bottom: 4px;

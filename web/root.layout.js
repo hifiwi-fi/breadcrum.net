@@ -1,5 +1,5 @@
 import { html, render } from 'uland-isomorphic'
-import { header } from './components/header.js'
+import { header } from './components/header/index.js'
 
 export default function defaultRootLayout ({
   title,
