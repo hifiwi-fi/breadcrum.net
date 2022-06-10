@@ -2,10 +2,10 @@ import { Component, html } from 'uland-isomorphic'
 
 export const sensitive = Component(({
   sensitive = false,
-  onClick = () => {}
+  onclick = () => {}
 }) => {
   return html`
-    <span onClick=${onClick} class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${onClick}>
+    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onclick=${onclick}>
       ${sensitive
         ? '🤫'
         : '🫥'

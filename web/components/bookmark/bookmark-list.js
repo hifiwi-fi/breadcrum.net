@@ -46,7 +46,58 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
     console.log({ json: await response.json(), foo: 'bar' })
     setDeleted(true)
     reload()
-  }, [state.apiUrl, bookmark, setDeleted, reload])
+  }, [state.apiUrl, bookmark.id, setDeleted, reload])
+
+  const handleToggleToRead = useCallback(async (ev) => {
+    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
+    await fetch(endpoint, {
+      method: 'put',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        toread: !bookmark.toread
+      }),
+      credentials: 'include'
+    })
+
+    // TODO: optimistic updates without full reload
+    reload()
+  }, [])
+
+  const handleToggleStarred = useCallback(async (ev) => {
+    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
+    await fetch(endpoint, {
+      method: 'put',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        starred: !bookmark.starred
+      }),
+      credentials: 'include'
+    })
+
+    // TODO: optimistic updates without full reload
+    reload()
+  }, [])
+
+  const handleToggleSensitive = useCallback(async (ev) => {
+    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
+    await fetch(endpoint, {
+      method: 'put',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sensitive: !bookmark.sensitive
+      }),
+      credentials: 'include'
+    })
+
+    // TODO: optimistic updates without full reload
+    reload()
+  }, [])
 
   return html`
   <div class="bc-bookmark">
@@ -60,7 +111,13 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${bookmark?.id}</code>`
           })
-        : bookmarkView({ bookmark, handleEdit })
+        : bookmarkView({
+            bookmark,
+            onEdit: handleEdit,
+            onToggleToread: handleToggleToRead,
+            onToggleStarred: handleToggleStarred,
+            onToggleSensitive: handleToggleSensitive
+          })
     }
   </div>`
 })

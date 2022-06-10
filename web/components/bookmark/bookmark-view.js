@@ -6,15 +6,34 @@ import { sensitive } from '../sensitive/index.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
-  handleEdit = () => {}
+  onEdit = () => {},
+  onToggleToread = () => {},
+  onToggleStarred = () => {},
+  onToggleSensitive = () => {}
 } = {}) => {
   return html`
     <div class="bc-bookmark-view">
       <div>
-        ${toread({ toread: b.toread })}
-        ${star({ starred: b.starred })}
-        ${sensitive({ sensitive: b.sensitive })}
-        <a class="${b.toread ? 'bc-bookmark-title-toread' : null}" href="${b.url}" target="_blank">${b.title}</a>
+        ${toread({
+          toread: b.toread,
+          onclick: onToggleToread
+        })}
+        ${star({
+          starred: b.starred,
+          onclick: onToggleStarred
+        })}
+        ${sensitive({
+          sensitive: b.sensitive,
+          onclick: onToggleSensitive
+        })}
+        <a class="${b.toread
+            ? 'bc-bookmark-title-toread'
+            : null}"
+           href="${b.url}"
+           target="_blank"
+        >
+          ${b.title}
+        </a>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
       ${b.note ? html`<div>${b.note}</div>` : null}
@@ -35,7 +54,7 @@ export const bookmarkView = Component(({
         </a>
       </div>
       <div>
-        <button onClick=${handleEdit}>edit</button>
+        <button onClick=${onEdit}>edit</button>
       </div>
     </div>`
 })

@@ -2,10 +2,10 @@ import { Component, html } from 'uland-isomorphic'
 
 export const star = Component(({
   starred = false,
-  onClick = () => {}
+  onclick = () => {}
 }) => {
   return html`
-    <span onClick=${onClick} class="${starred ? 'bc-starred' : 'bc-unstarred'}" onClick=${onClick}>
+    <span class="${starred ? 'bc-starred' : 'bc-unstarred'}" onclick=${onclick}>
       ${starred
         ? '★'
         : '☆'
