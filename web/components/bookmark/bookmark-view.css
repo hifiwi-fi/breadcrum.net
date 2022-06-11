@@ -28,7 +28,6 @@
   font-size: 0.8em;
 }
 
-.bc-tags-display a,
 .bc-date a,
 .bc-bookmark-url-display a {
   color: var(--accent-foreground);
@@ -36,4 +35,5 @@
 
 .bc-tags-display a {
   margin-right: 5px;
+  color:  var(--bc-tags-color);
 }
