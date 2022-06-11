@@ -1,7 +1,7 @@
 import { test } from 'tap'
 import { build } from '../helper.js'
 
-test('healthcheck baseline test', async (t) => {
+test('healthcheck baseline test', { skip: true }, async (t) => {
   const app = build(t)
 
   const res = await app.inject({
