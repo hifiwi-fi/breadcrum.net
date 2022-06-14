@@ -48,6 +48,10 @@ export default async function bookmarkRoutes (fastify, opts) {
             url: {
               type: 'string',
               format: 'uri'
+            },
+            sensitive: {
+              type: 'boolean',
+              default: false
             }
           },
           dependencies: {
@@ -85,7 +89,7 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async (request, reply) => {
       const id = request.user.id
-      let { before, after, per_page: perPage, url } = request.query
+      let { before, after, per_page: perPage, url, sensitive } = request.query
 
       let top = false
       let bottom = false
@@ -101,6 +105,8 @@ export default async function bookmarkRoutes (fastify, opts) {
             FROM bookmarks
                 WHERE owner_id = ${id}
                   AND created_at >= ${after}
+                  ${url ? SQL`AND url = ${url}` : SQL``}
+                  ${!sensitive ? SQL`AND sensitive = false` : SQL``}
                 ORDER BY
                   created_at ASC, title ASC, url ASC
                 FETCH FIRST ${perPageAfterOffset} ROWS ONLY
@@ -148,6 +154,7 @@ export default async function bookmarkRoutes (fastify, opts) {
         WHERE owner_id = ${id}
           ${before ? SQL`AND created_at < ${before}` : SQL``}
           ${url ? SQL`AND url = ${url}` : SQL``}
+          ${!sensitive ? SQL`AND sensitive = false` : SQL``}
         ORDER BY
           created_at DESC, title DESC, url DESC
         FETCH FIRST ${perPage} ROWS ONLY;

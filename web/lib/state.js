@@ -5,7 +5,8 @@ export const state = lsp('breadcrum', {
     user: null,
     apiUrl: '/api',
     host: 'breadcrum.net',
-    disableRegistration: true
+    disableRegistration: true,
+    sensitive: false
   },
   lspReset: 1
 })

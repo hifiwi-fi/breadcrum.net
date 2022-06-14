@@ -1,4 +1,4 @@
-import { Component, html } from 'uland-isomorphic'
+import { Component, html, useCallback } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
@@ -8,6 +8,10 @@ export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
+
+  const handleSensitiveToggle = useCallback(() => {
+    state.sensitive = !state.sensitive
+  })
 
   return html`
   <nav class="bc-header-nav">
@@ -49,7 +53,7 @@ export const header = Component(() => {
           : html`
             <div>🔖 <a href='/bookmarks'>bookmarks</a></div>
             <div>🏷 <a href='/tags'>tags</a></div>
-            <div>${sensitive({ sensitive: false })}</div>
+            <div>${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
             <div>· <a href='/logout'>logout</a></div>`
       }
 

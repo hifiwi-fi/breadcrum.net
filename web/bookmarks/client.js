@@ -37,6 +37,8 @@ export const page = Component(() => {
       if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
       if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
 
+      pageParams.set('sensitive', state.sensitive)
+
       const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
         method: 'get',
         headers: {
@@ -79,7 +81,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setBookmarksError(err) })
         .finally(() => { setBookmarksLoading(false) })
     }
-  }, [dataReload])
+  }, [dataReload, state.apiUrl, state.sensitive])
 
   return html`
     <div>
