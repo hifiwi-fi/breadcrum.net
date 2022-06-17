@@ -42,12 +42,12 @@ export const bookmarkView = Component(({
         ? html`
           <div class="bc-tags-display">
             🏷
-            ${b.tags.map(tag => html`<a href=${`/tags/t/?tag=${tag}`}>${tag}</a> `)}
+            ${b.tags.map(tag => html`<a href=${`/tags/view/?tag=${tag}`}>${tag}</a> `)}
           </div>`
         : null
       }
       <div class="bc-date">
-        <a href="${`./b/?id=${b.id}`}">
+        <a href="${`./view/?id=${b.id}`}">
           <time datetime="${b.created_at}">
             ${(new Date(b.created_at)).toLocaleString()}
           </time>
