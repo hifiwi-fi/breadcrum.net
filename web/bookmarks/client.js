@@ -34,6 +34,7 @@ export const page = Component(() => {
       setBookmarksError(null)
       const pageParams = new URLSearchParams(window.location.search)
 
+      // Transform date string to date object
       if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
       if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
 

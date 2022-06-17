@@ -63,7 +63,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [])
+  }, [state.apiUrl, bookmark.id, reload, bookmark.toread])
 
   const handleToggleStarred = useCallback(async (ev) => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
@@ -80,7 +80,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [])
+  }, [state.apiUrl, bookmark.id, reload, bookmark.starred])
 
   const handleToggleSensitive = useCallback(async (ev) => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
@@ -97,7 +97,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [])
+  }, [state.apiUrl, bookmark.id, reload, bookmark.sensitive])
 
   return html`
   <div class="bc-bookmark">
