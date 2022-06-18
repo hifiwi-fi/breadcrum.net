@@ -35,8 +35,8 @@ processes = []
   path = "/metrics" # default for most prometheus clients
 
 [[statics]]
-  guest_path = "/app/public"
-  url_prefix = "/"
+  guest_path = "/asdfasdf"
+  url_prefix = "/asdfasdf"
 
 [[services]]
   internal_port = 8080
