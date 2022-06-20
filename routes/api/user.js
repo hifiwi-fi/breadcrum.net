@@ -18,7 +18,7 @@ export default async function userRoutes (fastify, opts) {
         }
       }
     },
-    async (request, reply) => {
+    async function (request, reply) {
       const id = request.user.id
 
       const query = SQL`

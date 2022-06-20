@@ -2,7 +2,7 @@ export default async function deltaRoutes (fastify, opts) {
   fastify.get(
     '/last_update',
     {},
-    async (request, reply) => {
+    async function (request, reply) {
       throw new Error('not implemented')
     }
   )
@@ -10,7 +10,7 @@ export default async function deltaRoutes (fastify, opts) {
   fastify.get(
     '/delta/bookmarks',
     {},
-    async (request, reply) => {
+    async function (request, reply) {
       throw new Error('not implemented')
     }
   )

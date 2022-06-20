@@ -39,7 +39,7 @@ export default async function registerRoutes (fastify, opts) {
         }
       }
     },
-    async (request, reply) => {
+    async function (request, reply) {
       if (fastify.config.REGISTRATION !== 'enabled') {
         reply.code(403)
         return {

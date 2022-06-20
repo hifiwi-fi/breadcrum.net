@@ -87,7 +87,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
       }
     },
-    async (request, reply) => {
+    async function (request, reply) {
       const id = request.user.id
       let { before, after, per_page: perPage, url, sensitive } = request.query
 
@@ -205,7 +205,7 @@ export default async function bookmarkRoutes (fastify, opts) {
         }
       }
     },
-    async (request, reply) => {
+    async function (request, reply) {
       return fastify.pg.transact(async client => {
         const id = request.user.id
         const { url, title, note, toread, sensitive, tags = [] } = request.body
@@ -297,7 +297,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
     }
   },
-  async (request, reply) => {
+  async function (request, reply) {
     const userId = request.user.id
     const { id: bookmarkId } = request.params
 
@@ -348,7 +348,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
     }
   },
-  async (request, reply) => {
+  async function (request, reply) {
     return fastify.pg.transact(async client => {
       const userId = request.user.id
       const bookmarkId = request.params.id
@@ -430,7 +430,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
     }
   },
-  async (request, reply) => {
+  async function (request, reply) {
     const userId = request.user.id
     const bookmarkId = request.params.id
 
