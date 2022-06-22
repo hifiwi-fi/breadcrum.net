@@ -42,7 +42,7 @@ export const bookmarkView = Component(({
         ? html`
           <div class="bc-tags-display">
             🏷
-            ${b.tags.map(tag => html`<a href=${`/tags/view/?tag=${tag}`}>${tag}</a> `)}
+            ${b.tags.map(tag => html` <a href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
           </div>`
         : null
       }

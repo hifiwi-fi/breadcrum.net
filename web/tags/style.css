@@ -1,0 +1,10 @@
+.bc-tags-list {
+  font-size: 0.8em;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.bc-tags-list a {
+  color:  var(--bc-tags-color);
+}

@@ -92,7 +92,7 @@ export const page = Component(() => {
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)
       ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload })}`)
-  : null}
+      : null}
   <div>
     ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before.valueOf()}`)}>earlier</a>` : null}
     ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after.valueOf()}`)}>later</span>` : null}

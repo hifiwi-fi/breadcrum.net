@@ -49,6 +49,9 @@ export default async function bookmarkRoutes (fastify, opts) {
               type: 'string',
               format: 'uri'
             },
+            tag: {
+              type: 'string', minLength: 1, maxLength: 255
+            },
             sensitive: {
               type: 'boolean',
               default: false
@@ -89,7 +92,14 @@ export default async function bookmarkRoutes (fastify, opts) {
     },
     async function (request, reply) {
       const id = request.user.id
-      let { before, after, per_page: perPage, url, sensitive } = request.query
+      let {
+        before,
+        after,
+        per_page: perPage,
+        url,
+        tag,
+        sensitive
+      } = request.query
 
       let top = false
       let bottom = false
@@ -103,10 +113,17 @@ export default async function bookmarkRoutes (fastify, opts) {
           WITH page as (
             SELECT id, url, title, created_at
             FROM bookmarks
+            LEFT OUTER JOIN(
+              SELECT bt.bookmark_id as id, array_agg(t.name) as tag_array
+              FROM bookmarks_tags bt
+              JOIN tags t ON t.id = bt.tag_id
+              GROUP BY bt.bookmark_id
+            ) t using (id)
                 WHERE owner_id = ${id}
                   AND created_at >= ${after}
                   ${url ? SQL`AND url = ${url}` : SQL``}
                   ${!sensitive ? SQL`AND sensitive = false` : SQL``}
+                  ${tag ? SQL`AND t.tag_array @> ARRAY[${tag}::citext]` : SQL``}
                 ORDER BY
                   created_at ASC, title ASC, url ASC
                 FETCH FIRST ${perPageAfterOffset} ROWS ONLY
@@ -143,10 +160,10 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
 
       const query = SQL`
-        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, t.tag_array as tags
+        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, array_to_json(t.tag_array) as tags
         FROM bookmarks
         LEFT OUTER JOIN(
-          SELECT bt.bookmark_id as id, jsonb_agg(t.name) as tag_array
+          SELECT bt.bookmark_id as id, array_agg(t.name) as tag_array
           FROM bookmarks_tags bt
           JOIN tags t ON t.id = bt.tag_id
           GROUP BY bt.bookmark_id
@@ -155,6 +172,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           ${before ? SQL`AND created_at < ${before}` : SQL``}
           ${url ? SQL`AND url = ${url}` : SQL``}
           ${!sensitive ? SQL`AND sensitive = false` : SQL``}
+          ${tag ? SQL`AND t.tag_array @> ARRAY[${tag}::citext]` : SQL``}
         ORDER BY
           created_at DESC, title DESC, url DESC
         FETCH FIRST ${perPage} ROWS ONLY;
@@ -277,31 +295,31 @@ export default async function bookmarkRoutes (fastify, opts) {
     }
   )
 
-  fastify.get('/bookmarks/:id', {
-    preHandler: fastify.auth([fastify.verifyJWT]),
-    schema: {
-      params: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        },
-        required: ['id']
-      },
-      response: {
-        200: {
+  fastify.get(
+    '/bookmarks/:id', {
+      preHandler: fastify.auth([fastify.verifyJWT]),
+      schema: {
+        params: {
           type: 'object',
           properties: {
-            ...fullBookmarkProps
+            id: { type: 'string', format: 'uuid' }
+          },
+          required: ['id']
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              ...fullBookmarkProps
+            }
           }
         }
       }
-    }
-  },
-  async function (request, reply) {
-    const userId = request.user.id
-    const { id: bookmarkId } = request.params
+    }, async function (request, reply) {
+      const userId = request.user.id
+      const { id: bookmarkId } = request.params
 
-    const query = SQL`
+      const query = SQL`
       SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, t.tag_array as tags
         FROM bookmarks
         LEFT OUTER JOIN(
@@ -315,18 +333,18 @@ export default async function bookmarkRoutes (fastify, opts) {
         LIMIT 1;
       `
 
-    const results = await fastify.pg.query(query)
-    const bookmark = results.rows[0]
-    if (!bookmark) {
-      reply.code(404)
-      return {
-        status: 'bookmark id not found'
+      const results = await fastify.pg.query(query)
+      const bookmark = results.rows[0]
+      if (!bookmark) {
+        reply.code(404)
+        return {
+          status: 'bookmark id not found'
+        }
       }
-    }
-    return {
-      ...bookmark
-    }
-  })
+      return {
+        ...bookmark
+      }
+    })
 
   fastify.put('/bookmarks/:id', {
     preHandler: fastify.auth([fastify.verifyJWT]),
@@ -374,8 +392,9 @@ export default async function bookmarkRoutes (fastify, opts) {
         await client.query(query)
       }
 
-      if (bookmark.tags?.length > 0) {
-        const createTags = SQL`
+      if (Array.isArray(bookmark.tags)) {
+        if (bookmark.tags.length > 0) {
+          const createTags = SQL`
           INSERT INTO tags (name, owner_id)
           VALUES
              ${SQL.glue(
@@ -388,9 +407,9 @@ export default async function bookmarkRoutes (fastify, opts) {
           returning id, name, created_at, updated_at;
           `
 
-        const tagsResults = await client.query(createTags)
+          const tagsResults = await client.query(createTags)
 
-        const applyTags = SQL`
+          const applyTags = SQL`
           INSERT INTO bookmarks_tags (bookmark_id, tag_id)
           VALUES
             ${SQL.glue(
@@ -401,15 +420,23 @@ export default async function bookmarkRoutes (fastify, opts) {
           DO NOTHING;
           `
 
-        await client.query(applyTags)
+          await client.query(applyTags)
 
-        const removeOldTags = SQL`
+          const removeOldTags = SQL`
           DELETE FROM bookmarks_tags
           WHERE bookmark_id = ${bookmarkId}
             AND tag_id NOT IN (${SQL.glue(tagsResults.rows.map(tag => SQL`${tag.id}`), ', ')})
         `
 
-        await client.query(removeOldTags)
+          await client.query(removeOldTags)
+        } else {
+          const removeAllTags = SQL`
+          DELETE FROM bookmarks_tags
+          WHERE bookmark_id = ${bookmarkId}
+        `
+
+          await client.query(removeAllTags)
+        }
       }
 
       return {

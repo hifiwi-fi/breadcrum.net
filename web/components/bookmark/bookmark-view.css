@@ -33,7 +33,12 @@
   color: var(--accent-foreground);
 }
 
+.bc-tags-display {
+  display: inline-flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
 .bc-tags-display a {
-  margin-right: 5px;
   color:  var(--bc-tags-color);
 }
