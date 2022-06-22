@@ -19,7 +19,7 @@ export const page = Component(() => {
       setBookmark({
         url: query.get('url'),
         title: query.get('title'),
-        description: query.get('description'),
+        note: query.get('description'),
         tags: query.getAll('tags')
       })
     }
