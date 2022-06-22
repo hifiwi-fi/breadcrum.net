@@ -98,7 +98,7 @@ export const page = Component(() => {
     afterParms.delete('before')
   }
 
-  const tageFilterRemovedParams = new URLSearchParams(window.location.search)
+  const tageFilterRemovedParams = new URLSearchParams(window?.location?.search)
   const tagFilter = tageFilterRemovedParams.get('tag')
   tageFilterRemovedParams.delete('tag')
 
