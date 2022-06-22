@@ -21,8 +21,9 @@ export const page = Component(() => {
       console.log('getting tags')
       setTagsLoading(true)
       setTagsError(null)
-
-      const response = await fetch(`${state.apiUrl}/tags`, {
+      const pageParams = new URLSearchParams(window.location.search)
+      pageParams.set('sensitive', state.sensitive)
+      const response = await fetch(`${state.apiUrl}/tags?${pageParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
@@ -44,7 +45,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setTagsError(err) })
         .finally(() => { setTagsLoading(false) })
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, state.sensitive])
 
   return html`
     <div>

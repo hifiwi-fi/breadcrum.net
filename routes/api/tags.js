@@ -5,7 +5,17 @@ export default async function tagsRoutes (fastify, opts) {
     '/tags',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
-      schema: {},
+      schema: {
+        querystring: {
+          type: 'object',
+          properties: {
+            sensitive: {
+              type: 'boolean',
+              default: false
+            }
+          }
+        }
+      },
       response: {
         200: {
           type: 'object',
@@ -26,14 +36,17 @@ export default async function tagsRoutes (fastify, opts) {
     },
     async function (request, reply) {
       const userId = request.user.id
+      const { sensitive } = request.query
 
       const query = SQL`
-        select name, created_at, count(bookmarks_tags.tag_id) as count
+        select tags.name, tags.created_at, count(bookmarks_tags.tag_id) as count
         from tags
         left outer join bookmarks_tags on (tags.id = bookmarks_tags.tag_id)
-        where owner_id = ${userId}
-        group by (name, created_at)
-        order by created_at desc;
+        left outer join bookmarks on (bookmarks_tags.bookmark_id = bookmarks.id)
+        where tags.owner_id = ${userId}
+        ${!sensitive ? SQL`AND sensitive = false` : SQL``}
+        group by (tags.name, tags.created_at)
+        order by tags.created_at desc;
       `
 
       const results = await fastify.pg.query(query)
