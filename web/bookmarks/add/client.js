@@ -66,6 +66,11 @@ export const page = Component(() => {
       ? diffUpdate(bookmark, newBookmark)
       : newBookmark
 
+    if (Object.keys(payload).length === 0) {
+      // empty update
+      finish()
+    }
+
     const endpoint = existingBookmark
       ? `${state.apiUrl}/bookmarks/${bookmark.id}`
       : `${state.apiUrl}/bookmarks`
@@ -80,6 +85,10 @@ export const page = Component(() => {
     })
 
     if (response.ok) {
+      finish()
+    }
+
+    function finish () {
       if (query.get('jump') === 'close') {
         window.close()
       } else {

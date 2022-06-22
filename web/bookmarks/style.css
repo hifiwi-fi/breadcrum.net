@@ -1,1 +1,14 @@
-@import '../components/bookmark/bookmark-list.css'
+@import '../components/bookmark/bookmark-list.css';
+
+.bc-tag-filter-remove {
+  color: var(--bc-tags-color);
+}
+
+.bc-tag-filter-remove a {
+  color: hsla(360, 100%, 50%, 0.5);
+  text-decoration: none;
+}
+
+.bc-tag-filter-remove a:hover {
+  color: red;
+}

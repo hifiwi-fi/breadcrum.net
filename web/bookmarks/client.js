@@ -84,9 +84,32 @@ export const page = Component(() => {
     }
   }, [dataReload, state.apiUrl, state.sensitive])
 
+  let beforeParams
+  if (before) {
+    beforeParams = new URLSearchParams(window.location.search)
+    beforeParams.set('before', before.valueOf())
+    beforeParams.delete('after')
+  }
+
+  let afterParms
+  if (after) {
+    afterParms = new URLSearchParams(window.location.search)
+    afterParms.set('after', after.valueOf())
+    afterParms.delete('before')
+  }
+
+  const tageFilterRemovedParams = new URLSearchParams(window.location.search)
+  const tagFilter = tageFilterRemovedParams.get('tag')
+  tageFilterRemovedParams.delete('tag')
+
   return html`
     <div>
-      🔖 <a href="./add">add +</a>
+      ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a href=${'./?' + afterParms}>later</span>` : null}
+    <div>
+    <div>
+      <span>🔖 <a href="./add">add +</a></span>
+      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
     </div>
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
@@ -94,8 +117,8 @@ export const page = Component(() => {
       ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload })}`)
       : null}
   <div>
-    ${before ? html`<a href=${'./?' + new URLSearchParams(`before=${before.valueOf()}`)}>earlier</a>` : null}
-    ${after ? html`<a href=${'./?' + new URLSearchParams(`after=${after.valueOf()}`)}>later</span>` : null}
+    ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a href=${'./?' + afterParms}>later</span>` : null}
   <div>
 `
 })
