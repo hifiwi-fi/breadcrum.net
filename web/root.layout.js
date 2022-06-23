@@ -11,11 +11,12 @@ export default function defaultRootLayout ({
 }) {
   return render(String, html`
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
       <meta name='viewport' content='initial-scale=1, viewport-fit=cover, maximum-scale=1'>
+      <meta name="description" content="Breadcrum internet newspaper clippings and bookmarks. Podcast anything.">
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
         : null}
