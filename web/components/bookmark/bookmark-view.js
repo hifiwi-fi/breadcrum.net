@@ -3,6 +3,8 @@ import { Component, html } from 'uland-isomorphic'
 import { toread } from '../toread/index.js'
 import { star } from '../star/index.js'
 import { sensitive } from '../sensitive/index.js'
+import { useWindow } from '../../hooks/useWindow.js'
+import { useQuery } from '../../hooks/useQuery.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -11,6 +13,19 @@ export const bookmarkView = Component(({
   onToggleStarred = () => {},
   onToggleSensitive = () => {}
 } = {}) => {
+  const window = useWindow()
+  const { pushState } = useQuery()
+
+  const onPageNav = (ev) => {
+    const url = new URL(window.location)
+    const newUrl = new URL(ev.currentTarget.href)
+
+    if (url.pathname === newUrl.pathname) {
+      ev.preventDefault()
+      pushState(ev.currentTarget.href)
+    }
+  }
+
   return html`
     <div class="bc-bookmark-view">
       <div>
@@ -42,7 +57,7 @@ export const bookmarkView = Component(({
         ? html`
           <div class="bc-tags-display">
             🏷
-            ${b.tags.map(tag => html` <a href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
+            ${b.tags.map(tag => html` <a onclick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
           </div>`
         : null
       }

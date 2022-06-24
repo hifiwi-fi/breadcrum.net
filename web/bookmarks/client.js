@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
+import { useQuery } from '../hooks/useQuery.js'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
@@ -20,6 +21,7 @@ export const page = Component(() => {
   const reload = useCallback(() => {
     setDataReload(dataReload + 1)
   }, [dataReload, setDataReload])
+  const { query, pushState } = useQuery()
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
@@ -29,10 +31,10 @@ export const page = Component(() => {
     const controller = new AbortController()
 
     async function getBookmarks () {
-      console.log('getting bookmarks')
+      // TODO: port SWR or use https://usehooks.com/useAsync/
       setBookmarksLoading(true)
       setBookmarksError(null)
-      const pageParams = new URLSearchParams(window.location.search)
+      const pageParams = new URLSearchParams(query)
 
       // Transform date string to date object
       if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
@@ -55,7 +57,7 @@ export const page = Component(() => {
         setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
         setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
         if (body?.pagination?.top) {
-          const newParams = new URLSearchParams(window.location.search)
+          const newParams = new URLSearchParams(query)
           let modified = false
           if (newParams.get('before')) {
             newParams.delete('before')
@@ -82,34 +84,39 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setBookmarksError(err) })
         .finally(() => { setBookmarksLoading(false) })
     }
-  }, [dataReload, state.apiUrl, state.sensitive])
+  }, [query, state.apiUrl, state.sensitive, dataReload])
+
+  const onPageNav = (ev) => {
+    ev.preventDefault()
+    pushState(ev.currentTarget.href)
+  }
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(window.location.search)
+    beforeParams = new URLSearchParams(query)
     beforeParams.set('before', before.valueOf())
     beforeParams.delete('after')
   }
 
   let afterParms
   if (after) {
-    afterParms = new URLSearchParams(window.location.search)
+    afterParms = new URLSearchParams(query)
     afterParms.set('after', after.valueOf())
     afterParms.delete('before')
   }
 
-  const tageFilterRemovedParams = new URLSearchParams(window?.location?.search)
+  const tageFilterRemovedParams = new URLSearchParams(query)
   const tagFilter = tageFilterRemovedParams.get('tag')
   tageFilterRemovedParams.delete('tag')
 
   return html`
     <div>
-      ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a href=${'./?' + afterParms}>later</span>` : null}
+      ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
     <div>
     <div>
       <span>🔖 <a href="./add">add +</a></span>
-      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
+      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onclick=${onPageNav} href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
     </div>
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
@@ -117,8 +124,8 @@ export const page = Component(() => {
       ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload })}`)
       : null}
   <div>
-    ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a href=${'./?' + afterParms}>later</span>` : null}
+    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
   <div>
 `
 })

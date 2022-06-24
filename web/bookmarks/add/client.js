@@ -11,7 +11,7 @@ import { diffUpdate } from '../../lib/bookmark-diff.js'
 export const page = Component(() => {
   const state = useLSP()
   const { user, loading } = useUser()
-  const query = useQuery()
+  const { query } = useQuery()
   const [bookmark, setBookmark] = useState(null)
 
   useEffect(() => {
