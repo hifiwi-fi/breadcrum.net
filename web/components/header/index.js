@@ -3,15 +3,26 @@ import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { sensitive } from '../sensitive/index.js'
+import { useQuery } from '../../hooks/useQuery.js'
 
 export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
+  const { pushState } = useQuery()
 
   const handleSensitiveToggle = useCallback(() => {
     state.sensitive = !state.sensitive
   })
+
+  const onPageNav = (ev) => {
+    const url = new URL(window.location)
+    const newUrl = new URL(ev.currentTarget.href)
+    if (url.pathname === newUrl.pathname) {
+      ev.preventDefault()
+      pushState(ev.currentTarget.href)
+    }
+  }
 
   return html`
   <nav class="bc-header-nav">
@@ -51,10 +62,10 @@ export const header = Component(() => {
                 : null
             }`
           : html`
-            <div>🔖 <a href='/bookmarks'>bookmarks</a></div>
-            <div>🏷 <a href='/tags'>tags</a></div>
+            <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
+            <div>🏷 <a href='/tags/'>tags</a></div>
             <div>${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
-            <div>· <a href='/logout'>logout</a></div>`
+            <div>· <a href='/logout/'>logout</a></div>`
       }
 
     </div>
