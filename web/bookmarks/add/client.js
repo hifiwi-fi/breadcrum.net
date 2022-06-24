@@ -26,6 +26,7 @@ export const page = Component(() => {
 
     const init = async () => {
       const queryUrl = query.get('url')
+
       if (!queryUrl) return setFallbackBookmark()
       const response = await fetch(`${state.apiUrl}/bookmarks?url=${queryUrl}`, {
         headers: {
@@ -52,7 +53,7 @@ export const page = Component(() => {
       console.error(err)
       setFallbackBookmark()
     })
-  }, [])
+  }, [query, state.apiUrl])
 
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
