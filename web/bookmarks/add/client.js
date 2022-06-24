@@ -28,7 +28,7 @@ export const page = Component(() => {
       const queryUrl = query.get('url')
 
       if (!queryUrl) return setFallbackBookmark()
-      const response = await fetch(`${state.apiUrl}/bookmarks?url=${queryUrl}`, {
+      const response = await fetch(`${state.apiUrl}/bookmarks?url=${queryUrl}&sensitive=true`, {
         headers: {
           'content-type': 'application/json'
         },
