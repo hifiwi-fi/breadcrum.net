@@ -6,7 +6,7 @@ const __dirname = desm(import.meta.url)
 
 export default async () => {
   return {
-    siteName: 'breadcrum.net',
+    siteName: '🥖 Breadcrum',
     disableRegistration: true,
     version: JSON.parse(await readFile(new URL(join(__dirname, '../package.json'), import.meta.url))).version
   }
