@@ -69,7 +69,7 @@ export const bookmarkView = Component(({
         </a>
       </div>
       <div>
-        <button onClick=${onEdit}>edit</button>
+        <button onClick=${onEdit}>Edit</button>
       </div>
     </div>`
 })

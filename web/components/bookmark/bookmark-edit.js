@@ -1,4 +1,5 @@
 /* eslint-env browser */
+/* eslint-disable camelcase */
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
 export const bookmarkEdit = Component(({
@@ -48,6 +49,14 @@ export const bookmarkEdit = Component(({
     const toread = form.toread.checked
     const starred = form.starred.checked
     const sensitive = form.sensitive.checked
+    const episodeMedium = form.episodeMedium.value
+
+    const createEpisode = episodeMedium !== 'none'
+      ? {
+          type: 'redirect',
+          medium: episodeMedium
+        }
+      : null
 
     const formState = {
       url,
@@ -56,7 +65,8 @@ export const bookmarkEdit = Component(({
       tags,
       toread,
       starred,
-      sensitive
+      sensitive,
+      createEpisode
     }
 
     try {
@@ -114,18 +124,57 @@ export const bookmarkEdit = Component(({
           </label>
         </div>
         <div>
-          ${onDeleteBookmark
-            ? deleteConfirm
-              ? html`
-                <button onClick=${hanldeCancelDelete}>cancel</button>
-                <button onClick=${handleDeleteBookmark}>destroy</button>`
-              : html`<button onClick=${handleInitiateDelete}>delete</button>`
-            : null
-          }
+          <label for="bc-podcast-radio">
+            create podcast episode:
+          <label>
+
+          <div id="bc-podcast-radio">
+            <label>
+              <span>video</span>
+              <input
+                type="radio"
+                name="episodeMedium"
+                value="video"
+                ?checked="${b?.podcast_items?.[0]?.medium === 'video'}"
+              >
+            </label>
+
+            <label>
+              <span>audio</span>
+              <input
+                type="radio"
+                name="episodeMedium"
+                value="audio"
+                ?checked="${b?.podcast_items?.[0]?.medium === 'audio'}"
+              >
+            </label>
+
+            <label>
+              <span>none</span>
+              <input
+                type="radio"
+                name="episodeMedium"
+                value="none"
+                ?checked="${!b?.podcast_items?.[0]?.medium}"
+              >
+            </label>
+          </div>
         </div>
-        <div class="button-cluster">
-          ${onCancelEdit ? html`<button onClick=${onCancelEdit}>cancel</button>` : null}
-          ${onSave ? html`<input name="submit-button" type="submit">` : null}
+        <div class="bc-bookmark-edit-submit-line">
+          <div class="button-cluster">
+            ${onSave ? html`<input name="submit-button" type="submit">` : null}
+            ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
+          </div>
+          <div>
+            ${onDeleteBookmark
+              ? deleteConfirm
+                ? html`
+                  <button onClick=${hanldeCancelDelete}>Cancel</button>
+                  <button onClick=${handleDeleteBookmark}>Destroy</button>`
+                : html`<button onClick=${handleInitiateDelete}>Delete</button>`
+              : null
+            }
+          </div>
         </div>
         ${error ? html`<div class="error-box">${error.message}</div>` : null}
       </fieldset>

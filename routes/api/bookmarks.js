@@ -1,4 +1,8 @@
+/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
+import { createEpisode } from '../../lib/create-episode.js'
+import { queue } from '../../lib/queue.js'
+import { runYTDLP } from '../../lib/run-yt-dlp.js'
 
 const commnonBookmarkProps = {
   url: { type: 'string', format: 'uri' },
@@ -20,6 +24,23 @@ const fullBookmarkProps = {
   ...commnonBookmarkProps,
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' }
+}
+
+const createEpisodeProp = {
+  createEpisode: {
+    anyOf: [
+      {
+        type: 'object',
+        properties: {
+          type: { enum: ['redirect'] },
+          medium: { enum: ['video', 'audio'] }
+        }
+      },
+      {
+        type: 'null'
+      }
+    ]
+  }
 }
 
 export default async function bookmarkRoutes (fastify, opts) {
@@ -90,7 +111,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
       }
     },
-    async function (request, reply) {
+    async function getBookmarks (request, reply) {
       const id = request.user.id
       let {
         before,
@@ -206,8 +227,8 @@ export default async function bookmarkRoutes (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            ...commnonBookmarkProps
-            // TODO: allow arrays of tag names
+            ...commnonBookmarkProps,
+            ...createEpisodeProp
           },
           additionalProperties: false,
           required: ['url']
@@ -223,15 +244,22 @@ export default async function bookmarkRoutes (fastify, opts) {
         }
       }
     },
-    async function (request, reply) {
+    async function createBookmark (request, reply) {
       return fastify.pg.transact(async client => {
-        const id = request.user.id
-        const { url, title, note, toread, sensitive, tags = [] } = request.body
+        const userId = request.user.id
+        const {
+          url,
+          title,
+          note,
+          toread,
+          sensitive,
+          tags = []
+        } = request.body
 
         const checkForExistingQuery = SQL`
         SELECT id, url
         FROM bookmarks
-        WHERE owner_id = ${id}
+        WHERE owner_id = ${userId}
           AND url = ${url};
         `
 
@@ -252,7 +280,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           ${note},
           ${toread || false},
           ${sensitive || false},
-          ${id}
+          ${userId}
         )
         RETURNING id, url, title, toread, sensitive, owner_id;`
 
@@ -264,7 +292,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           INSERT INTO tags (name, owner_id)
           VALUES
              ${SQL.glue(
-                tags.map(tag => SQL`(${tag},${id})`),
+                tags.map(tag => SQL`(${tag},${userId})`),
                 ' , '
               )}
           ON CONFLICT (name, owner_id)
@@ -285,6 +313,24 @@ export default async function bookmarkRoutes (fastify, opts) {
           `
 
           await client.query(applyTags)
+        }
+
+        if (request?.body?.createEpisode) {
+          const { id: episodeId } = await createEpisode({
+            client,
+            userId,
+            bookmarkId: bookmark.id,
+            type: request?.body?.createEpisode.type,
+            medium: request?.body?.createEpisode.medium
+          })
+
+          queue.add(runYTDLP({
+            userId,
+            bookmarkId: bookmark.id,
+            episodeId,
+            pg: fastify.pg,
+            log: request.log
+          })).catch(request.log.error)
         }
 
         return {
@@ -315,7 +361,7 @@ export default async function bookmarkRoutes (fastify, opts) {
           }
         }
       }
-    }, async function (request, reply) {
+    }, async function getBookmark (request, reply) {
       const userId = request.user.id
       const { id: bookmarkId } = request.params
 
@@ -359,14 +405,15 @@ export default async function bookmarkRoutes (fastify, opts) {
       body: {
         type: 'object',
         properties: {
-          ...commnonBookmarkProps
+          ...commnonBookmarkProps,
+          ...createEpisodeProp
         },
         minProperties: 1,
         additionalProperties: false
       }
     }
   },
-  async function (request, reply) {
+  async function updateBookmark (request, reply) {
     return fastify.pg.transact(async client => {
       const userId = request.user.id
       const bookmarkId = request.params.id
@@ -439,6 +486,24 @@ export default async function bookmarkRoutes (fastify, opts) {
         }
       }
 
+      if (bookmark?.createEpisode) {
+        const { id: episodeId } = await createEpisode({
+          client,
+          userId,
+          bookmarkId,
+          type: bookmark.createEpisode.type,
+          medium: bookmark.createEpisode.medium
+        })
+
+        queue.add(runYTDLP({
+          userId,
+          bookmarkId,
+          episodeId,
+          pg: fastify.pg,
+          log: request.log
+        })).catch(request.log.error)
+      }
+
       return {
         status: 'ok'
       }
@@ -457,7 +522,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
     }
   },
-  async function (request, reply) {
+  async function deleteBookmark (request, reply) {
     const userId = request.user.id
     const bookmarkId = request.params.id
 
