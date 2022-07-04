@@ -411,6 +411,8 @@ export default async function bookmarkRoutes (fastify, opts) {
             medium: request?.body?.createEpisode.medium
           })
 
+          await client.query('commit')
+
           queue.add(runYTDLP({
             userId,
             bookmarkId: bookmark.id,
@@ -581,6 +583,8 @@ export default async function bookmarkRoutes (fastify, opts) {
           type: bookmark.createEpisode.type,
           medium: bookmark.createEpisode.medium
         })
+
+        await client.query('commit')
 
         queue.add(runYTDLP({
           userId,

@@ -45,7 +45,7 @@ export const bookmarkEdit = Component(({
     const title = form.title.value
     const note = form.note.value
     const rawTags = form.tags.value
-    const tags = rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))
+    const tags = Array.from(new Set(rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))))
     const toread = form.toread.checked
     const starred = form.starred.checked
     const sensitive = form.sensitive.checked
