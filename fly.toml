@@ -8,6 +8,7 @@ processes = []
 
 [build]
   builder = "heroku/buildpacks:20"
+  buildpacks = ["https://github.com/hifiwi-fi/heroku-yt-dlp-buildpack.git"]
 
 [build.args]
   NODE_ENV = 'production'
