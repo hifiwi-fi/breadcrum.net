@@ -28,7 +28,7 @@
     "fastify": "^4.0.1",
     "fastify-cli": "4.2.1",
     "fastify-healthcheck": "^4.0.0",
-    "fastify-metrics": "^8.0.0",
+    "fastify-metrics": "^9.0.0",
     "fastify-plugin": "^3.0.0",
     "fetch-undici": "^3.0.0",
     "fluent-json-schema": "^3.0.1",
