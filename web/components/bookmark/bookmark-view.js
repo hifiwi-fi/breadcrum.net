@@ -5,6 +5,7 @@ import { star } from '../star/index.js'
 import { sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
+import format from 'format-duration'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -61,6 +62,13 @@ export const bookmarkView = Component(({
           </div>`
         : null
       }
+      ${b.episodes?.length > 0
+        ? html`
+          <div class="bc-episodes-display">
+            ${b.episodes.map(ep => html.for(ep, ep.id)`<div>${ep.filename ? ep.filename : null}${ep.duration_in_seconds ? ` - ${format(ep.duration_in_seconds * 1000)}` : null}${ep.ready ? ep.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}${ep.error ? ' (❌)' : null}</div>`)}
+          </div>`
+        : null
+      }
       <div class="bc-date">
         <a href="${`./view/?id=${b.id}`}">
           <time datetime="${b.created_at}">
@@ -69,7 +77,7 @@ export const bookmarkView = Component(({
         </a>
       </div>
       <div>
-        <button onClick=${onEdit}>edit</button>
+        <button onClick=${onEdit}>Edit</button>
       </div>
     </div>`
 })

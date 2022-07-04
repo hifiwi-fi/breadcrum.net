@@ -27,3 +27,8 @@ input[type="week"] {
 .bc-bookmark-url-edit {
   font-family: var(--font-code);
 }
+
+.bc-bookmark-edit-submit-line {
+  display: flex;
+  justify-content: space-between;
+}

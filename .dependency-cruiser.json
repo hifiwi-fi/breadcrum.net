@@ -58,7 +58,8 @@
       "severity": "error",
       "from": {},
       "to": {
-        "couldNotResolve": true
+        "couldNotResolve": true,
+        "pathNot": "p-queue$"
       }
     },
     {
@@ -88,7 +89,8 @@
           "undetermined",
           "npm-no-pkg",
           "npm-unknown"
-        ]
+        ],
+        "pathNot": "p-queue$"
       }
     },
     {

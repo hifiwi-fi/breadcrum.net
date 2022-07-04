@@ -15,6 +15,10 @@ export const page = Component(() => {
   const [bookmark, setBookmark] = useState(null)
 
   useEffect(() => {
+    if (!user && !loading) window.location.replace('/login')
+  }, [user, loading])
+
+  useEffect(() => {
     const setFallbackBookmark = () => {
       setBookmark({
         url: query.get('url'),
@@ -54,10 +58,6 @@ export const page = Component(() => {
       setFallbackBookmark()
     })
   }, [query, state.apiUrl])
-
-  useEffect(() => {
-    if (!user && !loading) window.location.replace('/login')
-  }, [user, loading])
 
   const existingBookmark = Boolean(bookmark?.id)
 
