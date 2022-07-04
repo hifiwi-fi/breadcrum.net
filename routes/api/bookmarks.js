@@ -23,7 +23,31 @@ const fullBookmarkProps = {
   id: { type: 'string', format: 'uuid' },
   ...commnonBookmarkProps,
   created_at: { type: 'string', format: 'date-time' },
-  updated_at: { type: 'string', format: 'date-time' }
+  updated_at: { type: 'string', format: 'date-time' },
+  episodes: {
+    type: ['array', 'null'],
+    items: {
+      type: 'object',
+      properties: {
+        episode_id: { type: 'string', format: 'uuid' },
+        created_at: { type: 'string', format: 'date-time' },
+        updated_at: { type: 'string', format: 'date-time' },
+        url: { type: 'string', format: 'uri' },
+        type: { enum: ['redirect'] },
+        medium: { enum: ['video', 'audio'] },
+        size_in_bytes: { type: 'integer' },
+        duration_in_seconds: { type: 'integer' },
+        mime_type: { type: 'string' },
+        explicite: { type: 'boolean' },
+        author_name: { type: 'string' },
+        filename: { type: 'string' },
+        ext: { type: 'string' },
+        src_type: { type: 'string' },
+        ready: { type: 'boolean' },
+        error: { type: 'string' }
+      }
+    }
+  }
 }
 
 const createEpisodeProp = {
@@ -130,7 +154,6 @@ export default async function bookmarkRoutes (fastify, opts) {
         // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
         // and we need to get the item before the next 'before' set.
         const perPageAfterOffset = perPage + 2
-
         const afterCalcQuery = SQL`
           with page as (
             select bm.id, bm.url, bm.title, bm.created_at
@@ -183,26 +206,87 @@ export default async function bookmarkRoutes (fastify, opts) {
         before = (new Date()).toISOString()
       }
 
-      const query = SQL`
-        select id, url, title, note, created_at, updated_at, toread, sensitive, starred, array_to_json(t.tag_array) as tags
-        from bookmarks
-        LEFT OUTER JOIN(
-          SELECT bt.bookmark_id as id, array_agg(t.name) as tag_array
-          FROM bookmarks_tags bt
-          JOIN tags t ON t.id = bt.tag_id
-          GROUP BY bt.bookmark_id
-        ) t using (id)
-        WHERE owner_id = ${id}
-          ${before ? SQL`AND created_at < ${before}` : SQL``}
-          ${url ? SQL`AND url = ${url}` : SQL``}
-          ${!sensitive ? SQL`AND sensitive = false` : SQL``}
-          ${tag ? SQL`AND t.tag_array @> ARRAY[${tag}::citext]` : SQL``}
-        ORDER BY
-          created_at DESC, title DESC, url DESC
-        FETCH FIRST ${perPage} ROWS ONLY;
+      const getBookmarksQuery = SQL`
+        with bookmark_page as (
+          select bm.*
+          from bookmarks bm
+          ${tag
+              ? SQL`
+                left join bookmarks_tags bt
+                on bm.id = bt.bookmark_id
+                left join tags t
+                on t.id = bt.tag_id`
+              : SQL``}
+          where bm.owner_id = ${id}
+          ${before ? SQL`and bm.created_at < ${before}` : SQL``}
+          ${url ? SQL`and url = ${url}` : SQL``}
+          ${!sensitive ? SQL`and sensitive = false` : SQL``}
+          ${tag ? SQL`and t.name = ${tag} and t.owner_id = ${id}` : SQL``}
+          order by bm.created_at desc, bm.title desc, bm.url desc
+          fetch first ${perPage} rows only
+        ),
+        bookark_page_tags_array as (
+          select bm.id as bookmark_id, array_agg(t.name) as tag_array
+          from bookmark_page bm
+          left outer join bookmarks_tags bt
+          on bm.id = bt.bookmark_id
+          left outer join tags t
+          on t.id = bt.tag_id
+          where bm.owner_id = ${id}
+          and t.owner_id = ${id}
+          group by bm.id
+        ),
+        bookark_page_episodes_array as (
+          select bm.id as bookmark_id, jsonb_strip_nulls(jsonb_agg(
+            case
+            when ep.id is null then null
+            else jsonb_strip_nulls(jsonb_build_object(
+              'episode_id', ep.id,
+              'created_at', ep.created_at,
+              'updated_at', ep.updated_at,
+              'url', ep.url,
+              'type', ep.type,
+              'medium', ep.medium,
+              'size_in_bytes', ep.size_in_bytes,
+              'duration_in_seconds', ep.duration_in_seconds,
+              'mime_type', ep.mime_type,
+              'explicit', ep.explicit,
+              'author_name', ep.author_name,
+              'filename', ep.filename,
+              'ext', ep.ext,
+              'src_type', ep.src_type,
+              'ready', ep.ready,
+              'error', ep.error
+            ))
+            end)
+          ) episodes
+          from bookmark_page bm
+          left outer join episodes ep
+          on ep.bookmark_id = bm.id
+          where bm.owner_id = ${id}
+          and ep.owner_id = ${id}
+          group by bm.id
+        )
+        select
+          b.id,
+          b.url,
+          b.title,
+          b.note,
+          b.created_at,
+          b.updated_at,
+          b.toread,
+          b.sensitive,
+          b.starred,
+          coalesce(array_to_json(tag_array), '[]'::json)::jsonb as tags,
+          coalesce(episodes, '[]'::jsonb) as episodes
+        from bookmark_page b
+        left outer join bookark_page_tags_array
+        on bookark_page_tags_array.bookmark_id = b.id
+        left outer join bookark_page_episodes_array
+        on bookark_page_episodes_array.bookmark_id = b.id
       `
 
-      const results = await fastify.pg.query(query)
+      const results = await fastify.pg.query(getBookmarksQuery)
 
       if (results.rows.length !== perPage) bottom = true
 
