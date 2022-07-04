@@ -3,9 +3,13 @@ import cp from 'child_process'
 import util from 'util'
 const exec = util.promisify(cp.exec)
 
-const { stdout } = await exec('which yt-dlp')
-const binPath = stdout.trim()
 const YTDlpWrap = YTDlpWrapExports.default.default
+
+const results = await YTDlpWrap.downloadFromGithub()
+console.log(results)
+
+process.exit()
+
 const ytDlpWrap = new YTDlpWrap(binPath)
 
 const metadata = await ytDlpWrap.getVideoInfo(
