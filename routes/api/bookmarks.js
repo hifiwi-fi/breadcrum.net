@@ -79,8 +79,8 @@ export default async function bookmarkRoutes (fastify, opts) {
             }
           },
           dependencies: {
-            before: { allOf: [{ not: { required: ['after'] } }] },
-            after: { allOf: [{ not: { required: ['before'] } }] }
+            before: { allOf: [{ not: { required: ['after', 'url'] } }] },
+            after: { allOf: [{ not: { required: ['before', 'url'] } }] }
           }
         },
         response: {
@@ -111,6 +111,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
       }
     },
+    // Get Bookmarks
     async function getBookmarks (request, reply) {
       const id = request.user.id
       let {
@@ -131,37 +132,39 @@ export default async function bookmarkRoutes (fastify, opts) {
         const perPageAfterOffset = perPage + 2
 
         const afterCalcQuery = SQL`
-          WITH page as (
-            SELECT id, url, title, created_at
-            FROM bookmarks
-            LEFT OUTER JOIN(
-              SELECT bt.bookmark_id as id, array_agg(t.name) as tag_array
-              FROM bookmarks_tags bt
-              JOIN tags t ON t.id = bt.tag_id
-              GROUP BY bt.bookmark_id
-            ) t using (id)
-                WHERE owner_id = ${id}
-                  AND created_at >= ${after}
-                  ${url ? SQL`AND url = ${url}` : SQL``}
-                  ${!sensitive ? SQL`AND sensitive = false` : SQL``}
-                  ${tag ? SQL`AND t.tag_array @> ARRAY[${tag}::citext]` : SQL``}
-                ORDER BY
-                  created_at ASC, title ASC, url ASC
-                FETCH FIRST ${perPageAfterOffset} ROWS ONLY
+          with page as (
+            select bm.id, bm.url, bm.title, bm.created_at
+            from bookmarks bm
+            ${tag
+              ? SQL`
+                left join bookmarks_tags bt
+                on bm.id = bt.bookmark_id
+                left join tags t
+                on t.id = bt.tag_id`
+              : SQL``}
+            where bm.owner_id = ${id}
+            and bm.created_at >= ${after}
+            ${!sensitive ? SQL`AND bm.sensitive = false` : SQL``}
+            ${tag
+              ? SQL`
+                and t.name = ${tag}
+                and t.owner_id = ${id}`
+              : SQL``}
+            order by bm.created_at ASC, bm.title ASC, bm.url ASC
+            fetch first ${perPageAfterOffset} rows only
           ),
           bookmark_with_last_row_date as (
-            SELECT LAST_VALUE(page.created_at) OVER (
-                  ORDER BY page.created_at
-                  RANGE BETWEEN
+            select last_value(page.created_at) over (
+                  order by page.created_at
+                  range between
                       UNBOUNDED PRECEDING AND
                       UNBOUNDED FOLLOWING
               ) last_created_at
-            FROM page
+            from page
           )
-          SELECT COUNT(*)::int as bookmark_count, last_created_at
-          FROM bookmark_with_last_row_date
-          GROUP BY last_created_at
-        `
+          select count(*)::int as bookmark_count, last_created_at
+          from bookmark_with_last_row_date
+          group by last_created_at`
 
         const results = await fastify.pg.query(afterCalcQuery)
 
@@ -181,8 +184,8 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
 
       const query = SQL`
-        SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, array_to_json(t.tag_array) as tags
-        FROM bookmarks
+        select id, url, title, note, created_at, updated_at, toread, sensitive, starred, array_to_json(t.tag_array) as tags
+        from bookmarks
         LEFT OUTER JOIN(
           SELECT bt.bookmark_id as id, array_agg(t.name) as tag_array
           FROM bookmarks_tags bt
