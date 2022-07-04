@@ -17,7 +17,7 @@
     "@fastify/autoload": "^5.0.0",
     "@fastify/caching": "^8.0.0",
     "@fastify/circuit-breaker": "^3.0.0",
-    "fastify-cli": "^4.0.0",
+    "fastify-cli": "4.1.1",
     "@fastify/compress": "^6.0.0",
     "@fastify/cookie": "^7.0.0",
     "@fastify/cors": "^8.0.0",
@@ -88,7 +88,7 @@
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
-    "watch:server": "fastify start -w -l info -P -p 3000 --options --address 0.0.0.0 app.js",
+    "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:siteup": "npm run build:siteup -- --watch"
   },
   "standard": {
