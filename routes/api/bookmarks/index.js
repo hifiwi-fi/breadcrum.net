@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { createEpisode } from '../../lib/create-episode.js'
-import { queue } from '../../lib/queue.js'
-import { runYTDLP } from '../../lib/run-yt-dlp.js'
+import { createEpisode } from '../../../lib/create-episode.js'
+import { queue } from '../../../lib/queue.js'
+import { runYTDLP } from '../../../lib/run-yt-dlp.js'
 
 const commnonBookmarkProps = {
   url: { type: 'string', format: 'uri' },
@@ -69,7 +69,7 @@ const createEpisodeProp = {
 
 export default async function bookmarkRoutes (fastify, opts) {
   fastify.get(
-    '/bookmarks',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
@@ -307,7 +307,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
   // Create bookmark
   fastify.put(
-    '/bookmarks',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
@@ -431,7 +431,7 @@ export default async function bookmarkRoutes (fastify, opts) {
   )
 
   fastify.get(
-    '/bookmarks/:id', {
+    '/:id', {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         params: {
@@ -481,7 +481,7 @@ export default async function bookmarkRoutes (fastify, opts) {
       }
     })
 
-  fastify.put('/bookmarks/:id', {
+  fastify.put('/:id', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
       params: {
@@ -601,7 +601,7 @@ export default async function bookmarkRoutes (fastify, opts) {
     })
   })
 
-  fastify.delete('/bookmarks/:id', {
+  fastify.delete('/:id', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
       params: {

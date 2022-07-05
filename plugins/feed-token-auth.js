@@ -11,7 +11,7 @@ export default fp(async function (fastify, opts) {
     authenticate: true
   })
 
-  fastify.decorateRequest('basicAuth', null)
+  fastify.decorateRequest('feedTokenUser', null)
 
   async function validate (uuid, token, request, reply) {
     if (!uuid) throw new Error('Missing user')
@@ -30,12 +30,15 @@ export default fp(async function (fastify, opts) {
 
     const results = await fastify.pg.query(feedQuery)
     if (results.rowCount === 1) {
-
+      request.feedTokenUser = {
+        userId: uuid,
+        token
+      }
     } else {
-      throw new Error('Unauthorized')
+      throw new Error('Unauthorized feed token')
     }
   }
 }, {
-  name: 'basic-auth',
+  name: 'feed-token-auth',
   dependencies: ['env']
 })
