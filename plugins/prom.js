@@ -7,7 +7,12 @@ import Fastify from 'fastify'
  * @see https://gitlab.com/m03geek/fastify-metrics
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('fastify-metrics'), {})
+  fastify.register((await import('fastify-metrics')).default /* double default export bug */, {
+    defaultMetrics: { enabled: true },
+    endpoint: null,
+    name: 'metrics',
+    routeMetrics: { enabled: true }
+  })
 
   const promServer = Fastify({
     logger: true
@@ -28,9 +33,13 @@ export default fp(async function (fastify, opts) {
 
   const start = async () => {
     try {
-      await promServer.listen(9091, '0.0.0.0')
+      await promServer.listen({
+        port: 9091,
+        host: '0.0.0.0'
+      })
     } catch (err) {
       promServer.log.error(err)
+      promServer.log('promethius server stopped')
       process.exit(1)
     }
   }
@@ -38,7 +47,7 @@ export default fp(async function (fastify, opts) {
   fastify.addHook('onClose', async (instance) => {
     await promServer.close()
   })
-  if (fastify.config.ENV === 'production') { await start() }
+  await start()
 },
 {
   name: 'prom',
