@@ -8,6 +8,10 @@ const schema = {
       type: 'string',
       default: 'development'
     },
+    METRICS: {
+      type: 'boolean',
+      default: true
+    },
     JWT_SECRET: {
       type: 'string',
       // THIS IS JUST A DEV SECRET
