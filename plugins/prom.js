@@ -7,7 +7,7 @@ import Fastify from 'fastify'
  * @see https://gitlab.com/m03geek/fastify-metrics
  */
 export default fp(async function (fastify, opts) {
-  fastify.register((await import('fastify-metrics')).default /* double default export bug */, {
+  fastify.register((await import('fastify-metrics')).default, {
     defaultMetrics: { enabled: true },
     endpoint: null,
     name: 'metrics',
