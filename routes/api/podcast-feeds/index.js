@@ -13,7 +13,8 @@ export default async function podcastFeedsRoutes (fastify, opts) {
               type: 'string',
               format: 'uuid'
             }
-          }
+          },
+          required: ['feed']
         }
       }
     },
@@ -21,10 +22,6 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       const { userId } = request.feedTokenUser
       const { feed: feedId } = request.params
       if (!userId) throw new Error('missing authenticated feed userId')
-      return {
-        userId,
-        feedId
-      }
     }
   )
 }

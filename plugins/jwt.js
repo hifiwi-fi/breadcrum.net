@@ -1,6 +1,5 @@
 import fp from 'fastify-plugin'
 import SQL from '@nearform/sql'
-import { randomUUID } from 'crypto'
 
 /**
  * This plugins adds jwt token support
@@ -43,24 +42,25 @@ export default fp(async function (fastify, opts) {
    * @return {[type]}       [description]
    */
   fastify.decorateReply('createJWTToken', async function (user) {
-    const uuid = randomUUID()
-    const token = await this.jwtSign({
-      ...user,
-      jti: uuid
-    })
-
     const userAgent = this.request.headers['user-agent']
     const ip = Array.isArray(this.request.ips) ? [...this.request.ips].pop() : this.request.ip
 
     const query = SQL`
-        INSERT INTO auth_tokens (jti, owner_id, user_agent, ip) VALUES (
-          ${uuid},
+        insert into auth_tokens (owner_id, user_agent, ip) values (
           ${user.id},
           ${userAgent || null},
           ${ip || null}
-        );`
+        )
+        returning jti;`
 
     const results = await fastify.pg.query(query)
+    const jti = results.rows[0].jti
+    if (!jti) throw new Error('No jti returned when creating an auth token')
+
+    const token = await this.jwtSign({
+      ...user,
+      jti
+    })
 
     this.log.info(`Deleted ${results.rowCount} auth_tokens rows`)
 
