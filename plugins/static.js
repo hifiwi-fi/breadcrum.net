@@ -18,5 +18,5 @@ export default fp(async function (fastify, opts) {
   })
 }, {
   name: 'static',
-  dependencies: ['env']
+  dependencies: ['env', 'compress']
 })
