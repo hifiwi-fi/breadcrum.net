@@ -24,9 +24,10 @@
     "@fastify/sensible": "^5.0.0",
     "@fastify/static": "^6.4.0",
     "@nearform/sql": "^1.5.0",
-    "@siteup/cli": "^2.0.0",
+    "@siteup/cli": "^2.1.4",
     "clean-deep": "^3.4.0",
     "desm": "^1.2.0",
+    "env-schema": "^5.0.0",
     "fastify": "^4.0.1",
     "fastify-cli": "4.3.0",
     "fastify-healthcheck": "^4.0.0",
@@ -95,7 +96,8 @@
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
-    "watch:siteup": "npm run build:siteup -- --watch"
+    "watch:siteup": "npm run build:siteup -- --watch",
+    "create-dev-env": "node scripts/generate-default-env.js"
   },
   "standard": {
     "ignore": []

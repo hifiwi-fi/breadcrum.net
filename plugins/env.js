@@ -1,8 +1,11 @@
 import fp from 'fastify-plugin'
 
-const schema = {
+export const schema = {
   type: 'object',
-  required: [],
+  required: [
+    'JWT_SECRET',
+    'COOKIE_SECRET'
+  ],
   properties: {
     ENV: {
       type: 'string',
@@ -13,24 +16,14 @@ const schema = {
       default: true
     },
     JWT_SECRET: {
-      type: 'string',
-      // THIS IS JUST A DEV SECRET
-      // TODO: move these to .env file for dev, throw when missing
-      default: 'c24deaadfd768e04e833227b494d10d49a7fec4a5c6330ead080f2ffc051d33c'
+      type: 'string'
     },
     COOKIE_SECRET: {
-      type: 'string',
-      // THIS IS JUST A DEV SECRET
-      // // TODO: move these to .env file for dev, throw when missing
-      default: '08b7ee661730c8a0c8638f260a6b5e7dda40155dc27a416ad87470ad813250f9'
+      type: 'string'
     },
     COOKIE_NAME: {
       type: 'string',
       default: 'breadcrum_token'
-    },
-    APP_NAME: {
-      type: 'string',
-      default: 'breadcrum'
     },
     DATABASE_URL: {
       type: 'string',
@@ -38,11 +31,12 @@ const schema = {
     },
     DOMAIN: {
       type: 'string',
+      // breadcrum.net in production
       default: 'localhost'
     },
     REGISTRATION: {
-      type: 'string',
-      default: 'enabled'
+      type: 'boolean',
+      default: true
     }
   }
 }

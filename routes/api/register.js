@@ -40,7 +40,7 @@ export default async function registerRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
-      if (fastify.config.REGISTRATION !== 'enabled') {
+      if (!fastify.config.REGISTRATION) {
         reply.code(403)
         return {
           error: 'Registration is closed. Please try again later.'
