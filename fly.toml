@@ -21,7 +21,7 @@ processes = []
   ENV = 'production'
   NODE_ENV = 'production'
   DOMAIN = 'breadcrum.net'
-  REGISTRATION = 'disabled'
+  REGISTRATION = 0
 
 [deploy]
   release_command = "npm run prod-migrate"

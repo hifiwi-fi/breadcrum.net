@@ -4,7 +4,8 @@ export const schema = {
   type: 'object',
   required: [
     'JWT_SECRET',
-    'COOKIE_SECRET'
+    'COOKIE_SECRET',
+    'REGISTRATION' // Due to build time client use
   ],
   properties: {
     ENV: {
@@ -12,8 +13,8 @@ export const schema = {
       default: 'development'
     },
     METRICS: {
-      type: 'boolean',
-      default: true
+      enum: [0, 1],
+      default: 1
     },
     JWT_SECRET: {
       type: 'string'
@@ -30,13 +31,16 @@ export const schema = {
       default: 'postgres://postgres@localhost/breadcrum'
     },
     DOMAIN: {
+      // Hostname and port (if needed)
       type: 'string',
-      // breadcrum.net in production
-      default: 'localhost'
+      default: 'localhost:3000'
     },
     REGISTRATION: {
-      type: 'boolean',
-      default: true
+      enum: [0, 1]
+    },
+    TRANSPORT: {
+      enum: ['http', 'https'],
+      default: 'http'
     }
   }
 }
