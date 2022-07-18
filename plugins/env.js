@@ -13,7 +13,7 @@ export const schema = {
       default: 'development'
     },
     METRICS: {
-      enum: [0, 1],
+      type: 'integer',
       default: 1
     },
     JWT_SECRET: {
@@ -36,7 +36,8 @@ export const schema = {
       default: 'localhost:3000'
     },
     REGISTRATION: {
-      enum: [0, 1]
+      type: 'integer',
+      default: 1
     },
     TRANSPORT: {
       enum: ['http', 'https'],
