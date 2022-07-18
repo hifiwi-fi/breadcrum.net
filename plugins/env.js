@@ -13,7 +13,7 @@ export const schema = {
       default: 'development'
     },
     METRICS: {
-      type: 'integer',
+      type: 'integer', // 0 or 1
       default: 1
     },
     JWT_SECRET: {
@@ -36,7 +36,7 @@ export const schema = {
       default: 'localhost:3000'
     },
     REGISTRATION: {
-      type: 'integer',
+      type: 'integer', // 0 or 1
       default: 1
     },
     TRANSPORT: {
