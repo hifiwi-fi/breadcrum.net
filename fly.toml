@@ -12,6 +12,7 @@ processes = []
 [build.args]
   NODE_ENV = 'production'
   DOMAIN = 'breadcrum.net'
+  TRANSPORT='https'
   REGISTRATION = 0
 
 [env]
@@ -35,10 +36,6 @@ processes = []
 [metrics]
   port = 9091 # default for most prometheus clients
   path = "/metrics" # default for most prometheus clients
-
-[[statics]]
-  guest_path = "/asdfasdf"
-  url_prefix = "/asdfasdf"
 
 [[services]]
   internal_port = 8080
