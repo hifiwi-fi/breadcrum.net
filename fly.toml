@@ -10,6 +10,7 @@ processes = []
   builder = "heroku/buildpacks:20"
 
 [build.args]
+  ENV = 'production'
   NODE_ENV = 'production'
   DOMAIN = 'breadcrum.net'
   TRANSPORT='https'
