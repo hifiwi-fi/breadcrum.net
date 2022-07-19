@@ -30,7 +30,7 @@ export const schema = {
       type: 'string',
       default: 'postgres://postgres@localhost/breadcrum'
     },
-    DOMAIN: {
+    HOST: {
       // Hostname and port (if needed)
       type: 'string',
       default: 'localhost:3000'

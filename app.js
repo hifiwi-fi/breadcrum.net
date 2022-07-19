@@ -23,6 +23,8 @@ export default async function App (fastify, opts) {
     dir: join(__dirname, 'routes'),
     options: Object.assign({}, opts)
   })
+
+  // setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
 }
 
 export const options = {

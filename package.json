@@ -40,6 +40,7 @@
     "highlight.js": "^11.5.0",
     "jsonfeed-to-rss": "^3.0.6",
     "local-storage-proxy": "^4.0.3",
+    "lru-cache": "^7.13.1",
     "mine.css": "^7.0.0",
     "p-queue": "^7.2.0",
     "pg": "^8.6.0",

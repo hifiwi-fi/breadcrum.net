@@ -424,7 +424,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
         return {
           status: 'ok',
-          site_url: `https://${fastify.config.domain}/bookmarks/b?id=${bookmark.id}`
+          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`
         }
       })
     }
