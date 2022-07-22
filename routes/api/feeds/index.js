@@ -4,6 +4,7 @@ import cleanDeep from 'clean-deep'
 import { getYTDLPUrl } from '../../../lib/run-yt-dlp.js'
 import { cache } from '../../../lib/temp-cache.js'
 import { getOrCreateDefaultFeed } from '../../../lib/get-or-create-default-feed.js'
+import { getFileKey } from '../../../lib/file-key.js'
 
 export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
@@ -258,20 +259,9 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       }
     },
     async function episodeHandler (request, reply) {
-      const { userId, token: userProvidedToken } = request.feedTokenUser
+      const { userId } = request.feedTokenUser
       const { feed: feedId, episode: episodeId } = request.params
       if (!userId) throw new Error('missing authenticated feed userId')
-
-      const cacheKey = ['file', userId, userProvidedToken, feedId, episodeId].join(':')
-
-      const cachedUrl = await cache.get(cacheKey)
-
-      if (cachedUrl) {
-        reply.header('fly-cache-status', 'HIT')
-        return reply.redirect(302, cachedUrl)
-      } else {
-        reply.header('fly-cache-status', 'MISS')
-      }
 
       const episodeQuery = SQL`
           select
@@ -313,8 +303,25 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         return reply.notFound(`episide ${episodeId} not found in feed ${feedId}`)
       }
 
+      const cacheKey = getFileKey({
+        userId,
+        episodeId: episode.id,
+        sourceUrl: episode.src_url,
+        type: episode.type,
+        medium: episode.medium
+      })
+
+      const cachedUrl = cache.get(cacheKey)
+
+      if (cachedUrl) {
+        reply.header('fly-cache-status', 'HIT')
+        return reply.redirect(302, cachedUrl)
+      } else {
+        reply.header('fly-cache-status', 'MISS')
+      }
+
       const metadata = await getYTDLPUrl({ url: episode.src_url })
-      await cache.set(cacheKey, metadata.urls, metadata.urls)
+      cache.set(cacheKey, metadata.urls, metadata.urls)
       reply.redirect(302, metadata.urls)
     }
   )
