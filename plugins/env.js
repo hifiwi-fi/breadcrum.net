@@ -42,6 +42,14 @@ export const schema = {
     TRANSPORT: {
       enum: ['http', 'https'],
       default: 'http'
+    },
+    PQUEUE_CONCURRENCY: {
+      type: 'integer',
+      default: 1
+    },
+    PQUEUE_TIMEOUT: {
+      type: 'integer',
+      default: 60000
     }
   }
 }

@@ -3,8 +3,8 @@ import PQueue from 'p-queue'
 
 export default fp(async function (fastify, opts) {
   const queue = new PQueue({
-    concurrency: 10,
-    timeout: 60000
+    concurrency: fastify.config.PQUEUE_CONCURRENCY,
+    timeout: fastify.config.PQUEUE_TIMEOUT
   })
 
   let count = 0
