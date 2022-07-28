@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { createEpisode } from '../../../lib/create-episode.js'
-import { queue } from '../../../lib/queue.js'
 import { runYTDLP } from '../../../lib/run-yt-dlp.js'
 
 const commnonBookmarkProps = {
@@ -413,7 +412,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
           await client.query('commit')
 
-          queue.add(runYTDLP({
+          fastify.pqueue.add(runYTDLP({
             userId,
             bookmarkId: bookmark.id,
             episodeId,
@@ -586,7 +585,7 @@ export default async function bookmarkRoutes (fastify, opts) {
 
         await client.query('commit')
 
-        queue.add(runYTDLP({
+        fastify.pqueue.add(runYTDLP({
           userId,
           bookmarkId,
           episodeId,
