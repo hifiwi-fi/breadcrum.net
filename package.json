@@ -24,7 +24,7 @@
     "@fastify/sensible": "^5.0.0",
     "@fastify/static": "^6.4.0",
     "@nearform/sql": "^1.5.0",
-    "@siteup/cli": "^2.2.0",
+    "@siteup/cli": "^2.0.0",
     "clean-deep": "^3.4.0",
     "desm": "^1.2.0",
     "dotenv": "^16.0.1",
