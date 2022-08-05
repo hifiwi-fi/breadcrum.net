@@ -46,14 +46,14 @@ export const header = Component(() => {
                 : null
             }
             ${
-              window?.location?.pathname !== '/login/' && window?.location?.pathname !== '/register/' && state.registration
+              window?.location?.pathname !== '/login/' && window?.location?.pathname !== '/register/' && +process.env.REGISTRATION
                 ? html`
                   <div>/</div>
                 `
                 : null
             }
             ${
-              window?.location?.pathname !== '/register/' && state.registration
+              window?.location?.pathname !== '/register/' && +process.env.REGISTRATION
                 ? html`
                   <div>
                     <a href='/register'>register</a>

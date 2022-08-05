@@ -5,10 +5,9 @@ export const state = lsp('breadcrum', {
     user: null,
     apiUrl: '/api',
     host: 'breadcrum.net',
-    registration: +process.env.REGISTRATION,
     sensitive: false
   },
-  lspReset: 4
+  lspReset: 5
 })
 
 if (typeof window !== 'undefined') {

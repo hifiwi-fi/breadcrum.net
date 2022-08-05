@@ -9,8 +9,8 @@ export const page = Component(() => {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (!state.registration) window.location.replace('/')
-  }, [state.registration])
+    if (!+process.env.REGISTRATION) window.location.replace('/')
+  }, [process.env.REGISTRATION])
 
   useEffect(() => {
     if ((user && !loading)) window.location.replace('/bookmarks')
