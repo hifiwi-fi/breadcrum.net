@@ -6,7 +6,7 @@ const logoutInfoSchema = S.object()
 
 export default async function logoutRoute (fastify, opts) {
   fastify.post(
-    '/logout',
+    '/',
     {
       schema: {
         response: {

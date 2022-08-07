@@ -23,7 +23,7 @@ const userInfoSchema = S.object()
 
 export default async function loginRoutes (fastify, opts) {
   fastify.post(
-    '/login',
+    '/',
     {
       schema: {
         body: credentialsSchema,

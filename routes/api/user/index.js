@@ -9,7 +9,7 @@ const userJsonSchema = S.object()
 
 export default async function userRoutes (fastify, opts) {
   fastify.get(
-    '/user',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {

@@ -1,6 +1,6 @@
 export default async function tagsRoutes (fastify, opts) {
   fastify.get(
-    '/search/bookmarks',
+    '/bookmarks',
     {},
     async function (request, reply) {
       throw new Error('not implemented')
@@ -8,7 +8,7 @@ export default async function tagsRoutes (fastify, opts) {
   )
 
   fastify.get(
-    '/search/tags',
+    '/tags',
     {},
     async function (request, reply) {
       throw new Error('not implemented')

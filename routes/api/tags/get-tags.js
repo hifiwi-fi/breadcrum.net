@@ -2,7 +2,7 @@ import SQL from '@nearform/sql'
 
 export async function getTags (fastify, opts) {
   fastify.get(
-    '/tags',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {

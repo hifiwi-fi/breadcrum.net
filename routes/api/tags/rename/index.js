@@ -2,7 +2,7 @@
 
 export default async function tagsRenameRoutes (fastify, opts) {
   fastify.post(
-    '/tags/rename',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {

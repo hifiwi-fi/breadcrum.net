@@ -30,7 +30,7 @@ const createdUserJsonSchema = S.object()
 
 export default async function registerRoutes (fastify, opts) {
   fastify.post(
-    '/register',
+    '/',
     {
       schema: {
         body: newUserJsonSchema,

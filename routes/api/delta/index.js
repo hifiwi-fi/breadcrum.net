@@ -8,7 +8,7 @@ export default async function deltaRoutes (fastify, opts) {
   )
 
   fastify.get(
-    '/delta/bookmarks',
+    '/bookmarks',
     {},
     async function (request, reply) {
       throw new Error('not implemented')

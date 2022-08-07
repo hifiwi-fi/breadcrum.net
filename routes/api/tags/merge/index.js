@@ -2,7 +2,7 @@
 
 export default async function tagsMergeRoutes (fastify, opts) {
   fastify.post(
-    '/tags/merge',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {

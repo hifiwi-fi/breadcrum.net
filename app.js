@@ -25,7 +25,7 @@ export default async function App (fastify, opts) {
     options: Object.assign({}, opts)
   })
 
-  setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
+  // setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
 }
 
 export const options = {
