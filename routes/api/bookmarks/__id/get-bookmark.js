@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import SQL from '@nearform/sql'
+import { getBookmarksQuery } from '../get-bookmark-query.js'
 import { fullBookmarkProps } from '../bookmark-props.js'
 
 export async function getBookmark (fastify, opts) {
@@ -25,26 +25,16 @@ export async function getBookmark (fastify, opts) {
       }
     },
     async function getBookmarkHandler (request, reply) {
-      const userId = request.user.id
+      const ownerId = request.user.id
       const { id: bookmarkId } = request.params
 
-      const query = SQL`
-      with bookmark as (
-        select bm.*
-        from bookmarks bm
-      )
-      SELECT id, url, title, note, created_at, updated_at, toread, sensitive, starred, t.tag_array as tags
-        FROM bookmarks
-        LEFT OUTER JOIN(
-          SELECT bt.bookmark_id as id, jsonb_agg(t.name) as tag_array
-          FROM bookmarks_tags bt
-          JOIN tags t ON t.id = bt.tag_id
-          GROUP BY bt.bookmark_id
-        ) t using (id)
-        WHERE owner_id = ${userId}
-          AND id = ${bookmarkId}
-        LIMIT 1;
-      `
+      const query = getBookmarksQuery({
+        ownerId,
+        bookmarkId,
+        perPage: 1
+      })
+
+      console.log(query)
 
       const results = await fastify.pg.query(query)
       const bookmark = results.rows[0]
