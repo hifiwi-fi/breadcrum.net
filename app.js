@@ -21,10 +21,11 @@ export default async function App (fastify, opts) {
   // define your routes in one of these
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
+    routeParams: true,
     options: Object.assign({}, opts)
   })
 
-  // setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
+  setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
 }
 
 export const options = {
