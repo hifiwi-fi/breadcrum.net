@@ -70,7 +70,7 @@ export const bookmarkView = Component(({
         : null
       }
       <div class="bc-date">
-        <a href="${`./view/?id=${b.id}`}">
+        <a href="${`/bookmarks/view/?id=${b.id}`}">
           <time datetime="${b.created_at}">
             ${(new Date(b.created_at)).toLocaleString()}
           </time>
