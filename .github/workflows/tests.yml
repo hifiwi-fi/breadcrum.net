@@ -21,6 +21,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm i
+    - run: node ./scripts/bootstrap-yt-dlp.js
     - run: npm test --color=always -- -c
     - name: Coveralls
       uses: coverallsapp/github-action@1.1.3
