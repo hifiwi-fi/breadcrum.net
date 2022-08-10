@@ -3,6 +3,11 @@ import SQL from '@nearform/sql'
 import { createEpisode } from '../../../../lib/create-episode.js'
 import { runYTDLP } from '../../../../lib/run-yt-dlp.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
+import {
+  getBookmarkEditCounter,
+  getTagAppliedCounter,
+  getTagRemovedCounter
+} from '../put-bookmarks.js'
 
 const createEpisodeProp = {
   createEpisode: {
@@ -22,6 +27,15 @@ const createEpisodeProp = {
 }
 
 export async function putBookmark (fastify, opts) {
+  const bookmarkEditCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_bookmark_edit_total',
+    help: 'The number of times bookmarks are edited'
+  })
+
+  const episodeCounter = getBookmarkEditCounter(fastify)
+  const tagAppliedCounter = getTagAppliedCounter(fastify)
+  const tagRemovedCounter = getTagRemovedCounter(fastify)
+
   fastify.put('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
@@ -98,6 +112,7 @@ export async function putBookmark (fastify, opts) {
           `
 
           await client.query(applyTags)
+          tagAppliedCounter.inc(tagsResults.rows.length)
 
           const removeOldTags = SQL`
           DELETE FROM bookmarks_tags
@@ -105,7 +120,8 @@ export async function putBookmark (fastify, opts) {
             AND tag_id NOT IN (${SQL.glue(tagsResults.rows.map(tag => SQL`${tag.id}`), ', ')})
         `
 
-          await client.query(removeOldTags)
+          const removeResults = await client.query(removeOldTags)
+          tagRemovedCounter.inc(removeResults.rows.length)
         } else {
           const removeAllTags = SQL`
           DELETE FROM bookmarks_tags
@@ -133,8 +149,10 @@ export async function putBookmark (fastify, opts) {
           episodeId,
           pg: fastify.pg,
           log: request.log
-        })).catch(request.log.error)
+        })).then(() => episodeCounter.inc()).catch(request.log.error)
       }
+
+      bookmarkEditCounter.inc()
 
       return {
         status: 'ok'

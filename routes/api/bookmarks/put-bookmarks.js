@@ -8,6 +8,14 @@ import { createEpisode } from '../../../lib/create-episode.js'
 import { runYTDLP } from '../../../lib/run-yt-dlp.js'
 
 export async function putBookmarks (fastify, opts) {
+  const bookmarkCreatedCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_bookmark_created_total',
+    help: 'The number of times bookmarks are created'
+  })
+
+  const episodeCounter = getBookmarkEditCounter(fastify)
+  const tagAppliedCounter = getTagAppliedCounter(fastify)
+
   // Create bookmark
   fastify.put(
     '/',
@@ -64,7 +72,14 @@ export async function putBookmarks (fastify, opts) {
         }
 
         const createBookmark = SQL`
-        INSERT INTO bookmarks (url, title, note, toread, sensitive, owner_id) VALUES (
+        insert into bookmarks (
+          url,
+          title,
+          note,
+          toread,
+          sensitive,
+          owner_id
+        ) values (
           ${url},
           ${title},
           ${note},
@@ -72,7 +87,7 @@ export async function putBookmarks (fastify, opts) {
           ${sensitive || false},
           ${userId}
         )
-        RETURNING id, url, title, toread, sensitive, owner_id;`
+        returning id, url, title, toread, sensitive, owner_id;`
 
         const results = await client.query(createBookmark)
         const bookmark = results.rows[0]
@@ -103,6 +118,8 @@ export async function putBookmarks (fastify, opts) {
           `
 
           await client.query(applyTags)
+
+          tagAppliedCounter.inc(tagsResults.rows.length)
         }
 
         if (request?.body?.createEpisode) {
@@ -122,8 +139,12 @@ export async function putBookmarks (fastify, opts) {
             episodeId,
             pg: fastify.pg,
             log: request.log
-          })).catch(request.log.error)
+          }))
+            .then(() => { episodeCounter.inc() })
+            .catch(request.log.error)
         }
+
+        bookmarkCreatedCounter.inc()
 
         return {
           status: 'ok',
@@ -132,4 +153,31 @@ export async function putBookmarks (fastify, opts) {
       })
     }
   )
+}
+
+export function getBookmarkEditCounter (fastify) {
+  const episodeCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_episode_created_total',
+    help: 'The number of times episodes are created'
+  })
+
+  return episodeCounter
+}
+
+export function getTagAppliedCounter (fastify) {
+  const tagAppliedCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_tag_applied_total',
+    help: 'The number of times tags are applied to bookmarks'
+  })
+
+  return tagAppliedCounter
+}
+
+export function getTagRemovedCounter (fastify) {
+  const tagRemovedCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_tag_removed_total',
+    help: 'The number of times tags are removed from bookmarks'
+  })
+
+  return tagRemovedCounter
 }
