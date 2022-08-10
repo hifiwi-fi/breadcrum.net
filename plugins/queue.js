@@ -9,19 +9,19 @@ export default fp(async function (fastify, opts) {
 
   let count = 0
   const qCounter = new fastify.metrics.client.Counter({
-    name: 'bredcrum_pqueue_total',
+    name: 'breadcrum_pqueue_total',
     help: 'The number of times the queue has been added to'
   })
   const qErrorCounter = new fastify.metrics.client.Counter({
-    name: 'bredcrum_pqueue_error_total',
+    name: 'breadcrum_pqueue_error_total',
     help: 'The number of times the queue has an error'
   })
   const qGauge = new fastify.metrics.client.Gauge({
-    name: 'bredcrum_pqueue_size',
+    name: 'breadcrum_pqueue_size',
     help: 'The number of items waiting in the queue to run'
   })
   const pendingQGauge = new fastify.metrics.client.Gauge({
-    name: 'bredcrum_pqueue_pending',
+    name: 'breadcrum_pqueue_pending',
     help: 'The number of items currently running from the queue'
   })
 

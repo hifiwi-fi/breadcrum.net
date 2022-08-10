@@ -25,12 +25,12 @@ export default fp(async function (fastify, opts) {
   })
 
   const jwtVerifyCounter = new fastify.metrics.client.Counter({
-    name: 'bredcrum_jwt_verify_total',
+    name: 'breadcrum_jwt_verify_total',
     help: 'The number of times a jwt token attempts verification'
   })
 
   const jwtVerifyFailCounter = new fastify.metrics.client.Counter({
-    name: 'bredcrum_jwt_verify_fail_total',
+    name: 'breadcrum_jwt_verify_fail_total',
     help: 'The number of times a jwt token attempts verification'
   })
 
@@ -49,7 +49,7 @@ export default fp(async function (fastify, opts) {
   })
 
   const jwtCreatedCounter = new fastify.metrics.client.Counter({
-    name: 'bredcrum_jwt_created_total',
+    name: 'breadcrum_jwt_created_total',
     help: 'The number of times a jwt token is created'
   })
 
@@ -115,5 +115,5 @@ export default fp(async function (fastify, opts) {
   })
 }, {
   name: 'jwt',
-  dependencies: ['env', 'cookie', 'pg']
+  dependencies: ['env', 'cookie', 'pg', 'prom']
 })
