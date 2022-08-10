@@ -2,6 +2,11 @@
 import SQL from '@nearform/sql'
 
 export async function deleteBookmark (fastify, opts) {
+  const bookmarkDeleteCounter = new fastify.metrics.client.Counter({
+    name: 'bredcrum_bookmark_deleted_total',
+    help: 'The number of times bookmarks are deleted'
+  })
+
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
@@ -27,6 +32,7 @@ export async function deleteBookmark (fastify, opts) {
     await fastify.pg.query(query)
 
     reply.status = 202
+    bookmarkDeleteCounter.inc()
     return {
       status: 'ok'
     }

@@ -9,15 +9,21 @@ export default fp(async function (fastify, opts) {
 
   let count = 0
   const qCounter = new fastify.metrics.client.Counter({
-    name: 'queue_count',
+    name: 'bredcrum_pqueue_total',
     help: 'The number of times the queue has been added to'
   })
   const qErrorCounter = new fastify.metrics.client.Counter({
-    name: 'queue_error_count',
-    help: 'The number of times the queue has been added to'
+    name: 'bredcrum_pqueue_error_total',
+    help: 'The number of times the queue has an error'
   })
-  const qGauge = new fastify.metrics.client.Gauge({ name: 'queue_size', help: 'The size of the queue' })
-  const pendingQGauge = new fastify.metrics.client.Gauge({ name: 'queue_pending_size', help: 'The size of the pending queue' })
+  const qGauge = new fastify.metrics.client.Gauge({
+    name: 'bredcrum_pqueue_size',
+    help: 'The number of items waiting in the queue to run'
+  })
+  const pendingQGauge = new fastify.metrics.client.Gauge({
+    name: 'bredcrum_pqueue_pending',
+    help: 'The number of items currently running from the queue'
+  })
 
   queue.on('active', () => {
     qCounter.inc()
@@ -50,6 +56,6 @@ export default fp(async function (fastify, opts) {
   fastify.decorate('pqueue', queue)
 },
 {
-  name: 'queue',
+  name: 'pqueue',
   dependencies: ['env', 'prom']
 })
