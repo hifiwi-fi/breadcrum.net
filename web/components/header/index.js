@@ -64,6 +64,7 @@ export const header = Component(() => {
           : html`
             <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
             <div>🏷 <a href='/tags/'>tags</a></div>
+            <div>📡 <a href='/feeds/'>feeds</a></div>
             <div>${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
             <div>· <a href='/logout/'>logout</a></div>`
       }
