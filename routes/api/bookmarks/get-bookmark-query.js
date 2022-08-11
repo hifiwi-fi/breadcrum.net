@@ -97,6 +97,7 @@ export const getBookmarksQuery = ({
         on bookark_page_tags_array.bookmark_id = b.id
         left outer join bookark_page_episodes_array
         on bookark_page_episodes_array.bookmark_id = b.id
+        order by b.created_at desc, b.title desc, b.url desc
       `
 }
 
