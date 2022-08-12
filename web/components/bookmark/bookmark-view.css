@@ -12,6 +12,11 @@
   font-weight: bold;
 }
 
+.bc-bookmark-title,
+.bc-bookmark-note-display {
+  word-break: break-word;
+}
+
 .bc-bookmark-url-display {
   margin-top: -0.5em;
   margin-bottom: 5px;

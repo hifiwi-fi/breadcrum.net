@@ -6,6 +6,7 @@ import { sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import format from 'format-duration'
+import cn from 'classnames'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -42,9 +43,10 @@ export const bookmarkView = Component(({
           sensitive: b.sensitive,
           onclick: onToggleSensitive
         })}
-        <a class="${b.toread
-            ? 'bc-bookmark-title-toread'
-            : null}"
+        <a class="${cn({
+          'bc-bookmark-title': true,
+          'bc-bookmark-title-toread': b.toread
+        })}"
            href="${b.url}"
            target="_blank"
         >
@@ -52,7 +54,7 @@ export const bookmarkView = Component(({
         </a>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
-      ${b.note ? html`<div>${b.note}</div>` : null}
+      ${b.note ? html`<div class='bc-bookmark-note-display'>${b.note}</div>` : null}
       <div>
       ${b.tags?.length > 0
         ? html`
