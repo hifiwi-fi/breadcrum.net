@@ -3,7 +3,7 @@ name: tests
 on: [pull_request, push]
 
 env:
-  FORCE_COLOR: 2
+  FORCE_COLOR: 1
 
 jobs:
   test:
@@ -22,7 +22,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm i
     - run: node ./scripts/bootstrap-yt-dlp.js
-    - run: npm test --color=always -- -c
+    - run: npm test
     - name: Coveralls
       uses: coverallsapp/github-action@1.1.3
       with:

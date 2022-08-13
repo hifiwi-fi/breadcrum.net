@@ -12,7 +12,7 @@ export function config () {
 }
 
 // automatically build and tear down our instance
-export function build (t) {
+export async function build (t) {
   const app = Fastify()
 
   // fastify-plugin ensures that all decorators
@@ -22,6 +22,6 @@ export function build (t) {
 
   // tear down our app after we are done
   t.teardown(app.close.bind(app))
-
+  await app.ready()
   return app
 }

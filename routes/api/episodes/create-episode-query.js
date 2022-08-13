@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { getOrCreateDefaultFeed } from './get-or-create-default-feed.js'
+import { getOrCreateDefaultFeed } from '../feeds/default-feed/get-or-create-default-feed-query.js'
 
 export async function createEpisode ({
   client,

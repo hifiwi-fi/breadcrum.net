@@ -9,15 +9,6 @@ export const getBookmarksQuery = ({
   sensitive,
   perPage
 }) => {
-  console.log({
-    tag,
-    ownerId,
-    bookmarkId,
-    before,
-    url,
-    sensitive,
-    perPage
-  })
   return SQL`
         with bookmark_page as (
           select bm.*

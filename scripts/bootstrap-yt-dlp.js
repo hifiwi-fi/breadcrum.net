@@ -14,7 +14,7 @@ try {
   const { stdout } = await exec('which yt-dlp')
   console.log(`yt-dlp found: ${stdout.trim()}`)
 } catch (err) {
-  console.warn('Error looking for yt-dlp, downloading it')
+  console.warn('yt-dlp not found, downloading it')
   await YTDlpWrap.downloadFromGithub()
   console.log(`yt-dlp downloaded: ${path.join(__dirname, '../yt-dlp')}`)
 }
