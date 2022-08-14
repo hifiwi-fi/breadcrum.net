@@ -33,7 +33,7 @@ export async function putFeeds (fastify, opts) {
         }
       }
     },
-    async function putFeedsHandler (request, reply) {
+    async function createFeedHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
 
@@ -74,7 +74,7 @@ export async function putFeeds (fastify, opts) {
 
         return {
           status: 'ok',
-          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/episodes/?feed=${feed.id}`
+          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/feeds/${feed.id}/`
         }
       })
     })

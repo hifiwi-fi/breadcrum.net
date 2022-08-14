@@ -122,7 +122,7 @@ export async function getFeed (fastify, opts) {
           default_feed: pf.default_feed
         },
         items: episodes.map(ep => {
-          const redirectUrl = `${fastify.config.TRANSPORT}://${userId}:${userProvidedToken}@${fastify.config.HOST}/api/feeds/${pf.id}/episodes/${ep.id}`
+          const redirectUrl = `${fastify.config.TRANSPORT}://${userId}:${userProvidedToken}@${fastify.config.HOST}/api/feeds/${pf.id}/episode/${ep.id}`
 
           return {
             id: ep.id,
