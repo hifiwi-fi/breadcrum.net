@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { getBookmarksQuery } from '../get-bookmarks-query.js'
-import { fullBookmarkProps } from '../bookmark-props.js'
+import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 
 export async function getBookmark (fastify, opts) {
   fastify.get(
@@ -18,7 +18,7 @@ export async function getBookmark (fastify, opts) {
           200: {
             type: 'object',
             properties: {
-              ...fullBookmarkProps
+              ...fullBookmarkPropsWithEpisodes
             }
           }
         }

@@ -1,9 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import {
-  commnonBookmarkProps,
-  createEpisodeProp
-} from './bookmark-props.js'
+import { commnonBookmarkProps } from './bookmark-props.js'
+import { createEpisodeProp } from '../episodes/episode-props.js'
 import { createEpisode } from '../episodes/create-episode-query.js'
 import { runYTDLP } from '../../../lib/run-yt-dlp.js'
 

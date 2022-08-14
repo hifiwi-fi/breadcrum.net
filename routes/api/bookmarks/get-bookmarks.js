@@ -1,4 +1,4 @@
-import { fullBookmarkProps } from './bookmark-props.js'
+import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { getBookmarksQuery, afterToBeforeQuery } from './get-bookmarks-query.js'
 
 export async function getBookmarks (fastify, opts) {
@@ -50,7 +50,7 @@ export async function getBookmarks (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullBookmarkProps
+                    ...fullBookmarkPropsWithEpisodes
                   }
                 }
               },
