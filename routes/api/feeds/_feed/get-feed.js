@@ -88,11 +88,6 @@ export async function getFeed (fastify, opts) {
           fetch first row only;
         `
 
-      console.log({
-        episodesQuery,
-        feedQuery
-      })
-
       const [episodesResults, feedResults] = await Promise.all([
         fastify.pg.query(episodesQuery),
         fastify.pg.query(feedQuery)
