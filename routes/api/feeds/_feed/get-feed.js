@@ -78,8 +78,8 @@ export async function getFeed (fastify, opts) {
             pf.image_url,
             pf.explicit,
             pf.token,
-            u.username as owner_name
-            (pf.id = u.default_podcast_feed_id) as default_feed,
+            u.username as owner_name,
+            (pf.id = u.default_podcast_feed_id) as default_feed
           from podcast_feeds pf
           join users u
           on pf.owner_id = u.id
@@ -87,6 +87,11 @@ export async function getFeed (fastify, opts) {
           and pf.owner_id = ${userId}
           fetch first row only;
         `
+
+      console.log({
+        episodesQuery,
+        feedQuery
+      })
 
       const [episodesResults, feedResults] = await Promise.all([
         fastify.pg.query(episodesQuery),
