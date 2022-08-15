@@ -59,7 +59,8 @@
     "snazzy": "^9.0.0",
     "sodium-native": "^3.2.1",
     "standard": "^17.0.0",
-    "tap": "^16.0.0"
+    "tap": "^16.0.0",
+    "why-is-node-running": "^2.2.2"
   },
   "engines": {
     "node": "^18.0.0 || ^17.0.0",
@@ -93,7 +94,7 @@
     "test": "run-s test:*",
     "test:deptree": "depcruise --validate .dependency-cruiser.json app.js web routes plugins",
     "test:standard": "standard --verbose | snazzy",
-    "test:tap": "METRICS=0 c8 tap --no-coverage",
+    "test:tap": "METRICS=0 c8 tap --no-coverage --color",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",

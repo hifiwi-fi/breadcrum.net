@@ -24,6 +24,7 @@ export async function deleteBookmark (fastify, opts) {
         AND owner_id =${userId};
       `
 
+    // TODO: check results
     await fastify.pg.query(query)
 
     reply.status = 202

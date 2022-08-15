@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { getBookmarksQuery } from '../get-bookmark-query.js'
-import { fullBookmarkProps } from '../bookmark-props.js'
+import { getBookmarksQuery } from '../get-bookmarks-query.js'
+import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 
 export async function getBookmark (fastify, opts) {
   fastify.get(
@@ -18,7 +18,7 @@ export async function getBookmark (fastify, opts) {
           200: {
             type: 'object',
             properties: {
-              ...fullBookmarkProps
+              ...fullBookmarkPropsWithEpisodes
             }
           }
         }
@@ -33,8 +33,6 @@ export async function getBookmark (fastify, opts) {
         bookmarkId,
         perPage: 1
       })
-
-      console.log(query)
 
       const results = await fastify.pg.query(query)
       const bookmark = results.rows[0]

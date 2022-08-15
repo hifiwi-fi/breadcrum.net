@@ -1,25 +1,9 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { createEpisode } from '../../../../lib/create-episode.js'
+import { createEpisode } from '../../episodes/create-episode-query.js'
 import { runYTDLP } from '../../../../lib/run-yt-dlp.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
-
-const createEpisodeProp = {
-  createEpisode: {
-    anyOf: [
-      {
-        type: 'object',
-        properties: {
-          type: { enum: ['redirect'] },
-          medium: { enum: ['video', 'audio'] }
-        }
-      },
-      {
-        type: 'null'
-      }
-    ]
-  }
-}
+import { createEpisodeProp } from '../../episodes/episode-props.js'
 
 export async function putBookmark (fastify, opts) {
   fastify.put('/', {
