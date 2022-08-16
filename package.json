@@ -59,8 +59,7 @@
     "snazzy": "^9.0.0",
     "sodium-native": "^3.2.1",
     "standard": "^17.0.0",
-    "tap": "^16.0.0",
-    "why-is-node-running": "^2.2.2"
+    "tap": "^16.0.0"
   },
   "engines": {
     "node": "^18.0.0 || ^17.0.0",
