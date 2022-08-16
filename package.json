@@ -48,7 +48,7 @@
     "postgrator": "^7.0.0",
     "postgrator-cli": "^6.0.0",
     "uland-isomorphic": "^2.0.0",
-    "yt-dlp-wrap": "^2.3.11"
+    "yt-dlp-wrap": "^2.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
