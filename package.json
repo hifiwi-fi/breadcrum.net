@@ -23,6 +23,7 @@
     "@fastify/rate-limit": "^7.0.0",
     "@fastify/sensible": "^5.0.0",
     "@fastify/static": "^6.4.0",
+    "@fastify/swagger": "^7.4.1",
     "@nearform/sql": "^1.5.0",
     "@siteup/cli": "^2.2.0",
     "classnames": "^2.3.1",
