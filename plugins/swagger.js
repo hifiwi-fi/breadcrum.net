@@ -8,7 +8,7 @@ import fp from 'fastify-plugin'
 export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/swagger'), {
     routePrefix: '/documentation',
-    exposeRoute: false,
+    exposeRoute: fastify.config.ENV !== 'production',
     openapi: {
       info: {
         title: 'Test swagger',
