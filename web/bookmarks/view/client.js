@@ -30,15 +30,17 @@ export const page = Component(() => {
 
       const pageParams = new URLSearchParams(window.location.search)
 
-      pageParams.set('sensitive', state.sensitive)
-
       const id = pageParams.get('id')
 
       if (!id) {
         window.location.replace('/bookmarks')
       }
 
-      const response = await fetch(`${state.apiUrl}/bookmarks/${id}`, {
+      const requestParams = new URLSearchParams()
+
+      requestParams.set('sensitive', state.sensitive)
+
+      const response = await fetch(`${state.apiUrl}/bookmarks/${id}?${requestParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
@@ -50,6 +52,7 @@ export const page = Component(() => {
         const body = await response.json()
         setBookmark(body)
       } else {
+        setBookmark(null)
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
     }
@@ -60,7 +63,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setBookmarkError(err) })
         .finally(() => { setBookmarkLoading(false) })
     }
-  }, [dataReload, state.apiUrl])
+  }, [dataReload, state.apiUrl, state.sensitive])
 
   return html`
     <div>

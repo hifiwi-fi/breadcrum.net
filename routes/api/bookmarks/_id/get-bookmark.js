@@ -7,6 +7,12 @@ export async function getBookmark (fastify, opts) {
     '/', {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        querystring: {
+          sensitive: {
+            type: 'boolean',
+            default: false
+          }
+        },
         params: {
           type: 'object',
           properties: {
@@ -27,11 +33,13 @@ export async function getBookmark (fastify, opts) {
     async function getBookmarkHandler (request, reply) {
       const ownerId = request.user.id
       const { id: bookmarkId } = request.params
+      const { sensitive } = request.query
 
       const query = getBookmarksQuery({
         ownerId,
         bookmarkId,
-        perPage: 1
+        perPage: 1,
+        sensitive
       })
 
       const results = await fastify.pg.query(query)
