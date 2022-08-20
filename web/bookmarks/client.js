@@ -89,6 +89,7 @@ export const page = Component(() => {
   const onPageNav = (ev) => {
     ev.preventDefault()
     pushState(ev.currentTarget.href)
+    window.scrollTo({ top: 0 })
   }
 
   let beforeParams
