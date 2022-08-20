@@ -66,7 +66,7 @@ export const bookmarkView = Component(({
       }
       ${b.episodes?.length > 0
         ? html`
-          <div class="bc-episodes-display">
+          <div class="bc-bookmark-episodes-display">
             ${b.episodes.map(ep => html.for(ep, ep.id)`<div>${ep.filename ? ep.filename : null}${ep.duration_in_seconds ? ` - ${format(ep.duration_in_seconds * 1000)}` : null}${ep.ready ? ep.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}${ep.error ? ' (❌)' : null}</div>`)}
           </div>`
         : null

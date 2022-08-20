@@ -10,7 +10,7 @@ export async function deleteFeed (fastify, opts) {
   fastify.delete(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth]),
+      preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         parms: {
           type: 'object',

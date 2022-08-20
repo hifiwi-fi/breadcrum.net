@@ -1,5 +1,5 @@
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
-import { getBookmarksQuery, afterToBeforeQuery } from './get-bookmarks-query.js'
+import { getBookmarksQuery, afterToBeforeBookmarkQuery } from './get-bookmarks-query.js'
 
 export async function getBookmarks (fastify, opts) {
   fastify.get(
@@ -71,14 +71,16 @@ export async function getBookmarks (fastify, opts) {
     },
     // Get Bookmarks
     async function getBookmarksHandler (request, reply) {
-      const id = request.user.id
-      let {
-        before,
+      const userId = request.user.id
+      const {
         after,
         per_page: perPage,
         url,
         tag,
         sensitive
+      } = request.query
+      let {
+        before
       } = request.query
 
       let top = false
@@ -88,10 +90,10 @@ export async function getBookmarks (fastify, opts) {
         // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
         // and we need to get the item before the next 'before' set.
         const perPageAfterOffset = perPage + 2
-        const afterCalcQuery = afterToBeforeQuery({
+        const afterCalcQuery = afterToBeforeBookmarkQuery({
           perPage,
           tag,
-          ownerId: id,
+          ownerId: userId,
           after,
           sensitive
         })
@@ -115,7 +117,7 @@ export async function getBookmarks (fastify, opts) {
 
       const bookmarkQuery = getBookmarksQuery({
         tag,
-        ownerId: id,
+        ownerId: userId,
         before,
         url,
         sensitive,
