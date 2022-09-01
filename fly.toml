@@ -14,7 +14,6 @@ processes = []
   NODE_ENV = 'production'
   DOMAIN = 'breadcrum.net'
   TRANSPORT='https'
-  REGISTRATION = 0
 
 [env]
   PORT = "8080"
@@ -24,7 +23,6 @@ processes = []
   ENV = 'production'
   NODE_ENV = 'production'
   HOST = 'breadcrum.net'
-  REGISTRATION = 0
   TRANSPORT='https'
 
 [deploy]
