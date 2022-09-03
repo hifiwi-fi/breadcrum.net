@@ -10,7 +10,7 @@
   "dependencies": {
     "@fastify/accepts": "^4.0.0",
     "@fastify/auth": "^4.0.0",
-    "@fastify/autoload": "5.2.0",
+    "@fastify/autoload": "^5.3.1",
     "@fastify/basic-auth": "^4.0.0",
     "@fastify/caching": "^8.0.0",
     "@fastify/circuit-breaker": "^3.0.0",
