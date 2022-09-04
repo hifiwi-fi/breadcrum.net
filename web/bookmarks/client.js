@@ -10,23 +10,27 @@ import { bookmarkList } from '../components/bookmark/bookmark-list.js'
 export const page = Component(() => {
   const state = useLSP()
   const { user, loading } = useUser()
+  const window = useWindow()
+  const { query, pushState } = useQuery()
+
   const [bookmarks, setBookmarks] = useState()
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(null)
-  const [dataReload, setDataReload] = useState(0)
+
   const [before, setBefore] = useState()
   const [after, setAfter] = useState()
-  const window = useWindow()
 
+  const [dataReload, setDataReload] = useState(0)
   const reload = useCallback(() => {
     setDataReload(dataReload + 1)
   }, [dataReload, setDataReload])
-  const { query, pushState } = useQuery()
 
+  // Require a user
   useEffect(() => {
     if (!user && !loading) window.location.replace('/login')
   }, [user, loading])
 
+  // Load bookmarks
   useEffect(() => {
     const controller = new AbortController()
 
@@ -42,6 +46,7 @@ export const page = Component(() => {
 
       pageParams.set('sensitive', state.sensitive)
 
+      // Be selective about this
       const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
         method: 'get',
         headers: {

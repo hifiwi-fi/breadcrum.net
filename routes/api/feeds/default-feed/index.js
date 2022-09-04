@@ -1,5 +1,6 @@
-import SQL from '@nearform/sql'
 import { getOrCreateDefaultFeed } from './get-or-create-default-feed-query.js'
+import { getFeedQuery } from '../_feed/get-feed-query.js'
+import { getFeedUrl } from '../get-feed-url.js'
 
 export default async function defaultFeedRoutes (fastify, opts) {
   fastify.get(
@@ -34,24 +35,10 @@ export default async function defaultFeedRoutes (fastify, opts) {
 
       const feedId = await getOrCreateDefaultFeed({ userId, client: fastify.pg })
 
-      const feedQuery = SQL`
-          select
-            pf.id,
-            pf.created_at,
-            pf.updated_at,
-            pf.title,
-            pf.description,
-            pf.image_url,
-            pf.explicit,
-            pf.token,
-            u.username as owner_name
-          from podcast_feeds pf
-          join users u
-          on pf.owner_id = u.id
-          where pf.id = ${feedId}
-          and pf.owner_id = ${userId}
-          fetch first row only;
-        `
+      const feedQuery = getFeedQuery({
+        feedId,
+        ownerId: userId
+      })
 
       const feedResults = await fastify.pg.query(feedQuery)
 
@@ -60,11 +47,17 @@ export default async function defaultFeedRoutes (fastify, opts) {
         return reply.notFound(`podcast feed ${feedId} not found`)
       }
 
-      const feedURL = `${fastify.config.TRANSPORT}://${userId}:${pf.token}@${fastify.config.HOST}/api/feeds/${pf.id}`
+      const feedURL = getFeedUrl({
+        transport: fastify.config.TRANSPORT,
+        host: fastify.config.HOST,
+        userId,
+        token: pf.token,
+        feedId: pf.id
+      })
 
       return {
         data: {
-          url: `${fastify.config.TRANSPORT}://${userId}:${pf.token}@${fastify.config.HOST}/api/feeds/${pf.id}`,
+          url: feedURL,
           json: `${feedURL}?format=json`
         }
       }

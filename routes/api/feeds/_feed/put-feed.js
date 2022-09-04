@@ -11,7 +11,7 @@ export async function putFeed (fastify, opts) {
   fastify.put(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth]),
+      preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         parms: {
           type: 'object',

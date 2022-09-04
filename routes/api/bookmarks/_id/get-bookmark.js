@@ -45,10 +45,7 @@ export async function getBookmark (fastify, opts) {
       const results = await fastify.pg.query(query)
       const bookmark = results.rows[0]
       if (!bookmark) {
-        reply.code(404)
-        return {
-          status: 'bookmark id not found'
-        }
+        return reply.notFound('bookmark id not found')
       }
       return {
         ...bookmark

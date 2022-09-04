@@ -15,23 +15,31 @@ export async function getOrCreateDefaultFeed ({
   let { default_podcast_feed_id } = defaultFeedResults.rows[0]
 
   if (!default_podcast_feed_id) {
-    const createDefaultFeed = SQL`
+    try {
+      await client.query(SQL`BEGIN`)
+      const createDefaultFeed = SQL`
       INSERT INTO podcast_feeds (owner_id)
       VALUES (${userId})
       returning id;
       `
 
-    const defaultFeedResults = await client.query(createDefaultFeed)
+      const defaultFeedResults = await client.query(createDefaultFeed)
 
-    default_podcast_feed_id = defaultFeedResults.rows[0].id
+      default_podcast_feed_id = defaultFeedResults.rows[0].id
 
-    const applyDefaultFeed = SQL`
+      const applyDefaultFeed = SQL`
       update users
       set default_podcast_feed_id = ${default_podcast_feed_id}
       where id = ${userId};
       `
 
-    await client.query(applyDefaultFeed)
+      await client.query(applyDefaultFeed)
+      await client.query(SQL`COMMIT`)
+    } catch (err) {
+      await client.query(SQL`ROLLBACK`)
+      throw err
+    }
   }
+
   return default_podcast_feed_id
 }

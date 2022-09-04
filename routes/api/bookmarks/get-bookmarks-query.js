@@ -9,7 +9,7 @@ export const getBookmarksQuery = ({
   sensitive,
   perPage
 }) => {
-  return SQL`
+  const bookarmsQuery = SQL`
         with bookmark_page as (
           select bm.*
           from bookmarks bm
@@ -90,9 +90,11 @@ export const getBookmarksQuery = ({
         on bookark_page_episodes_array.bookmark_id = b.id
         order by b.created_at desc, b.title desc, b.url desc
       `
+
+  return bookarmsQuery
 }
 
-export const afterToBeforeQuery = ({
+export const afterToBeforeBookmarkQuery = ({
   perPage,
   tag,
   ownerId,
@@ -100,7 +102,7 @@ export const afterToBeforeQuery = ({
   sensitive
 }) => {
   const perPageAfterOffset = perPage + 2
-  const afterCalcQuery = SQL`
+  const afterCalcBookarksQuery = SQL`
           with page as (
             select bm.id, bm.url, bm.title, bm.created_at
             from bookmarks bm
@@ -135,5 +137,5 @@ export const afterToBeforeQuery = ({
           from bookmark_with_last_row_date
           group by last_created_at`
 
-  return afterCalcQuery
+  return afterCalcBookarksQuery
 }

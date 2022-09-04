@@ -9,5 +9,7 @@ export const fullFeedProps = {
   id: { type: 'string', format: 'uuid' },
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' },
+  token: { type: 'string' },
+  feed_url: { type: 'string', format: 'uri' },
   ...commonFeedProps
 }

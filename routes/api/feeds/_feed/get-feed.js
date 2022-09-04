@@ -1,6 +1,9 @@
 import SQL from '@nearform/sql'
 import jsonfeedToRSS from 'jsonfeed-to-rss'
 import cleanDeep from 'clean-deep'
+import { getFeedQuery } from './get-feed-query.js'
+import { getFeedUrl } from '../get-feed-url.js'
+import { getFeedTitle } from '../get-feed-title.js'
 
 export async function getFeed (fastify, opts) {
   fastify.get(
@@ -68,25 +71,7 @@ export async function getFeed (fastify, opts) {
           fetch first 100 rows only;
         `
 
-      const feedQuery = SQL`
-          select
-            pf.id,
-            pf.created_at,
-            pf.updated_at,
-            pf.title,
-            pf.description,
-            pf.image_url,
-            pf.explicit,
-            pf.token,
-            u.username as owner_name,
-            (pf.id = u.default_podcast_feed_id) as default_feed
-          from podcast_feeds pf
-          join users u
-          on pf.owner_id = u.id
-          where pf.id = ${feedId}
-          and pf.owner_id = ${userId}
-          fetch first row only;
-        `
+      const feedQuery = getFeedQuery({ feedId, ownerId: userId })
 
       const [episodesResults, feedResults] = await Promise.all([
         fastify.pg.query(episodesQuery),
@@ -104,12 +89,18 @@ export async function getFeed (fastify, opts) {
 
       const jsonfeed = {
         version: 'https://jsonfeed.org/version/1',
-        title: pf.title || `${pf.owner_name}'s breadcrum feed`,
+        title: getFeedTitle({ title: pf.title, ownerName: pf.owner_name }),
         home_page_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/feeds?id=${feedId}`, // TODO a page with the feed contents
         description: pf.description ?? `This is ${pf.owner_name}'s default podcast feed. Customize this description on the feed's home page.`,
         icon: pf.image_url ?? fallbackImg,
         favicon: pf.image_url ?? fallbackImg,
-        feed_url: `${fastify.config.TRANSPORT}://${userId}:${userProvidedToken}@${fastify.config.HOST}/api/feeds/${pf.id}`,
+        feed_url: getFeedUrl({
+          transport: fastify.config.TRANSPORT,
+          host: fastify.config.HOST,
+          userId,
+          token: pf.token,
+          feedId: pf.id
+        }),
         author: {
           name: pf.username,
           url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks`,
