@@ -1,23 +1,14 @@
 /* eslint-disable camelcase */
 import { fullFeedProps } from '../../feed-props.js'
-import { feedDetailsHandler } from './feed-details-handler.js'
+import { getOrCreateDefaultFeed } from '../default-feed-query.js'
+import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
 
-export default async function getFeedDetails (fastify, opts) {
+export async function getDefaultFeedDetails (fastify, opts) {
   fastify.get(
     '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
-        parms: {
-          type: 'object',
-          properties: {
-            feed: {
-              type: 'string',
-              format: 'uuid'
-            }
-          },
-          required: ['feed']
-        },
         response: {
           200: {
             type: 'object',
@@ -34,9 +25,9 @@ export default async function getFeedDetails (fastify, opts) {
       }
     },
 
-    async function getFeedHandler (request, reply) {
+    async function getDefaultFeedDetailsHandler (request, reply) {
       const userId = request.user.id
-      const { feed: feedId } = request.params
+      const feedId = await getOrCreateDefaultFeed({ userId, client: fastify.pg })
 
       return await feedDetailsHandler({
         fastify,

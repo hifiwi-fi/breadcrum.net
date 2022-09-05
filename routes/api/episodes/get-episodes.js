@@ -1,6 +1,6 @@
 import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
-import { getOrCreateDefaultFeed } from '../feeds/default-feed/get-or-create-default-feed-query.js'
-import { getEpisodesQuery, afterToBeforeEpisodesQuery } from './get-episode-query.js'
+import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
+import { getEpisodesQuery, afterToBeforeEpisodesQuery } from './episode-query.js'
 
 export async function getEpisodes (fastify, opts) {
   fastify.get(

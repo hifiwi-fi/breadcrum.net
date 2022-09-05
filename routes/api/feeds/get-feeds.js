@@ -1,5 +1,5 @@
 import SQL from '@nearform/sql'
-import { getOrCreateDefaultFeed } from './default-feed/get-or-create-default-feed-query.js'
+import { getOrCreateDefaultFeed } from './default-feed/default-feed-query.js'
 import { fullFeedProps } from './feed-props.js'
 
 export async function getFeeds (fastify, opts) {
@@ -34,7 +34,7 @@ export async function getFeeds (fastify, opts) {
 
         // Ensure default feed exists
         await getOrCreateDefaultFeed({ userId, client })
-        await client.query('commit')
+        await client.query(SQL`commit`)
 
         const query = SQL`
         select
