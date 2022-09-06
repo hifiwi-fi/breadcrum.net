@@ -24,7 +24,7 @@ export async function getUser (fastify, opts) {
         // TODO refresh token
         return user
       } else {
-        reply.statusCode = 404
+        return reply.notFound('User not found')
       }
     }
   )
