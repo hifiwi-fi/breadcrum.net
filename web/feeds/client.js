@@ -123,7 +123,7 @@ export const page = Component(() => {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        setFeed(body)
+        setFeed(body?.data)
       } else {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }

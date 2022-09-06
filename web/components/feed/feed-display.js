@@ -22,7 +22,7 @@ export const feedDisplay = Component(({
       </div>
 
       <div>
-        explicit: ${f.explicite}
+        explicit: ${f.explicit}
       </div>
 
       <div>
@@ -39,7 +39,7 @@ export const feedDisplay = Component(({
       </div>
 
       <div>
-        default: ${f.default}
+        default_feed: ${f.default_feed}
       </div>
 
       <div>

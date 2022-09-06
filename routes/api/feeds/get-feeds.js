@@ -1,6 +1,8 @@
 import SQL from '@nearform/sql'
 import { getOrCreateDefaultFeed } from './default-feed/default-feed-query.js'
 import { fullFeedProps } from './feed-props.js'
+import { getFeedsQuery } from './feeds-query.js'
+import { getFeedWithDefaults } from './feed-defaults.js'
 
 export async function getFeeds (fastify, opts) {
   fastify.get(
@@ -34,43 +36,28 @@ export async function getFeeds (fastify, opts) {
 
         // Ensure default feed exists
         await getOrCreateDefaultFeed({ userId, client })
-        await client.query(SQL`commit`)
 
-        const query = SQL`
-        select
-          pf.id,
-          pf.created_at,
-          pf.updated_at,
-          pf.title,
-          pf.description,
-          pf.image_url,
-          pf.explicit,
-          (pf.id = users.default_podcast_feed_id) as default_feed,
-          count(ep.id) as episode_count
-        from podcast_feeds pf
-        left outer join users
-        on users.default_podcast_feed_id = pf.id
-        left outer join episodes ep
-        on (pf.id = ep.podcast_feed_id)
-        where pf.owner_id = ${userId}
-        and ep.owner_id = ${userId}
-        group by (
-          pf.id,
-          pf.created_at,
-          pf.updated_at,
-          pf.title,
-          pf.description,
-          pf.image_url,
-          pf.explicit,
-          default_feed
-        )
-        order by pf.created_at asc;
-      `
+        const feedsQuery = getFeedsQuery({ userId })
+        const userQuery = SQL`
+          select username
+          from users
+          where id = ${userId}
+          fetch first row only`
 
-        const results = await client.query(query)
+        const [feedsResults, userResults] = await Promise.all([
+          client.query(feedsQuery),
+          client.query(userQuery)
+        ])
+
+        const { username: ownerName } = userResults.rows.pop()
+
+        const transport = fastify.config.TRANSPORT
+        const host = fastify.config.HOST
+
+        const resultsWithDefaults = feedsResults.rows.map(feed => getFeedWithDefaults({ feed, ownerName, transport, host }))
 
         return {
-          data: results.rows
+          data: resultsWithDefaults
         }
       })
     })

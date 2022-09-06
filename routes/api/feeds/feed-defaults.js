@@ -1,3 +1,5 @@
+import { getFeedImageUrl } from './feed-urls.js'
+
 export function getFeedTitle ({
   title,
   ownerName
@@ -16,4 +18,20 @@ Remember, feed URLs and episode contain a feed secret, so don't share it with an
 
 If you want to share a feed with a friend or family member, consider creating a new feed and sharing that.
 `
+}
+
+export function getFeedWithDefaults ({
+  feed,
+  ownerName,
+  ownerId,
+  transport,
+  host
+}) {
+  const feedWithDefaults = { ...feed }
+
+  feedWithDefaults.title = getFeedTitle({ ownerName, title: feedWithDefaults.title })
+  feedWithDefaults.description = getFeedDescription({ description: feedWithDefaults.description, ownerName, defaultFeed: feedWithDefaults.default_feed })
+  feedWithDefaults.image_url = getFeedImageUrl({ imageUrl: feedWithDefaults.image_url, transport, host })
+
+  return feedWithDefaults
 }

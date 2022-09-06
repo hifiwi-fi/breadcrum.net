@@ -11,5 +11,6 @@ export const fullFeedProps = {
   updated_at: { type: 'string', format: 'date-time' },
   token: { type: 'string' },
   feed_url: { type: 'string', format: 'uri' },
+  default_feed: { type: 'boolean' },
   ...commonFeedProps
 }
