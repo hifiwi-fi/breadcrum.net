@@ -94,7 +94,7 @@
     "test": "run-s test:*",
     "test:deptree": "depcruise --validate .dependency-cruiser.json app.js web routes plugins",
     "test:standard": "standard --verbose | snazzy",
-    "test:tap": "METRICS=0 c8 tap --no-coverage --color",
+    "test:tap": "METRICS=0 c8 tap --no-coverage",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
