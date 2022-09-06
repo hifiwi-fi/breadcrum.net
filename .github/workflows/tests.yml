@@ -21,6 +21,11 @@ jobs:
       with:
         node-version: ${{ matrix.node_version }}
     - run: npm i
+    - name: Archive lockfile
+      uses: actions/upload-artifact@v3
+      with:
+        name: pacakge-lock.json
+        path: package-lock.json
     - run: node ./scripts/bootstrap-yt-dlp.js
     - run: npm test
     - name: Coveralls
