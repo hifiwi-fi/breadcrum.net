@@ -1,15 +1,2 @@
-blink {
-  animation: 1s linear infinite condemned_blink_effect;
-}
-
-@keyframes condemned_blink_effect {
-  0% {
-    visibility: hidden;
-  }
-  50% {
-    visibility: hidden;
-  }
-  100% {
-    visibility: visible;
-  }
-}
+@import '../components/feed-header/feed-header.css';
+@import '../components/episode/episode-list.css';

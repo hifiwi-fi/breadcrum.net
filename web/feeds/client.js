@@ -5,7 +5,7 @@ import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { episodeList } from '../components/episode/episode-list.js'
-import { feedHeader } from '../components/feed/feed-header.js'
+import { feedHeader } from '../components/feed-header/feed-header.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -191,9 +191,6 @@ export const page = Component(() => {
   }
 
   return html`
-  <div>
-    <blink>Work in progress</blink>
-  </div>
   <div>
     ${feedLoading && feedsLoading ? 'loading feed' : feedHeader({ feed, feeds, reload })}
     ${feedError ? html`<div>${feedError.message}</div>` : null}

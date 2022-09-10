@@ -1,0 +1,47 @@
+@import '../text-icon';
+
+.bc-feed-display {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-feed-info {
+  margin-top: 10px;
+}
+
+.bc-feed-image {
+  float: left;
+  margin-right: 10px;
+}
+
+.bc-feed-image img {
+  border-radius: 5px;
+}
+
+.bc-feed-icon-button-line {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bc-feed-title {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.bc-feed-description {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.bc-feed-feed-url-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.bc-feed-feed-url-line .bc-feed-header-select {
+  flex-grow: 1;
+}
