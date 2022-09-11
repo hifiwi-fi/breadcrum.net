@@ -54,7 +54,7 @@ export const bookmarkView = Component(({
         </a>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url}</a></div>
-      ${b.note ? html`<div class='bc-bookmark-note-display'>${b.note}</div>` : null}
+      ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
       <div>
       ${b.tags?.length > 0
         ? html`

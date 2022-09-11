@@ -97,7 +97,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setEpisodesError(err) })
         .finally(() => { setEpisodesLoading(false) })
     }
-  }, [query, state.apiUrl])
+  }, [query?.get('before'), query?.get('after'), state.apiUrl])
 
   // Get Feed
   useEffect(() => {
@@ -135,7 +135,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setFeedError(err) })
         .finally(() => { setFeedLoading(false) })
     }
-  }, [query, state.apiUrl])
+  }, [query?.get('feed_id'), state.apiUrl])
 
   // Get Feeds
   useEffect(() => {
@@ -168,7 +168,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setFeedsError(err) })
         .finally(() => { setFeedsLoading(false) })
     }
-  }, [query, state.apiUrl])
+  }, [state.apiUrl])
 
   const onPageNav = (ev) => {
     ev.preventDefault()

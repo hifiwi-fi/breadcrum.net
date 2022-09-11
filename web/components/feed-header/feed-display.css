@@ -35,6 +35,14 @@
   margin-top: 10px;
 }
 
+.bc-feed-description p {
+  word-break: break-word;
+}
+
+.bc-feed-description p:last-child {
+  margin-bottom: 0px;
+}
+
 .bc-feed-feed-url-line {
   display: flex;
   align-items: center;

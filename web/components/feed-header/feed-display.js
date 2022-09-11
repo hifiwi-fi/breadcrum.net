@@ -17,20 +17,12 @@ export const feedDisplay = Component(({
       console.log('copied feed to clipboard')
     } catch (e) {
       console.error(e)
+      copyButton.current.innerText = 'Error'
     }
   }, [copyButton.current])
-
+  console.log(f?.description)
   return html`
     <div class="bc-feed-display">
-
-      <form class="bc-feed-select-form">
-        <label for="feed-select">Select Feed:</label>
-        <select id="feed-select">
-          ${feeds.map(f => html.for(f, f.id)`
-            <option value="${f.id}">${f.title}</option>
-          `)}
-        </select>
-      </form>
 
       <div class="bc-feed-info">
         <div class="bc-feed-image">
@@ -52,7 +44,7 @@ export const feedDisplay = Component(({
         </div>
 
         <div class='bc-feed-description'>
-          ${f.description}
+          ${f?.description?.split('\n\n').map(p => html`<p>${p}</p>`)}
         </div>
 
         <div class="bc-feed-feed-url-line">
