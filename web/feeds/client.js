@@ -97,7 +97,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setEpisodesError(err) })
         .finally(() => { setEpisodesLoading(false) })
     }
-  }, [query?.get('before'), query?.get('after'), state.apiUrl])
+  }, [query, state.apiUrl])
 
   // Get Feed
   useEffect(() => {
@@ -135,7 +135,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setFeedError(err) })
         .finally(() => { setFeedLoading(false) })
     }
-  }, [query?.get('feed_id'), state.apiUrl])
+  }, [state.apiUrl])
 
   // Get Feeds
   useEffect(() => {

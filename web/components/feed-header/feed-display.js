@@ -20,7 +20,7 @@ export const feedDisplay = Component(({
       copyButton.current.innerText = 'Error'
     }
   }, [copyButton.current])
-  console.log(f?.description)
+
   return html`
     <div class="bc-feed-display">
 
