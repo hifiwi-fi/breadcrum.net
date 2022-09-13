@@ -3,7 +3,7 @@ import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkEdit } from './bookmark-edit.js'
 import { bookmarkView } from './bookmark-view.js'
-import { diffUpdate } from '../../lib/bookmark-diff.js'
+import { diffBookmark } from '../../lib/diff-bookmark.js'
 
 export const bookmarkList = Component(({ bookmark, reload }) => {
   const state = useLSP()
@@ -19,7 +19,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
   }, [setEditing])
 
   const handleSave = useCallback(async (newBookmark) => {
-    const payload = diffUpdate(bookmark, newBookmark)
+    const payload = diffBookmark(bookmark, newBookmark)
 
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {

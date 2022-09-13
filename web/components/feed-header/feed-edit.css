@@ -1,0 +1,31 @@
+.bc-feed-edit
+input[type="date"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"] {
+  width: 100%;
+}
+
+.bc-feed-legend {
+  font-size: var(--small-font-size);
+}
+
+
+.bc-feed-description-edit {
+  display: block;
+  width: 100%;
+  resize: vertical;
+}
+
+.bc-feed-edit-submit-line {
+  display: flex;
+  justify-content: space-between;
+}
