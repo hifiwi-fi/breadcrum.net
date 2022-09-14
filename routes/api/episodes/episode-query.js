@@ -15,6 +15,8 @@ export function getEpisodesQuery ({
       ep.created_at,
       ep.updated_at,
       ep.url,
+      ep.title,
+      coalesce (ep.title, bm.title) as display_title,
       ep.type,
       ep.medium,
       ep.size_in_bytes,

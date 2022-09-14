@@ -1,6 +1,6 @@
 export const commnonBookmarkProps = {
   url: { type: 'string', format: 'uri' },
-  title: { type: 'string' },
+  title: { type: 'string', minLength: 1, maxLength: 255 },
   note: { type: 'string' },
   starred: { type: 'boolean' },
   toread: { type: 'boolean' },

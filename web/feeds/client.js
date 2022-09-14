@@ -29,10 +29,10 @@ export const page = Component(() => {
   const [after, setAfter] = useState()
 
   // Need a better way to trigger reloads
-  const [dataReload, setDataReload] = useState(0)
+  const [feedReload, setFeedReload] = useState(0)
   const reload = useCallback(() => {
-    setDataReload(dataReload + 1)
-  }, [dataReload, setDataReload])
+    setFeedReload(feedReload + 1)
+  }, [feedReload, setFeedReload])
 
   // Require a user
   useEffect(() => {
@@ -135,7 +135,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setFeedError(err) })
         .finally(() => { setFeedLoading(false) })
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, feedReload])
 
   // Get Feeds
   useEffect(() => {
@@ -168,7 +168,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setFeedsError(err) })
         .finally(() => { setFeedsLoading(false) })
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, feedReload])
 
   const onPageNav = (ev) => {
     ev.preventDefault()

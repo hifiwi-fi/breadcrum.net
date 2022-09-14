@@ -1,7 +1,7 @@
 import jsonfeedToRSS from 'jsonfeed-to-rss'
 import cleanDeep from 'clean-deep'
 import { getFeedQuery } from './feed-query.js'
-import { getFeedEpisodesQuery } from './feed-episodes-query.js'
+import { getEpisodesQuery } from '../../episodes/episode-query.js'
 import { getFeedUrl, getFeedHtmlUrl, getFeedImageUrl } from '../feed-urls.js'
 import { getFeedTitle, getFeedDescription } from '../feed-defaults.js'
 import { getBookmarksUrl } from '../../bookmarks/bookmarks-urls.js'
@@ -41,9 +41,10 @@ export async function getFeed (fastify, opts) {
       const accept = request.accepts()
       if (!userId) throw new Error('missing authenticated feed userId')
 
-      const episodesQuery = getFeedEpisodesQuery({
-        userId,
-        feedId
+      const episodesQuery = getEpisodesQuery({
+        ownerId: userId,
+        feedId,
+        perPage: 100
       })
 
       const feedQuery = getFeedQuery({ feedId, ownerId: userId })
@@ -85,9 +86,9 @@ export async function getFeed (fastify, opts) {
         items: episodes.map(ep => {
           return {
             id: ep.id,
-            url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark_id }),
-            title: ep.title,
-            content_text: ep.note,
+            url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
+            title: ep.display_title,
+            content_text: ep.bookmark.note,
             date_published: ep.created_at,
             attachments: cleanDeep([{
               url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: ep.id }),

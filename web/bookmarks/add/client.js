@@ -6,7 +6,7 @@ import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
-import { diffUpdate } from '../../lib/bookmark-diff.js'
+import { diffBookmark } from '../../lib/diff-bookmark.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -67,7 +67,7 @@ export const page = Component(() => {
   async function handleSaveBookmark (newBookmark) {
     // Clean request for updates
     const payload = existingBookmark
-      ? diffUpdate(bookmark, newBookmark)
+      ? diffBookmark(bookmark, newBookmark)
       : newBookmark
 
     if (Object.keys(payload).length === 0) {

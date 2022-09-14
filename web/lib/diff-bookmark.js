@@ -8,7 +8,7 @@ function equalSet (a, b) {
   })
 }
 
-export function diffUpdate (oldBookmark, newBookmark) {
+export function diffBookmark (oldBookmark, newBookmark) {
   const bookmarkDiff = {}
   for (const [key, newValue] of Object.entries(newBookmark)) {
     const oldValue = oldBookmark[key]

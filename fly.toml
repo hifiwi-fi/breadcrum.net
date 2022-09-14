@@ -28,7 +28,7 @@ processes = []
   REGISTRATION=0
 
 [deploy]
-  release_command = "npm run prod-migrate"
+  release_command = "npm run migrate -- --no-config"
 
 [experimental]
   allowed_public_ports = []

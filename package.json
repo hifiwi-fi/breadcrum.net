@@ -84,7 +84,6 @@
     "clean": "rimraf public && mkdirp public",
     "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg > dependencygraph.svg",
     "migrate": "postgrator",
-    "prod-migrate": "postgrator --no-config",
     "prepare": "npm run build",
     "postinstall": "node scripts/generate-default-env.js",
     "prepublishOnly": "git push --follow-tags && gh-releas -y",
