@@ -1,5 +1,6 @@
 export const commonEpisodeProps = {
   url: { type: 'string', format: 'uri' },
+  title: { type: 'string', minLength: 1, maxLength: 255 },
   type: { enum: ['redirect'] },
   medium: { enum: ['video', 'audio'] },
   size_in_bytes: { type: 'integer' },
@@ -18,7 +19,8 @@ export const fullEpisodeProps = {
   id: { type: 'string', format: 'uuid' },
   ...commonEpisodeProps,
   created_at: { type: 'string', format: 'date-time' },
-  updated_at: { type: 'string', format: 'date-time' }
+  updated_at: { type: 'string', format: 'date-time' },
+  display_title: { type: 'string', minLength: 1, maxLength: 255 }
 }
 
 export const createEpisodeProp = {

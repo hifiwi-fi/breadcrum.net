@@ -17,10 +17,6 @@
   word-break: break-word;
 }
 
-.bc-bookmark-note-display p {
-  word-break: break-word;
-}
-
 .bc-bookmark-note-display p:last-child {
   margin-bottom: 0px;
 }

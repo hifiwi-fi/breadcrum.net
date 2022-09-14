@@ -10,13 +10,13 @@ export const episodeView = Component(({
     <div class="bc-episode-view">
 
       <div>
-        <a class="bc-episode-title" href="${e.bookmark.url}" target="_blank">
-          ${e.bookmark.title}
+        <a class="bc-episode-title" href="${e.url}" target="_blank">
+          ${e.display_title}
         </a>
       </div>
 
       <div class="bc-episode-url-display">
-        <a href="${e.bookmark.url}">${e.bookmark.url}</a>
+        <a href="${e.url}">${e.url}</a>
       </div>
 
       <div class="bc-episode-details-display">
