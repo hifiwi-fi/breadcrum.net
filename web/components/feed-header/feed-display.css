@@ -47,9 +47,14 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 10px;
 }
 
 .bc-feed-feed-url-line .bc-feed-header-select {
   flex-grow: 1;
+}
+
+.bc-feed-header-help-text {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+  margin-bottom: 10px;
 }
