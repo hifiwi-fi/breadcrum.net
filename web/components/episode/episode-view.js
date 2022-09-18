@@ -2,6 +2,8 @@
 import { Component, html } from 'uland-isomorphic'
 import format from 'format-duration'
 
+import { textIcon } from '../text-icon/index.js'
+
 export const episodeView = Component(({
   episode: e,
   onEdit = () => {}
@@ -10,6 +12,27 @@ export const episodeView = Component(({
     <div class="bc-episode-view">
 
       <div>
+        ${
+          e.ready ? '✅' : '⏱'
+        }
+        ${
+          e.error ? '❌' : null
+        }
+        ${e.type === 'redirect'
+          ? '☁️'
+          : e.type === 'raw'
+            ? '🍣'
+            : e.type === 'b2_file'
+              ? '🗄'
+              : null
+        }
+        ${
+          e.medium === 'video'
+            ? '📼'
+            : e.medium === 'audio'
+              ? '💿'
+              : null
+        }
         <a class="bc-episode-title" href="${e.url}" target="_blank">
           ${e.display_title}
         </a>
@@ -20,7 +43,13 @@ export const episodeView = Component(({
       </div>
 
       <div class="bc-episode-details-display">
-        <div>${e.filename ? e.filename : null}${e.duration_in_seconds ? ` - ${format(e.duration_in_seconds * 1000)}` : null}${e.ready ? e.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}${e.error ? ' (❌)' : null}</div>
+        <div>
+          ${e.explicit ? textIcon({ value: 'Explicit' }) : null}
+          ${e.filename ? e.filename : null}
+          ${e.duration_in_seconds ? ` - ${format(e.duration_in_seconds * 1000)}` : null}
+          ${e.ready ? e.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}
+          ${e.error ? ' (❌)' : null}
+        </div>
       </div>
 
       <div class="bc-date">

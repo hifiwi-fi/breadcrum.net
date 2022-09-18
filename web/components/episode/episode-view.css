@@ -1,4 +1,5 @@
 /* episode-view.css */
+@import '../text-icon';
 
 .bc-episode-view {
   padding-bottom: 4px;

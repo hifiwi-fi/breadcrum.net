@@ -6,7 +6,7 @@ export const commonEpisodeProps = {
   size_in_bytes: { type: 'integer' },
   duration_in_seconds: { type: 'integer' },
   mime_type: { type: 'string' },
-  explicite: { type: 'boolean' },
+  explicit: { type: 'boolean' },
   author_name: { type: 'string' },
   filename: { type: 'string' },
   ext: { type: 'string' },
