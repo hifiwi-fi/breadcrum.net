@@ -1,4 +1,5 @@
 export const commonEpisodeProps = {
+  podcast_feed_id: { type: 'string', format: 'uuid' },
   url: { type: 'string', format: 'uri' },
   title: { type: 'string', minLength: 1, maxLength: 255 },
   type: { enum: ['redirect'] },

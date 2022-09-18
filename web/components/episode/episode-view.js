@@ -3,6 +3,7 @@ import { Component, html } from 'uland-isomorphic'
 import format from 'format-duration'
 
 import { textIcon } from '../text-icon/index.js'
+import { episodeTitle } from '../episode-title/index.js'
 
 export const episodeView = Component(({
   episode: e,
@@ -11,45 +12,28 @@ export const episodeView = Component(({
   return html`
     <div class="bc-episode-view">
 
-      <div>
-        ${
-          e.ready ? '✅' : '⏱'
-        }
-        ${
-          e.error ? '❌' : null
-        }
-        ${e.type === 'redirect'
-          ? '☁️'
-          : e.type === 'raw'
-            ? '🍣'
-            : e.type === 'b2_file'
-              ? '🗄'
-              : null
-        }
-        ${
-          e.medium === 'video'
-            ? '📼'
-            : e.medium === 'audio'
-              ? '💿'
-              : null
-        }
-        <a class="bc-episode-title" href="${e.url}" target="_blank">
-          ${e.display_title}
-        </a>
-      </div>
+      ${episodeTitle({ episode: e })}
 
       <div class="bc-episode-url-display">
+        ${e.explicit ? textIcon({ value: 'Explicit' }) : null}
         <a href="${e.url}">${e.url}</a>
       </div>
 
       <div class="bc-episode-details-display">
         <div>
-          ${e.explicit ? textIcon({ value: 'Explicit' }) : null}
+          ${e.src_type === 'video' ? ' 📼' : ' 💿'}
+          ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
           ${e.filename ? e.filename : null}
           ${e.duration_in_seconds ? ` - ${format(e.duration_in_seconds * 1000)}` : null}
-          ${e.ready ? e.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}
-          ${e.error ? ' (❌)' : null}
         </div>
+      </div>
+
+
+      <div>
+        🔖
+        <a class="bc-episode-bookmark-title" href="${`/bookmarks/view/?id=${e.bookmark.id}`}" target="_blank">
+          ${e.bookmark.title}
+        </a>
       </div>
 
       <div class="bc-date">
@@ -59,6 +43,16 @@ export const episodeView = Component(({
           </time>
         </a>
       </div>
+
+      ${e.error
+        ? html`
+        <div class="bc-episode-error-box">
+          <strong>Error:</strong>
+          <pre>${e.error}</pre>
+        </div>
+        `
+        : null
+      }
 
       <div>
         <button onClick=${onEdit}>Edit</button>

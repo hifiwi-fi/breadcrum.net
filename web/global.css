@@ -4,3 +4,6 @@
 @import './document.css';
 @import './components/header';
 
+:root {
+  --bc-episodes-color: hsla(87, 74%, 44%, 0.9);
+}

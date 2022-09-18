@@ -45,7 +45,7 @@ export const getBookmarksQuery = ({
             case
             when ep.id is null then null
             else jsonb_strip_nulls(jsonb_build_object(
-              'episode_id', ep.id,
+              'id', ep.id,
               'podcast_feed_id', ep.podcast_feed_id,
               'created_at', ep.created_at,
               'updated_at', ep.updated_at,

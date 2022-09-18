@@ -1,5 +1,6 @@
 /* episode-view.css */
 @import '../text-icon';
+@import '../episode-title';
 
 .bc-episode-view {
   padding-bottom: 4px;
@@ -7,9 +8,6 @@
   border-bottom: 1px solid var(--accent-background);
 }
 
-.bc-episode-title {
-  word-break: break-word;
-}
 
 .bc-episode-url-display {
   margin-top: -0.5em;
@@ -23,8 +21,16 @@
 
 .bc-date,
 .bc-episode-url-display,
+.bc-episode-bookmark-title,
 .bc-episode-details-display {
   font-size: 0.8em;
+}
+
+.bc-episode-url-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 1px;
 }
 
 .bc-date a,

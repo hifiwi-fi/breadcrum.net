@@ -1,0 +1,9 @@
+/* episode-title.css */
+.bc-episode-title {
+  word-break: break-word;
+  color: var(--bc-episodes-color);
+}
+
+.bc-episode-title-small {
+  font-size: 0.8em;
+}

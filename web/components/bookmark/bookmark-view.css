@@ -1,6 +1,7 @@
 @import '../toread';
 @import '../star';
 @import '../sensitive';
+@import '../episode-title';
 
 .bc-bookmark-view {
   padding-bottom: 4px;

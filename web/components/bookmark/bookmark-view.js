@@ -5,8 +5,8 @@ import { star } from '../star/index.js'
 import { sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
-import format from 'format-duration'
 import cn from 'classnames'
+import { episodeTitle } from '../episode-title/index.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -67,7 +67,7 @@ export const bookmarkView = Component(({
       ${b.episodes?.length > 0
         ? html`
           <div class="bc-bookmark-episodes-display">
-            ${b.episodes.map(ep => html.for(ep, ep.id)`<div>${ep.filename ? ep.filename : null}${ep.duration_in_seconds ? ` - ${format(ep.duration_in_seconds * 1000)}` : null}${ep.ready ? ep.src_type === 'video' ? ' (📼)' : ' (🎧)' : null}${ep.error ? ' (❌)' : null}</div>`)}
+            ${b.episodes.map(ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`)}
           </div>`
         : null
       }
