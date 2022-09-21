@@ -46,10 +46,10 @@ export const episodeView = Component(({
 
       ${e.error
         ? html`
-        <div class="bc-episode-error-box">
-          <strong>Error:</strong>
+        <details class="bc-episode-error-box">
+          <summary>Error</summary>
           <pre>${e.error}</pre>
-        </div>
+        </details>
         `
         : null
       }

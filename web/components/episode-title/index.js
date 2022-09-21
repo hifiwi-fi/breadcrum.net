@@ -17,10 +17,11 @@ export const episodeTitle = Component(({
       'bc-episode-title-small': small
     })}">
         ${
-          e.ready ? '✅' : '⏱'
-        }
-        ${
-          e.error ? '❌' : null
+          e.error
+            ? '❌'
+            : e.ready
+              ? '✅'
+              : '⏱'
         }
         ${e.type === 'redirect'
           ? '☁️'

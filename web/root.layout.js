@@ -34,6 +34,9 @@ export default function defaultRootLayout ({
         </main>
         <footer class="bc-footer">
           <div>
+            <a href="/docs">docs</a>
+          </div>
+          <div>
             <a href="https://twitter.com/breadcrum_">@breadcrum_</a>
           </div>
           <div>

@@ -44,6 +44,7 @@ export async function getFeed (fastify, opts) {
       const episodesQuery = getEpisodesQuery({
         ownerId: userId,
         feedId,
+        sensitive: true,
         perPage: 100
       })
 

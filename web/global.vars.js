@@ -14,5 +14,7 @@ export default async () => {
 }
 
 export const browser = {
-  'process.env.REGISTRATION': +process.env.REGISTRATION
+  'process.env.REGISTRATION': +process.env.REGISTRATION,
+  'process.env.TRANSPORT': process.env.TRANSPORT,
+  'process.env.HOST': process.env.HOST
 }
