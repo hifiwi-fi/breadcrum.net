@@ -45,6 +45,7 @@ export async function getFeed (fastify, opts) {
         ownerId: userId,
         feedId,
         sensitive: true,
+        ready: true,
         perPage: 100
       })
 

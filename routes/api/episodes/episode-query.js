@@ -5,6 +5,7 @@ export function getEpisodesQuery ({
   episodeId,
   before,
   sensitive,
+  ready,
   perPage,
   feedId
 }) {
@@ -49,6 +50,7 @@ export function getEpisodesQuery ({
     ${episodeId ? SQL`and ep.id = ${episodeId}` : SQL``}
     ${before ? SQL`and ep.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
+    ${ready != null ? SQL`and ready = ${ready}` : SQL``}
     order by ep.created_at desc, ep.url desc, bm.title desc
     ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
   `
