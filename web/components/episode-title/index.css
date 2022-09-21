@@ -1,5 +1,5 @@
 /* episode-title.css */
-.bc-episode-title {
+.bc-episode-title-text {
   word-break: break-word;
   color: var(--bc-episodes-color);
 }

@@ -7,7 +7,8 @@ export function getEpisodesQuery ({
   sensitive,
   ready,
   perPage,
-  feedId
+  feedId,
+  includeFeed
 }) {
   const episodesQuery = SQL`
     select
@@ -30,6 +31,20 @@ export function getEpisodesQuery ({
       ep.src_type,
       ep.ready,
       ep.error,
+      ${includeFeed
+        ? SQL`
+          json_build_object(
+            'id', pf.id,
+            'creacted_at', pf.created_at,
+            'updated_at', pf.updated_at,
+            'title', pf.title,
+            'description', pf.description,
+            'image_url', pf.image_url,
+            'explicit', pf.explicit,
+            'default_feed', (pf.id = u.default_podcast_feed_id)
+          ) as podcast_feed,
+        `
+        : SQL``}
       jsonb_build_object(
         'id', bm.id,
         'url', bm.url,
@@ -44,8 +59,17 @@ export function getEpisodesQuery ({
     from episodes ep
     join bookmarks bm
     on ep.bookmark_id = bm.id
+    ${includeFeed
+      ? SQL`
+        join podcast_feeds pf
+        on ep.podcast_feed_id = pf.id
+        join users u
+        on ep.owner_id = u.id
+      `
+      : SQL``}
     where ep.owner_id = ${ownerId}
     and bm.owner_id = ${ownerId}
+    ${includeFeed ? SQL`and pf.owner_id = ${ownerId}` : SQL``}
     ${feedId ? SQL`and ep.podcast_feed_id = ${feedId}` : SQL``}
     ${episodeId ? SQL`and ep.id = ${episodeId}` : SQL``}
     ${before ? SQL`and ep.created_at < ${before}` : SQL``}

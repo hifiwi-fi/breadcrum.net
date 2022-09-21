@@ -19,22 +19,41 @@ export const episodeView = Component(({
         <a href="${e.url}">${e.url}</a>
       </div>
 
-      <div class="bc-episode-details-display">
-        <div>
-          ${e.src_type === 'video' ? ' 📼' : ' 💿'}
-          ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
-          ${e.filename ? e.filename : null}
-          ${e.duration_in_seconds ? ` - ${format(e.duration_in_seconds * 1000)}` : null}
-        </div>
-      </div>
+      ${
+        e.ready
+        ? html`
+          <div class="bc-episode-details-display">
+            <div>
+              ${e.src_type === 'video' ? ' 📼' : e.src_type === 'audio' ? ' 💿' : null}
+              ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
+              ${e.duration_in_seconds ? ` (${format(e.duration_in_seconds * 1000)}) ` : null}
+              ${e.filename ? e.filename : null}
+            </div>
+          </div>
+        `
+        : null
+      }
 
 
-      <div>
+      <div class="bc-episode-bookmark-title">
         🔖
-        <a class="bc-episode-bookmark-title" href="${`/bookmarks/view/?id=${e.bookmark.id}`}" target="_blank">
+        <a class="bc-episode-bookmark-title-text" href="${`/bookmarks/view/?id=${e.bookmark.id}`}" target="_blank">
           ${e.bookmark.title}
         </a>
       </div>
+
+      ${
+        e.podcast_feed
+          ? html`
+          <div class="bc-episode-feed-title">
+            📡
+            <a class="bc-episode-feed-title-text" href="${e.podcast_feed.default_feed ? '/feeds/' : `/feeds/?feed_id=${e.podcast_feed.id}`}" target="_blank">
+              ${e.podcast_feed.title}
+            </a>
+          </div>
+          `
+          : null
+      }
 
       <div class="bc-date">
         <a href="${`/episodes/view/?id=${e.id}`}">

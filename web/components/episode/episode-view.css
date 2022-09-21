@@ -22,8 +22,13 @@
 .bc-date,
 .bc-episode-url-display,
 .bc-episode-bookmark-title,
+.bc-episode-feed-title,
 .bc-episode-details-display {
   font-size: 0.8em;
+}
+
+.bc-episode-feed-title-text {
+  color: var(--bc-feeds-color);
 }
 
 .bc-episode-url-display {
@@ -38,3 +43,4 @@
 .bc-episode-episodes-display {
   color: var(--accent-foreground);
 }
+

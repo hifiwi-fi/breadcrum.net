@@ -1,6 +1,7 @@
 import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
 import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
 import { getEpisodesQuery, afterToBeforeEpisodesQuery } from './episode-query.js'
+import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
 
 export async function getEpisodes (fastify, opts) {
   fastify.get(
@@ -32,11 +33,21 @@ export async function getEpisodes (fastify, opts) {
             feed_id: {
               type: 'string',
               format: 'uri'
+            },
+            default_feed: {
+              type: 'boolean',
+              default: false
+            },
+            include_feed: {
+              type: 'boolean',
+              default: false
             }
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after', 'url'] } }] },
-            after: { allOf: [{ not: { required: ['before', 'url'] } }] }
+            after: { allOf: [{ not: { required: ['before', 'url'] } }] },
+            feed_id: { allOf: [{ not: { required: ['default_feed'] } }] },
+            default_feed: { allOf: [{ not: { required: ['feed_id'] } }] }
           }
         },
         response: {
@@ -79,7 +90,9 @@ export async function getEpisodes (fastify, opts) {
           before
         } = request.query
 
-        const feedId = request.query.feed_id ?? await getOrCreateDefaultFeed({ client, userId })
+        const feedId = request.query.feed_id ?? request.query.default_feed
+          ? await getOrCreateDefaultFeed({ client, userId })
+          : null
 
         let top = false
         let bottom = false
@@ -121,7 +134,8 @@ export async function getEpisodes (fastify, opts) {
           before,
           sensitive,
           perPage,
-          feedId
+          feedId,
+          includeFeed: request.query.include_feed
         })
 
         const episodeResults = await fastify.pg.query(episodeQuery)
@@ -132,7 +146,16 @@ export async function getEpisodes (fastify, opts) {
         const prevPage = top ? null : episodeResults.rows[0]?.created_at || before
 
         return {
-          data: episodeResults.rows,
+          data: request.query.include_feed
+            ? episodeResults.rows.map(episode => {
+              episode.podcast_feed = getFeedWithDefaults({
+                feed: episode.podcast_feed,
+                transport: fastify.config.TRANSPORT,
+                host: fastify.config.HOST
+              })
+              return episode
+            })
+            : episodeResults.rows,
           pagination: {
             before: nextPage,
             after: prevPage,

@@ -5,7 +5,6 @@ import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { episodeList } from '../components/episode/episode-list.js'
-import { feedHeader } from '../components/feed-header/feed-header.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -16,14 +15,6 @@ export const page = Component(() => {
   const [episodes, setEpisodes] = useState()
   const [episodesLoading, setEpisodesLoading] = useState(false)
   const [episodesError, setEpisodesError] = useState(null)
-
-  const [feed, setFeed] = useState()
-  const [feedLoading, setFeedLoading] = useState(false)
-  const [feedError, setFeedError] = useState(null)
-
-  const [feeds, setFeeds] = useState()
-  const [feedsLoading, setFeedsLoading] = useState(false)
-  const [feedsError, setFeedsError] = useState(null)
 
   const [before, setBefore] = useState()
   const [after, setAfter] = useState()
@@ -53,10 +44,7 @@ export const page = Component(() => {
       if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
 
       pageParams.set('sensitive', state.sensitive)
-
-      if (!pageParams.get('feed_id')) {
-        pageParams.set('default_feed', true)
-      }
+      pageParams.set('include_feed', true)
 
       const response = await fetch(`${state.apiUrl}/episodes?${pageParams.toString()}`, {
         method: 'get',
@@ -103,77 +91,6 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, state.sensitive])
 
-  // Get Feed
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function getFeed () {
-      setFeedLoading(true)
-      setFeedError(null)
-      const pageParams = new URLSearchParams(query)
-
-      const requestURL = pageParams.get('feed_id')
-        ? `/feeds/${pageParams.get('feed_id')}/details/`
-        : '/feeds/default-feed/details'
-
-      const response = await fetch(`${state.apiUrl}${requestURL}`, {
-        method: 'get',
-        headers: {
-          'accept-encoding': 'application/json'
-        },
-        signal: controller.signal,
-        credentials: 'include'
-      })
-
-      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        setFeed(body?.data)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-      }
-    }
-
-    if (user) {
-      getFeed()
-        .then(() => { console.log('feed done') })
-        .catch(err => { console.error(err); setFeedError(err) })
-        .finally(() => { setFeedLoading(false) })
-    }
-  }, [state.apiUrl, feedReload])
-
-  // Get Feeds
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function getFeeds () {
-      setFeedsLoading(true)
-      setFeedsError(null)
-
-      const response = await fetch(`${state.apiUrl}/feeds/`, {
-        method: 'get',
-        headers: {
-          'accept-encoding': 'application/json'
-        },
-        signal: controller.signal,
-        credentials: 'include'
-      })
-
-      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        setFeeds(body?.data)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-      }
-    }
-
-    if (user) {
-      getFeeds()
-        .then(() => { console.log('feed done') })
-        .catch(err => { console.error(err); setFeedsError(err) })
-        .finally(() => { setFeedsLoading(false) })
-    }
-  }, [state.apiUrl, feedReload])
-
   const onPageNav = (ev) => {
     ev.preventDefault()
     pushState(ev.currentTarget.href)
@@ -195,11 +112,6 @@ export const page = Component(() => {
   }
 
   return html`
-  <div>
-    ${feedLoading && feedsLoading ? 'loading feed' : feedHeader({ feed, feeds, reload })}
-    ${feedError ? html`<div>${feedError.message}</div>` : null}
-    ${feedsError ? html`<div>${feedsError.message}</div>` : null}
-  </div>
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
