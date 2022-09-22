@@ -14,7 +14,7 @@ export async function createEpisode ({
   const createEpisodeQuery = SQL`
           INSERT INTO episodes (owner_id, podcast_feed_id, bookmark_id, type, medium)
           VALUES (${userId}, ${defaultFeedId}, ${bookmarkId}, ${type}, ${medium})
-          returning id;
+          returning id, type, medium, podcast_feed_id;
           `
 
   const episodeResults = await client.query(createEpisodeQuery)

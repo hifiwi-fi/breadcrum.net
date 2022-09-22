@@ -113,7 +113,7 @@ export async function putBookmarks (fastify, opts) {
         }
 
         if (request?.body?.createEpisode) {
-          const { id: episodeId } = await createEpisode({
+          const { id: episodeId, medium: episodeMedium } = await createEpisode({
             client,
             userId,
             bookmarkId: bookmark.id,
@@ -127,6 +127,7 @@ export async function putBookmarks (fastify, opts) {
             userId,
             bookmarkId: bookmark.id,
             episodeId,
+            medium: episodeMedium,
             pg: fastify.pg,
             log: request.log
           }))

@@ -103,7 +103,7 @@ export async function putBookmark (fastify, opts) {
       }
 
       if (bookmark?.createEpisode) {
-        const { id: episodeId } = await createEpisode({
+        const { id: episodeId, medium: episodeMedium } = await createEpisode({
           client,
           userId,
           bookmarkId,
@@ -117,6 +117,7 @@ export async function putBookmark (fastify, opts) {
           userId,
           bookmarkId,
           episodeId,
+          medium: episodeMedium,
           pg: fastify.pg,
           log: request.log
         })).then(() => fastify.metrics.episodeCounter.inc()).catch(request.log.error)
