@@ -18,6 +18,7 @@
     "@fastify/cookie": "^8.0.0",
     "@fastify/cors": "^8.0.0",
     "@fastify/env": "^4.0.0",
+    "@fastify/helmet": "^10.0.0",
     "@fastify/jwt": "^6.1.0",
     "@fastify/postgres": "^5.0.0",
     "@fastify/rate-limit": "^7.0.0",
