@@ -85,21 +85,35 @@ export async function getFeed (fastify, opts) {
         _breadcrum: {
           default_feed: pf.default_feed
         },
-        items: episodes.map(ep => {
-          return {
-            id: ep.id,
-            url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
-            title: ep.display_title,
-            content_text: ep.bookmark.note,
-            date_published: ep.created_at,
-            attachments: cleanDeep([{
-              url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: ep.id }),
-              mime_type: `${ep.src_type}/${ep.ext}`,
-              title: ep.filename,
-              duration_in_seconds: ep.duration_in_seconds
-            }])
-          }
-        })
+        items: episodes.length > 0
+          ? episodes.map(ep => {
+            return {
+              id: ep.id,
+              url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
+              title: ep.display_title,
+              content_text: ep.bookmark.note,
+              date_published: ep.created_at,
+              attachments: cleanDeep([{
+                url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: ep.id }),
+                mime_type: `${ep.src_type}/${ep.ext}`,
+                title: ep.filename,
+                duration_in_seconds: ep.duration_in_seconds
+              }])
+            }
+          })
+          : [{ // Placeholder show so people can subscribe to empty feeds.
+              id: 'breadcrum.net:episode:placeholder',
+              url: `${transport}://${host}/bookmarks`,
+              title: 'Breadcum.net placeholder episode',
+              content_text: 'This episode will disapear when you create your first breadcrum episode. Its added so that you can subscribe to your podcast feed URL before you add any episodes.',
+              date_published: new Date('2022-09-24T19:30:24.654Z'),
+              attachments: cleanDeep([{
+                url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: 'placeholder' }),
+                mime_type: 'video/mp4',
+                title: 'never-gonna-give-you-up.mp4',
+                duration_in_seconds: 212
+              }])
+            }]
       }
 
       // Querystring overrides accept header
