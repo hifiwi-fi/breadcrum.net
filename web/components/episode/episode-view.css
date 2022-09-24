@@ -31,13 +31,6 @@
   color: var(--bc-feeds-color);
 }
 
-.bc-episode-url-display {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 1px;
-}
-
 .bc-date a,
 .bc-episode-url-display a,
 .bc-episode-episodes-display {

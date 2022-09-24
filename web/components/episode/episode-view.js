@@ -15,7 +15,6 @@ export const episodeView = Component(({
       ${episodeTitle({ episode: e })}
 
       <div class="bc-episode-url-display">
-        ${e.explicit ? textIcon({ value: 'Explicit' }) : null}
         <a href="${e.url}">${e.url}</a>
       </div>
 
@@ -53,6 +52,11 @@ export const episodeView = Component(({
           </div>
           `
           : null
+      }
+
+      ${e.explicit
+        ? html`<div>${textIcon({ value: 'Explicit' })}</div>`
+        : null
       }
 
       <div class="bc-date">
