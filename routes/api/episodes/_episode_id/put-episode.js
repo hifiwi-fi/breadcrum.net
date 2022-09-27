@@ -18,7 +18,7 @@ export async function putEpisode (fastify, opts) {
         properties: {
           episode_id: { type: 'string', format: 'uuid' }
         },
-        required: ['id']
+        required: ['episode_id']
       },
       body: {
         type: 'object',

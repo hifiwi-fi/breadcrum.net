@@ -20,7 +20,7 @@ export async function getEpisode (fastify, opts) {
           properties: {
             episode_id: { type: 'string', format: 'uuid' }
           },
-          required: ['id']
+          required: ['episode_id']
         },
         response: {
           200: {
@@ -33,7 +33,7 @@ export async function getEpisode (fastify, opts) {
       }
     },
     async function getEpisodeHandler (request, reply) {
-      const ownerId = request.user.episode_id
+      const ownerId = request.user.id
       const { episode_id: episodeId } = request.params
       const { sensitive } = request.query
 

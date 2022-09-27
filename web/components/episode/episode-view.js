@@ -36,7 +36,7 @@ export const episodeView = Component(({
 
       <div class="bc-episode-bookmark-title">
         🔖
-        <a class="bc-episode-bookmark-title-text" href="${`/bookmarks/view/?id=${e.bookmark.id}`}" target="_blank">
+        <a class="bc-episode-bookmark-title-text" href="${`/bookmarks/view/?id=${e.bookmark.id}`}">
           ${e.bookmark.title}
         </a>
       </div>
