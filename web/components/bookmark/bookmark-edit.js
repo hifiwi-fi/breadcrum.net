@@ -93,7 +93,7 @@ export const bookmarkEdit = Component(({
         </div>
         <div>
           <label class="block">
-            Title:
+            title:
             <input class="block" type="text" name="title" value="${b?.title}">
           </label>
         </div>

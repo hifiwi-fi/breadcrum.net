@@ -45,11 +45,22 @@ export const episodeEdit = Component(({
       <form ref="${formRef}" class="add-episode-form" id="add-episode-form" onsubmit=${handleSave}>
         <fieldset ?disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-episode-legend">${legend}</legend>` : null}
-
           <div>
             <label class='block'>
               url:
-              <input class='block bc-episode-url-edit' type="url" name="url" value="${e?.url}"/>
+              <input disabled class='block bc-episode-url-edit' type="url" name="url" value="${e?.url}"/>
+            </labe>
+          </div>
+          <div>
+            <label class="block">
+              title:
+              <input class="block" type="text" name="title" value="${e?.title}">
+            </label>
+          </div>
+          <div>
+            <label>
+              explicit:
+              <input type="checkbox" name="explicit" ?checked="${e?.explicit}">
             </label>
           </div>
 

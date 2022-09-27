@@ -38,11 +38,12 @@ export async function putEpisode (fastify, opts) {
 
       const updates = []
 
-      if (episode.url != null) updates.push(SQL`url = ${episode.url}`)
+      // if (episode.url != null) updates.push(SQL`url = ${episode.url}`)
       if (episode.title != null) updates.push(SQL`title = ${episode.title}`)
       if (episode.explicit != null) updates.push(SQL`explicit = ${episode.explicit}`)
       // TODO: description editing
       // TODO: change medium or type?
+      // TODO: re-run create episode steps
 
       if (updates.length > 0) {
         const query = SQL`
