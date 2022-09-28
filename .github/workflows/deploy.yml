@@ -1,0 +1,46 @@
+name: flyctl deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'ref to deploy'
+        required: true
+        default: 'master'
+
+env:
+  node_version: 18
+  FORCE_COLOR: 2
+
+concurrency: # prevent concurrent releases
+  group: flyctl-deploy
+  cancel-in-progress: true
+
+jobs:
+  flyctl_deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.ref }}
+    - name: Use Node.js ${{ env.node_version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.node_version }}
+        # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
+        registry-url: 'https://registry.npmjs.org'
+    - run: npm i
+    - run: node ./scripts/bootstrap-yt-dlp.js
+    - run: npm test
+    - run: rm .env
+    - run: git reset --hard && git clean -fd
+    - uses: superfly/flyctl-actions/setup-flyctl@master
+    - run: flyctl deploy --remote-only
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    - name: Archive lockfile
+      uses: actions/upload-artifact@v3
+      with:
+        name: pacakge-lock.json
+        path: package-lock.json
+
