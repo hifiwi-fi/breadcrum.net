@@ -68,6 +68,8 @@ export default async function registerRoutes (fastify, opts) {
       reply.code(201)
       // TODO: ensure this user matches login/user object
 
+      fastify.metrics.userCreatedCounter.inc()
+
       return {
         token,
         user

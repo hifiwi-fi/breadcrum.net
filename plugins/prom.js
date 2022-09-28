@@ -54,6 +54,11 @@ export default fp(async function (fastify, opts) {
     help: 'The number of times tags are removed from bookmarks'
   })
 
+  fastify.metrics.userCreatedCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_user_created_total',
+    help: 'The number of times a new user is created'
+  })
+
   const promServer = Fastify({
     logger: true
   })
