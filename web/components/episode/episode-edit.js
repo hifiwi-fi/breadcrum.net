@@ -34,7 +34,26 @@ export const episodeEdit = Component(({
   }, [setDisabled, setError, onDeleteEpisode])
 
   const handleSave = useCallback(async (ev) => {
-    // TODO  this is the bookmark impl
+    ev.preventDefault()
+    setDisabled(true)
+    setError(null)
+
+    const form = formRef.current
+    // const url = form.url.value
+    const title = form.title.value
+    const explicit = form.explicit.checked
+
+    const formState = {
+      title,
+      explicit
+    }
+
+    try {
+      await onSave(formState)
+    } catch (err) {
+      setDisabled(false)
+      setError(err)
+    }
   }, [setDisabled, setError, formRef?.current, onSave])
 
   // Parent can delay passing a bookmark to disable the form.

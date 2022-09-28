@@ -36,14 +36,14 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
   }, [bookmark, state.apiUrl, reload, setEditing])
 
   const handleDeleteBookmark = useCallback(async (ev) => {
-    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
+    await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
         'accept-encoding': 'application/json'
       },
       credentials: 'include'
     })
-    console.log({ json: await response.json(), foo: 'bar' })
+
     setDeleted(true)
     reload()
   }, [state.apiUrl, bookmark.id, setDeleted, reload])

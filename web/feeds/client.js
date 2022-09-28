@@ -29,8 +29,14 @@ export const page = Component(() => {
   const [after, setAfter] = useState()
 
   // Need a better way to trigger reloads
+  const [episodesReload, setEpisodesReload] = useState(0)
+  const reloadEpisodes = useCallback(() => {
+    setEpisodesReload(episodesReload + 1)
+  }, [episodesReload, setEpisodesReload])
+
+  // Need a better way to trigger reloads
   const [feedReload, setFeedReload] = useState(0)
-  const reload = useCallback(() => {
+  const reloadFeed = useCallback(() => {
     setFeedReload(feedReload + 1)
   }, [feedReload, setFeedReload])
 
@@ -101,7 +107,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setEpisodesError(err) })
         .finally(() => { setEpisodesLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive])
+  }, [query, state.apiUrl, state.sensitive, episodesReload])
 
   // Get Feed
   useEffect(() => {
@@ -196,7 +202,7 @@ export const page = Component(() => {
 
   return html`
   <div>
-    ${feedLoading && feedsLoading ? 'loading feed' : feedHeader({ feed, feeds, reload })}
+    ${feedLoading && feedsLoading ? 'loading feed' : feedHeader({ feed, feeds, reload: reloadFeed })}
     ${feedError ? html`<div>${feedError.message}</div>` : null}
     ${feedsError ? html`<div>${feedsError.message}</div>` : null}
   </div>
@@ -207,7 +213,7 @@ export const page = Component(() => {
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
   ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload })}`)
+      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

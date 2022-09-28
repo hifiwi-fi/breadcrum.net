@@ -32,7 +32,7 @@ export async function putEpisode (fastify, opts) {
   },
   async function putEpisodeHandler (request, reply) {
     return fastify.pg.transact(async client => {
-      const ownerId = request.user.episode_id
+      const ownerId = request.user.id
       const { episode_id: episodeId } = request.params
       const episode = request.body
 
@@ -44,6 +44,8 @@ export async function putEpisode (fastify, opts) {
       // TODO: description editing
       // TODO: change medium or type?
       // TODO: re-run create episode steps
+
+      console.log({ updates })
 
       if (updates.length > 0) {
         const query = SQL`
