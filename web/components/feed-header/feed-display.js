@@ -21,6 +21,10 @@ export const feedDisplay = Component(({
     }
   }, [copyButton.current])
 
+  const handleSelect = useCallback(async ev => {
+    ev.target.select()
+  })
+
   return html`
     <div class="bc-feed-display">
 
@@ -53,7 +57,7 @@ export const feedDisplay = Component(({
             class="bc-feed-header-select"
             type="text"
             readonly
-            onclick="this.select()"
+            onclick=${handleSelect}
             value="${f.feed_url}">
           </input>
           <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
