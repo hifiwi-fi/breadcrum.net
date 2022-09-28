@@ -12,21 +12,22 @@
 .sans { font-family: var(--system-sans); }
 .round { font-family: var(--system-round); }
 
-.bc-page-container
-textarea,
-input[type="date"],
-input[type="datetime-local"],
-input[type="email"],
-input[type="month"],
-input[type="number"],
-input[type="password"],
-input[type="search"],
-input[type="tel"],
-input[type="text"],
-input[type="time"],
-input[type="url"],
-input[type="week"] {
-  font-size: calc(12px + var(--font-size-scale));
+.bc-page-container {
+  & textarea,
+  & input[type="date"],
+  & input[type="datetime-local"],
+  & input[type="email"],
+  & input[type="month"],
+  & input[type="number"],
+  & input[type="password"],
+  & input[type="search"],
+  & input[type="tel"],
+  & input[type="text"],
+  & input[type="time"],
+  & input[type="url"],
+  & input[type="week"] {
+    font-size: calc(12px + var(--font-size-scale));
+  }
 }
 
 .bc-page-container {

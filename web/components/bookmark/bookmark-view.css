@@ -34,14 +34,12 @@
 
 .bc-tags-display,
 .bc-date,
-.bc-bookmark-url-display,
-.bc-bookmark-episodes-display {
+.bc-bookmark-url-display {
   font-size: 0.8em;
 }
 
 .bc-date a,
-.bc-bookmark-url-display a,
-.bc-bookmark-episodes-display {
+.bc-bookmark-url-display a {
   color: var(--accent-foreground);
 }
 

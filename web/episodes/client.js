@@ -20,10 +20,10 @@ export const page = Component(() => {
   const [after, setAfter] = useState()
 
   // Need a better way to trigger reloads
-  const [feedReload, setFeedReload] = useState(0)
-  const reload = useCallback(() => {
-    setFeedReload(feedReload + 1)
-  }, [feedReload, setFeedReload])
+  const [episodeReload, setEpisodeReload] = useState(0)
+  const reloadEpisodes = useCallback(() => {
+    setEpisodeReload(episodeReload + 1)
+  }, [episodeReload, setEpisodeReload])
 
   // Require a user
   useEffect(() => {
@@ -89,7 +89,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setEpisodesError(err) })
         .finally(() => { setEpisodesLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive])
+  }, [query, state.apiUrl, state.sensitive, episodeReload])
 
   const onPageNav = (ev) => {
     ev.preventDefault()
@@ -119,7 +119,7 @@ export const page = Component(() => {
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
   ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload })}`)
+      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

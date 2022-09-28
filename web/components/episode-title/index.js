@@ -7,7 +7,7 @@ export const episodeTitle = Component(({
   small
 } = {}) => {
   const href = small === true
-    ? `/episodes/?id=${e.id}`
+    ? `/episodes/view/?id=${e.id}`
     : e.url
 
   return html`
@@ -37,7 +37,7 @@ export const episodeTitle = Component(({
               ? '💿'
               : null
         }
-        <a class="bc-episode-title-text" href="${href}" target="_blank">
+        <a class="bc-episode-title-text" href="${href}">
           ${e.display_title}
         </a>
       </div>

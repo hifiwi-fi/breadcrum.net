@@ -56,5 +56,6 @@
 .bc-feed-header-help-text {
   color: var(--accent-foreground);
   font-size: 0.8em;
+  margin-top: 0.5em;
   margin-bottom: 10px;
 }

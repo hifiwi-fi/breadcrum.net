@@ -65,10 +65,10 @@ export const bookmarkView = Component(({
         : null
       }
       ${b.episodes?.length > 0
-        ? html`
-          <div class="bc-bookmark-episodes-display">
-            ${b.episodes.map(ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`)}
-          </div>`
+        ? html`${b.episodes.map(
+            ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`
+          )
+      }`
         : null
       }
       <div class="bc-date">
