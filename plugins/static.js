@@ -14,7 +14,8 @@ export default fp(async function (fastify, opts) {
     root: path.join(__dirname, '../public'),
     prefix: '/',
     redirect: true,
-    lastModified: false // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
+    maxAge: 600000,
+    lastModified: fastify.config.ENV !== 'production' // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
   })
 }, {
   name: 'static',
