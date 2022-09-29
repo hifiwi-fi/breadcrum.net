@@ -1,6 +1,12 @@
 
 FROM node:18-alpine
 
+ARG ENV
+ARG NODE_ENV
+ARG DOMAIN
+ARG TRANSPORT
+ARG REGISTRATION=0
+
 LABEL maintainer="HifiWifi LLC"
 
 # Set the working directory
@@ -27,6 +33,6 @@ RUN addgroup -S nodegroup && \
 USER nodeuser
 
 # Open the mapped port
-EXPOSE 3000
+EXPOSE 8080
 
 CMD [ "./node_modules/.bin/fastify", "start", "app.js" ]
