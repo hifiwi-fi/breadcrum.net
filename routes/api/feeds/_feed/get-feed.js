@@ -95,7 +95,7 @@ export async function getFeed (fastify, opts) {
               date_published: ep.created_at,
               attachments: cleanDeep([{
                 url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: ep.id }),
-                mime_type: `${ep.src_type}/${ep.ext}`,
+                mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
                 title: ep.filename,
                 duration_in_seconds: ep.duration_in_seconds
               }])
