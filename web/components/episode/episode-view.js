@@ -46,7 +46,7 @@ export const episodeView = Component(({
           ? html`
           <div class="bc-episode-feed-title">
             📡
-            <a class="bc-episode-feed-title-text" href="${e.podcast_feed.default_feed ? '/feeds/' : `/feeds/?feed_id=${e.podcast_feed.id}`}" target="_blank">
+            <a class="bc-episode-feed-title-text" href="${e.podcast_feed.default_feed ? '/feeds/' : `/feeds/?feed_id=${e.podcast_feed.id}`}">
               ${e.podcast_feed.title}
             </a>
           </div>
