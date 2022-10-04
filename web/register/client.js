@@ -2,15 +2,17 @@
 import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { useFlags } from '../hooks/useFlags.js'
 
 export const page = Component(() => {
   const { user, loading, error: userError } = useUser()
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
+  const { flags, loading: flagsLoading } = useFlags()
 
   useEffect(() => {
-    if (!+process.env.REGISTRATION) window.location.replace('/')
-  }, [process.env.REGISTRATION])
+    if (!flags.registration && !flagsLoading) window.location.replace('/')
+  }, [flags.registration, flagsLoading])
 
   useEffect(() => {
     if ((user && !loading)) window.location.replace('/bookmarks')

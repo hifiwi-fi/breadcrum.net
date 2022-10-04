@@ -8,13 +8,11 @@ const __dirname = desm(import.meta.url)
 export default async () => {
   return {
     siteName: '🥖 Breadcrum',
-    registration: +process.env.REGISTRATION,
     version: JSON.parse(await readFile(new URL(join(__dirname, '../package.json'), import.meta.url))).version
   }
 }
 
 export const browser = {
-  'process.env.REGISTRATION': +process.env.REGISTRATION,
   'process.env.TRANSPORT': process.env.TRANSPORT,
   'process.env.HOST': process.env.HOST
 }

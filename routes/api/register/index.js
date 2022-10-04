@@ -40,40 +40,46 @@ export default async function registerRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
-      if (!fastify.config.REGISTRATION) {
-        reply.code(403)
-        return {
-          error: 'Registration is closed. Please try again later.'
+      return fastify.pg.transact(async client => {
+        const { registration } = await fastify.getFlags({
+          pgClient: client,
+          frontend: true,
+          backend: false
+        })
+        if (!registration) {
+          reply.code(403)
+          return {
+            error: 'Registration is closed. Please try again later.'
+          }
         }
-      }
-      const { username, email, password } = request.body
+        const { username, email, password } = request.body
 
-      // TODO: ensure not a duplicate user
+        // TODO: ensure not a duplicate user
 
-      const query = SQL`
-      INSERT INTO users (username, email, password) VALUES (
-        ${username},
-        ${email},
-        crypt(${password}, gen_salt('bf'))
-      )
-      RETURNING id, email, username, email_confirmed;
-      `
+        const query = SQL`
+          insert into users (username, email, password) values (
+            ${username},
+            ${email},
+            crypt(${password}, gen_salt('bf'))
+          )
+          returning id, email, username, email_confirmed;`
 
-      const results = await fastify.pg.query(query)
-      const user = results.rows[0]
+        const results = await client.query(query)
+        const user = results.rows[0]
 
-      const token = await reply.createJWTToken(user)
-      reply.setJWTCookie(token)
+        const token = await reply.createJWTToken(user)
+        reply.setJWTCookie(token)
 
-      reply.code(201)
-      // TODO: ensure this user matches login/user object
+        reply.code(201)
+        // TODO: ensure this user matches login/user object
 
-      fastify.metrics.userCreatedCounter.inc()
+        fastify.metrics.userCreatedCounter.inc()
 
-      return {
-        token,
-        user
-      }
+        return {
+          token,
+          user
+        }
+      })
     }
   )
 }

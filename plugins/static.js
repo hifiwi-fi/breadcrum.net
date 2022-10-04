@@ -15,9 +15,28 @@ export default fp(async function (fastify, opts) {
     prefix: '/',
     redirect: true,
     maxAge: 600000,
-    lastModified: fastify.config.ENV !== 'production' // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
+    lastModified: fastify.config.ENV !== 'production', // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
+    allowedPath: (pathName, root, request) => !pathName.startsWith('/admin')
   })
+
+  fastify.register(async function (fastify, opts) {
+    fastify.addHook('preHandler', fastify.auth([
+      fastify.verifyJWT,
+      fastify.verifyAdmin
+    ], {
+      relation: 'and'
+    }))
+    fastify.register(import('@fastify/static'), {
+      root: path.join(__dirname, '../public/admin'),
+      prefix: '/',
+      redirect: true,
+      cacheControl: false,
+      decorateReply: false,
+      etag: false,
+      lastModified: false
+    })
+  }, { prefix: '/admin' })
 }, {
   name: 'static',
-  dependencies: ['env', 'compress']
+  dependencies: ['compress', 'auth', 'jwt']
 })

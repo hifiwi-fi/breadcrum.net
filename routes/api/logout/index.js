@@ -28,8 +28,8 @@ export default async function logoutRoute (fastify, opts) {
           DELETE FROM auth_tokens
           WHERE jti = ${validJWT.jti} AND owner_id = ${validJWT.id};
           `
-          console.log(query)
-          console.log(await fastify.pg.query(query))
+
+          await fastify.pg.query(query)
           request.log.info(`Deleted ${validJWT.jti} for ${validJWT.username}`)
         } catch (err) {
           request.log.error(new Error('Error deleting JWT from db', { cause: err }))

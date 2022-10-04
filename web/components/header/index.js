@@ -4,6 +4,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { sensitive } from '../sensitive/index.js'
 import { useQuery } from '../../hooks/useQuery.js'
+import { loginButtons } from './login-buttons.js'
 
 export const header = Component(() => {
   const { user } = useUser()
@@ -35,32 +36,7 @@ export const header = Component(() => {
     </div>
     <div class="bc-header-end">
       ${!user
-          ? html`
-            ${
-              window?.location?.pathname !== '/login/'
-                ? html`
-                  <div>
-                    <a href='/login'>login</a>
-                  </div>
-                `
-                : null
-            }
-            ${
-              window?.location?.pathname !== '/login/' && window?.location?.pathname !== '/register/' && +process.env.REGISTRATION
-                ? html`
-                  <div>/</div>
-                `
-                : null
-            }
-            ${
-              window?.location?.pathname !== '/register/' && +process.env.REGISTRATION
-                ? html`
-                  <div>
-                    <a href='/register'>register</a>
-                  </div>
-                `
-                : null
-            }`
+          ? loginButtons()
           : html`
             <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
             <div>🏷 <a href='/tags/'>tags</a></div>

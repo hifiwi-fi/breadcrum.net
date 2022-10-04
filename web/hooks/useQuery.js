@@ -5,7 +5,6 @@ const QueryContext = createContext()
 
 if (typeof window !== 'undefined') {
   QueryContext.provide(new URLSearchParams(window.location.search))
-  console.log('adding listner')
   window.addEventListener('popstate', (ev) => {
     QueryContext.provide(new URLSearchParams(window.location.search))
   })
