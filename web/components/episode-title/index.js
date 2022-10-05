@@ -37,7 +37,7 @@ export const episodeTitle = Component(({
               ? '💿'
               : null
         }
-        <a class="bc-episode-title-text" href="${href}">
+        <a class="bc-episode-title-text" href="${href}" target="${small ? null : '_blank'}"}>
           ${e.display_title}
         </a>
       </div>
