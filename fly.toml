@@ -14,7 +14,6 @@ processes = []
   NODE_ENV = 'production'
   DOMAIN = 'breadcrum.net'
   TRANSPORT='https'
-  REGISTRATION=0
 
 [env]
   PORT = "8080"
@@ -25,7 +24,6 @@ processes = []
   NODE_ENV = 'production'
   HOST = 'breadcrum.net'
   TRANSPORT='https'
-  REGISTRATION=0
 
 [deploy]
   release_command = "npm run migrate -- --no-config"

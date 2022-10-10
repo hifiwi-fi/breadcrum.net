@@ -4,8 +4,7 @@ export const schema = {
   type: 'object',
   required: [
     'JWT_SECRET',
-    'COOKIE_SECRET',
-    'REGISTRATION' // Due to build time client use
+    'COOKIE_SECRET'
   ],
   properties: {
     ENV: {
@@ -34,10 +33,6 @@ export const schema = {
       // Hostname and port (if needed)
       type: 'string',
       default: 'localhost:3000'
-    },
-    REGISTRATION: {
-      type: 'integer', // 0 or 1
-      default: 1
     },
     TRANSPORT: {
       enum: ['http', 'https'],

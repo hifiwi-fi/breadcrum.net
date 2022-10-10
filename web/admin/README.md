@@ -1,0 +1,3 @@
+# Admin pannel
+
+- [Flags](./flags/)

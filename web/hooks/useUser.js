@@ -3,6 +3,8 @@ import { useEffect, useState } from 'uland-isomorphic'
 import { fetch } from 'fetch-undici'
 import { useLSP } from './useLSP.js'
 
+let userRequest = null
+
 export function useUser () {
   const state = useLSP()
 
@@ -14,18 +16,26 @@ export function useUser () {
     setError(null)
     const controller = new AbortController()
 
+    let requestor = false
+
     const getUser = async () => {
-      const response = await fetch(`${state.apiUrl}/user`, {
-        method: 'get',
-        headers: {
-          'accept-encoding': 'application/json'
-        },
-        signal: controller.signal,
-        credentials: 'include'
-      })
+      if (!userRequest) {
+        userRequest = fetch(`${state.apiUrl}/user`, {
+          method: 'get',
+          headers: {
+            'accept-encoding': 'application/json'
+          },
+          signal: controller.signal,
+          credentials: 'include'
+        })
+        requestor = true
+      }
+
+      const response = await userRequest
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
+        const clone = response.clone()
+        const body = await clone.json()
         if (body?.username !== state.user?.username || body?.email !== state.user?.email) {
           console.log('Updating user state')
           state.user = body
@@ -44,6 +54,7 @@ export function useUser () {
       setError(err)
     }).finally(() => {
       setLoading(false)
+      if (requestor) userRequest = null
     })
   }, [state.apiUrl])
 
