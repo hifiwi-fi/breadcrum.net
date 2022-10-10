@@ -1,5 +1,5 @@
 /* eslint-env browser */
-import { createContext, useContext } from 'uland-isomorphic'
+import { useEffect, useState } from 'uland-isomorphic'
 import lsp from 'local-storage-proxy'
 import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
 
@@ -19,17 +19,16 @@ if (typeof window !== 'undefined') {
   window.state = state
 }
 
-const StateContext = createContext()
-
-StateContext.provide(state)
-
-const listener = (ev) => { StateContext.provide(state) }
-state.addEventListener('update', listener)
-
-// TODO: look into this: https://usehooks.com/useLocalStorage/
-
 export function useLSP () {
-  const lsp = useContext(StateContext)
+  const [lsp, setLSP] = useState(state)
+  useEffect(() => {
+    const listener = (ev) => { setLSP(state) }
+    state.addEventListener('update', listener)
+
+    return () => {
+      state.removeEventListener('update', listener)
+    }
+  }, [state])
 
   return lsp
 }
