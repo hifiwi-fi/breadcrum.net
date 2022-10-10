@@ -15,8 +15,7 @@ export default fp(async function (fastify, opts) {
     prefix: '/',
     redirect: true,
     maxAge: 600000,
-    lastModified: fastify.config.ENV !== 'production', // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
-    allowedPath: (pathName, root, request) => !pathName.startsWith('/admin')
+    lastModified: fastify.config.ENV !== 'production' // Always showing  Tue, 01 Jan 1980 00:00:01 GMT in prod for some reason
   })
 
   fastify.register(async function (fastify, opts) {
