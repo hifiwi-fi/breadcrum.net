@@ -22,9 +22,14 @@
   margin-bottom: 0px;
 }
 
+
 .bc-bookmark-url-display {
   margin-top: -0.5em;
   margin-bottom: 5px;
+}
+
+.bc-bookmark-archive-url-display,
+.bc-bookmark-url-display {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -34,13 +39,25 @@
 
 .bc-tags-display,
 .bc-date,
-.bc-bookmark-url-display {
+.bc-bookmark-url-display,
+.bc-bookmark-archive-url-display {
   font-size: 0.8em;
 }
 
 .bc-date a,
 .bc-bookmark-url-display a {
   color: var(--accent-foreground);
+}
+
+.bc-bookmark-archive-url-display a {
+  color: var(--bc-archive-color);
+}
+
+.bc-bookmark-archive-url-edit-help-text {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+  margin-top: 0.5em;
+  margin-bottom: 10px;
 }
 
 .bc-tags-display {

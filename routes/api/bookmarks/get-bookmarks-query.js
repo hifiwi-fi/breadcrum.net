@@ -85,7 +85,8 @@ export const getBookmarksQuery = ({
           b.sensitive,
           b.starred,
           coalesce(array_to_json(tag_array), '[]'::json)::jsonb as tags,
-          coalesce(episodes, '[]'::jsonb) as episodes
+          coalesce(episodes, '[]'::jsonb) as episodes,
+          b.archive_urls
         from bookmark_page b
         left outer join bookark_page_tags_array
         on bookark_page_tags_array.bookmark_id = b.id

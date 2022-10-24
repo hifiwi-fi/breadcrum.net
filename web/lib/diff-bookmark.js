@@ -9,10 +9,14 @@ function equalSet (a, b) {
 }
 
 export function diffBookmark (oldBookmark, newBookmark) {
+  console.log({
+    oldBookmark,
+    newBookmark
+  })
   const bookmarkDiff = {}
   for (const [key, newValue] of Object.entries(newBookmark)) {
     const oldValue = oldBookmark[key]
-    if (key === 'tags') {
+    if (['tags', 'archive_urls'].includes(key)) {
       const oldTags = new Set(oldValue)
       const newTags = new Set(newValue)
       if (!equalSet(oldTags, newTags)) bookmarkDiff[key] = newValue

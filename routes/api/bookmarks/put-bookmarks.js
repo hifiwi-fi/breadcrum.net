@@ -41,7 +41,8 @@ export async function putBookmarks (fastify, opts) {
           note,
           toread,
           sensitive,
-          tags = []
+          tags = [],
+          archive_urls = []
         } = request.body
 
         const checkForExistingQuery = SQL`
@@ -68,16 +69,18 @@ export async function putBookmarks (fastify, opts) {
           note,
           toread,
           sensitive,
+          archive_urls,
           owner_id
         ) values (
           ${url},
           ${title},
           ${note},
-          ${toread || false},
-          ${sensitive || false},
+          ${toread ?? false},
+          ${sensitive ?? false},
+          ${archive_urls.length > 0 ? archive_urls : SQL`'{}'`},
           ${userId}
         )
-        returning id, url, title, toread, sensitive, owner_id;`
+        returning id, url, title, toread, sensitive, archive_urls, owner_id;`
 
         const results = await client.query(createBookmark)
         const bookmark = results.rows[0]
