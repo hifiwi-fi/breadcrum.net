@@ -16,7 +16,8 @@ export default function defaultRootLayout ({
       <meta charset="utf-8">
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
       <meta name='viewport' content='initial-scale=1, viewport-fit=cover, maximum-scale=1'>
-      <meta name="description" content="Breadcrum internet newspaper clippings and bookmarks. Podcast anything.">
+      <meta name='referrer' content='no-referrer'>
+      <meta name='description' content='Breadcrum internet newspaper clippings and bookmarks. Podcast anything.'>
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
         : null}
