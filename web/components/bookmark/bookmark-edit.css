@@ -25,6 +25,7 @@
   font-size: var(--small-font-size);
 }
 
+.bc-bookmark-archive-url-edit,
 .bc-bookmark-url-edit {
   font-family: var(--font-code);
 }
@@ -32,4 +33,13 @@
 .bc-bookmark-edit-submit-line {
   display: flex;
   justify-content: space-between;
+}
+
+.bc-bookmark-archive-url-edit-details {
+  /* hack. Don't know why details parent padding isn't passing to the child */
+  padding-inline-end: 0.9rem;
+}
+
+.bc-bookmark-archive-url-edit {
+  margin-bottom: 0.5em;
 }

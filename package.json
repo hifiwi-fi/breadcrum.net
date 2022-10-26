@@ -85,7 +85,7 @@
     "build": "npm run clean && run-s build:*",
     "build:siteup": "siteup --src web --dest public",
     "clean": "rimraf public && mkdirp public",
-    "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg > dependencygraph.svg",
+    "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg | depcruise-wrap-stream-in-html > dependency-graph.html",
     "migrate": "postgrator",
     "prepare": "npm run build",
     "postinstall": "node scripts/generate-default-env.js",

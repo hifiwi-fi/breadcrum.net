@@ -41,6 +41,7 @@ export async function putBookmark (fastify, opts) {
       if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
       if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
       if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
+      if (bookmark.archive_urls != null) updates.push(SQL`archive_urls = ${bookmark.archive_urls}`)
 
       if (updates.length > 0) {
         const query = SQL`

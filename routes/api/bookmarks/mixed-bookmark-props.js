@@ -4,7 +4,7 @@ import { fullBookmarkProps } from './bookmark-props.js'
 export const fullBookmarkPropsWithEpisodes = {
   ...fullBookmarkProps,
   episodes: {
-    type: ['array', 'null'],
+    type: 'array',
     items: {
       type: 'object',
       properties: {

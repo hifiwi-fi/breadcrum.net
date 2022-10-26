@@ -1,6 +1,7 @@
 /* eslint-env browser */
 /* eslint-disable camelcase */
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+import { useWindow } from '../../hooks/useWindow.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -9,10 +10,12 @@ export const bookmarkEdit = Component(({
   onCancelEdit,
   legend
 } = {}) => {
+  const window = useWindow()
   const [error, setError] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
+  const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
 
   const handleInitiateDelete = useCallback((ev) => {
     setDeleteConfirm(true)
@@ -51,6 +54,14 @@ export const bookmarkEdit = Component(({
     const sensitive = form.sensitive.checked
     const episodeMedium = form.episodeMedium.value
 
+    let archive_urls = []
+
+    for (const i of Object.keys(archiveURLs)) {
+      archive_urls.push(form[`archive-url-${i}`].value)
+    }
+
+    archive_urls = archive_urls.filter(v => !!v && validateURL(v)).map(url => url.trim())
+
     const createEpisode = episodeMedium !== 'none'
       ? {
           type: 'redirect',
@@ -66,6 +77,7 @@ export const bookmarkEdit = Component(({
       toread,
       starred,
       sensitive,
+      archive_urls,
       createEpisode
     }
 
@@ -76,6 +88,25 @@ export const bookmarkEdit = Component(({
       setError(err)
     }
   }, [setDisabled, setError, formRef?.current, onSave])
+
+  const handleAddArchiveURL = useCallback(async (ev) => {
+    ev.preventDefault()
+    archiveURLs.push(undefined)
+    setArchiveURLs(archiveURLs)
+  }, [archiveURLs])
+
+  const handleUndoAddArchiveURL = useCallback(async (ev) => {
+    ev.preventDefault()
+    archiveURLs.pop()
+    setArchiveURLs(archiveURLs)
+  }, [archiveURLs])
+
+  const handleNewWindowLink = useCallback((ev) => {
+    if (window.toolbar.visible) {
+      ev.preventDefault()
+      window.open(ev.currentTarget.href)
+    }
+  }, [window])
 
   // Parent can delay passing a bookmark to disable the form.
   const initializing = b == null
@@ -109,6 +140,23 @@ export const bookmarkEdit = Component(({
             <input class="block" type="text" name="tags" value="${b?.tags?.join(' ')}">
           </label>
         </div>
+        <details class="bc-bookmark-archive-url-edit-details">
+            <summary><label>archive URLs:</label></summary>
+            <div class="bc-bookmark-archive-url-edit-help-text">
+              ℹ️ Add additional archival links for this bookmark URL, like the <a onclick=${handleNewWindowLink} target="_blank" href="${`http://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a> or <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a> archive URLs.
+            </div>
+            ${archiveURLs.length > 0
+              ? html`${archiveURLs.map(
+                  (url, i) => html`<input class='bc-bookmark-archive-url-edit' placeholder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" value="${url}">`
+                )
+            }`
+              : null
+            }
+            <div>
+              <button onclick=${handleAddArchiveURL}>add</button>
+              ${archiveURLs.length > 1 ? html`<button onclick=${handleUndoAddArchiveURL}>remove</button>` : null}
+            </div>
+        </details>
         <div>
           <label>
             to read:
@@ -181,3 +229,13 @@ export const bookmarkEdit = Component(({
     </form>
     </div>`
 })
+
+function validateURL (maybeURL) {
+  try {
+    const url = new URL(maybeURL) // eslint-disable-line no-unused-vars
+    // TODO: block more bad URL stuff here
+    return true
+  } catch (err) {
+    return false
+  }
+}

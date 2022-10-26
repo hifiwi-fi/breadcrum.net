@@ -71,6 +71,13 @@ export const bookmarkView = Component(({
       }`
         : null
       }
+      ${b.archive_urls?.length > 0
+        ? html`${b.archive_urls.map(
+            url => html`<div class="bc-bookmark-archive-url-display">🫙 <a href="${url}">${url}</a></div>`
+          )
+      }`
+        : null
+      }
       <div class="bc-date">
         <a href="${`/bookmarks/view/?id=${b.id}`}">
           <time datetime="${b.created_at}">

@@ -7,4 +7,9 @@
 :root {
   --bc-episodes-color: hsla(87, 74%, 44%, 0.9);
   --bc-feeds-color: hsla(28, 86%, 58%, 0.9);
+  --bc-archive-color: hsla(355, 60%, 70%, 1);
+}
+
+.block {
+  display: block;
 }

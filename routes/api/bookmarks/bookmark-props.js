@@ -6,9 +6,16 @@ export const commnonBookmarkProps = {
   toread: { type: 'boolean' },
   sensitive: { type: 'boolean' },
   tags: {
-    type: ['array', 'null'],
+    type: 'array',
     items: {
       type: 'string', minLength: 1, maxLength: 255
+    }
+  },
+  archive_urls: {
+    type: 'array',
+    items: {
+      type: 'string',
+      format: 'uri'
     }
   }
 }
