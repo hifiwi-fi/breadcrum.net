@@ -11,7 +11,8 @@ LABEL maintainer="HifiWifi LLC"
 # Set the working directory
 WORKDIR /usr/src/app
 
-RUN apk add --no-cache python3
+RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
