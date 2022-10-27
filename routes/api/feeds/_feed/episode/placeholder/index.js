@@ -35,7 +35,9 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         reply.header('fly-cache-status', 'MISS')
       }
 
-      const metadata = await fastify.pqueue.add(() => getYTDLPUrl({ url: PLACEHOLDER_URL, medium: 'video' }))
+      const metadata = await fastify.pqueue.add(() => {
+        return getYTDLPUrl({ url: PLACEHOLDER_URL, medium: 'video', histogram: fastify.metrics.ytdlpSeconds })
+      })
       cache.set(cacheKey, metadata.urls, metadata.urls)
       reply.redirect(302, metadata.urls)
     }

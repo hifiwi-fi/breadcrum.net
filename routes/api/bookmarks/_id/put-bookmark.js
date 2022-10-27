@@ -120,7 +120,8 @@ export async function putBookmark (fastify, opts) {
           episodeId,
           medium: episodeMedium,
           pg: fastify.pg,
-          log: request.log
+          log: request.log,
+          histogram: fastify.metrics.ytdlpSeconds
         })).then(() => fastify.metrics.episodeCounter.inc()).catch(request.log.error)
       }
 

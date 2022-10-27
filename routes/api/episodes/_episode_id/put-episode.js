@@ -45,8 +45,6 @@ export async function putEpisode (fastify, opts) {
       // TODO: change medium or type?
       // TODO: re-run create episode steps
 
-      console.log({ updates })
-
       if (updates.length > 0) {
         const query = SQL`
           update episodes

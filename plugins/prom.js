@@ -59,6 +59,11 @@ export default fp(async function (fastify, opts) {
     help: 'The number of times a new user is created'
   })
 
+  fastify.metrics.ytdlpSeconds = new fastify.metrics.client.Histogram({
+    name: 'breadcrum_ytdlp_seconds',
+    help: 'The time it takes for ytdlp items to finish'
+  })
+
   const promServer = Fastify({
     logger: true
   })
