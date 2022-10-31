@@ -6,7 +6,10 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-rate-limit
  */
 export default fp(async function (fastify, opts) {
-  fastify.register(import('@fastify/rate-limit'))
+  fastify.register(import('@fastify/rate-limit'), {
+    redis: fastify.redis
+  })
 }, {
-  name: 'rateLimit'
+  name: 'rateLimit',
+  dependencies: ['redis']
 })

@@ -10,6 +10,7 @@ on:
 env:
   node_version: 18
   FORCE_COLOR: 2
+  redis-version: 7
 
 concurrency: # prevent concurrent releases
   group: npm-bump
@@ -29,6 +30,10 @@ jobs:
         node-version: ${{ env.node_version }}
         # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
         registry-url: 'https://registry.npmjs.org'
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.4.0
+      with:
+        redis-version: ${{ env.redis-version }}
     - run: npm i
     - run: node ./scripts/bootstrap-yt-dlp.js
     - run: npm test

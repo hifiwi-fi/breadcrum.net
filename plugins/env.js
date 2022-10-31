@@ -29,6 +29,10 @@ export const schema = {
       type: 'string',
       default: 'postgres://postgres@localhost/breadcrum'
     },
+    REDIS_URL: {
+      type: 'string',
+      default: 'redis://localhost:6379/1'
+    },
     HOST: {
       // Hostname and port (if needed)
       type: 'string',
