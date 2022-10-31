@@ -20,7 +20,7 @@ export const episodeTitle = Component(({
             ? '❌'
             : e.ready
               ? '✅'
-              : '⏱'
+              : '⏱️'
         }
         ${e.type === 'redirect'
           ? '☁️'
