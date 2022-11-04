@@ -17,4 +17,5 @@ try {
   console.warn('yt-dlp not found, downloading it')
   await YTDlpWrap.downloadFromGithub()
   console.log(`yt-dlp downloaded: ${path.join(__dirname, '../yt-dlp')}`)
+  process.exit(0)
 }

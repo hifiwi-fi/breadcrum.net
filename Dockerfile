@@ -1,5 +1,5 @@
 
-FROM node:18-alpine
+FROM node:19-alpine
 
 ARG ENV
 ARG NODE_ENV
