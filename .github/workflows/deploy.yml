@@ -9,8 +9,8 @@ on:
         default: 'master'
 
 env:
-  node_version: 18
-  FORCE_COLOR: 2
+  node_version: 19
+  FORCE_COLOR: 1
   redis-version: 7
 
 concurrency: # prevent concurrent releases
