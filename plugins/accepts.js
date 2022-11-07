@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin'
 
 /**
- * This plugins adds fastify-auth
+ * This plugins adds fastify-accepts
  *
  * @see https://github.com/fastify/fastify-accepts
  */
