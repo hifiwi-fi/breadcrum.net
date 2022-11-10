@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import S from 'fluent-json-schema'
 
@@ -57,15 +58,16 @@ export default async function registerRoutes (fastify, opts) {
         // TODO: ensure not a duplicate user
 
         const query = SQL`
-          insert into users (username, email, password) values (
+          insert into users (username, email, password, email_verify_token) values (
             ${username},
             ${email},
-            crypt(${password}, gen_salt('bf'))
+            crypt(${password}, gen_salt('bf')),
+            encode(gen_random_bytes(32), 'hex')
           )
-          returning id, email, username, email_confirmed;`
+          returning id, email, username, email_confirmed, email_verify_token;`
 
         const results = await client.query(query)
-        const user = results.rows[0]
+        const { email_verify_token, ...user } = results.rows[0]
 
         const token = await reply.createJWTToken(user)
         reply.setJWTCookie(token)
@@ -75,6 +77,15 @@ export default async function registerRoutes (fastify, opts) {
 
         fastify.metrics.userCreatedCounter.inc()
 
+        fastify.pqueue.add(async () => {
+          await fastify.email.sendMail({
+            from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+            to: email,
+            subject: 'Verify your account email address', // Subject line
+            text: verifyEmailBody({ email: user.email, username: user.username, host: fastify.config.HOST, token: email_verify_token })
+          })
+        })
+
         return {
           token,
           user
@@ -82,4 +93,16 @@ export default async function registerRoutes (fastify, opts) {
       })
     }
   )
+}
+
+function verifyEmailBody ({ email, username, host, token }) {
+  return `Hi ${username},
+
+Thanks for signing up for a Breadcrum.net account. Please verify your email address by clicking the link below.
+
+https://${host}/account/verify-email?token=${token}&update=${true}
+
+If you did not sign up for this account, please contact support@breadcrum.net or perform a password reset on the account associated with this email address and perform an account delete action if this is unwanted.
+
+Thank you!`
 }

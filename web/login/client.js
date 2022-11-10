@@ -67,6 +67,9 @@ export const page = Component(() => {
           <div class="error-box"></div>
         </fieldset>
       </form>
+      <div>
+        <a href='/password_reset'>Forgot password?</a>
+      </div>
       </div>
       `
       : html`

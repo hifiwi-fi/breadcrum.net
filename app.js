@@ -22,10 +22,14 @@ export default async function App (fastify, opts) {
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
     routeParams: true,
+    autoHooks: true,
+    cascadeHooks: true,
+    overwriteHooks: true,
     options: Object.assign({}, opts)
   })
 
-  // setTimeout(() => { console.log(fastify.printRoutes()) }, 500)
+  // await fastify.after()
+  // console.log(fastify.printRoutes())
 }
 
 export const options = {

@@ -4,7 +4,10 @@ export const schema = {
   type: 'object',
   required: [
     'JWT_SECRET',
-    'COOKIE_SECRET'
+    'COOKIE_SECRET',
+    'SMTP_HOST',
+    'SMTP_USER',
+    'SMTP_PASS'
   ],
   properties: {
     ENV: {
@@ -49,6 +52,34 @@ export const schema = {
     PQUEUE_TIMEOUT: {
       type: 'integer',
       default: 60000
+    },
+    SMTP_HOST: {
+      type: 'string'
+    },
+    SMTP_PORT: {
+      type: 'integer',
+      default: 465
+    },
+    SMTP_SECURE: {
+      type: 'boolean',
+      default: true
+    },
+    SMTP_USER: {
+      type: 'string'
+    },
+    SMTP_PASS: {
+      type: 'string'
+    },
+    APP_EMAIL: {
+      type: 'string',
+      default: 'noreply@breadcrum.net'
+    },
+    SNS_USER: {
+      type: 'string',
+      default: 'sns-user'
+    },
+    SNS_PASS: {
+      type: 'string'
     }
   }
 }

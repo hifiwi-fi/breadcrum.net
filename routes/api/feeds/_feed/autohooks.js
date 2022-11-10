@@ -1,11 +1,7 @@
 import SQL from '@nearform/sql'
-import fp from 'fastify-plugin'
-/**
- * This plugins adds @fastify/basic-auth
- *
- * @see https://github.com/fastify/fastify-basic-auth
- */
-export default fp(async function (fastify, opts) {
+
+export default async function (fastify, opts) {
+  // Add basic auth for feed and feed episode routes
   fastify.register(import('@fastify/basic-auth'), {
     validate,
     authenticate: true
@@ -38,7 +34,4 @@ export default fp(async function (fastify, opts) {
       throw new Error('Unauthorized feed token')
     }
   }
-}, {
-  name: 'feed-token-auth',
-  dependencies: ['env']
-})
+}

@@ -1,7 +1,11 @@
-import S from 'fluent-json-schema'
 
-export const userJsonSchema = S.object()
-  .prop('id', S.string().format('uuid'))
-  .prop('email', S.string().format('email'))
-  .prop('username', S.string())
-  .prop('email_confirmed', S.boolean())
+export const userJsonSchema = {
+
+  id: { type: 'string', format: 'uuid' },
+  email: { type: 'string', format: 'email' },
+  username: { type: 'string' },
+  email_confirmed: { type: 'boolean' },
+  created_at: { type: 'string', format: 'date-time' },
+  updated_at: { type: 'string', format: 'date-time' },
+  pending_email_update: { type: 'string', format: 'email' }
+}

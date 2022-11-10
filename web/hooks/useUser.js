@@ -25,8 +25,7 @@ export function useUser () {
           headers: {
             'accept-encoding': 'application/json'
           },
-          signal: controller.signal,
-          credentials: 'include'
+          signal: controller.signal
         })
         requestor = true
       }
@@ -36,9 +35,12 @@ export function useUser () {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const clone = response.clone()
         const body = await clone.json()
-        if (body?.username !== state.user?.username || body?.email !== state.user?.email) {
-          console.log('Updating user state')
-          state.user = body
+        for (const k of Object.keys(body)) {
+          if (state.user?.[k] !== body[k]) {
+            console.log('Updating user state')
+            state.user = body
+            break
+          }
         }
       } else {
         if (response.status === 401) {
