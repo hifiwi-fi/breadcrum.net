@@ -4,10 +4,7 @@ export const schema = {
   type: 'object',
   required: [
     'JWT_SECRET',
-    'COOKIE_SECRET',
-    'SMTP_HOST',
-    'SMTP_USER',
-    'SMTP_PASS'
+    'COOKIE_SECRET'
   ],
   properties: {
     ENV: {
