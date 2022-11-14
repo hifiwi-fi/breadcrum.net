@@ -11,7 +11,7 @@ export const page = Component(() => {
   const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
-    if (user && !loading) window.location.replace('/bookmarks')
+    if (user && !loading) window.location.replace('/account')
   }, [user])
 
   async function resetPassword (ev) {

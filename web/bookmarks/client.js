@@ -27,7 +27,10 @@ export const page = Component(() => {
 
   // Require a user
   useEffect(() => {
-    if (!user && !loading) window.location.replace('/login')
+    if (!user && !loading) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
   }, [user, loading])
 
   // Load bookmarks
@@ -127,7 +130,7 @@ export const page = Component(() => {
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload })}`)
+      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

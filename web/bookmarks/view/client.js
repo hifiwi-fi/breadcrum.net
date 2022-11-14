@@ -15,13 +15,21 @@ export const page = Component(() => {
   const [dataReload, setDataReload] = useState(0)
 
   useEffect(() => {
-    if (!user && !loading) window.location.replace('/login')
+    if (!user && !loading) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
   }, [user, loading])
 
   const reload = useCallback(() => {
     console.log(dataReload)
     setDataReload(dataReload + 1)
   }, [dataReload, setDataReload])
+
+  const handleDelete = useCallback(() => {
+    const beforeString = new Date(bookmark.created_at).valueOf()
+    window.location.replace(`/bookmarks?after=${beforeString}`)
+  })
 
   useEffect(() => {
     async function getBookmark () {
@@ -69,7 +77,7 @@ export const page = Component(() => {
     <div>
       ${bookmarkLoading ? html`<div>...</div>` : null}
       ${bookmarkError ? html`<div>${bookmarkError.message}</div>` : null}
-      ${bookmark ? bookmarkList({ bookmark, reload }) : null}
+      ${bookmark ? bookmarkList({ bookmark, reload, onDelete: handleDelete }) : null}
     </div>
 `
 })

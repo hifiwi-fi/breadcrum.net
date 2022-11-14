@@ -6,7 +6,7 @@ import { diffEpisode } from './diff-episode.js'
 import { episodeEdit } from './episode-edit.js'
 import { episodeView } from './episode-view.js'
 
-export const episodeList = Component(({ episode, reload }) => {
+export const episodeList = Component(({ episode, reload, onDelete }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -46,7 +46,7 @@ export const episodeList = Component(({ episode, reload }) => {
     })
 
     setDeleted(true)
-    reload()
+    onDelete()
   }, [state.apiUrl, episode.id, setDeleted, reload])
 
   return html`

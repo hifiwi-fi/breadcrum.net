@@ -12,7 +12,10 @@ export const page = Component(() => {
   const { user, loading } = useUser()
 
   useEffect(() => {
-    if (!user && !loading) window.location.replace('/bookmarks')
+    if (!user && !loading) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
   }, [user])
 
   const [serverFlags, setServerFlags] = useState()

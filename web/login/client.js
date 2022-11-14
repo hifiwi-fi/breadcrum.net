@@ -2,14 +2,27 @@
 import { Component, html, render, useState, useEffect } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { useQuery } from '../hooks/useQuery.js'
 
 export const page = Component(() => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser()
   const [loggingIn, setLoggingIn] = useState(false)
+  const { query } = useQuery()
 
   useEffect(() => {
-    if (user && !loading) window.location.replace('/bookmarks')
+    if (user && !loading) {
+      const pageParams = new URLSearchParams(query)
+      let destination
+      if (pageParams.get('redirect')) {
+        // Ensure only a path gets passed and not an open redirect
+        const url = new URL(pageParams.get('redirect'), 'https://example.com')
+        destination = `${url.pathname}${url.search}`
+      } else {
+        destination = '/bookmarks'
+      }
+      window.location.replace(destination)
+    }
   }, [user])
 
   async function login (ev) {

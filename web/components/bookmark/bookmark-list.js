@@ -5,7 +5,7 @@ import { bookmarkEdit } from './bookmark-edit.js'
 import { bookmarkView } from './bookmark-view.js'
 import { diffBookmark } from '../../lib/diff-bookmark.js'
 
-export const bookmarkList = Component(({ bookmark, reload }) => {
+export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -45,7 +45,7 @@ export const bookmarkList = Component(({ bookmark, reload }) => {
     })
 
     setDeleted(true)
-    reload()
+    onDelete()
   }, [state.apiUrl, bookmark.id, setDeleted, reload])
 
   const handleToggleToRead = useCallback(async (ev) => {

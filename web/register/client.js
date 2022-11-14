@@ -15,7 +15,10 @@ export const page = Component(() => {
   }, [flags.registration, flagsLoading])
 
   useEffect(() => {
-    if ((user && !loading)) window.location.replace('/bookmarks')
+    if ((user && !loading)) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
   }, [user])
 
   async function onRegister (ev) {

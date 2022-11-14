@@ -17,13 +17,20 @@ export const page = Component(() => {
   const [episodeReload, setEpisodeReload] = useState(0)
 
   useEffect(() => {
-    if (!user && !loading) window.location.replace('/login')
+    if (!user && !loading) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
   }, [user, loading])
 
   const reloadEpisode = useCallback(() => {
     console.log(episodeReload)
     setEpisodeReload(episodeReload + 1)
   }, [episodeReload, setEpisodeReload])
+
+  const handleDelete = useCallback(() => {
+    window.location.replace(`/bookmarks/view?id=${episode.bookmark.id}`)
+  }, [episode?.bookmark?.id])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -75,7 +82,7 @@ export const page = Component(() => {
     <div>
       ${episodeLoading ? html`<div>...</div>` : null}
       ${episodeError ? html`<div>${episodeError.message}</div>` : null}
-      ${episode ? episodeList({ episode, reload: reloadEpisode }) : null}
+      ${episode ? episodeList({ episode, reload: reloadEpisode, onDelete: handleDelete }) : null}
     </div>
 `
 })
