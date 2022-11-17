@@ -69,32 +69,61 @@ export async function postEmail (fastify, opts) {
         const updatedUser = queryResults.rows.pop()
 
         fastify.pqueue.add(async () => {
-          return await Promise.all([
-            fastify.email.sendMail({
-              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-              to: email,
-              subject: 'Verify your updated email address', // Subject line
-              text: verifyEmailUpdateBody({
-                username: updatedUser.username,
-                host: fastify.config.HOST,
-                token: updatedUser.pending_email_update_token,
-                oldEmail: updatedUser.email,
-                newEmail: updatedUser.pending_email_update
+          const emailJobs = []
+
+          const verifyBlackholeResults = await fastify.pg.query(SQL`
+            select email, bounce_count, disabled
+            from email_blackhole
+            where email = ${updatedUser.pending_email_update}
+            fetch first row only;
+          `)
+
+          if (verifyBlackholeResults.rows.length === 0 || verifyBlackholeResults.rows[0].disabled === false) {
+            emailJobs.push(
+              fastify.email.sendMail({
+                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+                to: updatedUser.pending_email_update,
+                subject: 'Verify your updated email address', // Subject line
+                text: verifyEmailUpdateBody({
+                  username: updatedUser.username,
+                  host: fastify.config.HOST,
+                  token: updatedUser.pending_email_update_token,
+                  oldEmail: updatedUser.email,
+                  newEmail: updatedUser.pending_email_update
+                })
               })
-            }),
-            fastify.email.sendMail({
-              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-              to: email,
-              subject: 'Your email address was changed', // Subject line
-              text: notifyOldEmailBody({
-                username: updatedUser.username,
-                host: fastify.config.HOST,
-                token: updatedUser.pending_email_update_token,
-                oldEmail: updatedUser.email,
-                newEmail: updatedUser.pending_email_update
+            )
+          } else {
+            fastify.log.warn({ email: updatedUser.pending_email_update }, 'Skipping email for blocked email address')
+          }
+
+          const notifyBlackholeResults = await fastify.pg.query(SQL`
+            select email, bounce_count, disabled
+            from email_blackhole
+            where email = ${updatedUser.email}
+            fetch first row only;
+          `)
+
+          if (notifyBlackholeResults.rows.length === 0 || notifyBlackholeResults.rows[0].disabled === false) {
+            emailJobs.push(
+              fastify.email.sendMail({
+                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+                to: updatedUser.email,
+                subject: 'Verify your updated email address', // Subject line
+                text: notifyOldEmailBody({
+                  username: updatedUser.username,
+                  host: fastify.config.HOST,
+                  token: updatedUser.pending_email_update_token,
+                  oldEmail: updatedUser.email,
+                  newEmail: updatedUser.pending_email_update
+                })
               })
-            })
-          ])
+            )
+          } else {
+            fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
+          }
+
+          return await Promise.all(emailJobs)
         })
 
         reply.code(202)

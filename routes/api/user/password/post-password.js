@@ -79,15 +79,25 @@ export async function postPassword (fastify, opts) {
         await client.query(updateQuery)
 
         fastify.pqueue.add(async () => {
-          return await fastify.email.sendMail({
-            from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-            to: user.email,
-            subject: 'Your password has been updated', // Subject line
-            text: passwordUpdatedBody({
-              username: user.username,
-              host: fastify.config.HOST
+          const blackholeResults = await fastify.pg.query(SQL`
+            select email, bounce_count, disabled
+            from email_blackhole
+            where email = ${user.email}
+            fetch first row only;
+          `)
+          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
+            return await fastify.email.sendMail({
+              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+              to: user.email,
+              subject: 'Your password has been updated', // Subject line
+              text: passwordUpdatedBody({
+                username: user.username,
+                host: fastify.config.HOST
+              })
             })
-          })
+          } else {
+            fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
+          }
         })
 
         reply.code(202)

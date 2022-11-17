@@ -44,15 +44,47 @@ export default async function snsRoutes (fastify, opts) {
       } else if (data.Type === 'Notification') {
         switch (data.Message?.notificationType) {
           case 'Bounce': {
-            fastify.log.info('Bounce')
+            fastify.log.info({
+              ...data.Message?.bounce
+            }, 'Bounced email')
+
+            if (data.Message?.bounce?.bounceType === 'Permanent') {
+              fastify.log.warn({ bouncedRecipients: data.Message?.bounce?.bouncedRecipients }, 'Black-hole perminent bounce')
+              return fastify.pg.transact(async client => {
+                const emailsToBlock = data.Message?.bounce?.bouncedRecipients.map(r => r.emailAddress)
+
+                const blockEmailQuery = SQL`
+                insert into email_blackhole (email, bounce_count, disabled)
+                values ${SQL.glue(emailsToBlock.map(email => SQL`(${email},${1},${true})`), ' , ')}
+                on conflict (email)
+                do update
+                  set bounce_count = email_blackhole.bounce_count + excluded.bounce_count, disabled = true;
+              `
+
+                await client.query(blockEmailQuery)
+              })
+            }
             break
           }
           case 'Complaint': {
-            fastify.log.info('Complaint')
-            break
+            fastify.log.warn({ ...data.Message?.complaint }, 'Complaint')
+            fastify.log.warn({ bouncedRecipients: data.Message?.complaint?.complainedRecipients }, 'Black-hole complaint')
+            return fastify.pg.transact(async client => {
+              const emailsToBlock = data.Message?.complaint?.complainedRecipients.map(r => r.emailAddress)
+
+              const blockEmailQuery = SQL`
+                insert into email_blackhole (email, bounce_count, disabled)
+                values ${SQL.glue(emailsToBlock.map(email => SQL`(${email},${1},${true})`), ' , ')}
+                on conflict (email)
+                do update
+                  set bounce_count = email_blackhole.bounce_count + excluded.bounce_count, disabled = true;
+              `
+
+              await client.query(blockEmailQuery)
+            })
           }
           case 'Delivery': {
-            fastify.log.info('Delivery')
+            fastify.log.info({ ...data.Message?.delivery }, 'Delivery')
             break
           }
           default: {

@@ -63,18 +63,29 @@ export async function resetPassword (fastify, opts) {
         const { password_reset_token } = resetTokenResults.rows.pop()
 
         fastify.pqueue.add(async () => {
-          return await fastify.email.sendMail({
-            from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-            to: user.email,
-            subject: 'Your password has been updated', // Subject line
-            text: passwordResetBody({
-              token: password_reset_token,
-              userID: user.id,
-              username: user.username,
-              host: fastify.config.HOST,
-              transport: fastify.config.TRANSPORT
+          const blackholeResults = await fastify.pg.query(SQL`
+            select email, bounce_count, disabled
+            from email_blackhole
+            where email = ${user.email}
+            fetch first row only;
+          `)
+
+          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
+            return await fastify.email.sendMail({
+              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+              to: user.email,
+              subject: 'Your password has been updated', // Subject line
+              text: passwordResetBody({
+                token: password_reset_token,
+                userID: user.id,
+                username: user.username,
+                host: fastify.config.HOST,
+                transport: fastify.config.TRANSPORT
+              })
             })
-          })
+          } else {
+            fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
+          }
         })
 
         reply.code(202)

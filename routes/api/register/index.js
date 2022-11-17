@@ -69,6 +69,8 @@ export default async function registerRoutes (fastify, opts) {
         const results = await client.query(query)
         const { email_verify_token, ...user } = results.rows[0]
 
+        await client.query('commit')
+
         const token = await reply.createJWTToken(user)
         reply.setJWTCookie(token)
 
@@ -78,12 +80,23 @@ export default async function registerRoutes (fastify, opts) {
         fastify.metrics.userCreatedCounter.inc()
 
         fastify.pqueue.add(async () => {
-          await fastify.email.sendMail({
-            from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-            to: email,
-            subject: 'Verify your account email address', // Subject line
-            text: verifyEmailBody({ email: user.email, username: user.username, host: fastify.config.HOST, token: email_verify_token })
-          })
+          const blackholeResults = await fastify.pg.query(SQL`
+            select email, bounce_count, disabled
+            from email_blackhole
+            where email = ${email}
+            fetch first row only;
+          `)
+
+          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
+            await fastify.email.sendMail({
+              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+              to: email,
+              subject: 'Verify your account email address', // Subject line
+              text: verifyEmailBody({ email: user.email, username: user.username, host: fastify.config.HOST, token: email_verify_token })
+            })
+          } else {
+            fastify.log.warn({ email }, 'Skipping email for blocked email address')
+          }
         })
 
         return {

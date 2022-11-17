@@ -16,8 +16,7 @@ export const page = Component(() => {
 
   useEffect(() => {
     if ((user && !loading)) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+      window.location.replace('/bookmarks')
     }
   }, [user])
 
