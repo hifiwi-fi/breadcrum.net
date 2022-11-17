@@ -80,7 +80,7 @@ export const page = Component(() => {
           <div class="error-box"></div>
         </fieldset>
       </form>
-      <div>
+      <div class="bc-login-password-reset-link">
         <a href='/password_reset'>Forgot password?</a>
       </div>
       </div>

@@ -1,0 +1,8 @@
+.bc-password-reset input {
+  width: 100%;
+}
+
+.bc-password-reset-help-text {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+}

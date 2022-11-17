@@ -59,6 +59,9 @@ export const page = Component(() => {
             <form class="password-reset-form" id="password-reset-form" onsubmit=${resetPassword}>
             <fieldset ?disabled=${resetting}>
               <legend>Reset Password</legend>
+              <div class="bc-password-reset-help-text">
+                  ℹ️ Reset your password by submitting your email address below. If an account exists with that email address, a password email will be sent.
+              </div>
               <div>
                 <label class="block">
                   Account Email

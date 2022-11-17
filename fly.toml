@@ -12,7 +12,7 @@ processes = []
 [build.args]
   ENV = 'production'
   NODE_ENV = 'production'
-  DOMAIN = 'breadcrum.net'
+  HOST = 'breadcrum.net'
   TRANSPORT='https'
 
 [env]

@@ -3,7 +3,7 @@ FROM node:19-alpine
 
 ARG ENV
 ARG NODE_ENV
-ARG DOMAIN
+ARG HOST
 ARG TRANSPORT
 
 LABEL maintainer="HifiWifi LLC"
