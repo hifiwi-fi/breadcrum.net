@@ -20,7 +20,7 @@ export async function getUser (fastify, opts) {
       const results = await fastify.pg.query(query)
       const user = results.rows.pop()
 
-      console.log({ user })
+      fastify.log.info({ user })
 
       if (user) {
         // TODO refresh token
