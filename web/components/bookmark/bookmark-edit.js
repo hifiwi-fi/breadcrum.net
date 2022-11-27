@@ -1,6 +1,6 @@
 /* eslint-env browser */
 /* eslint-disable camelcase */
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+import { Component, html, useState, useRef, useCallback, useEffect } from 'uland-isomorphic'
 import { useWindow } from '../../hooks/useWindow.js'
 
 export const bookmarkEdit = Component(({
@@ -16,6 +16,10 @@ export const bookmarkEdit = Component(({
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
   const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
+
+  useEffect(() => {
+    setArchiveURLs([...b?.archive_urls])
+  }, [b?.archive_urls])
 
   const handleInitiateDelete = useCallback((ev) => {
     setDeleteConfirm(true)
