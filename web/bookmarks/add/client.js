@@ -37,7 +37,7 @@ export const page = Component(() => {
       if (!queryUrl) return setFallbackBookmark()
       const searchParams = new URLSearchParams()
       searchParams.set('url', queryUrl)
-      searchParams.set('sensitive', true)
+      searchParams.set('sensitive', 'true')
       const response = await fetch(`${state.apiUrl}/bookmarks?${searchParams}`, {
         headers: {
           'content-type': 'application/json'

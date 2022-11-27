@@ -8,6 +8,7 @@ export const page = Component(() => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser()
   const [loggingIn, setLoggingIn] = useState(false)
+  const [loginError, setLoginError] = useState(null)
   const { query } = useQuery()
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export const page = Component(() => {
   async function login (ev) {
     ev.preventDefault()
     setLoggingIn(true)
+    setLoginError(null)
 
     const user = ev.currentTarget.user.value
     const password = ev.currentTarget.password.value
@@ -50,6 +52,7 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.log(err)
+      setLoginError(err)
     } finally {
       setLoggingIn(false)
     }
@@ -94,6 +97,7 @@ export const page = Component(() => {
       ? html`<div>${JSON.stringify(userError, null, ' ')}</div>`
       : null
     }
+    ${loginError ? html`<p>${loginError.message}</p>` : null}
 `
 })
 

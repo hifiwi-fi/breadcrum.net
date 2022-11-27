@@ -9,6 +9,7 @@ export const page = Component(() => {
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
   const { flags, loading: flagsLoading } = useFlags()
+  const [registerError, setRegisterError] = useState(null)
 
   useEffect(() => {
     if (!flags.registration && !flagsLoading) window.location.replace('/')
@@ -23,6 +24,8 @@ export const page = Component(() => {
   async function onRegister (ev) {
     ev.preventDefault()
     setSubmitting(true)
+    setRegisterError(null)
+
     try {
       const email = ev.currentTarget.email.value
       const username = ev.currentTarget.username.value
@@ -40,10 +43,13 @@ export const page = Component(() => {
       if (response.ok && response.status === 201) {
         const user = await response.json()
         state.user = user
+      } else {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     } catch (err) {
       console.log(err)
       setSubmitting(false)
+      setRegisterError(err)
     }
   }
 
@@ -81,6 +87,7 @@ export const page = Component(() => {
     ? html`<div>${userError?.message}</div>`
     : null
   }
+  ${registerError ? html`<p>${registerError.message}</p>` : null}
 `
 })
 
