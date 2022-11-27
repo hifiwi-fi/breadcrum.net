@@ -1,6 +1,8 @@
 
 FROM node:19-alpine
 
+## Make sure this matches build.args in fly.toml
+## These vars get baked into the image. Do not pass secrets here.
 ARG ENV
 ARG NODE_ENV
 ARG HOST
