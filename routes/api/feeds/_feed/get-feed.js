@@ -80,7 +80,8 @@ export async function getFeed (fastify, opts) {
           avatar: getFeedImageUrl({ transport, host, imageUrl: pf.image_url })
         },
         _itunes: {
-          explicit: pf.explicit
+          explicit: pf.explicit,
+          block: true
         },
         _breadcrum: {
           default_feed: pf.default_feed
