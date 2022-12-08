@@ -29,7 +29,7 @@ export async function resetPassword (fastify, opts) {
         }
       }
     },
-    async function verifyEmailHandler (request, reply) {
+    async function resetPasswordHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const { email } = request.body
 

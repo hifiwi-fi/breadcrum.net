@@ -14,7 +14,7 @@ LABEL maintainer="HifiWifi LLC"
 WORKDIR /usr/src/app
 
 RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr
+RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr yt-dlp
 
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .

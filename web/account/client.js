@@ -47,8 +47,6 @@ export const page = Component(() => {
   return html`
     <div>
       <dl>
-        <dt>id</dt>
-        <dd><code>${user?.id}</code></dd>
         <dt>username</dt>
         <dd>${user?.username}</dd>
         <dt>email${!loading && user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
@@ -57,6 +55,8 @@ export const page = Component(() => {
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
         <dd><time datetime="${user?.updated_at}">${user?.updated_at ? (new Date(user.updated_at)).toLocaleDateString() : null}</time></dd>
+        <dt>id</dt>
+        <dd><code>${user?.id}</code></dd>
      </dl>
     </div>
 `
