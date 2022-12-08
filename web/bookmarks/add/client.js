@@ -41,8 +41,7 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/bookmarks?${searchParams}`, {
         headers: {
           'content-type': 'application/json'
-        },
-        credentials: 'include'
+        }
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -87,8 +86,7 @@ export const page = Component(() => {
       headers: {
         'content-type': 'application/json'
       },
-      body: JSON.stringify(payload),
-      credentials: 'include'
+      body: JSON.stringify(payload)
     })
 
     if (response.ok) {

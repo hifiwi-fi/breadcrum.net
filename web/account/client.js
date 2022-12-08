@@ -1,13 +1,20 @@
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { usernameField } from './username/username-field.js'
 
 export const page = Component(() => {
   const state = useLSP()
-  const { user, loading } = useUser()
   const window = useWindow()
+
+  const [dataReload, setDataReload] = useState(0)
+  const reload = useCallback(() => {
+    setDataReload(dataReload + 1)
+  }, [dataReload, setDataReload])
+
+  const { user, loading } = useUser({ reload: dataReload })
 
   const [requestingEmailVerification, setRequestingEmailVerification] = useState(false)
   const [emailVerificationRequested, setEmailVerificationRequested] = useState(false)
@@ -47,8 +54,7 @@ export const page = Component(() => {
   return html`
     <div>
       <dl>
-        <dt>username</dt>
-        <dd>${user?.username}</dd>
+        ${usernameField({ user, reload })}
         <dt>email${!loading && user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
         <dd>${user?.email}${!loading && user?.email_confirmed === false ? html`<button ?disabled=${requestingEmailVerification || emailVerificationRequested} onclick=${handleClick}>${emailVerificationRequested ? 'Email verification sent' : 'Send confirmation email'}</button>` : null}</dd>
         <dt>created at</dt>

@@ -36,7 +36,6 @@ export const page = Component(() => {
         headers: {
           'content-type': 'application/json'
         },
-        credentials: 'include',
         body: JSON.stringify({ email, username, password })
       })
 

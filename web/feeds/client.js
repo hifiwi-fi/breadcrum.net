@@ -72,8 +72,7 @@ export const page = Component(() => {
         headers: {
           'accept-encoding': 'application/json'
         },
-        signal: controller.signal,
-        credentials: 'include'
+        signal: controller.signal
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -130,8 +129,7 @@ export const page = Component(() => {
         headers: {
           'accept-encoding': 'application/json'
         },
-        signal: controller.signal,
-        credentials: 'include'
+        signal: controller.signal
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -163,8 +161,7 @@ export const page = Component(() => {
         headers: {
           'accept-encoding': 'application/json'
         },
-        signal: controller.signal,
-        credentials: 'include'
+        signal: controller.signal
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {

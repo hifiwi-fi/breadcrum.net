@@ -40,8 +40,7 @@ export const page = Component(() => {
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ user, password }),
-        credentials: 'include'
+        body: JSON.stringify({ user, password })
       })
 
       if (response.ok && response.status === 201) {

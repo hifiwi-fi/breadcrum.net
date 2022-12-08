@@ -22,7 +22,7 @@ COPY . .
 # Running npm install
 RUN npm install --omit=dev
 
-RUN node scripts/bootstrap-yt-dlp.js
+# RUN node scripts/bootstrap-yt-dlp.js
 
 # Create a user group 'nodegroup', create a user 'nodeuser' under 'nodegroup' and chown all the files to the app user.
 RUN addgroup -S nodegroup && \

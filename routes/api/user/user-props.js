@@ -1,6 +1,4 @@
-
 export const userJsonSchema = {
-
   id: { type: 'string', format: 'uuid' },
   email: { type: 'string', format: 'email' },
   username: { type: 'string' },

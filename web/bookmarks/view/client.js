@@ -52,8 +52,7 @@ export const page = Component(() => {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
-        },
-        credentials: 'include'
+        }
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {

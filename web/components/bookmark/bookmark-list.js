@@ -27,8 +27,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       headers: {
         'content-type': 'application/json'
       },
-      body: JSON.stringify(payload),
-      credentials: 'include'
+      body: JSON.stringify(payload)
     })
 
     reload()
@@ -40,8 +39,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       method: 'delete',
       headers: {
         'accept-encoding': 'application/json'
-      },
-      credentials: 'include'
+      }
     })
 
     setDeleted(true)
@@ -57,8 +55,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       },
       body: JSON.stringify({
         toread: !bookmark.toread
-      }),
-      credentials: 'include'
+      })
     })
 
     // TODO: optimistic updates without full reload
@@ -74,8 +71,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       },
       body: JSON.stringify({
         starred: !bookmark.starred
-      }),
-      credentials: 'include'
+      })
     })
 
     // TODO: optimistic updates without full reload
@@ -91,8 +87,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       },
       body: JSON.stringify({
         sensitive: !bookmark.sensitive
-      }),
-      credentials: 'include'
+      })
     })
 
     // TODO: optimistic updates without full reload

@@ -11,8 +11,7 @@ export const page = Component(() => {
     const logout = async () => {
       try {
         await fetch(`${state.apiUrl}/logout`, {
-          method: 'post',
-          credentials: 'include'
+          method: 'post'
         })
       } finally {
         state.user = null

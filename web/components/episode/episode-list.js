@@ -28,8 +28,7 @@ export const episodeList = Component(({ episode, reload, onDelete }) => {
       headers: {
         'content-type': 'application/json'
       },
-      body: JSON.stringify(payload),
-      credentials: 'include'
+      body: JSON.stringify(payload)
     })
 
     reload()
@@ -41,8 +40,7 @@ export const episodeList = Component(({ episode, reload, onDelete }) => {
       method: 'delete',
       headers: {
         'accept-encoding': 'application/json'
-      },
-      credentials: 'include'
+      }
     })
 
     setDeleted(true)

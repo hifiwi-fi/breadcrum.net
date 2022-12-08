@@ -28,8 +28,7 @@ export const feedHeader = Component(({ feed, feeds, reload }) => {
       headers: {
         'content-type': 'application/json'
       },
-      body: JSON.stringify(payload),
-      credentials: 'include'
+      body: JSON.stringify(payload)
     })
 
     reload()

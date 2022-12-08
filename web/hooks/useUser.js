@@ -5,7 +5,9 @@ import { useLSP } from './useLSP.js'
 
 let userRequest = null
 
-export function useUser () {
+export function useUser ({
+  reload
+} = {}) {
   const state = useLSP()
 
   const [loading, setLoading] = useState(true)
@@ -58,7 +60,7 @@ export function useUser () {
       setLoading(false)
       if (requestor) userRequest = null
     })
-  }, [state.apiUrl])
+  }, [state.apiUrl, reload])
 
   return {
     user: state.user,
