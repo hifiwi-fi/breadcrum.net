@@ -18,7 +18,9 @@ export const bookmarkEdit = Component(({
   const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
 
   useEffect(() => {
-    setArchiveURLs([...b?.archive_urls])
+    if (b?.archive_urls?.length > 0) {
+      setArchiveURLs([...b?.archive_urls])
+    }
   }, [b?.archive_urls])
 
   const handleInitiateDelete = useCallback((ev) => {
