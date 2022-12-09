@@ -4,6 +4,7 @@ import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { usernameField } from './username/username-field.js'
+import { passwordField } from './password/password-field.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -55,6 +56,7 @@ export const page = Component(() => {
     <div>
       <dl>
         ${usernameField({ user, reload })}
+        ${passwordField()}
         <dt>email${!loading && user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
         <dd>${user?.email}${!loading && user?.email_confirmed === false ? html`<button ?disabled=${requestingEmailVerification || emailVerificationRequested} onclick=${handleClick}>${emailVerificationRequested ? 'Email verification sent' : 'Send confirmation email'}</button>` : null}</dd>
         <dt>created at</dt>
