@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import S from 'fluent-json-schema'
+import { verifyEmailBody } from '../user/email/resend-account-confirmation.js'
 
 const newUserJsonSchema = S.object()
   .prop('username',
@@ -88,12 +89,19 @@ export default async function registerRoutes (fastify, opts) {
           `)
 
           if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            await fastify.email.sendMail({
+            await Promise.allSettled([fastify.email.sendMail({
               from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
               to: email,
               subject: 'Verify your account email address', // Subject line
-              text: verifyEmailBody({ email: user.email, username: user.username, host: fastify.config.HOST, token: email_verify_token })
+              text: verifyEmailBody({
+                email: user.email,
+                username: user.username,
+                host: fastify.config.HOST,
+                transport: fastify.config.TRANSPORT,
+                token: email_verify_token
+              })
             })
+            ])
           } else {
             fastify.log.warn({ email }, 'Skipping email for blocked email address')
           }
@@ -106,16 +114,4 @@ export default async function registerRoutes (fastify, opts) {
       })
     }
   )
-}
-
-function verifyEmailBody ({ email, username, host, token }) {
-  return `Hi ${username},
-
-Thanks for signing up for a Breadcrum.net account. Please verify your email address by clicking the link below.
-
-https://${host}/account/verify-email?token=${token}&update=${true}
-
-If you did not sign up for this account, please contact support@breadcrum.net or perform a password reset on the account associated with this email address and perform an account delete action if this is unwanted.
-
-Thank you!`
 }

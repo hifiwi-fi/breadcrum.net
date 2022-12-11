@@ -2,6 +2,7 @@
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
 
+// Update the email address by setting a pending_email_update field.
 export async function postEmail (fastify, opts) {
   fastify.post(
     '/',
@@ -87,6 +88,7 @@ export async function postEmail (fastify, opts) {
                 text: verifyEmailUpdateBody({
                   username: updatedUser.username,
                   host: fastify.config.HOST,
+                  transport: fastify.config.TRANSPORT,
                   token: updatedUser.pending_email_update_token,
                   oldEmail: updatedUser.email,
                   newEmail: updatedUser.pending_email_update
@@ -109,10 +111,11 @@ export async function postEmail (fastify, opts) {
               fastify.email.sendMail({
                 from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
                 to: updatedUser.email,
-                subject: 'Verify your updated email address', // Subject line
+                subject: verifyEmailSubject,
                 text: notifyOldEmailBody({
                   username: updatedUser.username,
                   host: fastify.config.HOST,
+                  transport: fastify.config.TRANSPORT,
                   token: updatedUser.pending_email_update_token,
                   oldEmail: updatedUser.email,
                   newEmail: updatedUser.pending_email_update
@@ -123,7 +126,7 @@ export async function postEmail (fastify, opts) {
             fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
           }
 
-          return await Promise.all(emailJobs)
+          return await Promise.allSettled(emailJobs)
         })
 
         reply.code(202)
@@ -139,12 +142,14 @@ export async function postEmail (fastify, opts) {
   )
 }
 
-function verifyEmailUpdateBody ({ oldEmail, newEmail, username, host, token }) {
+export const verifyEmailSubject = 'Email update request notificaiton'
+
+export function verifyEmailUpdateBody ({ transport, oldEmail, newEmail, username, host, token }) {
   return `Hi ${username},
 
-If you requested to change your Breadcrum.net account email address from ${oldEmail} to ${newEmail}, click the following link to confir the change.
+If you requested to change your Breadcrum.net account email address from ${oldEmail} to ${newEmail}, click the following link to confirm the change.
 
-https://${host}/account/verify-email?token=${token}&update=${true}
+${transport}://${host}/email_confirm?token=${token}&update=${true}
 
 If you did not request this change, please immediately change your password and contact support@breadcrum.net
 

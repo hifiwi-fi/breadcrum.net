@@ -71,18 +71,20 @@ export async function resetPassword (fastify, opts) {
           `)
 
           if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            return await fastify.email.sendMail({
-              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-              to: user.email,
-              subject: 'Your password has been updated', // Subject line
-              text: passwordResetBody({
-                token: password_reset_token,
-                userID: user.id,
-                username: user.username,
-                host: fastify.config.HOST,
-                transport: fastify.config.TRANSPORT
+            return await Promise.allSettled([
+              fastify.email.sendMail({
+                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+                to: user.email,
+                subject: 'Password reset request', // Subject line
+                text: passwordResetBody({
+                  token: password_reset_token,
+                  userID: user.id,
+                  username: user.username,
+                  host: fastify.config.HOST,
+                  transport: fastify.config.TRANSPORT
+                })
               })
-            })
+            ])
           } else {
             fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
           }

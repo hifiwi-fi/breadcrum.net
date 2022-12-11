@@ -1,11 +1,13 @@
-import { confirmEmail } from './confirm-email.js'
+import { resendEmailVerification } from './resend-confirmation.js'
 import { postEmail } from './post-email.js'
 import { verifyEmail } from './verify-email.js'
+import { deleteEmail } from './delete-email.js'
 
 export default async function bookmarksRoutes (fastify, opts) {
   await Promise.all([
-    confirmEmail(fastify, opts),
+    resendEmailVerification(fastify, opts),
+    verifyEmail(fastify, opts),
     postEmail(fastify, opts),
-    verifyEmail(fastify, opts)
+    deleteEmail(fastify, opts)
   ])
 }

@@ -2,6 +2,7 @@
 import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
 import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 
+// Verify an email address or a pending email address
 export async function verifyEmail (fastify, opts) {
   fastify.post(
     '::verify',

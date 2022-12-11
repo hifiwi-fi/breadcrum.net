@@ -86,15 +86,17 @@ export async function postPassword (fastify, opts) {
             fetch first row only;
           `)
           if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            return await fastify.email.sendMail({
-              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-              to: user.email,
-              subject: 'Your password has been updated', // Subject line
-              text: passwordUpdatedBody({
-                username: user.username,
-                host: fastify.config.HOST
+            return await Promise.allSettled([
+              fastify.email.sendMail({
+                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
+                to: user.email,
+                subject: 'Your password has been updated', // Subject line
+                text: passwordUpdatedBody({
+                  username: user.username,
+                  host: fastify.config.HOST
+                })
               })
-            })
+            ])
           } else {
             fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
           }
