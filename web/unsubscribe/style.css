@@ -1,0 +1,9 @@
+.bc-help-text {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+}
+
+
+.bc-unsubscribe input {
+  width: 100%;
+}

@@ -93,7 +93,9 @@ export async function postPassword (fastify, opts) {
                 subject: 'Your password has been updated', // Subject line
                 text: passwordUpdatedBody({
                   username: user.username,
-                  host: fastify.config.HOST
+                  host: fastify.config.HOST,
+                  transport: fastify.config.TRANSPORT,
+                  email: user.email
                 })
               })
             ])
@@ -112,12 +114,15 @@ export async function postPassword (fastify, opts) {
   )
 }
 
-function passwordUpdatedBody ({ username, host, token }) {
+function passwordUpdatedBody ({ username, host, transport, token, email }) {
   return `Hi ${username},
 
 Your password on Breadcrum.net has been updated.
 
 If you did not request this change, please immediately reset your password and contact support@breadcrum.net and ensure no unauthorized access to your email address has occured.
 
-Thank you!`
+Thank you!
+
+Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${email}
+`
 }

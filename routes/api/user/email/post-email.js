@@ -153,15 +153,21 @@ ${transport}://${host}/email_confirm?token=${token}&update=${true}
 
 If you did not request this change, please immediately change your password and contact support@breadcrum.net
 
-Thank you!`
+Thank you!
+
+Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${newEmail}
+`
 }
 
-function notifyOldEmailBody ({ username, host, oldEmail, newEmail }) {
+function notifyOldEmailBody ({ username, transport, host, oldEmail, newEmail }) {
   return `Hi ${username},
 
 If you requested to change your Breadcrum.net account email address from ${oldEmail} to ${newEmail}, please check your inbox for ${newEmail} for a confirmation link to finish the email update process.
 
 If you did not request this change, please immediately change your password and contact support@breadcrum.net
 
-Thank you!`
+Thank you!
+
+Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${oldEmail}
+`
 }

@@ -5,5 +5,7 @@ export const userJsonSchema = {
   email_confirmed: { type: 'boolean' },
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' },
-  pending_email_update: { type: 'string', format: 'email' }
+  pending_email_update: { type: 'string', format: 'email' },
+  newsletter_subscription: { type: 'boolean' },
+  disabled_email: { type: 'boolean' }
 }

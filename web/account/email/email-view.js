@@ -100,12 +100,16 @@ export const emailView = Component(({ user, onEdit, reload }) => {
       ${user?.email_confirmed === false
         ? html`<div><button
           onclick="${handleEmailConfirmRequest}"
-          ?disabled="${requestingEmailVerification || emailVerificationRequested}">${
+          ?disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
+          ${
             emailVerificationRequested
               ? 'Email verification resent'
               : 'Resend email confirmation'
           }</button></div>`
         : null}
+      ${user?.disabled_email
+      ? html`<div>This email is disabled due to delivery issues. Please reach out to support@breadcrum.net for furthur help, or update to a new email address.</div>`
+      : null}
       ${user?.pending_email_update
       ? html`
       <div>

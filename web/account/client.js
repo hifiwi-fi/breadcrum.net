@@ -4,6 +4,7 @@ import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { usernameField } from './username/username-field.js'
 import { passwordField } from './password/password-field.js'
+import { newsletterField } from './newsletter/newsletter-field.js'
 import { emailField } from './email/email-field.js'
 
 export const page = Component(() => {
@@ -29,6 +30,7 @@ export const page = Component(() => {
         ${usernameField({ user, reload })}
         ${passwordField()}
         ${emailField({ user, reload })}
+        ${newsletterField({ user, reload })}
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>

@@ -20,6 +20,9 @@ export async function putUser (fastify, opts) {
               type: 'string',
               minLength: 8,
               maxLength: 50
+            },
+            newsletter_subscription: {
+              type: 'boolean'
             }
           }
         }
@@ -32,8 +35,9 @@ export async function putUser (fastify, opts) {
 
         const updates = []
 
-        if (user.username) updates.push(SQL`username = ${user.username}`)
-        if (user.password) updates.push(SQL`password = crypt(${user.password}, gen_salt('bf'))`)
+        if ('username' in user) updates.push(SQL`username = ${user.username}`)
+        if ('password' in user) updates.push(SQL`password = crypt(${user.password}, gen_salt('bf'))`)
+        if ('newsletter_subscription' in user) updates.push(SQL`newsletter_subscription = ${user.newsletter_subscription}`)
 
         if (updates.length > 0) {
           const query = SQL`
