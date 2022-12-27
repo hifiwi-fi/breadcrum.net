@@ -78,7 +78,6 @@ export const page = Component(() => {
         <div class="button-cluster">
           <input name="submit-button" type="submit">
         </div>
-        <div class="error-box"></div>
       </fieldset>
     </form>
   </div>

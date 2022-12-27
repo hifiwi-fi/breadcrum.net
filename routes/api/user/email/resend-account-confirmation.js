@@ -53,8 +53,7 @@ export async function resendAccountEmailVerificationHandler ({
             transport: fastify.config.TRANSPORT,
             host: fastify.config.HOST,
             token: updatedUser.email_verify_token,
-            oldEmail: updatedUser.email,
-            newEmail: updatedUser.pending_email_update
+            email: updatedUser.email
           })
         })
       ])
@@ -78,5 +77,7 @@ ${transport}://${host}/email_confirm?token=${token}
 
 If you did not sign up for this account, please contact support@breadcrum.net or perform a password reset on the account associated with this email address and perform an account delete action if this is unwanted.
 
-Thank you!`
+Thank you!
+
+Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${email}`
 }

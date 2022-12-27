@@ -61,30 +61,30 @@ export const page = Component(() => {
     ${!user
       ? html`
         <div class="bc-login">
-        <form class="login-form" id="login-form" onsubmit=${login}>
-        <fieldset ?disabled=${loggingIn}>
-          <legend>Log in:</legend>
-          <div>
-            <label class="block">
-              Email or Username:
-              <input class="block" type="text" name="user" />
-            </label>
-          </div>
-          <div>
-            <label class="block">
-              Password:
-              <input class="block" type="password" name="password">
-            </label>
-          </div>
-          <div class="button-cluster">
-            <input name="submit-button" type="submit">
-          </div>
-          <div class="error-box"></div>
-        </fieldset>
-      </form>
-      <div class="bc-login-password-reset-link">
-        <a href='/password_reset'>Forgot password?</a>
-      </div>
+          <form class="login-form" id="login-form" onsubmit=${login}>
+          <fieldset ?disabled=${loggingIn}>
+            <legend>Log in:</legend>
+            <div>
+              <label class="block">
+                Email or Username:
+                <input class="block" type="text" name="user" />
+              </label>
+            </div>
+            <div>
+              <label class="block">
+                Password:
+                <input class="block" type="password" name="password">
+              </label>
+            </div>
+            <div class="button-cluster">
+              <input name="submit-button" type="submit">
+            </div>
+            <div class="error-box"></div>
+          </fieldset>
+        </form>
+        <div class="bc-login-password-reset-link">
+          <a href='/password_reset'>Forgot password?</a>
+        </div>
       </div>
       `
       : html`
