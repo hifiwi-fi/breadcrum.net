@@ -1,3 +1,12 @@
-.bc-register input {
+.bc-register input[type='email'],
+.bc-register input[type='text'],
+.bc-register input[type='submit'],
+.bc-register input[type='password'] {
   width: 100%;
+}
+
+.bc-register .checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

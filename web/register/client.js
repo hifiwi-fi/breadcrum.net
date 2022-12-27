@@ -30,13 +30,14 @@ export const page = Component(() => {
       const email = ev.currentTarget.email.value
       const username = ev.currentTarget.username.value
       const password = ev.currentTarget.password.value
+      const newsletter = ev.currentTarget.newsletter.checked
 
       const response = await fetch(`${state.apiUrl}/register`, {
         method: 'post',
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ email, username, password })
+        body: JSON.stringify({ email, username, password, newsletter })
       })
 
       if (response.ok && response.status === 201) {
@@ -73,6 +74,12 @@ export const page = Component(() => {
           <label class="block">
             Password:
             <input class="block" type="password" name="password">
+          </label>
+        </div>
+        <div>
+          <label class="checkbox-label">
+            <input type="checkbox" name="newsletter">
+            Subscribe to news and updates
           </label>
         </div>
         <div class="button-cluster">
