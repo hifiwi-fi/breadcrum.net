@@ -29,6 +29,7 @@
     "@nearform/sql": "^1.5.0",
     "@siteup/cli": "^2.2.4",
     "abstract-cache-redis": "^2.0.0",
+    "bc-dlp": "^1.0.2",
     "classnames": "^2.3.1",
     "clean-deep": "^3.4.0",
     "desm": "^1.2.0",
@@ -59,8 +60,7 @@
     "sodium-native": "^3.2.1",
     "uland-isomorphic": "^2.0.0",
     "undici": "^5.12.0",
-    "webassert": "^3.0.2",
-    "yt-dlp-wrap": "^2.3.11"
+    "webassert": "^3.0.2"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
