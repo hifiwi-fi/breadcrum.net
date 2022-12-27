@@ -32,6 +32,8 @@ jobs:
         name: pacakge-lock.json
         path: package-lock.json
     - run: node ./scripts/bootstrap-yt-dlp.js
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - run: npm test
     - name: Coveralls
       uses: coverallsapp/github-action@1.1.3
