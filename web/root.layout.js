@@ -15,7 +15,7 @@ export default function defaultRootLayout ({
     <head>
       <meta charset="utf-8">
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
-      <meta name='viewport' content='initial-scale=1, viewport-fit=cover, maximum-scale=1'>
+      <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1'>
       <meta name='referrer' content='no-referrer'>
       <meta name='description' content='Breadcrum internet newspaper clippings and bookmarks. Podcast anything.'>
       ${scripts
