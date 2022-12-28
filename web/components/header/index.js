@@ -5,12 +5,14 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { sensitive } from '../sensitive/index.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { loginButtons } from './login-buttons.js'
+import { useFlags } from '../../hooks/useFlags.js'
 
 export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
   const { pushState } = useQuery()
+  const { flags } = useFlags()
 
   const handleSensitiveToggle = useCallback(() => {
     state.sensitive = !state.sensitive
@@ -44,8 +46,14 @@ export const header = Component(() => {
             <div>${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
             <div>· <a href='/logout/'>logout</a></div>`
       }
-
     </div>
   </nav>
+  ${flags.email_confirmation_banner && user && !user.email_confirmed && !['/account/', '/email_confirm/'].includes(window?.location?.pathname)
+    ? html`
+      <div class="bc-header-email-warning">
+        <a href="/account">Click here to confirm your email address!</a>
+      </div>`
+    : null
+  }
   `
 })

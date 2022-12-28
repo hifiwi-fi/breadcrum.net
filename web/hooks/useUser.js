@@ -16,7 +16,6 @@ export function useUser ({
   useEffect(() => {
     setLoading(true)
     setError(null)
-    const controller = new AbortController()
 
     let requestor = false
 
@@ -26,8 +25,7 @@ export function useUser ({
           method: 'get',
           headers: {
             'accept-encoding': 'application/json'
-          },
-          signal: controller.signal
+          }
         })
         requestor = true
       }

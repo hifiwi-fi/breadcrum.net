@@ -1,4 +1,5 @@
 import SQL from '@nearform/sql'
+import { getPasswordHashQuery } from './password/password-hash.js'
 
 export async function putUser (fastify, opts) {
   fastify.put(
@@ -36,7 +37,7 @@ export async function putUser (fastify, opts) {
         const updates = []
 
         if ('username' in user) updates.push(SQL`username = ${user.username}`)
-        if ('password' in user) updates.push(SQL`password = crypt(${user.password}, gen_salt('bf'))`)
+        if ('password' in user) updates.push(SQL`password = ${getPasswordHashQuery(user.password)}`)
         if ('newsletter_subscription' in user) updates.push(SQL`newsletter_subscription = ${user.newsletter_subscription}`)
 
         if (updates.length > 0) {

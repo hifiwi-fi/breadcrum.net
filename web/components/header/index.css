@@ -4,6 +4,11 @@
   display: flex;
   justify-content: space-between;
   font-size: var(--small-font-size);
+  border-bottom: dotted 1px var(--accent-midground);
+  padding-left: max(var(--body-padding), env(safe-area-inset-left));
+  padding-right: max(var(--body-padding), env(safe-area-inset-right));
+  padding-top: max(var(--body-padding), env(safe-area-inset-top));
+  padding-bottom: var(--body-padding);
 }
 
 .bc-logo {
@@ -21,4 +26,17 @@
 
 .bc-header-end {
   align-items: center;
+}
+
+.bc-header-email-warning {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+  font-size: var(--small-font-size);
+  justify-content: center;
+  background-color: var(--mark-background);
+}
+
+.bc-header-email-warning a {
+  color: var(--text);
 }

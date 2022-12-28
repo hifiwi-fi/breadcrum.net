@@ -2,6 +2,8 @@
 import SQL from '@nearform/sql'
 import S from 'fluent-json-schema'
 import { verifyEmailBody } from '../user/email/resend-account-confirmation.js'
+import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from '../user/email/email-confirm-tokens.js'
+import { getPasswordHashQuery } from '../user/password/password-hash.js'
 
 const newUserJsonSchema = S.object()
   .prop('username',
@@ -62,11 +64,12 @@ export default async function registerRoutes (fastify, opts) {
         // TODO: ensure not a duplicate user
 
         const query = SQL`
-          insert into users (username, email, password, email_verify_token, newsletter_subscription) values (
+          insert into users (username, email, password, email_verify_token, email_verify_token_exp, newsletter_subscription) values (
             ${username},
             ${email},
-            crypt(${password}, gen_salt('bf')),
-            encode(gen_random_bytes(32), 'hex'),
+            ${getPasswordHashQuery(password)},
+            ${EMAIL_CONFIRM_TOKEN},
+            ${EMAIL_CONFIRM_TOKEN_EXP}
             ${newsletter}
           )
           returning id, email, username, email_confirmed, email_verify_token, newsletter_subscription;`
@@ -93,7 +96,7 @@ export default async function registerRoutes (fastify, opts) {
           `)
 
           if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            await Promise.allSettled([fastify.email.sendMail({
+            const results = await Promise.allSettled([fastify.email.sendMail({
               from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
               to: email,
               subject: 'Verify your account email address', // Subject line
@@ -106,6 +109,8 @@ export default async function registerRoutes (fastify, opts) {
               })
             })
             ])
+
+            fastify.log.info(results)
           } else {
             fastify.log.warn({ email }, 'Skipping email for blocked email address')
           }

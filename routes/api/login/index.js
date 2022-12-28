@@ -39,21 +39,13 @@ export default async function loginRoutes (fastify, opts) {
 
       const isEmail = user.includes('@')
 
-      const query = isEmail
-        ? SQL`
+      const query = SQL`
       SELECT id, email, username, email_confirmed
       FROM users
-      WHERE email = ${user}
+      WHERE ${isEmail ? SQL`email = ${user}` : SQL`username = ${user}`}
       AND password = crypt(${password}, password)
       LIMIT 1;
       `
-        : SQL`
-      SELECT id, email, username, email_confirmed
-      FROM users
-      WHERE username = ${user}
-      AND password = crypt(${password}, password)
-      LIMIT 1;
-    `
 
       const { rows } = await fastify.pg.query(query)
 
