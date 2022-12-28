@@ -94,7 +94,7 @@
     "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg | depcruise-wrap-stream-in-html > dependency-graph.html",
     "migrate": "postgrator",
     "prepare": "npm run build",
-    "postinstall": "node scripts/generate-default-env.js",
+    "generate-default-env": "node scripts/generate-default-env.js",
     "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prod-sim": "fastify start -l info app.js --address 0.0.0.0",
     "release": "git push --follow-tags && gh-release -y",

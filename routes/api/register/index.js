@@ -20,6 +20,9 @@ const newUserJsonSchema = S.object()
       .minLength(8)
       .maxLength(50)
   ).required()
+  .prop('newsletter',
+    S.boolean()
+  ).required()
 
 const createdUserJsonSchema = S.object()
   .prop('token', S.string())
@@ -54,18 +57,19 @@ export default async function registerRoutes (fastify, opts) {
             error: 'Registration is closed. Please try again later.'
           }
         }
-        const { username, email, password } = request.body
+        const { username, email, password, newsletter } = request.body
 
         // TODO: ensure not a duplicate user
 
         const query = SQL`
-          insert into users (username, email, password, email_verify_token) values (
+          insert into users (username, email, password, email_verify_token, newsletter_subscription) values (
             ${username},
             ${email},
             crypt(${password}, gen_salt('bf')),
-            encode(gen_random_bytes(32), 'hex')
+            encode(gen_random_bytes(32), 'hex'),
+            ${newsletter}
           )
-          returning id, email, username, email_confirmed, email_verify_token;`
+          returning id, email, username, email_confirmed, email_verify_token, newsletter_subscription;`
 
         const results = await client.query(query)
         const { email_verify_token, ...user } = results.rows[0]
