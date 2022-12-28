@@ -100,7 +100,7 @@ export async function getBookmarks (fastify, opts) {
 
         const results = await fastify.pg.query(afterCalcQuery)
 
-        const { bookmark_count: bookmarkCount, last_created_at: lastCreatedAt } = results.rows.pop()
+        const { bookmark_count: bookmarkCount, last_created_at: lastCreatedAt } = results.rows.pop() ?? {}
 
         if (bookmarkCount !== perPageAfterOffset) {
           top = true
