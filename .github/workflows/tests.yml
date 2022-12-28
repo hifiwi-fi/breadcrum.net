@@ -36,6 +36,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - run: npm run generate-default-env
     - run: npm test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - name: Coveralls
       uses: coverallsapp/github-action@1.1.3
       with:

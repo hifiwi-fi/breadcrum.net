@@ -40,6 +40,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - run: npm run generate-default-env
     - run: npm test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - run: rm .env
     - run: git reset --hard && git clean -fd
     - uses: superfly/flyctl-actions/setup-flyctl@master
