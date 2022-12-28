@@ -126,7 +126,8 @@ export async function postEmail (fastify, opts) {
             fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
           }
 
-          return await Promise.allSettled(emailJobs)
+          const results = await Promise.allSettled(emailJobs)
+          fastify.log.info(results)
         })
 
         reply.code(202)

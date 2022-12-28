@@ -44,7 +44,7 @@ export async function resendPendingEmailVerificationHandler ({
           `)
 
     if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-      return await Promise.allSettled([
+      const results = Promise.allSettled([
         fastify.email.sendMail({
           from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
           to: updatedUser.email,
@@ -59,6 +59,8 @@ export async function resendPendingEmailVerificationHandler ({
           })
         })
       ])
+
+      fastify.log.info(results)
     } else {
       fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
     }

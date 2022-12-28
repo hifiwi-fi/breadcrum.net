@@ -65,7 +65,7 @@ export const page = Component(() => {
           <div>
             ${query && JSON.parse(query.get('update'))
               ? 'Email address successfully updated!'
-              : 'Email address confimred!'
+              : 'Email address confirmed!'
             }
           </div>
         `

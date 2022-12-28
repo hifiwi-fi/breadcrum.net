@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
+import { getPasswordHashQuery } from './password-hash.js'
 
 export async function postPassword (fastify, opts) {
   fastify.post(
@@ -65,7 +66,7 @@ export async function postPassword (fastify, opts) {
         }
 
         const updates = [
-          SQL`password = crypt(${password}, gen_salt('bf'))`,
+          SQL`password = ${getPasswordHashQuery(password)}`,
           SQL`password_reset_token = null`,
           SQL`password_reset_token_exp = null`
         ]
@@ -86,7 +87,7 @@ export async function postPassword (fastify, opts) {
             fetch first row only;
           `)
           if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            return await Promise.allSettled([
+            const results = await Promise.allSettled([
               fastify.email.sendMail({
                 from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
                 to: user.email,
@@ -99,6 +100,8 @@ export async function postPassword (fastify, opts) {
                 })
               })
             ])
+
+            fastify.log.info(results)
           } else {
             fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
           }

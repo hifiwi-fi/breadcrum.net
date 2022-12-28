@@ -62,7 +62,10 @@ export const page = Component(() => {
       ? reset
         ? html`
           <div>
-            New password set.
+            New password set
+          </div>
+          <div>
+            <a href="/login/">Log in</a>
           </div>
         `
         : html`

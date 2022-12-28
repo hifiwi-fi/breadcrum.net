@@ -1,6 +1,13 @@
 import { html, render } from 'uland-isomorphic'
 import { header } from './components/header/index.js'
 
+/*
+
+THIS LAYOUT IS STATIC.
+If you need to render components inside, you need attatch them in the global client.
+
+*/
+
 export default function defaultRootLayout ({
   title,
   siteName = 'breadcrum.net',

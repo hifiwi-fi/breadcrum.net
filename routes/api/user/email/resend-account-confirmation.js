@@ -43,7 +43,7 @@ export async function resendAccountEmailVerificationHandler ({
           `)
 
     if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-      return await Promise.allSettled([
+      const results = await Promise.allSettled([
         fastify.email.sendMail({
           from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
           to: updatedUser.email,
@@ -57,6 +57,8 @@ export async function resendAccountEmailVerificationHandler ({
           })
         })
       ])
+
+      fastify.log.info(results)
     } else {
       fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
     }
@@ -74,8 +76,6 @@ export function verifyEmailBody ({ email, username, transport, host, token }) {
 Thanks for signing up for a Breadcrum.net account. Please verify your email address by clicking the link below.
 
 ${transport}://${host}/email_confirm?token=${token}
-
-If you did not sign up for this account, please contact support@breadcrum.net or perform a password reset on the account associated with this email address and perform an account delete action if this is unwanted.
 
 Thank you!
 
