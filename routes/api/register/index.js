@@ -69,7 +69,7 @@ export default async function registerRoutes (fastify, opts) {
             ${email},
             ${getPasswordHashQuery(password)},
             ${EMAIL_CONFIRM_TOKEN},
-            ${EMAIL_CONFIRM_TOKEN_EXP}
+            ${EMAIL_CONFIRM_TOKEN_EXP},
             ${newsletter}
           )
           returning id, email, username, email_confirmed, email_verify_token, newsletter_subscription;`
