@@ -8,12 +8,48 @@ export const page = Component(() => {
     <h1>
       Docs
     </h1>
-    <p>Drag this bookmarklet to your bookmark bar or menu. When you visit a page you want to bookmark, click the the bookmarklet that saved and it will open a new bookmark window.</p>
-    <li>
-      <a class="bookmarklet" href="${bookmarklet}">
-        🥖 bookmark
-      </a>
-    </li>
+
+    <div class="bc-marketing-feature-block">
+      <h2>👷‍♂️ Early access</h2>
+      <p>
+        Breadcrum is still early in development by a one man team.
+        Please be patient!
+      </p>
+    </div>
+
+    <div>
+      <h2>Bookmarklet</h2>
+    <p>
+      Drag this bookmarklet to your bookmark bar or menu.
+      When you visit a page you want to bookmark, click the the bookmarklet in your bookmark bar or menu and it will open a new bookmark window. Existing URLs will open an edit window.
+    </p>
+    <ul>
+      <li>
+        <a class="bookmarklet" href="${bookmarklet}">
+          🥖 bookmark
+        </a>
+      </li>
+    </ul>
+  </div>
+
+    <div>
+      <h2>Apple shortcut</h2>
+      <p>This apple shortcut will let you save safari web pages to breadcrum from the share sheet. Eventually this will be provided by a native app.</p>
+      <ul>
+        <li>
+          <a href="https://www.icloud.com/shortcuts/7026e513f3d749b8b4f40f61c6d88cd5">Breadcrum iOS shortcut</a>
+        </li>
+      </ul>
+    </div>
+
+  <div class="bc-marketing-feature-block">
+      <h2>🔒 Private and neutral</h2>
+      <p>
+        Breadcrum is for private use by individuals and is comitted to content neutrality and user privacy.
+        That said, do not store any content that is illegal under US law or highly sensitive secrets
+        in the service.
+      </p>
+    </div>
 `
 })
 

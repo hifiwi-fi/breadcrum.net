@@ -1,11 +1,38 @@
-.bc-placeholder {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
+.bc-main {
+	max-width: 55em;
 }
 
-.bc-big-bread {
-	font-size: 10em;
+
+.bc-marketing-hero {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.bc-marking-hero-title {
+	margin: 0;
+	font-weight: 600;
+	margin-bottom: 50px;
+}
+
+.bc-marking-hero-description {
+	max-width: 440px;
+	text-align: center;
+	color: var(--accent-foreground);
+}
+
+
+
+/* Portfolio grid */
+.bc-marketing-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 1em;
+}
+
+@media screen and (max-width: 53em) {
+  .bc-marketing-feature-grid {
+    grid-template-columns: 1fr;
+  }
 }
