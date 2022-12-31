@@ -12,10 +12,6 @@ export const page = Component(() => {
   const [registerError, setRegisterError] = useState(null)
 
   useEffect(() => {
-    if (!flags.registration && !flagsLoading) window.location.replace('/')
-  }, [flags.registration, flagsLoading])
-
-  useEffect(() => {
     if ((user && !loading)) {
       window.location.replace('/bookmarks')
     }
@@ -56,8 +52,8 @@ export const page = Component(() => {
   return html`
     <div class="bc-register">
       <form class="register-form" id="register-form" onsubmit=${onRegister}>
-      <fieldset ?disabled="${Boolean(user) || submitting}">
-        <legend>Register:</legend>
+      <fieldset ?disabled="${Boolean(user) || submitting || !flags.registration || flagsLoading}">
+        <legend>${flags.registration ? 'Register:' : 'Registration closed. Please come back soon!'}</legend>
         <div>
           <label class="block">
             Email:
