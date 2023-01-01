@@ -32,9 +32,9 @@ export const header = Component(() => {
     <div class="bc-header-start">
       <span class="bc-logo round">
         <span>🥖 </span>
-        ${user ? null : html`<a href="/">Breadcrum</a>`}
+        ${!user ? html`<a href="/">Breadcrum</a>` : null}
       </span>
-      ${user ? html`<span><a href='/account'>${user.username}</a></span>` : null}
+      ${user ? html`<a href='/account'>${user.username}</a>` : null}
     </div>
     <div class="bc-header-end">
       ${!user

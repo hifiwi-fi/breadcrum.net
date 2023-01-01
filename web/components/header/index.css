@@ -9,6 +9,14 @@
   padding-right: max(var(--body-padding), env(safe-area-inset-right));
   padding-top: max(var(--body-padding), env(safe-area-inset-top));
   padding-bottom: var(--body-padding);
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space:nowrap;
+  scrollbar-width: none;
+}
+
+.bc-header-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .bc-logo {
@@ -22,6 +30,13 @@
 
 .bc-header-start {
   align-items: baseline;
+  overflow: hidden;
+  min-width: 100px;
+}
+
+.bc-header-start a {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .bc-header-end {

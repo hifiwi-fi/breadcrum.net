@@ -31,10 +31,10 @@ export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
       <form ref="${formRef}" class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
       <fieldset ?disabled=${disabled}>
         <legend class="bc-account-username-edit-legend">Edit username</legend>
-        <div>
+      <div>
           <label class='block'>
             username:
-            <input class='block' type="text" name="username" value="${user.username}"/>
+            <input class='block' pattern="^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user.username}"/>
           </label>
         </div>
         <div class="bc-account-username-edit-submit-line">
