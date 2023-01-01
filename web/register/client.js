@@ -13,7 +13,7 @@ export const page = Component(() => {
 
   useEffect(() => {
     if ((user && !loading)) {
-      window.location.replace('/bookmarks')
+      window.location.replace('/docs')
     }
   }, [user])
 
