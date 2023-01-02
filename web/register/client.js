@@ -13,7 +13,7 @@ export const page = Component(() => {
 
   useEffect(() => {
     if ((user && !loading)) {
-      window.location.replace('/docs')
+      window.location.replace('/docs/tutorial')
     }
   }, [user])
 

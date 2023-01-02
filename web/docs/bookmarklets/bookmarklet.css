@@ -1,0 +1,10 @@
+.bc-bookmarklet {
+	font-weight: bold;
+	font-family: var(--system-round);
+	border: 2px dotted;
+	border-radius: 30px;
+	border-color: var(--accent-midground);
+	color: var(--text) !important;
+	padding: 5px;
+	text-decoration: none !important;
+}

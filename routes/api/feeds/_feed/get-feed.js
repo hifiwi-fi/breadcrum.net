@@ -103,7 +103,7 @@ export async function getFeed (fastify, opts) {
             }
           })
           : [{ // Placeholder show so people can subscribe to empty feeds.
-              id: 'breadcrum.net:episode:placeholder',
+              id: `breadcrum.net:episode:placeholder:${feedId}:${userId}`,
               url: `${transport}://${host}/bookmarks`,
               title: 'Breadcum.net placeholder episode',
               content_text: 'This episode will disapear when you create your first breadcrum episode. Its added so that you can subscribe to your podcast feed URL before you add any episodes.',
