@@ -26,7 +26,7 @@ export default function defaultRootLayout ({
       <meta name='referrer' content='no-referrer'>
       <meta name='description' content='Breadcrum internet newspaper clippings and bookmarks. Podcast anything.'>
 
-      <link rel="shortcut icon" href="/favicon.ico">
+      <link rel="shortcut icon" href="/static/bread-transformed.png">
 
       <link rel="apple-touch-icon" href="touch-icon-iphone.png">
       <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad.png">
