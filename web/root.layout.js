@@ -28,11 +28,6 @@ export default function defaultRootLayout ({
 
       <link rel="shortcut icon" href="/static/bread-transformed.png">
 
-      <link rel="apple-touch-icon" href="touch-icon-iphone.png">
-      <link rel="apple-touch-icon" sizes="152x152" href="touch-icon-ipad.png">
-      <link rel="apple-touch-icon" sizes="180x180" href="touch-icon-iphone-retina.png">
-      <link rel="apple-touch-icon" sizes="167x167" href="touch-icon-ipad-retina.png">
-
       <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
       <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png">
       <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-96x96.png">
