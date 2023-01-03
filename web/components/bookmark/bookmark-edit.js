@@ -149,7 +149,12 @@ export const bookmarkEdit = Component(({
         <details class="bc-bookmark-archive-url-edit-details">
             <summary><label>archive URLs:</label></summary>
             <div class="bc-bookmark-archive-url-edit-help-text">
-              ℹ️ Add additional archival links for this bookmark URL, like the <a onclick=${handleNewWindowLink} target="_blank" href="${`http://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a> or <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a> archive URLs.
+              ℹ️ Add additional archival links for this bookmark URL, like the
+              <a onclick=${handleNewWindowLink} target="_blank" href="${`http://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
+              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>
+              or
+              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
+              archive URLs.
             </div>
             ${archiveURLs.length > 0
               ? html`${archiveURLs.map(
