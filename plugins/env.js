@@ -69,7 +69,7 @@ export const schema = {
     },
     APP_EMAIL: {
       type: 'string',
-      default: 'noreply@breadcrum.net'
+      default: 'support@breadcrum.net'
     },
     SNS_USER: {
       type: 'string',
