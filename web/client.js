@@ -1,13 +1,13 @@
 /* eslint-env browser */
-import { Component, html, render, useEffect } from 'uland-isomorphic'
-import { useUser } from './hooks/useUser.js'
+import { Component, html, render /*, useEffect */ } from 'uland-isomorphic'
+// import { useUser } from './hooks/useUser.js'
 
 export const page = Component(() => {
-  const { user, loading } = useUser()
+  // const { user, loading } = useUser()
 
-  useEffect(() => {
-    if (user && !loading) window.location.replace('/bookmarks')
-  }, [user])
+  // useEffect(() => {
+  //   if (user) window.location.replace('/bookmarks')
+  // }, [user])
 
   return html`
     <div class="bc-marketing">
