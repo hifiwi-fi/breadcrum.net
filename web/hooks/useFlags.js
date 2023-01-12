@@ -3,7 +3,7 @@ import { fetch } from 'fetch-undici'
 import { useEffect, useState } from 'uland-isomorphic'
 import { useLSP } from './useLSP.js'
 
-export function useFlags () {
+export function useFlags() {
   const state = useLSP()
 
   const [loading, setLoading] = useState(true)
@@ -30,7 +30,7 @@ export function useFlags () {
           state.flags = body
         }
       } else {
-        throw new Error(`${(await response).status} ${(await response).statusText}: ${await response.text()}`)
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
     }
 
@@ -44,7 +44,7 @@ export function useFlags () {
   return { flags: state.flags, loading, error }
 }
 
-function localFlagsEqualServerFlags (localFlags, serverFlags) {
+function localFlagsEqualServerFlags(localFlags, serverFlags) {
   for (const [k, v] of Object.entries(serverFlags)) {
     if (localFlags[k] !== v) return false
   }

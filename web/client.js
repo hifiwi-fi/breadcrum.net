@@ -212,6 +212,13 @@ export const page = Component(() => {
             </p>
           </div>
 
+          <div class="bc-marketing-feature-block">
+            <h2>📠 Import/Export <div><small>(Coming soon)</small></div></h2>
+            <p>
+              Import your data from your browser or other bookmarking sites, or export what you collected on Breadcrum.
+            </p>
+          </div>
+
         </div>
       </div>
 `

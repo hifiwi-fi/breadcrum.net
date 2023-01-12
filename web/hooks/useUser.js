@@ -5,7 +5,7 @@ import { useLSP } from './useLSP.js'
 
 let userRequest = null
 
-export function useUser ({
+export function useUser({
   reload
 } = {}) {
   const state = useLSP()
@@ -46,7 +46,7 @@ export function useUser ({
         if (response.status === 401) {
           if (state.user) state.user = null
         } else {
-          throw new Error(`${(await response).status} ${(await response).statusText}: ${await response.text()}`)
+          throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
         }
       }
     }
