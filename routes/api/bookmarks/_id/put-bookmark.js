@@ -115,6 +115,7 @@ export async function putBookmark (fastify, opts) {
         await client.query('commit')
 
         fastify.pqueue.add(runYTDLP({
+          apiURL: fastify.config.YT_DLP_API_URL,
           userId,
           bookmarkId,
           episodeId,

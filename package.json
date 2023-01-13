@@ -29,7 +29,6 @@
     "@nearform/sql": "^1.5.0",
     "@siteup/cli": "^2.2.4",
     "abstract-cache-redis": "^2.0.0",
-    "bc-dlp": "^1.0.2",
     "classnames": "^2.3.1",
     "clean-deep": "^3.4.0",
     "desm": "^1.2.0",

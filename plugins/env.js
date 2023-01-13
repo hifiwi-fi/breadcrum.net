@@ -44,7 +44,7 @@ export const schema = {
     },
     PQUEUE_CONCURRENCY: {
       type: 'integer',
-      default: 1
+      default: 10
     },
     PQUEUE_TIMEOUT: {
       type: 'integer',
@@ -77,6 +77,10 @@ export const schema = {
     },
     SNS_PASS: {
       type: 'string'
+    },
+    YT_DLP_API_URL: {
+      type: 'string',
+      default: 'http://user:pass@127.0.0.1:5000'
     }
   }
 }
