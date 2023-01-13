@@ -35,9 +35,6 @@ jobs:
       with:
         redis-version: ${{ env.redis-version }}
     - run: npm i
-    - run: node ./scripts/bootstrap-yt-dlp.js
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - run: npm run generate-default-env
     - run: npm test
       env:

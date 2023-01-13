@@ -36,10 +36,13 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       }
 
       const metadata = await fastify.pqueue.add(() => {
-        return getYTDLPUrl({ url: PLACEHOLDER_URL, medium: 'video', histogram: fastify.metrics.ytdlpSeconds })
+        return getYTDLPUrl({ apiURL: fastify.config.YT_DLP_API_URL, url: PLACEHOLDER_URL, medium: 'video', histogram: fastify.metrics.ytdlpSeconds })
       })
-      cache.set(cacheKey, metadata.urls, metadata.urls)
-      reply.redirect(302, metadata.urls)
+
+      if (!metadata.url) throw new Error('metadata is missing url')
+
+      cache.set(cacheKey, metadata.url, metadata.url)
+      reply.redirect(302, metadata.url)
     }
   )
 }

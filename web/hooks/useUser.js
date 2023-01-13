@@ -5,7 +5,7 @@ import { useLSP } from './useLSP.js'
 
 let userRequest = null
 
-export function useUser({
+export function useUser ({
   reload
 } = {}) {
   const state = useLSP()
