@@ -146,7 +146,7 @@ export const bookmarkEdit = Component(({
             <input class="block" type="text" name="tags" value="${b?.tags?.join(' ')}">
           </label>
         </div>
-        <details class="bc-bookmark-archive-url-edit-details">
+        <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
             <summary><label>archive URLs:</label></summary>
             <div class="bc-bookmark-archive-url-edit-help-text">
               ℹ️ Add additional archival links for this bookmark URL, like the
