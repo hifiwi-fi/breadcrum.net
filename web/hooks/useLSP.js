@@ -10,6 +10,8 @@ export const state = lsp('breadcrum', {
     host: process.env.HOST,
     transport: process.env.TRANSPORT,
     sensitive: false,
+    toread: false,
+    starred: false,
     flags: defaultFrontendFlags
   },
   lspReset: 6

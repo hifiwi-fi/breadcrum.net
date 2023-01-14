@@ -34,6 +34,14 @@ export async function getBookmarks (fastify, opts) {
             sensitive: {
               type: 'boolean',
               default: false
+            },
+            starred: {
+              type: 'boolean',
+              default: false
+            },
+            toread: {
+              type: 'boolean',
+              default: false
             }
           },
           dependencies: {
@@ -77,7 +85,9 @@ export async function getBookmarks (fastify, opts) {
         per_page: perPage,
         url,
         tag,
-        sensitive
+        sensitive,
+        starred,
+        toread
       } = request.query
       let {
         before
@@ -95,7 +105,9 @@ export async function getBookmarks (fastify, opts) {
           tag,
           ownerId: userId,
           after,
-          sensitive
+          sensitive,
+          starred,
+          toread
         })
 
         const results = await fastify.pg.query(afterCalcQuery)
@@ -121,6 +133,8 @@ export async function getBookmarks (fastify, opts) {
         before,
         url,
         sensitive,
+        starred,
+        toread,
         perPage
       })
 

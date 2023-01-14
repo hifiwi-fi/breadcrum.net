@@ -1,11 +1,12 @@
 import { Component, html } from 'uland-isomorphic'
+import cn from 'classnames'
 
 export const star = Component(({
   starred = false,
   onclick = () => {}
 }) => {
   return html`
-    <span class="${starred ? 'bc-starred' : 'bc-unstarred'}" onclick=${onclick}>
+    <span class="${cn({ 'bc-starred': starred, 'bc-unstarred': !starred, 'bc-star': true })}" onclick=${onclick}>
       ${starred
         ? '★'
         : '☆'

@@ -1,4 +1,7 @@
 /* header/index.css  */
+@import '../star/index.css';
+@import '../toread/index.css';
+@import '../sensitive/index.css';
 
 .bc-header-nav {
   display: flex;
@@ -54,4 +57,12 @@
 
 .bc-header-email-warning a {
   color: var(--text);
+}
+
+.bc-header-button {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 3px;
 }

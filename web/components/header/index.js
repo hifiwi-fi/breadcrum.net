@@ -3,6 +3,8 @@ import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { sensitive } from '../sensitive/index.js'
+import { toread } from '../toread/index.js'
+import { star } from '../star/index.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { loginButtons } from './login-buttons.js'
 import { useFlags } from '../../hooks/useFlags.js'
@@ -16,6 +18,14 @@ export const header = Component(() => {
 
   const handleSensitiveToggle = useCallback(() => {
     state.sensitive = !state.sensitive
+  })
+
+  const handleToreadToggle = useCallback(() => {
+    state.toread = !state.toread
+  })
+
+  const handleStarToggle = useCallback(() => {
+    state.starred = !state.starred
   })
 
   const onPageNav = (ev) => {
@@ -43,7 +53,9 @@ export const header = Component(() => {
             <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
             <div>🏷 <a href='/tags/'>tags</a></div>
             <div>📡 <a href='/feeds/'>feeds</a></div>
-            <div>${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
+            <div class="bc-header-button">${toread({ toread: state.toread, onclick: handleToreadToggle })}</div>
+            <div class="bc-header-button">${star({ starred: state.starred, onclick: handleStarToggle })}</div>
+            <div class="bc-header-button">${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
             <div>· <a href='/logout/'>logout</a></div>`
       }
     </div>

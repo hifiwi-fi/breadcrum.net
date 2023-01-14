@@ -48,6 +48,8 @@ export const page = Component(() => {
       if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
 
       pageParams.set('sensitive', state.sensitive)
+      pageParams.set('toread', state.toread)
+      pageParams.set('starred', state.starred)
 
       // Be selective about this
       const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
@@ -91,7 +93,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setBookmarksError(err) })
         .finally(() => { setBookmarksLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, dataReload])
+  }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
 
   const onPageNav = (ev) => {
     ev.preventDefault()

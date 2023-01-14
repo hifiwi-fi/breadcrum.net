@@ -30,7 +30,7 @@ export const bookmarkView = Component(({
 
   return html`
     <div class="bc-bookmark-view">
-      <div>
+      <div class="bc-bookmark-title-line">
         ${toread({
           toread: b.toread,
           onclick: onToggleToread

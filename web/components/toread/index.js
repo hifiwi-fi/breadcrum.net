@@ -1,11 +1,12 @@
 import { Component, svg, html } from 'uland-isomorphic'
+import cn from 'classnames'
 
 export const toread = Component(({
   toread = false,
   onclick = () => {}
 }) => {
   return html`
-    <span class="${toread ? 'bc-unread' : 'bc-read'}" onclick=${onclick}>
+    <span class="${cn({ 'bc-unread': toread, 'bc-read': !toread, 'bc-toread': true })}" onclick=${onclick}>
       ${toread
         ? svg`
           <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"

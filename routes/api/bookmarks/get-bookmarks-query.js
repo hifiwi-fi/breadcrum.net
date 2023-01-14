@@ -7,6 +7,8 @@ export const getBookmarksQuery = ({
   before,
   url,
   sensitive,
+  starred,
+  toread,
   perPage
 }) => {
   const bookarmsQuery = SQL`
@@ -25,6 +27,8 @@ export const getBookmarksQuery = ({
           ${before ? SQL`and bm.created_at < ${before}` : SQL``}
           ${url ? SQL`and url = ${url}` : SQL``}
           ${!sensitive ? SQL`and sensitive = false` : SQL``}
+          ${starred ? SQL`and starred = true` : SQL``}
+          ${toread ? SQL`and toread = true` : SQL``}
           ${tag ? SQL`and t.name = ${tag} and t.owner_id = ${ownerId}` : SQL``}
           order by bm.created_at desc, bm.title desc, bm.url desc
           ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
@@ -103,7 +107,9 @@ export const afterToBeforeBookmarkQuery = ({
   tag,
   ownerId,
   after,
-  sensitive
+  sensitive,
+  starred,
+  toread
 }) => {
   const perPageAfterOffset = perPage + 2
   const afterCalcBookarksQuery = SQL`
@@ -120,6 +126,8 @@ export const afterToBeforeBookmarkQuery = ({
             where bm.owner_id = ${ownerId}
             and bm.created_at >= ${after}
             ${!sensitive ? SQL`AND bm.sensitive = false` : SQL``}
+            ${starred ? SQL`AND bm.starred = true` : SQL``}
+            ${toread ? SQL`AND bm.toread = true` : SQL``}
             ${tag
               ? SQL`
                 and t.name = ${tag}
