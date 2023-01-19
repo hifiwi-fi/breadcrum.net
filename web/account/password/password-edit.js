@@ -41,11 +41,11 @@ export const passwordEdit = Component(({ onSave, onCancelEdit }) => {
         <div>
           <label class='block'>
             password:
-            <input class="block" type="password" minlength="8" maxlength="50" name="password">
+            <input class="block" type="password" minlength="8" maxlength="255" name="password">
           </label>
           <label class='block'>
             confirm password:
-            <input class="block" type="password" minlength="8" maxlength="50" name="confirmPassword">
+            <input class="block" type="password" minlength="8" maxlength="255" name="confirmPassword">
           </label>
         </div>
         <div class="bc-account-password-edit-submit-line">

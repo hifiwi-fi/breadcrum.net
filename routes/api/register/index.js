@@ -1,48 +1,40 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import S from 'fluent-json-schema'
 import { verifyEmailBody } from '../user/email/resend-account-confirmation.js'
-import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from '../user/email/email-confirm-tokens.js'
+import {
+  EMAIL_CONFIRM_TOKEN,
+  EMAIL_CONFIRM_TOKEN_EXP
+} from '../user/email/email-confirm-tokens.js'
 import { getPasswordHashQuery } from '../user/password/password-hash.js'
-
-const newUserJsonSchema = S.object()
-  .prop('username',
-    S.string()
-      .minLength(1)
-      .maxLength(50)
-      .pattern('^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$')
-  ).required()
-  .prop('email',
-    S.string()
-      .format('email')
-      .pattern("^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$") // eslint-disable-line no-useless-escape
-  ).required()
-  .prop('password',
-    S.string()
-      .minLength(8)
-      .maxLength(50)
-  ).required()
-  .prop('newsletter',
-    S.boolean()
-  ).required()
-
-const createdUserJsonSchema = S.object()
-  .prop('token', S.string())
-  .prop('user', S.object()
-    .prop('id', S.string().format('uuid'))
-    .prop('email', S.string().format('email'))
-    .prop('email_confirmed', S.boolean())
-    .prop('username', S.string())
-  )
+import {
+  tokenWithUserProps,
+  validatedUserProps
+} from '../user/user-props.js'
 
 export default async function registerRoutes (fastify, opts) {
   fastify.post(
     '/',
     {
       schema: {
-        body: newUserJsonSchema,
+        body: {
+          type: 'object',
+          required: [
+            'username',
+            'email',
+            'password',
+            'newsletter_subscription'
+          ],
+          properties: {
+            ...validatedUserProps
+          }
+        },
         response: {
-          201: createdUserJsonSchema
+          201: {
+            type: 'object',
+            properties: {
+              ...tokenWithUserProps
+            }
+          }
         }
       }
     },
@@ -59,20 +51,35 @@ export default async function registerRoutes (fastify, opts) {
             error: 'Registration is closed. Please try again later.'
           }
         }
-        const { username, email, password, newsletter } = request.body
+        const { username, email, password, newsletter_subscription } = request.body
 
         // TODO: ensure not a duplicate user
+        // TODO: pre-validate email more (MX record lookup)
 
         const query = SQL`
-          insert into users (username, email, password, email_verify_token, email_verify_token_exp, newsletter_subscription) values (
-            ${username},
-            ${email},
-            ${getPasswordHashQuery(password)},
-            ${EMAIL_CONFIRM_TOKEN},
-            ${EMAIL_CONFIRM_TOKEN_EXP},
-            ${newsletter}
+          insert into users (
+              username,
+              email,
+              password,
+              email_verify_token,
+              email_verify_token_exp,
+              newsletter_subscription
+            ) values (
+              ${username},
+              ${email},
+              ${getPasswordHashQuery(password)},
+              ${EMAIL_CONFIRM_TOKEN},
+              ${EMAIL_CONFIRM_TOKEN_EXP},
+              ${newsletter_subscription}
           )
-          returning id, email, username, email_confirmed, email_verify_token, newsletter_subscription;`
+          returning
+            id,
+            email,
+            username,
+            email_confirmed,
+            email_verify_token,
+            newsletter_subscription;
+          `
 
         const results = await client.query(query)
         const { email_verify_token, ...user } = results.rows[0]

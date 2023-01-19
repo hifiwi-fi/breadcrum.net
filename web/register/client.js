@@ -26,14 +26,14 @@ export const page = Component(() => {
       const email = ev.currentTarget.email.value
       const username = ev.currentTarget.username.value
       const password = ev.currentTarget.password.value
-      const newsletter = ev.currentTarget.newsletter.checked
+      const newsletter_subscription = ev.currentTarget.newsletter_subscription.checked // eslint-disable-line camelcase
 
       const response = await fetch(`${state.apiUrl}/register`, {
         method: 'post',
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ email, username, password, newsletter })
+        body: JSON.stringify({ email, username, password, newsletter_subscription }) // eslint-disable-line camelcase
       })
 
       if (response.ok && response.status === 201) {
@@ -57,24 +57,24 @@ export const page = Component(() => {
         <div>
           <label class="block">
             Email:
-            <input class="block" type="email" name="email" />
+            <input class="block" minlength="1" maxlength="200" type="email" name="email" />
           </label>
         </div>
         <div>
           <label class="block">
             Username:
-            <input class="block" pattern="^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" />
+            <input class="block" pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" autocorrect="off" autocapitalize="off" spellcheck="false" />
           </label>
         </div>
         <div>
           <label class="block">
             Password:
-            <input class="block" type="password" name="password">
+            <input class="block" type="password" name="password" minlength="8" maxlength="255">
           </label>
         </div>
         <div>
           <label class="checkbox-label">
-            <input type="checkbox" name="newsletter">
+            <input type="checkbox" name="newsletter_subscription">
             Subscribe to news and updates
           </label>
         </div>

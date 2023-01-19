@@ -1,4 +1,4 @@
-import { userJsonSchema } from './user-props.js'
+import { userProps } from './user-props.js'
 import { getUserQuery } from './user-query.js'
 
 export async function getUser (fastify, opts) {
@@ -8,7 +8,7 @@ export async function getUser (fastify, opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         response: {
-          200: userJsonSchema
+          200: userProps
         }
       }
     },

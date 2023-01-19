@@ -34,7 +34,7 @@ export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
       <div>
           <label class='block'>
             username:
-            <input class='block' pattern="^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user.username}"/>
+            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user.username}" autocorrect="off" autocapitalize="off" spellcheck="false"/>
           </label>
         </div>
         <div class="bc-account-username-edit-submit-line">

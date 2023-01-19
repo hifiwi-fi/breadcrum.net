@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password-hash.js'
+import { validatedUserProps } from '../user-props.js'
 
 export async function postPassword (fastify, opts) {
   fastify.post(
@@ -11,9 +12,7 @@ export async function postPassword (fastify, opts) {
           type: 'object',
           properties: {
             password: {
-              type: 'string',
-              minLength: 8,
-              maxLength: 50
+              ...validatedUserProps.password
             },
             token: {
               type: 'string',

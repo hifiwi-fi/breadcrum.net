@@ -1,8 +1,4 @@
-import S from 'fluent-json-schema'
 import SQL from '@nearform/sql'
-
-const logoutInfoSchema = S.object()
-  .prop('logged_out', S.boolean())
 
 export default async function logoutRoute (fastify, opts) {
   fastify.post(
@@ -10,7 +6,13 @@ export default async function logoutRoute (fastify, opts) {
     {
       schema: {
         response: {
-          200: logoutInfoSchema
+          200: {
+            type: 'object',
+            required: ['logged_out'],
+            properties: {
+              logged_out: { type: 'boolean' }
+            }
+          }
         }
       }
     },
@@ -25,8 +27,8 @@ export default async function logoutRoute (fastify, opts) {
       if (validJWT) {
         try {
           const query = SQL`
-          DELETE FROM auth_tokens
-          WHERE jti = ${validJWT.jti} AND owner_id = ${validJWT.id};
+          delete from auth_tokens
+          where jti = ${validJWT.jti} and owner_id = ${validJWT.id};
           `
 
           await fastify.pg.query(query)

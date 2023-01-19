@@ -1,5 +1,8 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
+import {
+  validatedUserProps
+} from '../user/user-props.js'
 
 export async function putUser (fastify, opts) {
   fastify.put(
@@ -12,18 +15,16 @@ export async function putUser (fastify, opts) {
           additionalProperties: false,
           minProperties: 1,
           properties: {
-            username: {
-              type: 'string',
-              minLength: 1,
-              maxLength: 100
-            },
-            password: {
-              type: 'string',
-              minLength: 8,
-              maxLength: 50
-            },
-            newsletter_subscription: {
-              type: 'boolean'
+            username: { ...validatedUserProps.username },
+            password: { ...validatedUserProps.password },
+            newsletter_subscription: { ...validatedUserProps.newsletter_subscription }
+          }
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string' }
             }
           }
         }

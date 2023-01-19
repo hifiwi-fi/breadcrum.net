@@ -39,7 +39,7 @@ export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
         <div>
           <label class='block'>
             email:
-            <input class='block' type="email" name="email" value="${user.email}"/>
+            <input class='block' minlength="1" maxlength="200" type="email" name="email" value="${user.email}"/>
           </label>
         </div>
         <div class="bc-account-email-edit-submit-line">

@@ -67,13 +67,13 @@ export const page = Component(() => {
             <div>
               <label class="block">
                 Email or Username:
-                <input class="block" type="text" name="user" />
+                <input class="block" minlength="1" maxlength="200" type="text" name="user" autocorrect="off" autocapitalize="off" spellcheck="false" />
               </label>
             </div>
             <div>
               <label class="block">
                 Password:
-                <input class="block" type="password" name="password">
+                <input class="block" type="password" minlength="8" maxlength="255" name="password">
               </label>
             </div>
             <div class="button-cluster">

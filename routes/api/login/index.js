@@ -1,50 +1,57 @@
 import SQL from '@nearform/sql'
-import S from 'fluent-json-schema'
 
-const credentialsSchema = S.object()
-  .prop('user',
-    S.string()
-      .minLength(1)
-      .maxLength(100)
-  ).required()
-  .prop('password',
-    S.string()
-      .minLength(8)
-      .maxLength(50)
-  ).required()
-
-const userInfoSchema = S.object()
-  .prop('user', S.object()
-    .prop('id', S.string().format('uuid'))
-    .prop('email', S.string().format('email'))
-    .prop('username', S.string())
-    .prop('email_confirmed', S.boolean()))
-  .prop('token', S.string())
+import {
+  tokenWithUserProps,
+  validatedUserProps
+} from '../user/user-props.js'
 
 export default async function loginRoutes (fastify, opts) {
   fastify.post(
     '/',
     {
       schema: {
-        body: credentialsSchema,
+        body: {
+          type: 'object',
+          required: ['user', 'password'],
+          properties: {
+            user: {
+              anyOf: [
+                validatedUserProps.username,
+                validatedUserProps.email
+              ]
+            },
+            password: { ...validatedUserProps.password }
+          }
+        },
         response: {
-          201: userInfoSchema
+          201: {
+            type: 'object',
+            properties: {
+              ...tokenWithUserProps
+            }
+          }
         }
       }
     },
     async function (request, reply) {
       // TODO: fail if logged in
+
       const user = request.body.user
       const password = request.body.password
 
       const isEmail = user.includes('@')
 
       const query = SQL`
-      SELECT id, email, username, email_confirmed
-      FROM users
-      WHERE ${isEmail ? SQL`email = ${user}` : SQL`username = ${user}`}
-      AND password = crypt(${password}, password)
-      LIMIT 1;
+      select
+        id,
+        email,
+        username,
+        email_confirmed,
+        newsletter_subscription
+      from users
+      where ${isEmail ? SQL`email = ${user}` : SQL`username = ${user}`}
+      and password = crypt(${password}, password)
+      limit 1;
       `
 
       const { rows } = await fastify.pg.query(query)

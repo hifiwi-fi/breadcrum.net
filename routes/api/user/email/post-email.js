@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
+import { validatedUserProps } from '../user-props.js'
 
 // Update the email address by setting a pending_email_update field.
 export async function postEmail (fastify, opts) {
@@ -13,8 +14,7 @@ export async function postEmail (fastify, opts) {
           type: 'object',
           properties: {
             email: {
-              type: 'string',
-              format: 'email'
+              ...validatedUserProps.email
             }
           },
           required: ['email']
