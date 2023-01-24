@@ -46,7 +46,7 @@
     "jsonfeed-to-rss": "^3.0.6",
     "local-storage-proxy": "^4.0.3",
     "lru-cache": "^7.13.1",
-    "mine.css": "^8.0.0",
+    "mine.css": "^9.0.1",
     "nodemailer": "^6.8.0",
     "npm-run-all2": "^6.0.0",
     "p-queue": "^7.2.0",
