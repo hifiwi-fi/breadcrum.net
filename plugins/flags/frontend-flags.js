@@ -8,10 +8,5 @@ export const defaultFrontendFlags = {
     type: 'boolean',
     default: false,
     description: 'Require an invite code to register'
-  },
-  email_confirmation_banner: {
-    type: 'boolean',
-    default: false,
-    description: 'Show the email confirmation banner when email address is unconfirmed'
   }
 }

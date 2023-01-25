@@ -7,14 +7,12 @@ import { toread } from '../toread/index.js'
 import { star } from '../star/index.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { loginButtons } from './login-buttons.js'
-import { useFlags } from '../../hooks/useFlags.js'
 
 export const header = Component(() => {
   const { user } = useUser()
   const window = useWindow()
   const state = useLSP()
   const { pushState } = useQuery()
-  const { flags } = useFlags()
 
   const handleSensitiveToggle = useCallback(() => {
     state.sensitive = !state.sensitive
@@ -60,10 +58,10 @@ export const header = Component(() => {
       }
     </div>
   </nav>
-  ${flags.email_confirmation_banner && user && !user.email_confirmed && !['/account/', '/email_confirm/'].includes(window?.location?.pathname)
+  ${user && !user.email_confirmed && !['/email_confirm/'].includes(window?.location?.pathname)
     ? html`
       <div class="bc-header-email-warning">
-        <a href="/account">Click here to confirm your email address!</a>
+        <a href="/account">${['/account/'].includes(window?.location?.pathname) ? 'Please confirm your email address below' : 'Click here to confirm your email address!'}</a>
       </div>`
     : null
   }
