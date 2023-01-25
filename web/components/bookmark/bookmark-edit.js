@@ -50,7 +50,13 @@ export const bookmarkEdit = Component(({
 
     const form = formRef.current
 
-    const url = form.url.value
+    let url = form.url.value
+    try {
+      url = (new URL(form.url.value)).toString()
+    } catch (err) {
+      console.warn(err)
+      console.warn('Error sanitizing URL')
+    }
     const title = form.title.value
     const note = form.note.value
     const rawTags = form.tags.value
@@ -63,7 +69,14 @@ export const bookmarkEdit = Component(({
     let archive_urls = []
 
     for (const i of Object.keys(archiveURLs)) {
-      archive_urls.push(form[`archive-url-${i}`].value)
+      let archiveURL = form[`archive-url-${i}`].value
+      try {
+        archiveURL = (new URL(archiveURL)).toString()
+      } catch (err) {
+        console.warn(err)
+        console.warn('Error sanitizing archive url')
+      }
+      archive_urls.push(archiveURL)
     }
 
     archive_urls = archive_urls.filter(v => !!v && validateURL(v)).map(url => url.trim())
