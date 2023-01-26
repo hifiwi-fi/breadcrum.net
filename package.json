@@ -1,7 +1,7 @@
 {
   "name": "breadcrum.net",
   "description": "Breadcrum internet newspaper clippigns",
-  "version": "2023.1.18",
+  "version": "2023.1.25",
   "type": "module",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
