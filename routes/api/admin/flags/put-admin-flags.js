@@ -18,6 +18,7 @@ export async function putAdminFlags (fastify, opts) {
         relation: 'and'
       }),
       schema: {
+        hide: true,
         body: {
           type: 'object',
           properties: defaultFlags,

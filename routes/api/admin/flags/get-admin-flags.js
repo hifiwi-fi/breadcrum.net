@@ -13,6 +13,7 @@ export async function getAdminFlags (fastify, opts) {
         relation: 'and'
       }),
       schema: {
+        hide: true,
         response: {
           200: {
             type: 'object',
