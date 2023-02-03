@@ -13,6 +13,6 @@ export default async () => {
 }
 
 export const browser = {
-  'process.env.TRANSPORT': process.env.TRANSPORT,
-  'process.env.HOST': process.env.HOST
+  'process.env.TRANSPORT': process.env.TRANSPORT ?? 'https',
+  'process.env.HOST': process.env.HOST ?? 'localhost:3000'
 }
