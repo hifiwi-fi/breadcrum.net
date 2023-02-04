@@ -34,40 +34,27 @@ export async function resendAccountEmailVerificationHandler ({
   const queryResults = await client.query(updateQuery)
   const updatedUser = queryResults.rows.pop()
 
-  fastify.pqueue.add(async () => {
-    const blackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${updatedUser.email}
-            fetch first row only;
-          `)
-
-    if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-      const results = await Promise.allSettled([
-        fastify.email.sendMail({
-          from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-          to: updatedUser.email,
-          subject: 'Verify your email address', // Subject line
-          text: verifyEmailBody({
-            username: updatedUser.username,
-            transport: fastify.config.TRANSPORT,
-            host: fastify.config.HOST,
-            token: updatedUser.email_verify_token,
-            email: updatedUser.email
-          })
-        })
-      ])
-
-      fastify.log.info(results)
-    } else {
-      fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
-    }
+  const emailSendJob = fastify.sendEmail({
+    toEmail: updatedUser.email,
+    subject: 'Verify your email address',
+    text: verifyEmailBody({
+      username: updatedUser.username,
+      transport: fastify.config.TRANSPORT,
+      host: fastify.config.HOST,
+      token: updatedUser.email_verify_token,
+      email: updatedUser.email
+    })
   })
 
   reply.code(202)
-  return {
+  reply.send({
     status: 'ok'
-  }
+  })
+
+  await reply
+  // Request finished
+
+  await emailSendJob
 }
 
 export function verifyEmailBody ({ email, username, transport, host, token }) {
@@ -77,7 +64,5 @@ Thanks for signing up for a Breadcrum.net account. Please verify your email addr
 
 ${transport}://${host}/email_confirm?token=${token}
 
-Thank you!
-
-Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${email}`
+Thank you!`
 }

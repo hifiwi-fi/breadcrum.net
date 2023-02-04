@@ -62,42 +62,27 @@ export async function resetPassword (fastify, opts) {
         const resetTokenResults = await client.query(updateQuery)
         const { password_reset_token } = resetTokenResults.rows.pop()
 
-        fastify.pqueue.add(async () => {
-          const blackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${user.email}
-            fetch first row only;
-          `)
-
-          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            const results = await Promise.allSettled([
-              fastify.email.sendMail({
-                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-                to: user.email,
-                subject: 'Password reset request', // Subject line
-                text: passwordResetBody({
-                  token: password_reset_token,
-                  userID: user.id,
-                  username: user.username,
-                  host: fastify.config.HOST,
-                  transport: fastify.config.TRANSPORT,
-                  email: user.email
-                })
-              })
-            ])
-
-            fastify.log.info(results)
-          } else {
-            fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
-          }
+        const emailSendJob = fastify.sendEmail({
+          toEmail: user.email,
+          subject: 'Password reset request',
+          text: passwordResetBody({
+            token: password_reset_token,
+            userID: user.id,
+            username: user.username,
+            host: fastify.config.HOST,
+            transport: fastify.config.TRANSPORT,
+            email: user.email
+          })
         })
 
         reply.code(202)
-
-        return {
+        reply.send({
           status: 'ok'
-        }
+        })
+        await reply
+        // Request finished
+
+        await emailSendJob
       })
     }
   )
@@ -112,8 +97,5 @@ ${transport}://${host}/password_reset/confirm?token=${token}&user_id=${userID}
 
 If you did not request this change, delete this email. If you have furthur issues contact support@breadcrum.net.
 
-Thank you!
-
-Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${email}
-`
+Thank you!`
 }

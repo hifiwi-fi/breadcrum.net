@@ -89,44 +89,30 @@ export default async function registerRoutes (fastify, opts) {
         const token = await reply.createJWTToken(user)
         reply.setJWTCookie(token)
 
-        reply.code(201)
-        // TODO: ensure this user matches login/user object
-
         fastify.metrics.userCreatedCounter.inc()
 
-        fastify.pqueue.add(async () => {
-          const blackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${email}
-            fetch first row only;
-          `)
-
-          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            const results = await Promise.allSettled([fastify.email.sendMail({
-              from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-              to: email,
-              subject: 'Verify your account email address', // Subject line
-              text: verifyEmailBody({
-                email: user.email,
-                username: user.username,
-                host: fastify.config.HOST,
-                transport: fastify.config.TRANSPORT,
-                token: email_verify_token
-              })
-            })
-            ])
-
-            fastify.log.info(results)
-          } else {
-            fastify.log.warn({ email }, 'Skipping email for blocked email address')
-          }
+        const emailSendJob = fastify.sendEmail({
+          toEmail: email,
+          subject: 'Verify your account email address',
+          text: verifyEmailBody({
+            email: user.email,
+            username: user.username,
+            host: fastify.config.HOST,
+            transport: fastify.config.TRANSPORT,
+            token: email_verify_token
+          })
         })
 
-        return {
+        reply.code(201)
+        reply.send({
           token,
           user
-        }
+        })
+
+        await reply
+        // Request finished
+
+        await emailSendJob
       })
     }
   )

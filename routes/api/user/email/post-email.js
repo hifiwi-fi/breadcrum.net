@@ -69,75 +69,47 @@ export async function postEmail (fastify, opts) {
         const queryResults = await client.query(updateQuery)
         const updatedUser = queryResults.rows.pop()
 
-        fastify.pqueue.add(async () => {
-          const emailJobs = []
+        const verifyEmailSendJob = fastify.sendEmail({
+          toEmail: updatedUser.pending_email_update,
+          subject: 'Verify your updated email address',
+          text: verifyEmailUpdateBody({
+            username: updatedUser.username,
+            host: fastify.config.HOST,
+            transport: fastify.config.TRANSPORT,
+            token: updatedUser.pending_email_update_token,
+            oldEmail: updatedUser.email,
+            newEmail: updatedUser.pending_email_update
+          })
+        })
 
-          const verifyBlackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${updatedUser.pending_email_update}
-            fetch first row only;
-          `)
-
-          if (verifyBlackholeResults.rows.length === 0 || verifyBlackholeResults.rows[0].disabled === false) {
-            emailJobs.push(
-              fastify.email.sendMail({
-                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-                to: updatedUser.pending_email_update,
-                subject: 'Verify your updated email address', // Subject line
-                text: verifyEmailUpdateBody({
-                  username: updatedUser.username,
-                  host: fastify.config.HOST,
-                  transport: fastify.config.TRANSPORT,
-                  token: updatedUser.pending_email_update_token,
-                  oldEmail: updatedUser.email,
-                  newEmail: updatedUser.pending_email_update
-                })
-              })
-            )
-          } else {
-            fastify.log.warn({ email: updatedUser.pending_email_update }, 'Skipping email for blocked email address')
-          }
-
-          const notifyBlackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${updatedUser.email}
-            fetch first row only;
-          `)
-
-          if (notifyBlackholeResults.rows.length === 0 || notifyBlackholeResults.rows[0].disabled === false) {
-            emailJobs.push(
-              fastify.email.sendMail({
-                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-                to: updatedUser.email,
-                subject: verifyEmailSubject,
-                text: notifyOldEmailBody({
-                  username: updatedUser.username,
-                  host: fastify.config.HOST,
-                  transport: fastify.config.TRANSPORT,
-                  token: updatedUser.pending_email_update_token,
-                  oldEmail: updatedUser.email,
-                  newEmail: updatedUser.pending_email_update
-                })
-              })
-            )
-          } else {
-            fastify.log.warn({ email: updatedUser.email }, 'Skipping email for blocked email address')
-          }
-
-          const results = await Promise.allSettled(emailJobs)
-          fastify.log.info(results)
+        const notifyEmailSendJob = fastify.sendEmail({
+          toEmail: updatedUser.email,
+          subject: verifyEmailSubject,
+          text: notifyOldEmailBody({
+            username: updatedUser.username,
+            host: fastify.config.HOST,
+            transport: fastify.config.TRANSPORT,
+            token: updatedUser.pending_email_update_token,
+            oldEmail: updatedUser.email,
+            newEmail: updatedUser.pending_email_update
+          })
         })
 
         reply.code(202)
-
-        return {
+        reply.send({
           status: 'ok',
           oldEmail: updatedUser.email,
           newEmail: updatedUser.pending_email_update,
           message: 'The newEmail will replace the active oldEmail after the user clicks the confirmation link sent to their newEmail addreess.'
-        }
+        })
+
+        await reply
+        // Request finished
+
+        await Promise.all([
+          verifyEmailSendJob,
+          notifyEmailSendJob
+        ])
       })
     }
   )
@@ -154,10 +126,7 @@ ${transport}://${host}/email_confirm?token=${token}&update=${true}
 
 If you did not request this change, please immediately change your password and contact support@breadcrum.net
 
-Thank you!
-
-Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${newEmail}
-`
+Thank you!`
 }
 
 function notifyOldEmailBody ({ username, transport, host, oldEmail, newEmail }) {
@@ -167,8 +136,5 @@ If you requested to change your Breadcrum.net account email address from ${oldEm
 
 If you did not request this change, please immediately change your password and contact support@breadcrum.net
 
-Thank you!
-
-Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${oldEmail}
-`
+Thank you!`
 }

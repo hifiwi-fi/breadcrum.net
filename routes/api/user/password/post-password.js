@@ -78,39 +78,26 @@ export async function postPassword (fastify, opts) {
 
         await client.query(updateQuery)
 
-        fastify.pqueue.add(async () => {
-          const blackholeResults = await fastify.pg.query(SQL`
-            select email, bounce_count, disabled
-            from email_blackhole
-            where email = ${user.email}
-            fetch first row only;
-          `)
-          if (blackholeResults.rows.length === 0 || blackholeResults.rows[0].disabled === false) {
-            const results = await Promise.allSettled([
-              fastify.email.sendMail({
-                from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
-                to: user.email,
-                subject: 'Your password has been updated', // Subject line
-                text: passwordUpdatedBody({
-                  username: user.username,
-                  host: fastify.config.HOST,
-                  transport: fastify.config.TRANSPORT,
-                  email: user.email
-                })
-              })
-            ])
-
-            fastify.log.info(results)
-          } else {
-            fastify.log.warn({ email: user.email }, 'Skipping email for blocked email address')
-          }
+        const emailSendJob = fastify.sendEmail({
+          toEmail: user.email,
+          subject: 'Your password has been updated',
+          text: passwordUpdatedBody({
+            username: user.username,
+            host: fastify.config.HOST,
+            transport: fastify.config.TRANSPORT,
+            email: user.email
+          })
         })
 
         reply.code(202)
-
-        return {
+        reply.send({
           status: 'ok'
-        }
+        })
+
+        await reply
+        // Request finished
+
+        await emailSendJob
       })
     }
   )
@@ -123,8 +110,5 @@ Your password on Breadcrum.net has been updated.
 
 If you did not request this change, please immediately reset your password and contact support@breadcrum.net and ensure no unauthorized access to your email address has occured.
 
-Thank you!
-
-Click here to unsubscribe: ${transport}://${host}/unsubscribe?email=${email}
-`
+Thank you!`
 }
