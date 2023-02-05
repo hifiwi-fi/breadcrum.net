@@ -48,6 +48,7 @@ export async function resendPendingEmailVerificationHandler ({
     })
   })
 
+  await client.query('commit')
   reply.code(202)
   reply.send({
     status: 'ok'

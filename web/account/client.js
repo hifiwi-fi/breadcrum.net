@@ -11,6 +11,7 @@ export const page = Component(() => {
   const window = useWindow()
 
   const [dataReload, setDataReload] = useState(0)
+
   const reload = useCallback(() => {
     setDataReload(dataReload + 1)
   }, [dataReload, setDataReload])

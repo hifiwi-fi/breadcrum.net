@@ -95,6 +95,7 @@ export async function postPassword (fastify, opts) {
           })
         })
 
+        await client.query('commit')
         reply.code(202)
         reply.send({
           status: 'ok'

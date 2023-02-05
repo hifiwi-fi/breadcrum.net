@@ -109,6 +109,7 @@ export default async function registerRoutes (fastify, opts) {
           })
         })
 
+        await client.query('commit')
         reply.code(201)
         reply.send({
           token,

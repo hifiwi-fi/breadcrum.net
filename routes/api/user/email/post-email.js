@@ -73,6 +73,7 @@ export async function postEmail (fastify, opts) {
         `
 
         const queryResults = await client.query(updateQuery)
+        await client.query('commit')
         const updatedUser = queryResults.rows.pop()
 
         const verifyEmailSendJob = fastify.sendEmail({
@@ -101,6 +102,7 @@ export async function postEmail (fastify, opts) {
           })
         })
 
+        await client.query('commit')
         reply.code(202)
         reply.send({
           status: 'ok',

@@ -81,6 +81,7 @@ export async function resetPassword (fastify, opts) {
           })
         })
 
+        await client.query('commit')
         reply.code(202)
         reply.send({
           status: 'ok'
