@@ -19,7 +19,7 @@ export async function verifyEmailConfirmHandler ({
 
   if (user.email_verify_token !== token ||
         user.email_verify_token === null) {
-    return reply.forbidden('Invalid email confirmation token')
+    return reply.forbidden('Invalid email confirmation token, or a token for another user account.')
   }
 
   if (now > user.email_verify_token_exp) {

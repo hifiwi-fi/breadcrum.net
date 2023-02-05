@@ -19,7 +19,7 @@ export async function verifyEmailUpdateHandler ({
 
   if (user.pending_email_update_token !== token ||
         user.pending_email_update_token === null) {
-    return reply.forbidden('Invalid email update confirmation token')
+    return reply.forbidden('Invalid email confirmation token, or a token for another user account')
   }
 
   if (now > user.pending_email_update_token_exp) {
