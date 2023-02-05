@@ -5,7 +5,10 @@ export default async function snsRoutes (fastify, opts) {
   fastify.post(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth])
+      preHandler: fastify.auth([fastify.basicAuth]),
+      schema: {
+        hide: true
+      }
     },
     async function postSNSHandler (request, reply) {
       const data = request.body

@@ -5,6 +5,7 @@ export async function getFlags (fastify, opts) {
     '/',
     {
       schema: {
+        hide: true,
         response: {
           200: {
             type: 'object',

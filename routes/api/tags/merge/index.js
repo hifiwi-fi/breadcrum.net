@@ -6,6 +6,7 @@ export default async function tagsMergeRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        hide: true, // TODO: remove when implemented
         body: {
           type: 'object',
           properties: {

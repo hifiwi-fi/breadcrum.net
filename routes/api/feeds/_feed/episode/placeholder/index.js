@@ -9,6 +9,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.basicAuth]),
       schema: {
+        hide: true,
         parms: {
           type: 'object',
           properties: {
