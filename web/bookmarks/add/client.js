@@ -91,6 +91,8 @@ export const page = Component(() => {
 
     if (response.ok) {
       finish()
+    } else {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
 
     function finish () {

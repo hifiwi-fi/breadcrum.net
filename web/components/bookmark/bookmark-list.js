@@ -22,7 +22,8 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     const payload = diffBookmark(bookmark, newBookmark)
 
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    await fetch(endpoint, {
+
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json'
@@ -30,8 +31,12 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
       body: JSON.stringify(payload)
     })
 
-    reload()
-    setEditing(false)
+    if (response.ok) {
+      reload()
+      setEditing(false)
+    } else {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
   }, [bookmark, state.apiUrl, reload, setEditing])
 
   const handleDeleteBookmark = useCallback(async (ev) => {

@@ -54,8 +54,7 @@ export const bookmarkEdit = Component(({
     try {
       url = (new URL(form.url.value)).toString()
     } catch (err) {
-      console.warn(err)
-      console.warn('Error sanitizing URL')
+      console.error(new Error(`Error sanitizing URL: ${url}`, { cause: err }))
     }
     const title = form.title.value
     const note = form.note.value
@@ -73,8 +72,7 @@ export const bookmarkEdit = Component(({
       try {
         archiveURL = (new URL(archiveURL)).toString()
       } catch (err) {
-        console.warn(err)
-        console.warn('Error sanitizing archive url')
+        console.error(new Error(`Error sanitizing archive URL: ${archiveURL}`, { cause: err }))
       }
       archive_urls.push(archiveURL)
     }
