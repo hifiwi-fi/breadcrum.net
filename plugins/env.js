@@ -81,6 +81,10 @@ export const schema = {
     YT_DLP_API_URL: {
       type: 'string',
       default: 'http://user:pass@127.0.0.1:5000'
+    },
+    SWAGGER: {
+      type: 'boolean',
+      default: true
     }
   }
 }

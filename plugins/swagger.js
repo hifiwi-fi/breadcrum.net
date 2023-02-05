@@ -16,7 +16,7 @@ export default fp(async function (fastify, opts) {
     }
   })
 
-  if (fastify.config.ENV !== 'production') {
+  if (fastify.config.SWAGGER) {
     fastify.register(import('@fastify/swagger-ui'), {
       routePrefix: '/openapi'
     })
