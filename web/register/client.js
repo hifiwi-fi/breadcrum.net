@@ -63,7 +63,17 @@ export const page = Component(() => {
         <div>
           <label class="block">
             Username:
-            <input class="block" pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <input
+              class="block"
+              pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$"
+              minlength="1"
+              maxlength="50"
+              type="text"
+              name="username"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
           </label>
         </div>
         <div>

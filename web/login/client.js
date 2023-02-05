@@ -67,7 +67,16 @@ export const page = Component(() => {
             <div>
               <label class="block">
                 Email or Username:
-                <input class="block" minlength="1" maxlength="200" type="text" name="user" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <input
+                  class="block"
+                  minlength="1"
+                  maxlength="200"
+                  type="text"
+                  name="user"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                />
               </label>
             </div>
             <div>

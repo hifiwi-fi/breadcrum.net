@@ -156,7 +156,14 @@ export const bookmarkEdit = Component(({
         <div>
           <label class="block">
             tags:
-            <input class="block" type="text" name="tags" value="${b?.tags?.join(' ')}">
+            <input
+              class="block"
+              type="text"
+              name="tags"
+              autocapitalize="off"
+              autocorrect="off"
+              value="${b?.tags?.join(' ')}"
+            >
           </label>
         </div>
         <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
