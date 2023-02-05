@@ -8,6 +8,12 @@ export async function resendEmailVerification (fastify, opts) {
     '::resend',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute'
+        }
+      },
       schema: {
         body: {
           type: 'object',

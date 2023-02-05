@@ -15,6 +15,12 @@ export default async function registerRoutes (fastify, opts) {
   fastify.post(
     '/',
     {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute'
+        }
+      },
       schema: {
         body: {
           type: 'object',

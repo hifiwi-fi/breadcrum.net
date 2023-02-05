@@ -7,6 +7,12 @@ export async function resetPassword (fastify, opts) {
   fastify.post(
     '::reset',
     {
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute'
+        }
+      },
       schema: {
         body: {
           type: 'object',

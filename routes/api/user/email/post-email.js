@@ -9,6 +9,12 @@ export async function postEmail (fastify, opts) {
     '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
+      config: {
+        rateLimit: {
+          max: 5,
+          timeWindow: '1 minute'
+        }
+      },
       schema: {
         body: {
           type: 'object',

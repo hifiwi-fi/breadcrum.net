@@ -8,7 +8,9 @@ import fp from 'fastify-plugin'
 export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/redis'), {
     url: fastify.config.REDIS_URL,
-    family: 6
+    family: 6,
+    connectTimeout: 500,
+    maxRetriesPerRequest: 1
   })
 },
 {
