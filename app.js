@@ -1,8 +1,10 @@
 import AutoLoad from '@fastify/autoload'
 import { join } from 'path'
 import desm from 'desm'
+import hyperid from 'hyperid'
 
 const __dirname = desm(import.meta.url)
+const hid = hyperid()
 
 export default async function App (fastify, opts) {
   // Place here your custom code!
@@ -34,5 +36,6 @@ export default async function App (fastify, opts) {
 
 export const options = {
   // TODO: get this out of env from fly
-  trustProxy: true
+  trustProxy: true,
+  genReqId: function (req) { return hid() }
 }
