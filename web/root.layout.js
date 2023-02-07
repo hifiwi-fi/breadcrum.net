@@ -49,7 +49,7 @@ export default function defaultRootLayout ({
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
         : null}
       ${styles
-        ? styles.map(style => html`<link rel="stylesheet" href=${style} />`)
+        ? styles.map(style => html`<link rel="stylesheet" href="${style}">`)
         : null}
     </head>
     <body class="bc-body">

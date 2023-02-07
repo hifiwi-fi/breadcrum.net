@@ -209,7 +209,7 @@ export const page = Component(() => {
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
-  <div>
+  </div>
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
   ${Array.isArray(episodes)
@@ -218,7 +218,7 @@ export const page = Component(() => {
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
-  <div>
+  </div>
 `
 })
 

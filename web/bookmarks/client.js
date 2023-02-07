@@ -123,7 +123,7 @@ export const page = Component(() => {
     <div>
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
       ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
-    <div>
+    </div>
     <div>
       <span>🔖 <a href="./add">add +</a></span>
       ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onclick=${onPageNav} href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
@@ -136,7 +136,7 @@ export const page = Component(() => {
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
-  <div>
+  </div>
 `
 })
 

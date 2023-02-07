@@ -27,10 +27,9 @@ export const feedDisplay = Component(({
 
   return html`
     <div class="bc-feed-display">
-
       <div class="bc-feed-info">
         <div class="bc-feed-image">
-          <img width="100" height="100" src="${f.image_url}" />
+          <img width="100" height="100" src="${f.image_url ?? '/static/bread.png'}">
         </div>
 
         <h1 class="bc-feed-title">
@@ -52,20 +51,20 @@ export const feedDisplay = Component(({
         </div>
 
         <div class="bc-feed-feed-url-line">
-          <img height="32" src="/static/atom.svg" />
+          <img height="32" src="/static/atom.svg">
           <input
             class="bc-feed-header-select"
             type="text"
             readonly
             onclick=${handleSelect}
-            value="${f.feed_url}">
-          </input>
+            value="${f.feed_url}"
+          >
           <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
         </div>
         <div class="bc-feed-header-help-text">
           ℹ️ Subscribe to this RSS feed in your favorite podcast client that supports video podcasts. Episodes created with bookmarks end up in this feed.
         </div>
-      <div>
+      </div>
     </div>
   `
 })
