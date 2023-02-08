@@ -124,6 +124,7 @@ export const page = Component(() => {
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
       ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
     </div>
+
     <div>
       <span>🔖 <a href="./add">add +</a></span>
       ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onclick=${onPageNav} href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
@@ -133,6 +134,7 @@ export const page = Component(() => {
     ${Array.isArray(bookmarks)
       ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
       : null}
+
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
