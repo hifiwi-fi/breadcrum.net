@@ -1,7 +1,7 @@
 import jsonfeedToRSS from 'jsonfeed-to-rss'
 import cleanDeep from 'clean-deep'
 import { getFeedQuery } from './feed-query.js'
-import { getEpisodesQuery } from '../../episodes/episode-query.js'
+import { getEpisodesQuery } from '../../episodes/episode-query-get.js'
 import { getFeedUrl, getFeedHtmlUrl, getFeedImageUrl } from '../feed-urls.js'
 import { getFeedTitle, getFeedDescription } from '../feed-defaults.js'
 import { getBookmarksUrl } from '../../bookmarks/bookmarks-urls.js'

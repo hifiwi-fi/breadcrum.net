@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { getEpisodesQuery } from '../episode-query.js'
+import { getEpisodesQuery } from '../episode-query-get.js'
 import { fullEpisodePropsWithBookmarkAndFeed } from '../mixed-episode-props.js'
 
 export async function getEpisode (fastify, opts) {

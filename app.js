@@ -11,11 +11,14 @@ export default async function App (fastify, opts) {
 
   // Do not touch the following lines
 
+  const testPattern = /.*(test|spec).js/
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
+    dirNameRoutePrefix: false,
+    ignorePattern: testPattern,
     options: Object.assign({}, opts)
   })
 
@@ -27,6 +30,7 @@ export default async function App (fastify, opts) {
     autoHooks: true,
     cascadeHooks: true,
     overwriteHooks: true,
+    ignorePattern: testPattern,
     options: Object.assign({}, opts)
   })
 

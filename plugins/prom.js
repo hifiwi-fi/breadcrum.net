@@ -94,10 +94,15 @@ export default fp(async function (fastify, opts) {
     }
   }
 
+  if (fastify.config.METRICS) {
+    fastify.addHook('onReady', async () => {
+      await start()
+    })
+  }
+
   fastify.addHook('onClose', async (instance) => {
     await promServer.close()
   })
-  if (fastify.config.METRICS) await start()
 },
 {
   name: 'prom',

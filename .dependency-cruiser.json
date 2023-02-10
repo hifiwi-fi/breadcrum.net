@@ -5,7 +5,7 @@
       "comment": "Don't allow dependencies from outside the test folder to test",
       "severity": "error",
       "from": {
-        "pathNot": "^(test|spec)"
+        "pathNot": "^(test|spec)|(\\.test\\.js$)"
       },
       "to": {
         "path": "^(test|spec)"

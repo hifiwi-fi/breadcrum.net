@@ -1,8 +1,3 @@
-import { getYTDLPUrl } from '../../../../../../lib/run-yt-dlp.js'
-import { cache } from '../../../../../../lib/temp-cache.js'
-
-const PLACEHOLDER_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-
 export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
     '/',
@@ -27,7 +22,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       if (!userId) throw new Error('missing authenticated feed userId')
 
       const cacheKey = 'breadcrum:files:placeholder'
-      const cachedUrl = cache.get(cacheKey)
+      const cachedUrl = fastify.memURLCache.get(cacheKey)
 
       if (cachedUrl) {
         reply.header('fly-cache-status', 'HIT')
@@ -36,13 +31,17 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         reply.header('fly-cache-status', 'MISS')
       }
 
-      const metadata = await fastify.pqueue.add(() => {
-        return getYTDLPUrl({ apiURL: fastify.config.YT_DLP_API_URL, url: PLACEHOLDER_URL, medium: 'video', histogram: fastify.metrics.ytdlpSeconds })
+      const metadata = await fastify.pqueue.add(async () => {
+        const flags = await fastify.getFlags({ frontend: false, backend: true })
+        return await fastify.getYTDLPMetadata({
+          url: flags.placeholder_url,
+          medium: 'video'
+        })
       })
 
       if (!metadata.url) throw new Error('metadata is missing url')
 
-      cache.set(cacheKey, metadata.url, metadata.url)
+      fastify.memURLCache.set(cacheKey, metadata.url, metadata.url)
       reply.redirect(302, metadata.url)
     }
   )

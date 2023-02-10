@@ -54,6 +54,11 @@ export default fp(async function (fastify, opts) {
   })
 
   fastify.decorate('pqueue', queue)
+
+  fastify.addHook('onClose', async (instance) => {
+    // Wait for the queue to be empty before shutting down
+    await queue.onEmpty()
+  })
 },
 {
   name: 'pqueue',

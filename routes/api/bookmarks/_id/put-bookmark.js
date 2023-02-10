@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { createEpisode } from '../../episodes/create-episode-query.js'
-import { runYTDLP } from '../../../../lib/run-yt-dlp.js'
+import { createEpisode } from '../../episodes/episode-query-create.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
 import { createEpisodeProp } from '../../episodes/episode-props.js'
+import { resolveEpisode } from '../../episodes/resolve-episode.js'
 
 export async function putBookmark (fastify, opts) {
   fastify.put('/', {
@@ -32,6 +32,18 @@ export async function putBookmark (fastify, opts) {
       const userId = request.user.id
       const bookmarkId = request.params.id
       const bookmark = request.body
+
+      // Check if bookmark exists:
+      const bookmarkQuery = SQL`
+              select url from bookmarks
+              WHERE id = ${bookmarkId}
+              AND owner_id =${userId};
+            `
+      const bookmarkResults = await client.query(bookmarkQuery)
+      const existingBookmark = bookmarkResults.rows[0]
+      if (!existingBookmark) {
+        return reply.notFound(`bookmark ${bookmarkId} not found for user ${userId}`)
+      }
 
       const updates = []
 
@@ -113,17 +125,19 @@ export async function putBookmark (fastify, opts) {
         })
 
         await client.query('commit')
+        fastify.metrics.episodeCounter.inc()
 
-        fastify.pqueue.add(runYTDLP({
-          apiURL: fastify.config.YT_DLP_API_URL,
-          userId,
-          bookmarkId,
-          episodeId,
-          medium: episodeMedium,
-          pg: fastify.pg,
-          log: request.log,
-          histogram: fastify.metrics.ytdlpSeconds
-        })).then(() => fastify.metrics.episodeCounter.inc()).catch(request.log.error)
+        const url = existingBookmark.url ?? bookmark.url // TODO: source this separately
+
+        fastify.pqueue.add(() => {
+          return resolveEpisode({
+            userID: userId,
+            episodeID: episodeId,
+            url,
+            medium: episodeMedium,
+            log: request.log
+          })
+        })
       }
 
       fastify.metrics.bookmarkEditCounter.inc()

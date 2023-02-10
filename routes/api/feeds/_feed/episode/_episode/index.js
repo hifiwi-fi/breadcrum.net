@@ -1,7 +1,5 @@
 import SQL from '@nearform/sql'
-import { getYTDLPUrl } from '../../../../../../lib/run-yt-dlp.js'
-import { cache } from '../../../../../../lib/temp-cache.js'
-import { getFileKey } from '../../../../../../lib/file-key.js'
+import { getFileKey } from '../../../../../../plugins/yt-dlp/index.js'
 
 export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
@@ -78,7 +76,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         medium: episode.medium
       })
 
-      const cachedUrl = cache.get(cacheKey)
+      const cachedUrl = fastify.memURLCache.get(cacheKey)
 
       if (cachedUrl) {
         reply.header('fly-cache-status', 'HIT')
@@ -88,12 +86,15 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       }
 
       const metadata = await fastify.pqueue.add(() => {
-        return getYTDLPUrl({ apiURL: fastify.config.YT_DLP_API_URL, url: episode.src_url, medium: episode.medium, histogram: fastify.metrics.ytdlpSeconds })
+        return fastify.getYTDLPMetadata({
+          url: episode.src_url,
+          medium: episode.medium
+        })
       })
 
       if (!metadata.url) throw new Error('metadata is missing url')
 
-      cache.set(cacheKey, metadata.url, metadata.url)
+      fastify.memURLCache.set(cacheKey, metadata.url, metadata.url)
       reply.redirect(302, metadata.url)
     }
   )

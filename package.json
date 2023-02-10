@@ -106,7 +106,8 @@
     "version:git": "git add CHANGELOG.md",
     "watch": "npm run clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
-    "watch:siteup": "npm run build:siteup -- --watch"
+    "watch:siteup": "npm run build:siteup -- --watch",
+    "print-routes": "fastify print-routes app.js"
   },
   "standard": {
     "ignore": []

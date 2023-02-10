@@ -1,5 +1,5 @@
 import { test } from 'tap'
-import { build } from '../helper.js'
+import { build } from '../test/helper.js'
 
 test('healthcheck baseline test', async (t) => {
   const app = await build(t)

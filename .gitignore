@@ -4,6 +4,6 @@ sandbox.js
 package-lock.json
 coverage
 public
-yt-dlp
+./yt-dlp
 .env
 dependency-graph.html

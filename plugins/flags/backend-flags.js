@@ -1,7 +1,7 @@
 export const defaultBackendFlags = {
-  foo: {
+  placeholder_url: {
     type: 'string',
-    default: 'bar',
-    description: 'An example backend flag that isn\'t sent to clients'
+    default: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // rick roll
+    description: 'The default file to inject into empty feeds'
   }
 }

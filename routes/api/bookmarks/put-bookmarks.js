@@ -2,8 +2,8 @@
 import SQL from '@nearform/sql'
 import { commnonBookmarkProps } from './bookmark-props.js'
 import { createEpisodeProp } from '../episodes/episode-props.js'
-import { createEpisode } from '../episodes/create-episode-query.js'
-import { runYTDLP } from '../../../lib/run-yt-dlp.js'
+import { createEpisode } from '../episodes/episode-query-create.js'
+import { resolveEpisode } from '../episodes/resolve-episode.js'
 
 export async function putBookmarks (fastify, opts) {
   // Create bookmark
@@ -125,19 +125,17 @@ export async function putBookmarks (fastify, opts) {
           })
 
           await client.query('commit')
+          fastify.metrics.episodeCounter.inc()
 
-          fastify.pqueue.add(runYTDLP({
-            apiURL: fastify.config.YT_DLP_API_URL,
-            userId,
-            bookmarkId: bookmark.id,
-            episodeId,
-            medium: episodeMedium,
-            pg: fastify.pg,
-            log: request.log,
-            histogram: fastify.metrics.ytdlpSeconds
-          }))
-            .then(() => { fastify.metrics.episodeCounter.inc() })
-            .catch(request.log.error)
+          fastify.pqueue.add(() => {
+            return resolveEpisode({
+              userID: userId,
+              episodeID: episodeId,
+              url, // TODO: source this separately
+              medium: episodeMedium,
+              log: request.log
+            })
+          })
         }
 
         fastify.metrics.bookmarkCreatedCounter.inc()
