@@ -55,7 +55,7 @@ export async function putEpisodes (fastify, opts) {
       }
     },
     async function putEpisodesHandler (request, reply) {
-
+      return reply.notImplemented()
     }
   )
 }

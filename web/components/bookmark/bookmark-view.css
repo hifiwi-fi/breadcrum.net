@@ -53,13 +53,6 @@
   color: var(--bc-archive-color);
 }
 
-.bc-bookmark-archive-url-edit-help-text {
-  color: var(--accent-foreground);
-  font-size: 0.8em;
-  margin-top: 0.5em;
-  margin-bottom: 10px;
-}
-
 .bc-tags-display {
   display: inline-flex;
   gap: 5px;

@@ -2,7 +2,12 @@ export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.basicAuth
+      ], {
+        relation: 'or'
+      }),
       schema: {
         hide: true,
         parms: {
@@ -18,8 +23,9 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       }
     },
     async function placeholderHandler (request, reply) {
-      const { userId } = request.feedTokenUser
-      if (!userId) throw new Error('missing authenticated feed userId')
+      const feedTokenUser = request.feedTokenUser
+      const userId = feedTokenUser?.userId ?? request?.user?.id
+      if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
       const cacheKey = 'breadcrum:files:placeholder'
       const cachedUrl = fastify.memURLCache.get(cacheKey)

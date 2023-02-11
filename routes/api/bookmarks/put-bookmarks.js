@@ -116,12 +116,13 @@ export async function putBookmarks (fastify, opts) {
         }
 
         if (request?.body?.createEpisode) {
-          const { id: episodeId, medium: episodeMedium } = await createEpisode({
+          const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
             client,
             userId,
             bookmarkId: bookmark.id,
             type: request?.body?.createEpisode.type,
-            medium: request?.body?.createEpisode.medium
+            medium: request?.body?.createEpisode.medium,
+            url: request?.body?.createEpisode.url ?? url
           })
 
           await client.query('commit')
@@ -129,9 +130,10 @@ export async function putBookmarks (fastify, opts) {
 
           fastify.pqueue.add(() => {
             return resolveEpisode({
+              fastify,
               userID: userId,
               episodeID: episodeId,
-              url, // TODO: source this separately
+              url: episodeURL,
               medium: episodeMedium,
               log: request.log
             })

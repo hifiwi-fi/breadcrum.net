@@ -31,6 +31,8 @@ export default fp(async function (fastify, opts) {
 
       const metadata = await response.body.json()
 
+      // TODO: cache this in memMetaCache
+
       return metadata
     } finally {
       endTimer()

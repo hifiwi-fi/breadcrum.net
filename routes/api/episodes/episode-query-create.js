@@ -7,14 +7,15 @@ export async function createEpisode ({
   userId,
   bookmarkId,
   type,
-  medium
+  medium,
+  url
 }) {
   const defaultFeedId = await getOrCreateDefaultFeed({ client, userId })
 
   const createEpisodeQuery = SQL`
-          INSERT INTO episodes (owner_id, podcast_feed_id, bookmark_id, type, medium)
-          VALUES (${userId}, ${defaultFeedId}, ${bookmarkId}, ${type}, ${medium})
-          returning id, type, medium, podcast_feed_id;
+          INSERT INTO episodes (owner_id, podcast_feed_id, bookmark_id, type, medium, url)
+          VALUES (${userId}, ${defaultFeedId}, ${bookmarkId}, ${type}, ${medium}, ${url})
+          returning id, type, medium, podcast_feed_id, url;
           `
 
   const episodeResults = await client.query(createEpisodeQuery)

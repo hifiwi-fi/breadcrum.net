@@ -17,7 +17,7 @@ export default async function tagsRenameRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
-      throw new Error('not implemented')
+      return reply.notImplemented()
     }
   )
 }

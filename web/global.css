@@ -13,3 +13,8 @@
 .block {
   display: block;
 }
+
+.bc-help-text {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+}

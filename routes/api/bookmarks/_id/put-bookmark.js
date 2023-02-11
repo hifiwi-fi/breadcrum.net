@@ -116,25 +116,25 @@ export async function putBookmark (fastify, opts) {
       }
 
       if (bookmark?.createEpisode) {
-        const { id: episodeId, medium: episodeMedium } = await createEpisode({
+        const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
           client,
           userId,
           bookmarkId,
           type: bookmark.createEpisode.type,
-          medium: bookmark.createEpisode.medium
+          medium: bookmark.createEpisode.medium,
+          url: request?.body?.createEpisode.url ?? bookmark.url ?? existingBookmark.url
         })
 
         await client.query('commit')
         fastify.metrics.episodeCounter.inc()
 
-        const url = existingBookmark.url ?? bookmark.url // TODO: source this separately
-
         fastify.pqueue.add(() => {
           return resolveEpisode({
+            fastify,
             userID: userId,
             episodeID: episodeId,
-            url,
             medium: episodeMedium,
+            url: episodeURL,
             log: request.log
           })
         })

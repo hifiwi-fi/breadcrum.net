@@ -3,8 +3,8 @@ export function getEpisodeUrl ({
   host,
   userId,
   feedId,
-  userProvidedToken,
+  token,
   episodeId
 }) {
-  return `${transport}://${userId}:${userProvidedToken}@${host}/api/feeds/${feedId}/episode/${episodeId}`
+  return `${transport}://${userId}:${token}@${host}/api/feeds/${feedId}/episode/${episodeId}`
 }

@@ -61,7 +61,7 @@ export const feedDisplay = Component(({
           >
           <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
         </div>
-        <div class="bc-feed-header-help-text">
+        <div class="bc-help-text bc-feed-header-help-text">
           ℹ️ Subscribe to this RSS feed in your favorite podcast client that supports video podcasts. Episodes created with bookmarks end up in this feed.
         </div>
       </div>

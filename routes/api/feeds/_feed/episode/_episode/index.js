@@ -5,7 +5,12 @@ export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.basicAuth
+      ], {
+        relation: 'or'
+      }),
       schema: {
         parms: {
           type: 'object',
@@ -24,9 +29,11 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       }
     },
     async function episodeHandler (request, reply) {
-      const { userId } = request.feedTokenUser
+      const feedTokenUser = request.feedTokenUser
+      const userId = feedTokenUser?.userId ?? request?.user?.id
+      if (!userId) return reply.unauthorized('Missing authenticated feed userId')
+
       const { feed: feedId, episode: episodeId } = request.params
-      if (!userId) throw new Error('missing authenticated feed userId')
 
       const episodeQuery = SQL`
           select

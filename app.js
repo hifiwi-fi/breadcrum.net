@@ -39,7 +39,6 @@ export default async function App (fastify, opts) {
 }
 
 export const options = {
-  // TODO: get this out of env from fly
   trustProxy: true,
   genReqId: function (req) { return hid() }
 }

@@ -31,8 +31,12 @@ export const createEpisodeProp = {
         type: 'object',
         properties: {
           type: { enum: ['redirect'] },
-          medium: { enum: ['video', 'audio'] }
-        }
+          medium: { enum: ['video', 'audio'] },
+          url: { type: 'string', format: 'uri' }
+        },
+        required: [
+          'type', 'medium'
+        ]
       },
       {
         type: 'null'

@@ -7,7 +7,7 @@ export default async function deltaRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
-      throw new Error('not implemented')
+      return reply.notImplemented()
     }
   )
 
@@ -19,7 +19,7 @@ export default async function deltaRoutes (fastify, opts) {
       }
     },
     async function (request, reply) {
-      throw new Error('not implemented')
+      return reply.notImplemented()
     }
   )
 }

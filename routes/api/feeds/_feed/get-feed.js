@@ -12,7 +12,12 @@ export async function getFeed (fastify, opts) {
   fastify.get(
     '/',
     {
-      preHandler: fastify.auth([fastify.basicAuth]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.basicAuth
+      ], {
+        relation: 'or'
+      }),
       schema: {
         parms: {
           type: 'object',
@@ -35,11 +40,14 @@ export async function getFeed (fastify, opts) {
       }
     },
     async function getFeedHandler (request, reply) {
-      const { userId, token: userProvidedToken } = request.feedTokenUser
+      // const { userId, token: userProvidedToken } = request.feedTokenUser
+      const feedTokenUser = request.feedTokenUser
+      const userId = feedTokenUser?.userId ?? request?.user?.id
+      if (!userId) return reply.unauthorized('Missing authenticated feed userId')
+
       const { feed: feedId } = request.params
       const { format } = request.query
       const accept = request.accepts()
-      if (!userId) throw new Error('missing authenticated feed userId')
 
       const episodesQuery = getEpisodesQuery({
         ownerId: userId,
@@ -61,6 +69,11 @@ export async function getFeed (fastify, opts) {
         return reply.notFound(`podcast feed ${feedId} not found`)
       }
 
+      // Default to the token the user passes
+      // If for some reason they were able to bypass auth with a bad token, don't
+      // hand out good tokens.
+      const token = feedTokenUser.token ?? pf.token
+
       const episodes = episodesResults.rows
 
       const transport = fastify.config.TRANSPORT
@@ -73,7 +86,7 @@ export async function getFeed (fastify, opts) {
         description: getFeedDescription({ description: pf.description, ownerName: pf.owner_name, defaultFeed: pf.default_feed }),
         icon: getFeedImageUrl({ transport, host, imageUrl: pf.image_url }),
         favicon: getFeedImageUrl({ transport, host, imageUrl: pf.image_url }),
-        feed_url: getFeedUrl({ transport, host, userId, token: pf.token, feedId: pf.id }),
+        feed_url: getFeedUrl({ transport, host, userId, token, feedId: pf.id }),
         author: {
           name: pf.username,
           url: getBookmarksUrl({ transport, host }),
@@ -95,7 +108,7 @@ export async function getFeed (fastify, opts) {
               content_text: ep.bookmark.note,
               date_published: ep.created_at,
               attachments: cleanDeep([{
-                url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: ep.id }),
+                url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: ep.id }),
                 mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
                 title: ep.filename,
                 duration_in_seconds: ep.duration_in_seconds
@@ -109,7 +122,7 @@ export async function getFeed (fastify, opts) {
               content_text: 'This episode will disapear when you create your first breadcrum episode. Its added so that you can subscribe to your podcast feed URL before you add any episodes.',
               date_published: new Date('2022-09-24T19:30:24.654Z'),
               attachments: cleanDeep([{
-                url: getEpisodeUrl({ transport, host, userId, userProvidedToken, feedId: pf.id, episodeId: 'placeholder' }),
+                url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: 'placeholder' }),
                 mime_type: 'video/mp4',
                 title: 'never-gonna-give-you-up.mp4',
                 duration_in_seconds: 212
@@ -132,6 +145,7 @@ export async function getFeed (fastify, opts) {
         }
       }
 
+      // Different defaults for when the qs is not defined
       switch (accept.type(['rss', 'json'])) {
         case 'json': {
           reply.type('application/json')
