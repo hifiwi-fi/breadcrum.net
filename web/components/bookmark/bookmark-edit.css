@@ -1,3 +1,5 @@
+@import '../episode-title';
+
 .bc-bookmark-edit {
   & input[type="date"],
   & input[type="datetime-local"],
@@ -36,7 +38,6 @@
   justify-content: space-between;
 }
 
-.bc-bookmark-edit-create-episode-details,
 .bc-bookmark-archive-url-edit-details {
   /* hack. Don't know why details parent padding isn't passing to the child */
   padding-inline-end: 0.9rem;
@@ -45,4 +46,9 @@
 .bc-bookmark-edit-create-episode-url,
 .bc-bookmark-archive-url-edit {
   margin-bottom: 0.5em;
+}
+
+.bc-bookmark-edit-create-episode-url-hidden,
+.bc-create-episode-details.bc-create-episode-hidden {
+  display: none;
 }

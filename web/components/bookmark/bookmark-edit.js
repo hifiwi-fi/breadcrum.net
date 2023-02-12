@@ -1,7 +1,9 @@
 /* eslint-env browser */
 /* eslint-disable camelcase */
 import { Component, html, useState, useRef, useCallback, useEffect } from 'uland-isomorphic'
+import cn from 'classnames'
 import { useWindow } from '../../hooks/useWindow.js'
+import { episodeTitle } from '../episode-title/index.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -15,8 +17,9 @@ export const bookmarkEdit = Component(({
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
-  const createEpisodeDetailsRef = useRef()
   const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
+  const [createEpisodeChecked, setCreateEpisodeChecked] = useState(false)
+  const [customEpisodeURLChecked, setCustomEpisodeURLChecked] = useState(false)
 
   useEffect(() => {
     // Set bookmark archiveURL state when we get new ones in
@@ -45,19 +48,20 @@ export const bookmarkEdit = Component(({
     }
   }, [setDisabled, setError, onDeleteBookmark])
 
+  const handleCreateEpisodeCheckbox = useCallback(async (ev) => {
+    const checked = ev.currentTarget.checked
+    setCreateEpisodeChecked(checked)
+  }, [setCreateEpisodeChecked])
+
   const handleCustomEpisodeURLCheckboxChange = useCallback(async (ev) => {
     const checked = ev.currentTarget.checked
+    setCustomEpisodeURLChecked(checked)
     const form = formRef.current
 
     if (!checked) {
       form.createEpisodeURL.value = form.url.value
     }
-  }, [formRef])
-
-  const handleCustomEpisodeURLInput = useCallback(async (ev) => {
-    const form = formRef.current
-    form['custom-episode-url'].checked = ev.currentTarget.value !== form.url.value
-  }, [formRef])
+  }, [formRef, setCustomEpisodeURLChecked])
 
   const handleBookmarkURLInput = useCallback(async (ev) => {
     const form = formRef.current
@@ -88,7 +92,7 @@ export const bookmarkEdit = Component(({
     const starred = form.starred.checked
     const sensitive = form.sensitive.checked
     const episodeMedium = form.episodeMedium.value
-    let episodeURL = form.createEpisodeURL.value
+    let episodeURL = customEpisodeURLChecked ? form.createEpisodeURL.value : url
     try {
       episodeURL = (new URL(form.createEpisodeURL.value)).toString()
     } catch (err) {
@@ -109,7 +113,7 @@ export const bookmarkEdit = Component(({
 
     archive_urls = archive_urls.filter(v => !!v && validateURL(v)).map(url => url.trim())
 
-    const createEpisode = createEpisodeDetailsRef.current.open
+    const createEpisode = createEpisodeChecked
       ? {
           type: 'redirect',
           medium: episodeMedium,
@@ -129,13 +133,15 @@ export const bookmarkEdit = Component(({
       createEpisode
     }
 
+    console.log({ formState })
+
     try {
       await onSave(formState)
     } catch (err) {
       setDisabled(false)
       setError(err)
     }
-  }, [setDisabled, setError, formRef?.current, onSave])
+  }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked])
 
   const handleAddArchiveURL = useCallback(async (ev) => {
     ev.preventDefault()
@@ -154,7 +160,7 @@ export const bookmarkEdit = Component(({
       ev.preventDefault()
       window.open(ev.currentTarget.href)
     }
-  }, [window, createEpisodeDetailsRef])
+  }, [window])
 
   // Parent can delay passing a bookmark to disable the form.
   const initializing = b == null
@@ -204,33 +210,20 @@ export const bookmarkEdit = Component(({
           </label>
         </div>
 
-        <!-- Bookmark Options -->
-        <div>
-          <label>
-            to read:
-            <input type="checkbox" name="toread" ?checked="${b?.toread}">
-          </label>
-          <label>
-            starred:
-            <input type="checkbox" name="starred" ?checked="${b?.starred}">
-          </label>
-          <label>
-            sensitive:
-            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
-          </label>
-        </div>
-
-        <!-- Bookmark Archive URLs -->
+         <!-- Bookmark Archive URLs -->
         <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
-            <summary><label>archive URLs:</label></summary>
+            <summary>
+              <label>archive URLs</label>
+              <span class="bc-help-text">
+                ℹ️ Add additional archival links for this bookmark URL
+              </span>
+            </summary>
 
             <div class="bc-help-text">
-              ℹ️ Add additional archival links for this bookmark URL, like the
+              Shortcut links:
               <a onclick=${handleNewWindowLink} target="_blank" href="${`http://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>
-              or
+              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>,
               <a onclick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
-              archive URLs.
             </div>
 
             ${archiveURLs.length > 0
@@ -248,42 +241,79 @@ export const bookmarkEdit = Component(({
 
         </details>
 
-        <!-- Bookmark TODO: List and delete existing episodes -->
+        <!-- Bookmark Options -->
+        <div>
+          <label>
+            <input type="checkbox" name="toread" ?checked="${b?.toread}">
+            to read
+          </label>
+          <label>
+            <input type="checkbox" name="starred" ?checked="${b?.starred}">
+            starred
+          </label>
+          <label>
+            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
+            sensitive
+          </label>
+        </div>
+
+        ${b?.episodes?.length > 0
+            ? html`
+            <label class="block">
+              episodes:
+            </label>
+            ${b.episodes.map(
+                ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`
+              )
+          }`
+            : null
+          }
 
         <!-- Bookmark Create Episode -->
-        <details ref="${createEpisodeDetailsRef}" class="bc-bookmark-edit-create-episode-details">
-          <summary><label>create episode:</label></summary>
+        <div>
+          <label>
+            <input type="checkbox" onchange="${handleCreateEpisodeCheckbox}" name="createEpisode">
+            create episode
+          </label>
+          <span class="bc-help-text">
+            ℹ️ Create a podcast episode when saving this bookmark.
+          </span>
+        </div>
 
+        <div class="${cn({
+          'bc-create-episode-details': true,
+          'bc-create-episode-hidden': !createEpisodeChecked
+        })}">
           <div id="bc-podcast-radio">
-            <div class="bc-help-text">
-              ℹ️ Leave this detail tab open when saving the bookmark to create a new episode.
-            </div>
             <label>
-              <span>video</span>
               <input
                 type="radio"
                 name="episodeMedium"
                 value="video"
                 ?checked=${true}
               >
+              <span>video</span>
             </label>
 
             <label>
-              <span>audio</span>
               <input
                 type="radio"
                 name="episodeMedium"
                 value="audio"
               >
+              <span>audio</span>
             </label>
+          <label>
+            <input type="checkbox" name="custom-episode-url" onchange="${handleCustomEpisodeURLCheckboxChange}">
+            custom url
+          </label>
+          </div>
 
-            <label>
-              custom url:
-              <input type="checkbox" name="custom-episode-url" onchange="${handleCustomEpisodeURLCheckboxChange}">
-            </label>
-
-            <input class='bc-bookmark-edit-create-episode-url' type="url" name="createEpisodeURL" value="${b?.url}" oninput="${handleCustomEpisodeURLInput}">
-        </details>
+          <input class="${cn({
+            'bc-bookmark-edit-create-episode-url': true,
+            'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked
+          })}" type="url" name="createEpisodeURL" value="${b?.url}">
+        </div>
 
         <!-- Bookmark Submission Line -->
         <div class="bc-bookmark-edit-submit-line">
