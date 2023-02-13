@@ -13,6 +13,18 @@ export default fp(async function (fastify, opts) {
     try {
       const formatOpts = getFormatArg(medium)
       const requestURL = new URL(fastify.config.YT_DLP_API_URL)
+
+      const cacheKey = getMetaKey({
+        url,
+        medium
+      })
+
+      const cachedMeta = fastify.memMetaCache.get(cacheKey)
+
+      if (cachedMeta) {
+        return cachedMeta
+      }
+
       requestURL.searchParams.set('url', url)
       requestURL.searchParams.set('format', formatOpts)
       requestURL.pathname = 'info'
@@ -31,7 +43,7 @@ export default fp(async function (fastify, opts) {
 
       const metadata = await response.body.json()
 
-      // TODO: cache this in memMetaCache
+      fastify.memMetaCache.set(cacheKey, metadata)
 
       return metadata
     } finally {
@@ -73,6 +85,17 @@ export function getFileKey ({
     episodeId,
     sourceUrl,
     type,
+    medium
+  ].join(':')
+}
+
+export function getMetaKey ({
+  url,
+  medium
+}) {
+  return [
+    'meta',
+    url,
     medium
   ].join(':')
 }

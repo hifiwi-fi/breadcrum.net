@@ -2,8 +2,10 @@
 /* eslint-disable camelcase */
 import { Component, html, useState, useRef, useCallback, useEffect } from 'uland-isomorphic'
 import cn from 'classnames'
+import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
 import { episodeTitle } from '../episode-title/index.js'
+import { useLSP } from '../../hooks/useLSP.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -13,6 +15,7 @@ export const bookmarkEdit = Component(({
   legend
 } = {}) => {
   const window = useWindow()
+  const state = useLSP()
   const [error, setError] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
@@ -20,6 +23,12 @@ export const bookmarkEdit = Component(({
   const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
   const [createEpisodeChecked, setCreateEpisodeChecked] = useState(false)
   const [customEpisodeURLChecked, setCustomEpisodeURLChecked] = useState(false)
+  const [episodeMediumSelect, setEpisodeMediumSelect] = useState(false)
+  const [episodePreviewLoading, setEpisodePreviewLoading] = useState(false)
+  const [episodePreview, setEpisodePreview] = useState()
+  const [episodePreviewError, setEpisodePreviewError] = useState()
+  const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(formRef?.current?.url?.value)
+  const [previewRefresh, setPreviewRefresh] = useState(0)
 
   useEffect(() => {
     // Set bookmark archiveURL state when we get new ones in
@@ -27,6 +36,51 @@ export const bookmarkEdit = Component(({
       setArchiveURLs([...b?.archive_urls])
     }
   }, [b?.archive_urls])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const getPreview = async () => {
+      setEpisodePreviewLoading(true)
+      setEpisodePreview(null)
+      setEpisodePreviewError(null)
+      try {
+        const form = formRef.current
+        const searchParams = new URLSearchParams()
+        searchParams.set('url', form.createEpisodeURL.value)
+        searchParams.set('medium', form.episodeMedium.value)
+        const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
+          headers: {
+            'content-type': 'application/json'
+          },
+          signal: controller.signal
+        })
+
+        if (response.ok) {
+          const body = await response.json()
+          setEpisodePreview(body)
+        } else {
+          const err = await response.json()
+          setEpisodePreviewError(new Error(`${err.message}`))
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err)
+          setEpisodePreviewError(err)
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setEpisodePreviewLoading(false)
+        }
+      }
+    }
+    if (createEpisodeChecked) {
+      getPreview()
+    }
+
+    return () => {
+      controller.abort()
+    }
+  }, [createEpisodeChecked, episodeMediumSelect, previewRefresh])
 
   const handleInitiateDelete = useCallback((ev) => {
     setDeleteConfirm(true)
@@ -53,23 +107,39 @@ export const bookmarkEdit = Component(({
     setCreateEpisodeChecked(checked)
   }, [setCreateEpisodeChecked])
 
+  const handleEpisodeMediumSelect = useCallback(async (ev) => {
+    setEpisodeMediumSelect(formRef.current.episodeMedium.value)
+  }, [setEpisodeMediumSelect, formRef])
+
   const handleCustomEpisodeURLCheckboxChange = useCallback(async (ev) => {
     const checked = ev.currentTarget.checked
     setCustomEpisodeURLChecked(checked)
     const form = formRef.current
 
     if (!checked) {
-      form.createEpisodeURL.value = form.url.value
+      if (form.createEpisodeURL.value !== form.url.value) {
+        form.createEpisodeURL.value = form.url.value
+        setPreviewRefresh(previewRefresh + 1)
+      }
     }
   }, [formRef, setCustomEpisodeURLChecked])
 
   const handleBookmarkURLInput = useCallback(async (ev) => {
     const form = formRef.current
-
-    if (!form['custom-episode-url'].checked) {
+    if (!form['custom-episode-url'].checked || form.createEpisodeURL.value === prevBookmarkURLValue) {
       form.createEpisodeURL.value = ev.currentTarget.value
     }
-  }, [formRef])
+    setPrevBookmarkURLValue(ev.currentTarget.value)
+  }, [formRef, prevBookmarkURLValue])
+
+  useEffect(() => {
+    setPrevBookmarkURLValue(b?.url)
+  }, [b?.url])
+
+  const handlePreviewRefresh = useCallback(async (ev) => {
+    ev.preventDefault()
+    setPreviewRefresh(previewRefresh + 1)
+  })
 
   const handleSave = useCallback(async (ev) => {
     ev.preventDefault()
@@ -133,8 +203,6 @@ export const bookmarkEdit = Component(({
       createEpisode
     }
 
-    console.log({ formState })
-
     try {
       await onSave(formState)
     } catch (err) {
@@ -168,7 +236,7 @@ export const bookmarkEdit = Component(({
   return html`
     <div class='bc-bookmark-edit'>
       <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
-      <fieldset ?disabled=${disabled || initializing}>
+      <fieldset class='bc-bookmark-edit-fieldset' ?disabled=${disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
 
         <!-- Bookmark URL -->
@@ -215,12 +283,12 @@ export const bookmarkEdit = Component(({
             <summary>
               <label>archive URLs</label>
               <span class="bc-help-text">
-                ℹ️ Add additional archival links for this bookmark URL
+                ℹ️ Save associate public archive URLs
               </span>
             </summary>
 
             <div class="bc-help-text">
-              Shortcut links:
+              ↬:
               <a onclick=${handleNewWindowLink} target="_blank" href="${`http://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
               <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>,
               <a onclick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
@@ -276,7 +344,7 @@ export const bookmarkEdit = Component(({
             create episode
           </label>
           <span class="bc-help-text">
-            ℹ️ Create a podcast episode when saving this bookmark.
+            ℹ️ Save an episode with this bookmark
           </span>
         </div>
 
@@ -290,7 +358,8 @@ export const bookmarkEdit = Component(({
                 type="radio"
                 name="episodeMedium"
                 value="video"
-                ?checked=${true}
+                ?checked="${true}"
+                onchange="${handleEpisodeMediumSelect}"
               >
               <span>video</span>
             </label>
@@ -300,6 +369,7 @@ export const bookmarkEdit = Component(({
                 type="radio"
                 name="episodeMedium"
                 value="audio"
+                onchange=${handleEpisodeMediumSelect}
               >
               <span>audio</span>
             </label>
@@ -307,12 +377,29 @@ export const bookmarkEdit = Component(({
             <input type="checkbox" name="custom-episode-url" onchange="${handleCustomEpisodeURLCheckboxChange}">
             custom url
           </label>
+          <button onclick="${handlePreviewRefresh}">refresh preview</button>
           </div>
 
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
             'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked
           })}" type="url" name="createEpisodeURL" value="${b?.url}">
+
+          ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}
+          ${episodePreview
+            ? html`
+            <span class="bc-help-text bc-episode-preview-title">
+              <span>${episodePreview.src_type === 'video' ? '📼' : episodePreview.src_type === 'audio' ? '💿' : null}</span>
+              <a onclick=${handleNewWindowLink} target="_blank" href="${episodePreview.url}">${`${episodePreview.title}.${episodePreview.ext}`}</a>
+              <span>(${format(episodePreview.duration * 1000)})</span>
+            <span>
+            `
+            : null
+          }
+          ${episodePreviewError
+            ? html`<pre class='bc-bookmark-edit-episode-error'>${episodePreviewError?.message}</pre>`
+            : null
+          }
         </div>
 
         <!-- Bookmark Submission Line -->

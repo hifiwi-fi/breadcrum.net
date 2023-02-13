@@ -1,5 +1,3 @@
-@import '../episode-title';
-
 .bc-bookmark-edit {
   & input[type="date"],
   & input[type="datetime-local"],
@@ -15,6 +13,14 @@
   & input[type="week"] {
     width: 100%;
   }
+}
+
+.bc-bookmark-edit {
+  width: 100%;
+}
+
+.bc-bookmark-edit-fieldset {
+  min-width: 0;
 }
 
 .bc-bookmark-note {
@@ -51,4 +57,17 @@
 .bc-bookmark-edit-create-episode-url-hidden,
 .bc-create-episode-details.bc-create-episode-hidden {
   display: none;
+}
+
+.bc-episode-preview-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bc-bookmark-edit-episode-error {
+  overflow-x: auto;
+  white-space: pre-wrap;
 }

@@ -1,4 +1,6 @@
+
 /* eslint-disable camelcase */
+import { resolveType } from '../resolve-episode.js'
 
 export async function getPreview (fastify, opts) {
   fastify.get(
@@ -18,7 +20,27 @@ export async function getPreview (fastify, opts) {
     },
     async function getPreviewHandler (request, reply) {
       const { url, medium } = request.query
-      return await fastify.getYTDLPMetadata({ url, medium })
+      const metadata = await fastify.getYTDLPMetadata({ url, medium })
+
+      const {
+        title,
+        ext,
+        duration,
+        channel,
+        filesize_approx
+      } = metadata
+      const src_type = resolveType(metadata)
+
+      // TODO: what are we doing here
+      return {
+        title,
+        ext,
+        url: metadata.url,
+        duration,
+        channel,
+        src_type,
+        filesize_approx
+      }
     }
   )
 }

@@ -43,15 +43,7 @@ export async function resolveEpisode ({
       videoData.push(SQL`title = ${metadata.title}`)
     }
     if (metadata.ext != null) videoData.push(SQL`ext = ${metadata.ext}`)
-    if (metadata._type != null) {
-      videoData.push(
-        SQL`src_type = ${['mp3', 'm4a'].includes(metadata.ext)
-          ? 'audio'
-          : ['mp4', 'mov', 'm3u8'].includes(metadata.ext)
-            ? 'video'
-            : metadata._type}`
-      )
-    }
+    if (metadata._type != null) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
 
     const query = SQL`
         update episodes
@@ -87,4 +79,14 @@ export async function resolveEpisode ({
         and owner_id =${userID};`
     await pg.query(errorQuery)
   }
+}
+
+export function resolveType (metadata) {
+  return (
+    ['mp3', 'm4a'].includes(metadata.ext)
+      ? 'audio'
+      : ['mp4', 'mov', 'm3u8'].includes(metadata.ext)
+          ? 'video'
+          : metadata._type
+  )
 }

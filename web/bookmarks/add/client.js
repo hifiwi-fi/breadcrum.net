@@ -46,7 +46,6 @@ export const page = Component(() => {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        console.log(body)
         const maybeBookmark = body?.data?.[0]
         if (maybeBookmark) {
           setBookmark(maybeBookmark)

@@ -1,14 +1,23 @@
 /* eslint-env browser */
+/* eslint-disable camelcase */
 import { Component, html } from 'uland-isomorphic'
 import cn from 'classnames'
 
 export const episodeTitle = Component(({
-  episode: e,
+  episode: {
+    id,
+    url,
+    error,
+    ready,
+    type,
+    medium,
+    display_title
+  } = {},
   small
 } = {}) => {
   const href = small === true
-    ? `/episodes/view/?id=${e.id}`
-    : e.url
+    ? `/episodes/view/?id=${id}`
+    : url
 
   return html`
     <div class="${cn({
@@ -16,29 +25,29 @@ export const episodeTitle = Component(({
       'bc-episode-title-small': small
     })}">
         ${
-          e.error
+          error
             ? '❌'
-            : e.ready
+            : ready
               ? '✅'
               : '⏱️'
         }
-        ${e.type === 'redirect'
+        ${type === 'redirect'
           ? '☁️'
-          : e.type === 'raw'
+          : type === 'raw'
             ? '🍣'
-            : e.type === 'b2_file'
+            : type === 'b2_file'
               ? '🗄'
               : null
         }
         ${
-          e.medium === 'video'
+          medium === 'video'
             ? '📼'
-            : e.medium === 'audio'
+            : medium === 'audio'
               ? '💿'
               : null
         }
         <a class="bc-episode-title-text" href="${href}" target="${small ? null : '_blank'}"}>
-          ${e.display_title}
+          ${display_title}
         </a>
       </div>
   `
