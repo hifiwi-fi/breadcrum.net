@@ -2,7 +2,6 @@
 	max-width: 55em;
 }
 
-
 .bc-marketing-hero {
 	display: flex;
 	flex-direction: column;
@@ -22,9 +21,6 @@
 	color: var(--accent-foreground);
 }
 
-
-
-/* Portfolio grid */
 .bc-marketing-feature-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -283,7 +283,7 @@ export const bookmarkEdit = Component(({
             <summary>
               <label>archive URLs</label>
               <span class="bc-help-text">
-                ℹ️ Save associate public archive URLs
+                ℹ️ Save associated public archive URLs
               </span>
             </summary>
 
