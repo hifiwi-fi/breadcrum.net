@@ -15,6 +15,34 @@ export async function getPreview (fastify, opts) {
             url: { type: 'string', format: 'uri' }
           },
           required: ['url']
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              title: {
+                type: 'string'
+              },
+              ext: {
+                type: 'string'
+              },
+              url: {
+                type: 'string'
+              },
+              duration: {
+                type: 'number'
+              },
+              channel: {
+                type: 'string'
+              },
+              src_type: {
+                type: 'string'
+              },
+              filesize_approx: {
+                type: 'number'
+              }
+            }
+          }
         }
       }
     },
