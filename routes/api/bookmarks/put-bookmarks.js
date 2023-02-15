@@ -4,6 +4,8 @@ import { commnonBookmarkProps } from './bookmark-props.js'
 import { createEpisodeProp } from '../episodes/episode-props.js'
 import { createEpisode } from '../episodes/episode-query-create.js'
 import { resolveEpisode } from '../episodes/resolve-episode.js'
+import { getBookmarksQuery } from './get-bookmarks-query.js'
+import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 
 export async function putBookmarks (fastify, opts) {
   // Create bookmark
@@ -21,12 +23,40 @@ export async function putBookmarks (fastify, opts) {
           additionalProperties: false,
           required: ['url']
         },
+        query: {
+          update: {
+            type: 'boolean',
+            default: false,
+            description: 'If set to true, bookmarks that already exist at URL are redirected to to the specific bookmark endpoint which will process the request as a bookmark update. Otherwise, this creates or returns the existing bookmark.'
+          }
+        },
         response: {
           201: {
             type: 'object',
+            description: 'Newly created bookmarks are returned in full',
             properties: {
-              status: { type: 'string' },
-              site_url: { type: 'string' }
+              status: { enum: ['created'] },
+              site_url: { type: 'string' },
+              data: {
+                type: 'object',
+                properties: {
+                  ...fullBookmarkPropsWithEpisodes
+                }
+              }
+            }
+          },
+          200: {
+            type: 'object',
+            description: 'Existing bookmarks are returned unmodified',
+            properties: {
+              status: { enum: ['nochange'] },
+              site_url: { type: 'string' },
+              data: {
+                type: 'object',
+                properties: {
+                  ...fullBookmarkPropsWithEpisodes
+                }
+              }
             }
           }
         }
@@ -45,20 +75,31 @@ export async function putBookmarks (fastify, opts) {
           archive_urls = []
         } = request.body
 
-        const checkForExistingQuery = SQL`
-        SELECT id, url
-        FROM bookmarks
-        WHERE owner_id = ${userId}
-          AND url = ${url};
-        `
+        const {
+          update
+        } = request.query
+
+        const checkForExistingQuery = getBookmarksQuery({
+          ownerId: userId,
+          url,
+          sensitive: true,
+          perPage: 1
+        })
 
         const existingResults = await client.query(checkForExistingQuery)
         const maybeResult = existingResults.rows[0]
 
         if (existingResults.rows.length > 0) {
-          reply.redirect(301, `/api/bookmarks/${maybeResult.id}`)
-          return {
-            status: 'bookmark exists'
+          if (update) {
+            reply.redirect(308, `/api/bookmarks/${maybeResult.id}`)
+            return
+          } else {
+            reply.status(200)
+            return {
+              status: 'nochange',
+              site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
+              data: maybeResult
+            }
           }
         }
 
@@ -73,8 +114,8 @@ export async function putBookmarks (fastify, opts) {
           owner_id
         ) values (
           ${url},
-          ${title},
-          ${note},
+          ${title ?? null},
+          ${note ?? null},
           ${toread ?? false},
           ${sensitive ?? false},
           ${archive_urls.length > 0 ? archive_urls : SQL`'{}'`},
@@ -139,12 +180,25 @@ export async function putBookmarks (fastify, opts) {
             })
           })
         }
-
+        await client.query('commit')
         fastify.metrics.bookmarkCreatedCounter.inc()
 
+        // Look up the newly created bookmark instead of trying to re-assemble it here.
+        const bookmarkQuery = getBookmarksQuery({
+          ownerId: userId,
+          url,
+          sensitive: true,
+          perPage: 1
+        })
+
+        const createdResults = await fastify.pg.query(bookmarkQuery)
+        const createdBookmark = createdResults.rows.pop()
+
+        reply.status(201)
         return {
           status: 'ok',
-          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`
+          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`,
+          data: createdBookmark
         }
       })
     }

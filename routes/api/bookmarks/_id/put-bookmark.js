@@ -4,6 +4,8 @@ import { createEpisode } from '../../episodes/episode-query-create.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
 import { createEpisodeProp } from '../../episodes/episode-props.js'
 import { resolveEpisode } from '../../episodes/resolve-episode.js'
+import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
+import { getBookmarksQuery } from '../get-bookmarks-query.js'
 
 export async function putBookmark (fastify, opts) {
   fastify.put('/', {
@@ -24,6 +26,22 @@ export async function putBookmark (fastify, opts) {
         },
         minProperties: 1,
         additionalProperties: false
+      },
+      response: {
+        200: {
+          type: 'object',
+          description: 'Existing bookmarks are returned unmodified',
+          properties: {
+            status: { enum: ['updated'] },
+            site_url: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: {
+                ...fullBookmarkPropsWithEpisodes
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -139,11 +157,26 @@ export async function putBookmark (fastify, opts) {
           })
         })
       }
-
+      await client.query('commit')
       fastify.metrics.bookmarkEditCounter.inc()
 
+      // Look up the newly created bookmark instead of trying to re-assemble it here.
+      const updatedBookmarkQuery = getBookmarksQuery({
+        ownerId: userId,
+        bookmarkId,
+        sensitive: true,
+        perPage: 1
+      })
+
+      const createdResults = await fastify.pg.query(updatedBookmarkQuery)
+      const createdBookmark = createdResults.rows.pop()
+
+      reply.status(200)
+
       return {
-        status: 'ok'
+        status: 'updated',
+        site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmarkId}`,
+        data: createdBookmark
       }
     })
   })
