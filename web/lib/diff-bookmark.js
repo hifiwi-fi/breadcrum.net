@@ -9,10 +9,6 @@ function equalSet (a, b) {
 }
 
 export function diffBookmark (oldBookmark, newBookmark) {
-  console.log({
-    oldBookmark,
-    newBookmark
-  })
   const bookmarkDiff = {}
   for (const [key, newValue] of Object.entries(newBookmark)) {
     const oldValue = oldBookmark[key]

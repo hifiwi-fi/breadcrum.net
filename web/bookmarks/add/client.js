@@ -13,6 +13,7 @@ export const page = Component(() => {
   const { user, loading } = useUser()
   const { query } = useQuery()
   const [bookmark, setBookmark] = useState(null)
+  const [newlyCreated, setNewlyCreated] = useState(false)
 
   useEffect(() => {
     if (!user && !loading) {
@@ -32,13 +33,24 @@ export const page = Component(() => {
     }
 
     const init = async () => {
+      setNewlyCreated(false)
       const queryUrl = query.get('url')
 
-      if (!queryUrl) return setFallbackBookmark()
-      const searchParams = new URLSearchParams()
-      searchParams.set('url', queryUrl)
-      searchParams.set('sensitive', 'true')
-      const response = await fetch(`${state.apiUrl}/bookmarks?${searchParams}`, {
+      if (!queryUrl) {
+        setFallbackBookmark()
+        return
+      }
+
+      const payload = {
+        url: queryUrl,
+        title: query.get('title'),
+        note: query.get('description'),
+        tags: query.getAll('tags').filter(t => Boolean(t))
+      }
+
+      const response = await fetch(`${state.apiUrl}/bookmarks`, {
+        method: 'put',
+        body: JSON.stringify(payload),
         headers: {
           'content-type': 'application/json'
         }
@@ -46,14 +58,15 @@ export const page = Component(() => {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        const maybeBookmark = body?.data?.[0]
+        const maybeBookmark = body?.data
         if (maybeBookmark) {
           setBookmark(maybeBookmark)
+          if (response.status === 201) setNewlyCreated(true)
         } else {
           setFallbackBookmark()
         }
       } else {
-        setFallbackBookmark()
+        throw new Error(`${response.status} ${await response.text()}`)
       }
     }
 
@@ -109,7 +122,9 @@ export const page = Component(() => {
       bookmark,
       onSave: handleSaveBookmark,
       legend: existingBookmark
-        ? html`edit: <code>${bookmark?.id}</code>`
+        ? newlyCreated
+          ? html`created: <code>${bookmark?.id}</code>`
+          : html`edit: <code>${bookmark?.id}</code>`
         : 'New bookmark'
     })}
   `
