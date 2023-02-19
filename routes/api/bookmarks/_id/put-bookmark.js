@@ -175,7 +175,7 @@ export async function putBookmark (fastify, opts) {
 
       return {
         status: 'updated',
-        site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmarkId}`,
+        site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${createdBookmark.id}`,
         data: createdBookmark
       }
     })
