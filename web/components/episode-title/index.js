@@ -3,26 +3,21 @@
 import { Component, html } from 'uland-isomorphic'
 import cn from 'classnames'
 
-export const episodeTitle = Component(({
-  episode: {
-    id,
-    url,
-    error,
-    ready,
-    type,
-    medium,
-    display_title
-  } = {},
-  small
-} = {}) => {
-  const href = small === true
-    ? `/episodes/view/?id=${id}`
-    : url
+export const episodeTitle = Component(
+  (
+    {
+      episode: { id, url, error, ready, type, medium, display_title } = {},
+      small
+    } = {}
+  ) => {
+    const href = small === true
+      ? `/episodes/view/?id=${id}`
+      : url
 
-  return html`
+    return html`
     <div class="${cn({
       'bc-episode-title-container': true,
-      'bc-episode-title-small': small
+      'bc-episode-title-container-small': small
     })}">
         ${
           error
@@ -31,7 +26,8 @@ export const episodeTitle = Component(({
               ? '✅'
               : '⏱️'
         }
-        ${type === 'redirect'
+        ${
+          type === 'redirect'
           ? '☁️'
           : type === 'raw'
             ? '🍣'
@@ -46,9 +42,11 @@ export const episodeTitle = Component(({
               ? '💿'
               : null
         }
-        <a class="bc-episode-title-text" href="${href}" target="${small ? null : '_blank'}"}>
+
+        <a href="${href}" target="${small ? null : '_blank'}">
           ${display_title}
         </a>
       </div>
   `
-})
+  }
+)

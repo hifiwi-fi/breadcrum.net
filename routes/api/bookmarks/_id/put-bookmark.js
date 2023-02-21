@@ -133,6 +133,20 @@ export async function putBookmark (fastify, opts) {
         }
       }
 
+      await client.query('commit')
+      fastify.metrics.bookmarkEditCounter.inc()
+
+      // Look up the newly created bookmark instead of trying to re-assemble it here.
+      const updatedBookmarkQuery = getBookmarksQuery({
+        ownerId: userId,
+        bookmarkId,
+        sensitive: true,
+        perPage: 1
+      })
+
+      const createdResults = await fastify.pg.query(updatedBookmarkQuery)
+      const createdBookmark = createdResults.rows.pop()
+
       if (bookmark?.createEpisode) {
         const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
           client,
@@ -151,25 +165,13 @@ export async function putBookmark (fastify, opts) {
             fastify,
             userID: userId,
             episodeID: episodeId,
+            bookmarkTitle: createdBookmark.title,
             medium: episodeMedium,
             url: episodeURL,
             log: request.log
           })
         })
       }
-      await client.query('commit')
-      fastify.metrics.bookmarkEditCounter.inc()
-
-      // Look up the newly created bookmark instead of trying to re-assemble it here.
-      const updatedBookmarkQuery = getBookmarksQuery({
-        ownerId: userId,
-        bookmarkId,
-        sensitive: true,
-        perPage: 1
-      })
-
-      const createdResults = await fastify.pg.query(updatedBookmarkQuery)
-      const createdBookmark = createdResults.rows.pop()
 
       reply.status(200)
 

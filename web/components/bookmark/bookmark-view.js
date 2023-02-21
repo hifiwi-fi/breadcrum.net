@@ -67,8 +67,7 @@ export const bookmarkView = Component(({
       ${b.episodes?.length > 0
         ? html`${b.episodes.map(
             ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`
-          )
-      }`
+          )}`
         : null
       }
       ${b.archive_urls?.length > 0

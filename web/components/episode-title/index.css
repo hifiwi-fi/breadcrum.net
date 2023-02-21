@@ -1,9 +1,19 @@
 /* episode-title.css */
-.bc-episode-title-text {
-  word-break: break-word;
+
+.bc-episode-title-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bc-episode-title-container a {
   color: var(--bc-episodes-color);
 }
 
-.bc-episode-title-small {
+.bc-episode-title-container-small {
+  -webkit-line-clamp: 1;
   font-size: 0.8em;
 }
+

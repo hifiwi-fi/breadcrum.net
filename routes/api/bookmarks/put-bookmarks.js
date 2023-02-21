@@ -173,6 +173,7 @@ export async function putBookmarks (fastify, opts) {
             return resolveEpisode({
               fastify,
               userID: userId,
+              bookmarkTitle: title,
               episodeID: episodeId,
               url: episodeURL,
               medium: episodeMedium,

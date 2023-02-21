@@ -7,6 +7,7 @@ import { getFileKey } from '../../../plugins/yt-dlp/index.js'
  * @param  {object} options.pg        a postgres client
  * @param  {object} options.log       a pino client, like from the request
  * @param  {string} options.userID    ID of user
+ * @param  {string} options.bookmarkTitle  Title of the bookmark
  * @param  {string} options.episodeID ID of episode
  * @param  {string} options.url       The URL of the episode to resolve
  * @param  {string} options.medium    The medium to attempt to resolve
@@ -17,6 +18,7 @@ export async function resolveEpisode ({
   pg, // optional tx client
   log, // optional request logging instance
   userID,
+  bookmarkTitle,
   episodeID,
   url,
   medium
@@ -38,9 +40,13 @@ export async function resolveEpisode ({
       const filename = `${metadata.title}.${metadata.ext}`
       videoData.push(SQL`filename = ${filename}`)
     }
-    if (metadata.title != null) {
+    console.log({
+      metaTitle: metadata.title,
+      bookmarkTitle
+    })
+    if (metadata.title != null && metadata.title !== bookmarkTitle) {
       // TODO: when bookmarks have auto-extract, maybe remove this
-      videoData.push(SQL`title = ${metadata.title}`)
+      videoData.push(SQL`title = ${metadata.title.trim().substring(0, 255)}`)
     }
     if (metadata.ext != null) videoData.push(SQL`ext = ${metadata.ext}`)
     if (metadata._type != null) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
