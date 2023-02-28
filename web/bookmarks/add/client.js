@@ -3,7 +3,7 @@
 import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
-import { version } from '@breadcrum/bookmarklet/version.js'
+import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'

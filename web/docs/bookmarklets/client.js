@@ -1,7 +1,7 @@
 /* eslint-env browser */
 import { Component, html, render } from 'uland-isomorphic'
 import { bookmarklet } from '../bookmarklets/bookmarklet.js'
-import { version } from '@breadcrum/bookmarklet/version.js'
+import { version } from '@breadcrum/bookmarklet/dist/version.js'
 
 export const page = Component(() => {
   return html`
