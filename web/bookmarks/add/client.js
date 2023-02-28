@@ -3,6 +3,7 @@
 import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
 import { useUser } from '../../hooks/useUser.js'
 import { fetch } from 'fetch-undici'
+import { version } from '@breadcrum/bookmarklet/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
@@ -14,6 +15,8 @@ export const page = Component(() => {
   const { query } = useQuery()
   const [bookmark, setBookmark] = useState(null)
   const [newlyCreated, setNewlyCreated] = useState(false)
+  const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)
+  const [bookmarkletVersion, setBookmarkletVersion] = useState()
 
   useEffect(() => {
     if (!user && !loading) {
@@ -27,14 +30,17 @@ export const page = Component(() => {
       setBookmark({
         url: query.get('url'),
         title: query.get('title'),
-        note: query.get('description'),
-        tags: query.getAll('tags')
+        note: query.get('note') || query.get('description'),
+        tags: query.getAll('tags').filter(t => Boolean(t))
       })
     }
 
     const init = async () => {
       setNewlyCreated(false)
       const queryUrl = query.get('url')
+      const ver = query.get('ver')
+      setBookmarkletVersion(ver)
+      if (ver !== version) setBookmarkletUpdateAvailable(true)
 
       if (!queryUrl) {
         setFallbackBookmark()
@@ -44,7 +50,7 @@ export const page = Component(() => {
       const payload = {
         url: queryUrl,
         title: query.get('title'),
-        note: query.get('description'),
+        note: query.get('note') || query.get('description'),
         tags: query.getAll('tags').filter(t => Boolean(t))
       }
 
@@ -120,6 +126,8 @@ export const page = Component(() => {
   return html`
     ${bookmarkEdit({
       bookmark,
+      bookmarkletUpdateAvailable,
+      bookmarkletVersion,
       onSave: handleSaveBookmark,
       legend: existingBookmark
         ? newlyCreated

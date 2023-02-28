@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import { Component, html, render } from 'uland-isomorphic'
 import { bookmarklet } from '../bookmarklets/bookmarklet.js'
+import { version } from '@breadcrum/bookmarklet/version.js'
 
 export const page = Component(() => {
   return html`
@@ -11,7 +12,7 @@ export const page = Component(() => {
     When you visit a page you want to bookmark, click the the bookmarklet in your bookmark bar or menu and it will open a new bookmark window. Existing URLs will open an edit window.
   </p>
 
-  <p><a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a></p>
+  <p><a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a> <span class="bc-help-text">Version ${version}</span></p>
 
   <h2>Apple Shortcut</h2>
 

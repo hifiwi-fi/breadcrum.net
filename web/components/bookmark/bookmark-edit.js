@@ -9,6 +9,8 @@ import { useLSP } from '../../hooks/useLSP.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
+  bookmarkletUpdateAvailable,
+  bookmarkletVersion,
   onSave,
   onDeleteBookmark,
   onCancelEdit,
@@ -420,6 +422,18 @@ export const bookmarkEdit = Component(({
           </div>
         </div>
 
+        ${
+          bookmarkletVersion
+            ? html`
+            <div class="bc-help-text">
+              Version ${bookmarkletVersion}
+              ${bookmarkletUpdateAvailable
+                ? html`<a onclick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
+              : null}
+            </div>
+            `
+            : null
+        }
         <!-- Bookmark Error Box -->
         ${error ? html`<div class="error-box">${error.message}</div>` : null}
       </fieldset>

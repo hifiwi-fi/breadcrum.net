@@ -5,5 +5,3 @@ export const bookmarklet = getBookmarklet({
   HOST: process.env.HOST,
   WINDOW_TITLE: '🥖 Breadcrum'
 })
-
-console.log({ bookmarklet })
