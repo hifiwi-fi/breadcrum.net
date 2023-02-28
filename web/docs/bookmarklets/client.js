@@ -12,7 +12,7 @@ export const page = Component(() => {
     When you visit a page you want to bookmark, click the the bookmarklet in your bookmark bar or menu and it will open a new bookmark window. Existing URLs will open an edit window.
   </p>
 
-  <p><a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a> <span class="bc-help-text">Version ${version}</span></p>
+  <p><a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a> <a class="bc-help-text" href="${`https://github.com/hifiwi-fi/bc-bookmarklet/releases/tag/v${version}`}">Version ${version}</a></p>
 
   <h2>Apple Shortcut</h2>
 
