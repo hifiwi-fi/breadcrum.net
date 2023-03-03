@@ -1,5 +1,4 @@
 import SQL from '@nearform/sql'
-import { getFileKey } from '../../../plugins/yt-dlp/index.js'
 
 /**
  * Resolve metadata for an existing episode entry.
@@ -63,16 +62,14 @@ export async function resolveEpisode ({
     const episode = epResults.rows.pop()
 
     // TODO: move this caching behavior into getYTDLPMetadata
-    const cacheKey = getFileKey({
+    // Warm mem cache
+    fastify.memURLCache.set({
       userId: userID,
       episodeId: episodeID,
       sourceUrl: url,
       type: episode.type,
       medium: episode.medium
-    })
-
-    // Warm mem cache
-    fastify.memURLCache.set(cacheKey, metadata.url)
+    }, metadata.url)
 
     log.info(`Episode ${episodeID} for ${url} is ready.`)
   } catch (err) {

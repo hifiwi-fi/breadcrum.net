@@ -14,10 +14,10 @@ export default fp(async function (fastify, opts) {
       const formatOpts = getFormatArg(medium)
       const requestURL = new URL(fastify.config.YT_DLP_API_URL)
 
-      const cacheKey = getMetaKey({
+      const cacheKey = {
         url,
         medium
-      })
+      }
 
       const cachedMeta = fastify.memMetaCache.get(cacheKey)
 
@@ -38,7 +38,7 @@ export default fp(async function (fastify, opts) {
 
       if (response.statusCode !== 200) {
         const text = await response.body.text()
-        throw new Error('yt-dlp error: ' + text)
+        throw new Error(`yt-dlp error${response.statusCode}: ` + text)
       }
 
       const metadata = await response.body.json()
@@ -70,32 +70,4 @@ export function getFormatArg (medium) {
   if (!formatOpts) throw new Error('No format options generated. Please report this bug')
 
   return formatOpts
-}
-
-export function getFileKey ({
-  userId,
-  episodeId,
-  sourceUrl,
-  type,
-  medium
-}) {
-  return [
-    'file',
-    userId,
-    episodeId,
-    sourceUrl,
-    type,
-    medium
-  ].join(':')
-}
-
-export function getMetaKey ({
-  url,
-  medium
-}) {
-  return [
-    'meta',
-    url,
-    medium
-  ].join(':')
 }

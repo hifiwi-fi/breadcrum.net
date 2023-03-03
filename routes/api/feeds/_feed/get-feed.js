@@ -72,7 +72,7 @@ export async function getFeed (fastify, opts) {
       // Default to the token the user passes
       // If for some reason they were able to bypass auth with a bad token, don't
       // hand out good tokens.
-      const token = feedTokenUser.token ?? pf.token
+      const token = feedTokenUser?.token ?? pf.token
 
       const episodes = episodesResults.rows
 
