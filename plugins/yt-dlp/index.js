@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import { request as undiciRequest } from 'undici'
 
 /**
- * This plugin adds yt-dlp fetching helpeers
+ * This plugin adds yt-dlp fetching helpers
  */
 export default fp(async function (fastify, opts) {
   fastify.decorate('getYTDLPMetadata', async function getYTDLPMetadata ({
@@ -19,7 +19,7 @@ export default fp(async function (fastify, opts) {
         medium
       }
 
-      const cachedMeta = fastify.memMetaCache.get(cacheKey)
+      const cachedMeta = fastify.ytDLPMemMetaCache.get(cacheKey)
 
       if (cachedMeta) {
         return cachedMeta
@@ -43,7 +43,7 @@ export default fp(async function (fastify, opts) {
 
       const metadata = await response.body.json()
 
-      fastify.memMetaCache.set(cacheKey, metadata)
+      fastify.ytDLPMemMetaCache.set(cacheKey, metadata)
 
       return metadata
     } finally {
@@ -52,7 +52,7 @@ export default fp(async function (fastify, opts) {
   })
 }, {
   name: 'yt-dlp',
-  dependencies: ['env', 'prom']
+  dependencies: ['env', 'prom', 'cache']
 })
 
 const videoFormat = 'best[ext=mp4]/best[ext=mov]/mp4/mov'

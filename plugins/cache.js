@@ -15,6 +15,8 @@ export default fp(async function (fastify, opts) {
     client
   })
 
+  // TODO: Maybe delete these mem caches or move them to redis
+
   // For caching file URLs
   const memURLCache = new LRU({
     max: 10000,
@@ -58,14 +60,14 @@ export default fp(async function (fastify, opts) {
   })
 
   // For caching url metadata objects
-  const memMetaCache = new LRU({
+  const ytDLPMemMetaCache = new LRU({
     max: 200,
     ttl: 1000 * 60 * 5, // 20 mins,
     updateAgeOnGet: false,
     ttlAutopurge: true
   })
 
-  function getMetaKey ({
+  function getYTDLPMetaKey ({
     url,
     medium
   }) {
@@ -78,14 +80,44 @@ export default fp(async function (fastify, opts) {
     ].join(':')
   }
 
-  fastify.decorate('memMetaCache', {
+  fastify.decorate('ytDLPMemMetaCache', {
     get ({ url, medium } = {}) {
-      const key = getMetaKey({ url, medium })
-      return memMetaCache.get(key)
+      const key = getYTDLPMetaKey({ url, medium })
+      return ytDLPMemMetaCache.get(key)
     },
     set ({ url, medium } = {}, value) {
-      const key = getMetaKey({ url, medium })
-      return memMetaCache.set(key, value)
+      const key = getYTDLPMetaKey({ url, medium })
+      return ytDLPMemMetaCache.set(key, value)
+    }
+  })
+
+  // For caching server extracted site metadata
+  const siteMetaCache = new LRU({
+    max: 200,
+    ttl: 1000 * 60 * 5, // 20 mins,
+    updateAgeOnGet: false,
+    ttlAutopurge: true
+  })
+
+  function getSiteMetaKey ({
+    url,
+    medium
+  }) {
+    assert(url, 'url required')
+    return [
+      'smeta',
+      url
+    ].join(':')
+  }
+
+  fastify.decorate('siteMetaCache', {
+    get ({ url } = {}) {
+      const key = getSiteMetaKey({ url })
+      return siteMetaCache.get(key)
+    },
+    set ({ url } = {}, value) {
+      const key = getSiteMetaKey({ url })
+      return siteMetaCache.set(key, value)
     }
   })
 }, {
