@@ -22,8 +22,45 @@ export const page = Component(() => {
     <li>
       <a href="https://www.icloud.com/shortcuts/7026e513f3d749b8b4f40f61c6d88cd5">Breadcrum iOS shortcut</a>
     </li>
-    </ul>
+  </ul>
 
+  <h2>
+    Bookmark Add Page API
+  </h2>
+
+  <p>
+    The bookmarklet simply opens the <a href="/bookmarks/add">Bookmark Add</a> page with a few query params populated by client side metadata extraction.
+    This page supports client provided metadata, or an option to request server side extracted metadata.
+    Here are the relavant query params you can use on this page:
+  </p>
+
+  <p>Example:</p>
+
+  <pre>
+${process.env.TRANSPORT}://${process.env.HOST}/bookmarks/add/?url=https://example.com&title=Example Title
+  </pre>
+
+  <ul>
+    <li>
+      <code>url</code>: (Required) A URL you want to bookmark or edit.
+    </li>
+    <li>
+      <code>title</code>: The title to create a non-existing bookmark with.
+    </li>
+    <li>
+      <code>note</code>: The note to create a non-existing bookmark with.
+    </li>
+    <li>
+      <code>tags</code>: The tags to create a non-existing bookmark with. Append multiple tags query strings to apply more than one tag.
+    </li>
+    <li>
+      <code>meta</code>: Set this param to <code>true</code> to request server extracta metadata. Node, any client provided metadata will override the server extracted metadata. This option is slightly slower to create a bookmark.
+    </li>
+  </ul>
+
+  <p>
+    A title is required if <code>meta</code> is set to <code>false</code>.
+  </p>
 `
 })
 

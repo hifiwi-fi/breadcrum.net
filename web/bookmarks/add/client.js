@@ -47,12 +47,12 @@ export const page = Component(() => {
         return
       }
 
-      const payload = {
-        url: queryUrl
-        // title: query.get('title'),
-        // note: query.get('note') || query.get('description'),
-        // tags: query.getAll('tags').filter(t => Boolean(t))
-      }
+      const payload = { url: queryUrl }
+      if (query.get('title')) payload.title = query.get('title')
+      const queryNote = query.get('note') || query.get('description')
+      if (queryNote) payload.note = queryNote
+      const queryTags = query.getAll('tags').filter(t => Boolean(t))
+      if (queryTags.length > 0) payload.tags = queryTags
 
       const params = new URLSearchParams()
 
