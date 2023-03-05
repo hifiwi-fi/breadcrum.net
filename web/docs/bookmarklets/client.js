@@ -54,7 +54,9 @@ ${process.env.TRANSPORT}://${process.env.HOST}/bookmarks/add/?url=https://exampl
       <code>tags</code>: The tags to create a non-existing bookmark with. Append multiple tags query strings to apply more than one tag.
     </li>
     <li>
-      <code>meta</code>: Set this param to <code>true</code> to request server extracta metadata. Node, any client provided metadata will override the server extracted metadata. This option is slightly slower to create a bookmark.
+      <code>meta</code>: Set this param to <code>true</code> to request server extracta metadata.
+      Note, any client provided metadata will override the server extracted metadata.
+      This option is slightly slower to create a bookmark.
     </li>
   </ul>
 
