@@ -30,7 +30,10 @@ export default fp(async function (fastify, opts) {
           Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           'user-agent': GOOGLE_BOT_UA
         },
-        maxRedirections: 3
+        maxRedirections: 3,
+        autoSelectFamily: true,
+        headersTimeout: 15000,
+        bodyTimeout: 15000
       })
 
       if (response.statusCode > 299) {

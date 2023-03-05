@@ -33,7 +33,8 @@ export default fp(async function (fastify, opts) {
         headers: {
           Accept: 'application/json',
           Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password)
-        }
+        },
+        autoSelectFamily: true
       })
 
       if (response.statusCode !== 200) {

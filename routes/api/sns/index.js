@@ -37,7 +37,7 @@ export default async function snsRoutes (fastify, opts) {
           headers,
           trailers,
           body
-        } = await undiciRequest(data.SubscribeURL)
+        } = await undiciRequest(data.SubscribeURL, { autoSelectFamily: true })
         fastify.log.info({
           statusCode,
           headers,
