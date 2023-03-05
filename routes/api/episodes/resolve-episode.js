@@ -39,10 +39,7 @@ export async function resolveEpisode ({
       const filename = `${metadata.title}.${metadata.ext}`
       videoData.push(SQL`filename = ${filename}`)
     }
-    console.log({
-      metaTitle: metadata.title,
-      bookmarkTitle
-    })
+
     if (metadata.title != null && metadata.title !== bookmarkTitle) {
       // TODO: when bookmarks have auto-extract, maybe remove this
       videoData.push(SQL`title = ${metadata.title.trim().substring(0, 255)}`)

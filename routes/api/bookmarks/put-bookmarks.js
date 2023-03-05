@@ -7,6 +7,19 @@ import { resolveEpisode } from '../episodes/resolve-episode.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 
+const autoEpisodeHostnames = {
+  'www.youtube.com': 'video',
+  'm.youtube.com': 'video',
+  'vimeo.com': 'video'
+}
+
+function normalizeURL (urlObj) {
+  if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com'
+  return {
+    normalizedURL: urlObj.toString()
+  }
+}
+
 export async function putBookmarks (fastify, opts) {
   // Create bookmark
   fastify.put(
@@ -28,6 +41,21 @@ export async function putBookmarks (fastify, opts) {
             type: 'boolean',
             default: false,
             description: 'If set to true, bookmarks that already exist at URL are redirected to to the specific bookmark endpoint which will process the request as a bookmark update. Otherwise, this creates or returns the existing bookmark.'
+          },
+          meta: {
+            type: 'boolean',
+            default: false,
+            description: 'Extract page metadata on the server.'
+          },
+          normalize: {
+            type: 'boolean',
+            default: true,
+            description: 'Normalize URLs when looking them up or creating them.'
+          },
+          autoEpisodes: {
+            type: 'boolean',
+            default: true,
+            description: 'Automatically create episodes on common episode sources.'
           }
         },
         response: {
@@ -66,7 +94,6 @@ export async function putBookmarks (fastify, opts) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
         const {
-          url,
           title,
           note,
           toread,
@@ -74,10 +101,20 @@ export async function putBookmarks (fastify, opts) {
           tags = [],
           archive_urls = []
         } = request.body
+        let { url } = request.body
+        const urlObj = new URL(url)
 
         const {
-          update
+          update,
+          meta,
+          normalize,
+          autoEpisodes
         } = request.query
+
+        if (normalize) {
+          const { normalizedURL } = normalizeURL(urlObj)
+          url = normalizedURL
+        }
 
         const checkForExistingQuery = getBookmarksQuery({
           ownerId: userId,
@@ -103,6 +140,8 @@ export async function putBookmarks (fastify, opts) {
           }
         }
 
+        const serverMeta = meta ? await fastify.getSiteMetaData({ url }) : {}
+
         const createBookmark = SQL`
         insert into bookmarks (
           url,
@@ -114,8 +153,8 @@ export async function putBookmarks (fastify, opts) {
           owner_id
         ) values (
           ${url},
-          ${title ?? null},
-          ${note ?? null},
+          ${title ?? serverMeta?.title ?? null},
+          ${note ?? serverMeta?.summary ?? null},
           ${toread ?? false},
           ${sensitive ?? false},
           ${archive_urls.length > 0 ? archive_urls : SQL`'{}'`},
@@ -126,12 +165,13 @@ export async function putBookmarks (fastify, opts) {
         const results = await client.query(createBookmark)
         const bookmark = results.rows[0]
 
-        if (tags.length > 0) {
+        if (tags.length > 0 || serverMeta.tags.length > 0) {
+          const activeTagSet = tags.length > 0 ? tags : serverMeta.tags
           const createTags = SQL`
           INSERT INTO tags (name, owner_id)
           VALUES
              ${SQL.glue(
-                tags.map(tag => SQL`(${tag},${userId})`),
+                activeTagSet.map(tag => SQL`(${tag},${userId})`),
                 ' , '
               )}
           ON CONFLICT (name, owner_id)
@@ -156,14 +196,14 @@ export async function putBookmarks (fastify, opts) {
           fastify.metrics.tagAppliedCounter.inc(tagsResults.rows.length)
         }
 
-        if (request?.body?.createEpisode) {
+        if (request?.body?.createEpisode || (autoEpisodes && autoEpisodeHostnames[urlObj.hostname])) {
           const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
             client,
             userId,
             bookmarkId: bookmark.id,
-            type: request?.body?.createEpisode.type,
-            medium: request?.body?.createEpisode.medium,
-            url: request?.body?.createEpisode.url ?? url
+            type: request?.body?.createEpisode?.type ?? 'redirect',
+            medium: request?.body?.createEpisode?.medium ?? autoEpisodeHostnames[urlObj.hostname],
+            url: request?.body?.createEpisode?.url ?? url
           })
 
           await client.query('commit')
