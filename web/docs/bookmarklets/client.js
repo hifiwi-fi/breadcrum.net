@@ -58,6 +58,9 @@ ${process.env.TRANSPORT}://${process.env.HOST}/bookmarks/add/?url=https://exampl
       Note, any client provided metadata will override the server extracted metadata.
       This option is slightly slower to create a bookmark.
     </li>
+    <li>
+      <code>jump</code>: Set this param to <code>close</code> to close the window after successful submit.
+    </li>
   </ul>
 
   <p>
