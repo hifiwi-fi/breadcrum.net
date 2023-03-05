@@ -165,8 +165,8 @@ export async function putBookmarks (fastify, opts) {
         const results = await client.query(createBookmark)
         const bookmark = results.rows[0]
 
-        if (tags.length > 0 || serverMeta.tags.length > 0) {
-          const activeTagSet = tags.length > 0 ? tags : serverMeta.tags
+        if (tags?.length > 0 || serverMeta?.tags?.length > 0) {
+          const activeTagSet = tags.length > 0 ? tags : serverMeta?.tags
           const createTags = SQL`
           INSERT INTO tags (name, owner_id)
           VALUES
