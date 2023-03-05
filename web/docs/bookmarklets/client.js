@@ -20,7 +20,10 @@ export const page = Component(() => {
 
   <ul>
     <li>
-      <a href="https://www.icloud.com/shortcuts/7026e513f3d749b8b4f40f61c6d88cd5">Breadcrum iOS shortcut</a>
+      <a href="https://www.icloud.com/shortcuts/2067714b7f974298886570256528bf46">Breadcrum iOS shortcut</a>: Create a bookmark and show the edit prompt.
+    </li>
+    <li>
+      <a href="https://www.icloud.com/shortcuts/73f889f9d0d544488e247bc522e524bb">Breadcrum instant iOS shortcut</a>: Create a bookmark without any prompts. Requires an <a href="https://breadcrum.net/openapi/static/index.html#/default/post_api_login_">auth token</a>.
     </li>
   </ul>
 
