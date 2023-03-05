@@ -40,21 +40,26 @@ export const page = Component(() => {
       const queryUrl = query.get('url')
       const ver = query.get('ver')
       setBookmarkletVersion(ver)
-      if (ver !== version) setBookmarkletUpdateAvailable(true)
+      if (ver !== version || query.get('description')) setBookmarkletUpdateAvailable(true)
 
       if (!queryUrl) {
         setFallbackBookmark()
         return
       }
 
-      const payload = {
-        url: queryUrl,
-        title: query.get('title'),
-        note: query.get('note') || query.get('description'),
-        tags: query.getAll('tags').filter(t => Boolean(t))
-      }
+      const payload = { url: queryUrl }
+      if (query.get('title')) payload.title = query.get('title')
+      const queryNote = query.get('note') || query.get('description')
+      if (queryNote) payload.note = queryNote
+      const queryTags = query.getAll('tags').filter(t => Boolean(t))
+      if (queryTags.length > 0) payload.tags = queryTags
 
-      const response = await fetch(`${state.apiUrl}/bookmarks`, {
+      const params = new URLSearchParams()
+
+      const serverMeta = query.get('meta')
+      if (serverMeta) params.set('meta', 'true')
+
+      const response = await fetch(`${state.apiUrl}/bookmarks?${params.toString()}`, {
         method: 'put',
         body: JSON.stringify(payload),
         headers: {

@@ -64,6 +64,11 @@ export default fp(async function (fastify, opts) {
     help: 'The time it takes for ytdlp items to finish'
   })
 
+  fastify.metrics.siteMetaSeconds = new fastify.metrics.client.Histogram({
+    name: 'breadcrum_site_meta_seconds',
+    help: 'The time it takes for site meta extraction'
+  })
+
   const promServer = Fastify({
     logger: true
   })

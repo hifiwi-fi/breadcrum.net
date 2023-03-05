@@ -1,5 +1,4 @@
 import SQL from '@nearform/sql'
-import { getFileKey } from '../../../../../../plugins/yt-dlp/index.js'
 
 export default async function podcastFeedsRoutes (fastify, opts) {
   fastify.get(
@@ -75,13 +74,13 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         return reply.notFound(`episide ${episodeId} not found in feed ${feedId}`)
       }
 
-      const cacheKey = getFileKey({
+      const cacheKey = {
         userId,
         episodeId: episode.id,
         sourceUrl: episode.src_url,
         type: episode.type,
         medium: episode.medium
-      })
+      }
 
       const cachedUrl = fastify.memURLCache.get(cacheKey)
 

@@ -1,5 +1,4 @@
 import SQL from '@nearform/sql'
-import { getFileKey } from '../../../plugins/yt-dlp/index.js'
 
 /**
  * Resolve metadata for an existing episode entry.
@@ -40,10 +39,7 @@ export async function resolveEpisode ({
       const filename = `${metadata.title}.${metadata.ext}`
       videoData.push(SQL`filename = ${filename}`)
     }
-    console.log({
-      metaTitle: metadata.title,
-      bookmarkTitle
-    })
+
     if (metadata.title != null && metadata.title !== bookmarkTitle) {
       // TODO: when bookmarks have auto-extract, maybe remove this
       videoData.push(SQL`title = ${metadata.title.trim().substring(0, 255)}`)
@@ -63,16 +59,14 @@ export async function resolveEpisode ({
     const episode = epResults.rows.pop()
 
     // TODO: move this caching behavior into getYTDLPMetadata
-    const cacheKey = getFileKey({
+    // Warm mem cache
+    fastify.memURLCache.set({
       userId: userID,
       episodeId: episodeID,
       sourceUrl: url,
       type: episode.type,
       medium: episode.medium
-    })
-
-    // Warm mem cache
-    fastify.memURLCache.set(cacheKey, metadata.url)
+    }, metadata.url)
 
     log.info(`Episode ${episodeID} for ${url} is ready.`)
   } catch (err) {

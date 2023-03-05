@@ -28,7 +28,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
       const cacheKey = 'breadcrum:files:placeholder'
-      const cachedUrl = fastify.memURLCache.get(cacheKey)
+      const cachedUrl = fastify.memURLCache.raw.get(cacheKey)
 
       if (cachedUrl) {
         reply.header('fly-cache-status', 'HIT')
@@ -47,7 +47,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
 
       if (!metadata.url) throw new Error('metadata is missing url')
 
-      fastify.memURLCache.set(cacheKey, metadata.url)
+      fastify.memURLCache.raw.set(cacheKey, metadata.url)
       reply.redirect(302, metadata.url)
     }
   )
