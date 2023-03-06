@@ -120,7 +120,13 @@ export const page = Component(() => {
 
     function finish () {
       if (query.get('jump') === 'close') {
-        window.close()
+        try {
+          window.close()
+        } catch (err) {
+          console.error(err)
+          // TODO: go to permalink?
+          window.location.replace('/bookmarks')
+        }
       } else {
         // TODO: go to permalink?
         window.location.replace('/bookmarks')
