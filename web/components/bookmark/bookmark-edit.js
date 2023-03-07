@@ -154,7 +154,7 @@ export const bookmarkEdit = Component(({
     try {
       url = (new URL(form.url.value)).toString()
     } catch (err) {
-      console.error(new Error(`Error sanitizing URL: ${url}`, { cause: err }))
+      console.warn(new Error(`Error sanitizing URL: ${url}`, { cause: err }))
     }
     const title = form.title.value
     const note = form.note.value

@@ -113,23 +113,23 @@ export const page = Component(() => {
     })
 
     if (response.ok) {
-      finish()
+      finish(await response.json())
     } else {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
 
-    function finish () {
+    function finish (responseBody) {
+      const { id } = responseBody?.data ?? {}
+      const redirectTarget = id ? `/bookmarks/view/?id=${id}` : '/bookmarks'
       if (query.get('jump') === 'close') {
         try {
           window.close()
         } catch (err) {
           console.error(err)
-          // TODO: go to permalink?
-          window.location.replace('/bookmarks')
+          window.location.replace(redirectTarget)
         }
       } else {
-        // TODO: go to permalink?
-        window.location.replace('/bookmarks')
+        window.location.replace(redirectTarget)
       }
     }
   }
