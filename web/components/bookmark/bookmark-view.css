@@ -37,6 +37,11 @@
   -webkit-box-orient: vertical;
 }
 
+/* Don't need 2nd lines for archive links */
+.bc-bookmark-archive-url-display {
+  -webkit-line-clamp: 1;
+}
+
 .bc-tags-display,
 .bc-date,
 .bc-bookmark-url-display,
