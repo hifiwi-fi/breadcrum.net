@@ -36,3 +36,13 @@
   color: var(--accent-foreground);
 }
 
+
+.bc-episode-video-preview,
+.bc-episode-audio-preview {
+  width: 100%;
+}
+
+.bc-episode-video-preview {
+  background-color: var(--accent-background);
+  border-radius: 5px;
+}

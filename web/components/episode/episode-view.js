@@ -9,6 +9,7 @@ export const episodeView = Component(({
   episode: e,
   onEdit = () => {}
 } = {}) => {
+  const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
   return html`
     <div class="bc-episode-view">
 
@@ -19,6 +20,30 @@ export const episodeView = Component(({
       </div>
 
       ${
+        e.ready && mediaLink
+          ? e.src_type === 'video'
+            ? html`<video class="bc-episode-video-preview"
+                    controls
+                    preload="none"
+                    crossorigin="anonymous"
+                    src="${mediaLink}">
+                      <a href="${mediaLink}">
+                        View video
+                      </a>
+                  </video>`
+            : html`<audio class="bc-episode-audio-preview"
+                    controls
+                    preload="none"
+                    crossorigin="anonymous"
+                    src="${mediaLink}">
+                      <a href="${mediaLink}">
+                        View audio
+                      </a>
+                  </audio>`
+          : null
+      }
+
+      ${
         e.ready
         ? html`
           <div class="bc-episode-details-display">
@@ -26,7 +51,7 @@ export const episodeView = Component(({
               ${e.src_type === 'video' ? ' 📼' : e.src_type === 'audio' ? ' 💿' : null}
               ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
               ${e.duration_in_seconds ? ` (${format(e.duration_in_seconds * 1000)}) ` : null}
-              ${e.filename ? e.filename : null}
+              <a href="${mediaLink}">${e.filename ? e.filename : null}</a>
             </div>
           </div>
         `
