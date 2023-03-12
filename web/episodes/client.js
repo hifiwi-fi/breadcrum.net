@@ -121,7 +121,7 @@ export const page = Component(() => {
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
   ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes, onDelete: reloadEpisodes })}`)
+      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes, onDelete: reloadEpisodes, clickForPreview: true })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

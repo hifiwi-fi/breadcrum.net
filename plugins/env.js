@@ -1,4 +1,7 @@
 import fp from 'fastify-plugin'
+import { readFile } from 'fs/promises'
+import desm from 'desm'
+import { join } from 'path'
 
 export const schema = {
   type: 'object',
@@ -99,6 +102,11 @@ export default fp(async function (fastify, opts) {
     schema,
     dotenv: true
   })
+
+  const __dirname = desm(import.meta.url)
+  const pkg = JSON.parse(await readFile(join(__dirname, '../package.json')))
+
+  fastify.decorate('pkg', pkg)
 }, {
   name: 'env'
 })

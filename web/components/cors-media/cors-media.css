@@ -1,0 +1,22 @@
+.bc-cors-video,
+.bc-cors-audio {
+  width: 100%;
+}
+
+.bc-cors-media-placeholder,
+.bc-cors-video {
+  border-radius: 10px;
+  background-color: var(--accent-background);
+}
+
+
+.bc-cors-media-placeholder {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 1;
+  width: 100%;
+  margin-bottom: 1em;
+}
+

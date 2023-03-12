@@ -3,6 +3,7 @@ import { Component, html, useRef, useCallback } from 'uland-isomorphic'
 import { textIcon } from '../text-icon/index.js'
 
 export const feedDisplay = Component(({
+  loading,
   feed: f = {},
   feeds = [],
   onEdit = () => {}
@@ -33,7 +34,7 @@ export const feedDisplay = Component(({
         </div>
 
         <h1 class="bc-feed-title">
-          ${f.title}
+          ${f.title ?? 'breadcrum.net'}
         </h1>
 
         <div class="bc-feed-icon-button-line">

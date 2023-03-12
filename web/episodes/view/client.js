@@ -81,7 +81,7 @@ export const page = Component(() => {
     <div>
       ${episodeLoading ? html`<div>...</div>` : null}
       ${episodeError ? html`<div>${episodeError.message}</div>` : null}
-      ${episode ? episodeList({ episode, reload: reloadEpisode, onDelete: handleDelete }) : null}
+      ${episode ? episodeList({ episode, reload: reloadEpisode, onDelete: handleDelete, clickForPreview: false }) : null}
     </div>
 `
 })

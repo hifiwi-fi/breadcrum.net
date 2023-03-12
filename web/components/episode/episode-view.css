@@ -1,6 +1,7 @@
 /* episode-view.css */
 @import '../text-icon';
 @import '../episode-title';
+@import '../cors-media/cors-media.css';
 
 .bc-episode-view {
   padding-bottom: 4px;

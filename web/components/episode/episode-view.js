@@ -4,12 +4,15 @@ import format from 'format-duration'
 
 import { textIcon } from '../text-icon/index.js'
 import { episodeTitle } from '../episode-title/index.js'
+import { corsMedia } from '../cors-media/cors-media.js'
 
 export const episodeView = Component(({
   episode: e,
+  clickForPreview,
   onEdit = () => {}
 } = {}) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
+
   return html`
     <div class="bc-episode-view">
 
@@ -19,32 +22,11 @@ export const episodeView = Component(({
         <a href="${e.url}">${e.url}</a>
       </div>
 
-      ${
-        e.ready && mediaLink
-          ? e.src_type === 'video'
-            ? html`<video class="bc-episode-video-preview"
-                    controls
-                    preload="none"
-                    crossorigin="anonymous"
-                    src="${mediaLink}">
-                      <a href="${mediaLink}">
-                        View video
-                      </a>
-                  </video>`
-            : html`<audio class="bc-episode-audio-preview"
-                    controls
-                    preload="none"
-                    crossorigin="anonymous"
-                    src="${mediaLink}">
-                      <a href="${mediaLink}">
-                        View audio
-                      </a>
-                  </audio>`
-          : null
-      }
+
+      ${corsMedia({ id: e?.id, src: mediaLink, type: e?.src_type, clickForPreview })}
 
       ${
-        e.ready
+        e?.ready
         ? html`
           <div class="bc-episode-details-display">
             <div>

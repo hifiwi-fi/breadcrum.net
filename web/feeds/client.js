@@ -202,7 +202,7 @@ export const page = Component(() => {
 
   return html`
   <div>
-    ${feedLoading && feedsLoading ? 'loading feed' : feedHeader({ feed, feeds, reload: reloadFeed })}
+    ${feedHeader({ feed, feeds, reload: reloadFeed, loading: feedLoading && feedsLoading })}
     ${feedError ? html`<div>${feedError.message}</div>` : null}
     ${feedsError ? html`<div>${feedsError.message}</div>` : null}
   </div>
@@ -213,7 +213,7 @@ export const page = Component(() => {
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
   ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes })}`)
+      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes, clickForPreview: true })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

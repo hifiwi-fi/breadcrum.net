@@ -6,7 +6,7 @@ import { feedDisplay } from './feed-display.js'
 import { feedEdit } from './feed-edit.js'
 import { diffFeed } from '../../lib/diff-feed.js'
 
-export const feedHeader = Component(({ feed, feeds, reload }) => {
+export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -49,12 +49,14 @@ export const feedHeader = Component(({ feed, feeds, reload }) => {
             onSave: handleSave,
             onDeleteFeed,
             onCancelEdit: handleCancelEdit,
-            legend: html`edit: <code>${feed?.id}</code>`
+            legend: html`edit: <code>${feed?.id}</code>`,
+            loading
           })
         : feedDisplay({
             feed,
             feeds,
-            onEdit: handleEdit
+            onEdit: handleEdit,
+            loading
           })
     }
   </div>`
