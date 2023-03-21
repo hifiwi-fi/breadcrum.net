@@ -3,6 +3,9 @@ import SQL from '@nearform/sql'
 import { createEpisode } from '../../episodes/episode-query-create.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
 import { createEpisodeProp } from '../../episodes/episode-props.js'
+import { createArchiveProp } from '../../archives/archive-props.js'
+import { createArchive } from '../../archives/archive-query-create.js'
+import { resolveArchive } from '../../archives/resolve-archive.js'
 import { resolveEpisode } from '../../episodes/resolve-episode.js'
 import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 import { getBookmarksQuery } from '../get-bookmarks-query.js'
@@ -22,7 +25,8 @@ export async function putBookmark (fastify, opts) {
         type: 'object',
         properties: {
           ...commnonBookmarkProps,
-          ...createEpisodeProp
+          ...createEpisodeProp,
+          ...createArchiveProp
         },
         minProperties: 1,
         additionalProperties: false
@@ -168,6 +172,30 @@ export async function putBookmark (fastify, opts) {
             bookmarkTitle: createdBookmark.title,
             medium: episodeMedium,
             url: episodeURL,
+            log: request.log
+          })
+        })
+      }
+
+      if (request?.body?.createArchive) {
+        const { id: archiveID, url: archiveURL } = await createArchive({
+          client,
+          userID: userId,
+          bookmarkId: createdBookmark.id,
+          bookmarkTitle: createdBookmark.title,
+          url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url
+        })
+
+        await client.query('commit')
+        fastify.metrics.archiveCounter.inc()
+
+        fastify.pqueue.add(() => {
+          return resolveArchive({
+            fastify,
+            userID: userId,
+            bookmarkTitle: createdBookmark.title,
+            archiveID,
+            url: archiveURL,
             log: request.log
           })
         })

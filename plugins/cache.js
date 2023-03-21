@@ -120,6 +120,35 @@ export default fp(async function (fastify, opts) {
       return siteMetaCache.set(key, value)
     }
   })
+
+  // For caching server extracted site metadata
+  const archiveCache = new LRU({
+    max: 50,
+    ttl: 1000 * 60 * 5, // 20 mins,
+    updateAgeOnGet: false,
+    ttlAutopurge: true
+  })
+
+  function getArchiveCacheKey ({
+    url
+  }) {
+    assert(url, 'url required')
+    return [
+      'readability',
+      url
+    ].join(':')
+  }
+
+  fastify.decorate('archiveCache', {
+    get ({ url } = {}) {
+      const key = getArchiveCacheKey({ url })
+      return archiveCache.get(key)
+    },
+    set ({ url } = {}, value) {
+      const key = getArchiveCacheKey({ url })
+      return archiveCache.set(key, value)
+    }
+  })
 }, {
   name: 'cache',
   dependencies: ['redis']

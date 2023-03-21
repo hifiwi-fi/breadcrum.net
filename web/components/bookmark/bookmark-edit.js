@@ -163,6 +163,7 @@ export const bookmarkEdit = Component(({
     const toread = form.toread.checked
     const starred = form.starred.checked
     const sensitive = form.sensitive.checked
+    const createArchive = form.createArchive.checked
     const episodeMedium = form.episodeMedium.value
     let episodeURL = customEpisodeURLChecked ? form.createEpisodeURL.value : url
     try {
@@ -202,6 +203,7 @@ export const bookmarkEdit = Component(({
       starred,
       sensitive,
       archive_urls,
+      createArchive,
       createEpisode
     }
 
@@ -338,6 +340,17 @@ export const bookmarkEdit = Component(({
           }`
             : null
           }
+
+        <!-- Readanility Archive Options -->
+        <div>
+          <label>
+            <input type="checkbox" name="createArchive">
+            create archive
+            <span class="bc-help-text">
+              ℹ️ Save readability archive
+            </span>
+          </label>
+        </div>
 
         <!-- Bookmark Create Episode -->
         <div>

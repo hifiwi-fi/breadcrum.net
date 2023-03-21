@@ -69,6 +69,16 @@ export default fp(async function (fastify, opts) {
     help: 'The time it takes for site meta extraction'
   })
 
+  fastify.metrics.archiveSeconds = new fastify.metrics.client.Histogram({
+    name: 'breadcrum_archive_seconds',
+    help: 'The time it takes for readability archive extraction'
+  })
+
+  fastify.metrics.archiveCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_created_total',
+    help: 'The number of times a readability archive is created'
+  })
+
   const promServer = Fastify({
     logger: true
   })
