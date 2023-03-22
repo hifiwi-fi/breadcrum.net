@@ -39,9 +39,19 @@ export default fp(async function (fastify, opts) {
     help: 'The number of times episodes are edited'
   })
 
+  fastify.metrics.archiveEditCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_edit_total',
+    help: 'The number of times archives are edited'
+  })
+
   fastify.metrics.episodeDeleteCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_episode_delete_total',
     help: 'The number of times episodes are deleted'
+  })
+
+  fastify.metrics.archiveDeleteCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_delete_total',
+    help: 'The number of times archives are deleted'
   })
 
   fastify.metrics.tagAppliedCounter = new fastify.metrics.client.Counter({
