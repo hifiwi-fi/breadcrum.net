@@ -12,7 +12,6 @@
 .bc-marking-hero-title {
 	margin: 0;
 	font-weight: 600;
-	margin-bottom: 50px;
 }
 
 .bc-marking-hero-description {
@@ -31,4 +30,16 @@
   .bc-marketing-feature-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.badge {
+  background-color: red;
+  color: white;
+  padding: 4px 8px;
+  text-align: center;
+  border-radius: 5px;
+  margin: 0;
+  margin-bottom: 50px;
+  position: absolute;
+  font-weight: 600;
 }

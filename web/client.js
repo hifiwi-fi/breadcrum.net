@@ -11,7 +11,7 @@ export const page = Component(() => {
 
   return html`
     <div class="bc-marketing">
-
+      <div class="badge">Pre-Launch Alpha!</div>
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png">
