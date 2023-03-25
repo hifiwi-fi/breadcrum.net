@@ -1,3 +1,5 @@
+@import './components/badge/badge.css';
+
 .bc-main {
 	max-width: 55em;
 }
@@ -32,14 +34,3 @@
   }
 }
 
-.badge {
-  background-color: red;
-  color: white;
-  padding: 4px 8px;
-  text-align: center;
-  border-radius: 5px;
-  margin: 0;
-  margin-bottom: 50px;
-  position: absolute;
-  font-weight: 600;
-}

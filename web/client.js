@@ -1,6 +1,7 @@
 /* eslint-env browser */
 import { Component, html, render /*, useEffect */ } from 'uland-isomorphic'
 // import { useUser } from './hooks/useUser.js'
+import { badge } from './components/badge/badge.js'
 
 export const page = Component(() => {
   // const { user, loading } = useUser()
@@ -11,7 +12,7 @@ export const page = Component(() => {
 
   return html`
     <div class="bc-marketing">
-      <div class="badge">Pre-Launch Alpha!</div>
+      ${badge('Pre-Launch Alpha!')}
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png">

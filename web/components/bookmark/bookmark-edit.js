@@ -346,10 +346,10 @@ export const bookmarkEdit = Component(({
           <label>
             <input type="checkbox" name="createArchive">
             create archive
-            <span class="bc-help-text">
-              ℹ️ Save readability archive
-            </span>
           </label>
+          <span class="bc-help-text">
+            ℹ️ Save readability archive
+          </span>
         </div>
 
         <!-- Bookmark Create Episode -->

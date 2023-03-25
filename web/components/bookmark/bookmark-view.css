@@ -2,6 +2,7 @@
 @import '../star';
 @import '../sensitive';
 @import '../episode-title';
+@import '../archive-entry';
 
 .bc-bookmark-view {
   padding-bottom: 4px;

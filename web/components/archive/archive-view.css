@@ -1,0 +1,49 @@
+/* episode-view.css */
+@import '../text-icon';
+@import '../episode-title';
+@import '../cors-media/cors-media.css';
+
+.bc-episode-view {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+
+.bc-episode-url-display {
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bc-date,
+.bc-episode-url-display,
+.bc-episode-bookmark-title,
+.bc-episode-feed-title,
+.bc-episode-details-display {
+  font-size: 0.8em;
+}
+
+.bc-episode-feed-title-text {
+  color: var(--bc-feeds-color);
+}
+
+.bc-date a,
+.bc-episode-url-display a,
+.bc-episode-episodes-display {
+  color: var(--accent-foreground);
+}
+
+
+.bc-episode-video-preview,
+.bc-episode-audio-preview {
+  width: 100%;
+}
+
+.bc-episode-video-preview {
+  background-color: var(--accent-background);
+  border-radius: 5px;
+}

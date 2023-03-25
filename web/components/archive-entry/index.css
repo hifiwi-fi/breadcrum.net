@@ -1,0 +1,24 @@
+/* episode-title.css */
+
+.bc-archives-title-container {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bc-archives-title-container a {
+  color: var(--bc-archives-color);
+}
+
+.bc-archives-title-container-small {
+  -webkit-line-clamp: 1;
+  font-size: 0.8em;
+}
+
+.bc-archives-excerpt {
+  color: var(--bc-archives-accent);
+  font-style: italic;
+  margin-bottom: 0px;
+}
