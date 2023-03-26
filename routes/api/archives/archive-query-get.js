@@ -23,7 +23,7 @@ export function getArchivesQuery ({
       ar.excerpt,
       ar.byline,
       ar.direction,
-      ar.language,,
+      ar.language,
       ar.ready,
       ar.error,
       jsonb_build_object(
@@ -36,7 +36,7 @@ export function getArchivesQuery ({
         'starred', bm.starred,
         'toread', bm.toread,
         'sensitive', bm.sensitive
-        # tags?
+        /* tags? */
       ) as bookmark
     from archives ar
     join bookmarks bm

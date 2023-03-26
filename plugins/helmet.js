@@ -6,27 +6,23 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-helmet
  */
 
-const defaultDirectives = {
-  'media-src': '*'
-}
-
 export default fp(async function (fastify, opts) {
-  fastify.register(import('@fastify/helmet'), fastify.config.ENV === 'production'
-    ? {
-        contentSecurityPolicy: {
-          directives: {
-            ...defaultDirectives
-          }
-        }
+  const options = {
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginEmbedderPolicy: { policy: 'credentialless' },
+    contentSecurityPolicy: {
+      directives: {
+        'media-src': '*',
+        'img-src': '*'
       }
-    : {
-        contentSecurityPolicy: {
-          directives: {
-            ...defaultDirectives,
-            'upgrade-insecure-requests': null
-          }
-        }
-      })
+    }
+  }
+
+  if (fastify.config.ENV !== 'production') {
+    options.contentSecurityPolicy.directives['upgrade-insecure-requests'] = null
+  }
+
+  fastify.register(import('@fastify/helmet'), options)
 }, {
   name: 'helmet',
   dependencies: ['env']

@@ -79,7 +79,7 @@ export const page = Component(() => {
     <div>
       ${archiveLoading ? html`<div>...</div>` : null}
       ${archiveError ? html`<div>${archiveError.message}</div>` : null}
-      ${archive ? archiveList({ archive, reload: reloadArchive, onDelete: handleDelete, clickForPreview: false }) : null}
+      ${archive ? archiveList({ archive, reload: reloadArchive, onDelete: handleDelete, fullView: true }) : null}
     </div>
 `
 })

@@ -6,7 +6,7 @@ import { diffArchive } from './diff-archive.js'
 import { archiveEdit } from './archive-edit.js'
 import { archiveView } from './archive-view.js'
 
-export const archiveList = Component(({ archive, reload, onDelete, clickForPreview }) => {
+export const archiveList = Component(({ archive, reload, onDelete, fullView }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -62,7 +62,7 @@ export const archiveList = Component(({ archive, reload, onDelete, clickForPrevi
         : archiveView({
             archive,
             onEdit: handleEdit,
-            clickForPreview
+            fullView
           })
     }
   </div>`

@@ -5,7 +5,8 @@ import { archiveEntry } from '../archive-entry/index.js'
 
 export const archiveView = Component(({
   archive: ar,
-  onEdit = () => {}
+  onEdit = () => {},
+  fullView
 } = {}) => {
   return html`
     <div class="bc-archive-view">
@@ -44,6 +45,8 @@ export const archiveView = Component(({
       <div>
         <button onClick=${onEdit}>Edit</button>
       </div>
+
+      ${html([ar?.html_content])}
     </div>
   `
 })

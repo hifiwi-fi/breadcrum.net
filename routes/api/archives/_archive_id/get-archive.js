@@ -45,6 +45,8 @@ export async function getArchive (fastify, opts) {
         fullArchives: true
       })
 
+      console.log({ archiveQuery })
+
       const results = await fastify.pg.query(archiveQuery)
       const archive = results.rows[0]
 
