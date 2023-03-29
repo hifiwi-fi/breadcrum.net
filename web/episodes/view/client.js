@@ -45,6 +45,7 @@ export const page = Component(() => {
 
       if (!id) {
         window.location.replace('/episodes')
+        return
       }
 
       const requestParams = new URLSearchParams()

@@ -17,7 +17,8 @@ export const commnonBookmarkProps = {
       type: 'string',
       format: 'uri'
     }
-  }
+  },
+  summary: { type: 'string' } // for client side extracted descriptions as fallbacks
 }
 
 export const fullBookmarkProps = {

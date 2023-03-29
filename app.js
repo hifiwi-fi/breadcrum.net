@@ -7,10 +7,6 @@ const __dirname = desm(import.meta.url)
 const hid = hyperid()
 
 export default async function App (fastify, opts) {
-  // Place here your custom code!
-
-  // Do not touch the following lines
-
   const testPattern = /.*(test|spec).js/
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
@@ -33,9 +29,6 @@ export default async function App (fastify, opts) {
     ignorePattern: testPattern,
     options: Object.assign({}, opts)
   })
-
-  // await fastify.after()
-  // console.log(fastify.printRoutes())
 }
 
 export const options = {

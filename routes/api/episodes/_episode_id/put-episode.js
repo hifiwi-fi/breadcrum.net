@@ -7,12 +7,7 @@ export async function putEpisode (fastify, opts) {
   fastify.put('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
-      querystring: {
-        sensitive: {
-          type: 'boolean',
-          default: false
-        }
-      },
+      querystring: {},
       params: {
         type: 'object',
         properties: {

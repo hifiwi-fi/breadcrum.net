@@ -9,7 +9,8 @@ export const getBookmarksQuery = ({
   sensitive,
   starred,
   toread,
-  perPage
+  perPage,
+  fullArchives
 }) => {
   const bookarmsQuery = SQL`
         with bookmark_page as (
@@ -77,6 +78,36 @@ export const getBookmarksQuery = ({
           where bm.owner_id = ${ownerId}
           and ep.owner_id = ${ownerId}
           group by bm.id
+        ),
+        archives_array as (
+          select bm.id as bookmark_id, jsonb_strip_nulls(jsonb_agg(
+            case
+            when ar.id is null then null
+            else jsonb_strip_nulls(jsonb_build_object(
+              'id', ar.id,
+              'created_at', ar.created_at,
+              'updated_at', ar.updated_at,
+              'url', ar.url,
+              'title', ar.title,
+              'site_name', ar.site_name,
+              'length', ar.length,
+              ${fullArchives ? SQL`'html_content', ar.html_content,` : SQL``}
+              'excerpt', ar.excerpt,
+              'byline', ar.byline,
+              'direction', ar.direction,
+              'language', ar.language,
+              'extraction_method', ar.extraction_method,
+              'ready', ar.ready,
+              'error', ar.error
+            ))
+            end)
+          ) archives
+          from bookmark_page bm
+          left outer join archives ar
+          on ar.bookmark_id = bm.id
+          where bm.owner_id = ${ownerId}
+          and ar.owner_id = ${ownerId}
+          group by bm.id
         )
         select
           b.id,
@@ -88,14 +119,18 @@ export const getBookmarksQuery = ({
           b.toread,
           b.sensitive,
           b.starred,
+          b.summary,
           coalesce(array_to_json(tag_array), '[]'::json)::jsonb as tags,
           coalesce(episodes, '[]'::jsonb) as episodes,
+          coalesce(archives, '[]'::jsonb) as archives,
           b.archive_urls
         from bookmark_page b
         left outer join bookark_page_tags_array
         on bookark_page_tags_array.bookmark_id = b.id
         left outer join bookark_page_episodes_array
         on bookark_page_episodes_array.bookmark_id = b.id
+        left outer join archives_array
+        on archives_array.bookmark_id = b.id
         order by b.created_at desc, b.title desc, b.url desc
       `
 

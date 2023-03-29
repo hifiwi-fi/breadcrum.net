@@ -6,27 +6,15 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-helmet
  */
 
-const defaultDirectives = {
-  'media-src': '*'
-}
-
 export default fp(async function (fastify, opts) {
-  fastify.register(import('@fastify/helmet'), fastify.config.ENV === 'production'
-    ? {
-        contentSecurityPolicy: {
-          directives: {
-            ...defaultDirectives
-          }
-        }
+  // This is also customized in the ./static.js plugin
+  fastify.register(import('@fastify/helmet'), {
+    contentSecurityPolicy: {
+      directives: {
+        'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : []
       }
-    : {
-        contentSecurityPolicy: {
-          directives: {
-            ...defaultDirectives,
-            'upgrade-insecure-requests': null
-          }
-        }
-      })
+    }
+  })
 }, {
   name: 'helmet',
   dependencies: ['env']

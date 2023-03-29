@@ -1,0 +1,37 @@
+/* episode-view.css */
+@import '../text-icon';
+@import '../episode-title';
+@import '../cors-media/cors-media.css';
+
+.bc-archive-view {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+
+.bc-archive-url-display {
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bc-date,
+.bc-archive-url-display,
+.bc-archive-bookmark-title {
+  font-size: 0.8em;
+}
+
+.bc-date a,
+.bc-archive-url-display a,
+.bc-archive-episodes-display {
+  color: var(--accent-foreground);
+}
+
+
+.bc-archive-html-content {
+  margin-top: 1.2em;
+}

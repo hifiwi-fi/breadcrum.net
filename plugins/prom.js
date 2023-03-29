@@ -39,9 +39,19 @@ export default fp(async function (fastify, opts) {
     help: 'The number of times episodes are edited'
   })
 
+  fastify.metrics.archiveEditCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_edit_total',
+    help: 'The number of times archives are edited'
+  })
+
   fastify.metrics.episodeDeleteCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_episode_delete_total',
     help: 'The number of times episodes are deleted'
+  })
+
+  fastify.metrics.archiveDeleteCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_delete_total',
+    help: 'The number of times archives are deleted'
   })
 
   fastify.metrics.tagAppliedCounter = new fastify.metrics.client.Counter({
@@ -67,6 +77,16 @@ export default fp(async function (fastify, opts) {
   fastify.metrics.siteMetaSeconds = new fastify.metrics.client.Histogram({
     name: 'breadcrum_site_meta_seconds',
     help: 'The time it takes for site meta extraction'
+  })
+
+  fastify.metrics.archiveSeconds = new fastify.metrics.client.Histogram({
+    name: 'breadcrum_archive_seconds',
+    help: 'The time it takes for readability archive extraction'
+  })
+
+  fastify.metrics.archiveCounter = new fastify.metrics.client.Counter({
+    name: 'breadcrum_archive_created_total',
+    help: 'The number of times a readability archive is created'
   })
 
   const promServer = Fastify({

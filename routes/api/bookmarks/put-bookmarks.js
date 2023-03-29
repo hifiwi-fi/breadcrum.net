@@ -3,7 +3,10 @@ import SQL from '@nearform/sql'
 import { commnonBookmarkProps } from './bookmark-props.js'
 import { createEpisodeProp } from '../episodes/episode-props.js'
 import { createEpisode } from '../episodes/episode-query-create.js'
+import { createArchive } from '../archives/archive-query-create.js'
+import { createArchiveProp } from '../archives/archive-props.js'
 import { resolveEpisode } from '../episodes/resolve-episode.js'
+import { resolveArchive } from '../archives/resolve-archive.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 
@@ -31,7 +34,8 @@ export async function putBookmarks (fastify, opts) {
           type: 'object',
           properties: {
             ...commnonBookmarkProps,
-            ...createEpisodeProp
+            ...createEpisodeProp,
+            ...createArchiveProp
           },
           additionalProperties: false,
           required: ['url']
@@ -99,7 +103,8 @@ export async function putBookmarks (fastify, opts) {
           toread,
           sensitive,
           tags = [],
-          archive_urls = []
+          archive_urls = [],
+          summary
         } = request.body
         let { url } = request.body
         const urlObj = new URL(url)
@@ -150,14 +155,16 @@ export async function putBookmarks (fastify, opts) {
           toread,
           sensitive,
           archive_urls,
+          summary,
           owner_id
         ) values (
           ${url},
           ${title ?? serverMeta?.title ?? null},
-          ${note ?? serverMeta?.summary ?? null},
+          ${note ?? null},
           ${toread ?? false},
           ${sensitive ?? false},
           ${archive_urls.length > 0 ? archive_urls : SQL`'{}'`},
+          ${summary ?? serverMeta?.summary ?? null},
           ${userId}
         )
         returning id, url, title, toread, sensitive, archive_urls, owner_id;`
@@ -221,6 +228,31 @@ export async function putBookmarks (fastify, opts) {
             })
           })
         }
+
+        const { id: archiveID, url: archiveURL } = await createArchive({
+          client,
+          userID: userId,
+          bookmarkId: bookmark.id,
+          bookmarkTitle: title,
+          url: request?.body?.createArchive?.url ?? url,
+          extractionMethod: 'server'
+        })
+
+        await client.query('commit')
+        fastify.metrics.archiveCounter.inc()
+
+        fastify.pqueue.add(() => {
+          return resolveArchive({
+            fastify,
+            userID: userId,
+            bookmarkTitle: title,
+            archiveID,
+            url: archiveURL,
+            initialHTML: serverMeta?.html,
+            log: request.log
+          })
+        })
+
         await client.query('commit')
         fastify.metrics.bookmarkCreatedCounter.inc()
 

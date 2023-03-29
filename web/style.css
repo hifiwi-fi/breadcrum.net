@@ -1,3 +1,5 @@
+@import './components/badge/badge.css';
+
 .bc-main {
 	max-width: 55em;
 }
@@ -12,7 +14,6 @@
 .bc-marking-hero-title {
 	margin: 0;
 	font-weight: 600;
-	margin-bottom: 50px;
 }
 
 .bc-marking-hero-description {
@@ -32,3 +33,4 @@
     grid-template-columns: 1fr;
   }
 }
+
