@@ -6,6 +6,7 @@ import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
 import { episodeTitle } from '../episode-title/index.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { archiveTitle } from '../archive-title/index.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -158,6 +159,7 @@ export const bookmarkEdit = Component(({
     }
     const title = form.title.value
     const note = form.note.value
+    const summary = form.summary.value
     const rawTags = form.tags.value
     const tags = Array.from(new Set(rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))))
     const toread = form.toread.checked
@@ -198,6 +200,7 @@ export const bookmarkEdit = Component(({
       url,
       title,
       note,
+      summary,
       tags,
       toread,
       starred,
@@ -282,6 +285,34 @@ export const bookmarkEdit = Component(({
           </label>
         </div>
 
+        <!-- Bookmark Options -->
+        <div>
+          <label>
+            <input type="checkbox" name="toread" ?checked="${b?.toread}">
+            to read
+          </label>
+          <label>
+            <input type="checkbox" name="starred" ?checked="${b?.starred}">
+            starred
+          </label>
+          <label>
+            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
+            sensitive
+          </label>
+        </div>
+
+        <!-- Bookmark Summary -->
+        <details class="bc-bookmark-summary-edit-details">
+            <summary>
+              <label>summary</label>
+              <span class="bc-help-text">
+                ℹ️ Summary fallback text is typically auto-populated
+              </span>
+            </summary>
+
+            <textarea class="bc-bookmark-summary" rows="3" name="summary">${b?.summary}</textarea>
+        </details>
+
          <!-- Bookmark Archive URLs -->
         <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
             <summary>
@@ -313,21 +344,17 @@ export const bookmarkEdit = Component(({
 
         </details>
 
-        <!-- Bookmark Options -->
-        <div>
-          <label>
-            <input type="checkbox" name="toread" ?checked="${b?.toread}">
-            to read
-          </label>
-          <label>
-            <input type="checkbox" name="starred" ?checked="${b?.starred}">
-            starred
-          </label>
-          <label>
-            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
-            sensitive
-          </label>
-        </div>
+        ${b?.archives?.length > 0
+            ? html`
+            <label class="block">
+              archives:
+            </label>
+            ${b.archives.map(
+                ar => html.for(ar, ar.id)`${archiveTitle({ archive: ar, small: true })}`
+              )
+          }`
+            : null
+        }
 
         ${b?.episodes?.length > 0
             ? html`
@@ -339,13 +366,14 @@ export const bookmarkEdit = Component(({
               )
           }`
             : null
-          }
+        }
 
-        <!-- Readanility Archive Options -->
+
+        <!-- Readability Archive Options -->
         <div>
           <label>
             <input type="checkbox" name="createArchive">
-            create archive
+            create new archive
           </label>
           <span class="bc-help-text">
             ℹ️ Save readability archive
@@ -356,7 +384,7 @@ export const bookmarkEdit = Component(({
         <div>
           <label>
             <input type="checkbox" onchange="${handleCreateEpisodeCheckbox}" name="createEpisode">
-            create episode
+            create new episode
           </label>
           <span class="bc-help-text">
             ℹ️ Save an episode with this bookmark

@@ -1,3 +1,5 @@
+create type archive_extraction_method as enum ('server', 'client');
+
 create table archives (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null,
@@ -8,11 +10,13 @@ create table archives (
   title text,
   site_name text,
   html_content text,
+  text_content text, /* used for full text search maybe */
   length bigint,
   excerpt text,
   byline text,
   direction text,
   language text,
+  extraction_method archive_extraction_method not null,
   ready boolean not null default false,
   error text,
 
@@ -34,3 +38,7 @@ create trigger set_timestamp_archives
 before update on archives
 for each row
 execute procedure trigger_set_timestamp();
+
+
+alter table bookmarks
+  add column summary text;

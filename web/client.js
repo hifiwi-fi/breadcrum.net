@@ -70,6 +70,15 @@ export const page = Component(() => {
           </div>
 
           <div class="bc-marketing-feature-block">
+            <h2>🗄️ Readability Archive</h2>
+            <p>
+              Privately archive a minimal full-text content (aka article or reader mode) extraction of every article you bookmark.
+              Contents are indexed and full text searchable along side your bookmark notes and tags.
+              Quit fumbling your hand written note, and just clip out the full contents of the article sent to your browser.
+            </p>
+          </div>
+
+          <div class="bc-marketing-feature-block">
             <h2>🏷️ Tags</h2>
             <p>
               Tag it up like its 2005! Organize bookmarks by tags.
@@ -161,15 +170,6 @@ export const page = Component(() => {
                 <img src="./static/screenshots/feed-window-light.png" alt="Screenshot of Breadcrum.net">
               </picture>
             </div>
-          </div>
-
-          <div class="bc-marketing-feature-block">
-            <h2>🗄️ Reader archive <div><small>(Coming soon)</small></div></h2>
-            <p>
-              Privately archive a minimal full-text content (aka article or reader mode) extraction of every article you bookmark.
-              Contents are indexed and full text searchable along side your bookmark notes and tags.
-              Quit fumbling your hand written note, and just clip out the full contents of the article sent to your browser.
-            </p>
           </div>
 
           <div class="bc-marketing-feature-block">

@@ -7,22 +7,14 @@ import fp from 'fastify-plugin'
  */
 
 export default fp(async function (fastify, opts) {
-  const options = {
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    crossOriginEmbedderPolicy: { policy: 'credentialless' },
+  // This is also customized in the ./static.js plugin
+  fastify.register(import('@fastify/helmet'), {
     contentSecurityPolicy: {
       directives: {
-        'media-src': '*',
-        'img-src': '*'
+        'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : []
       }
     }
-  }
-
-  if (fastify.config.ENV !== 'production') {
-    options.contentSecurityPolicy.directives['upgrade-insecure-requests'] = null
-  }
-
-  fastify.register(import('@fastify/helmet'), options)
+  })
 }, {
   name: 'helmet',
   dependencies: ['env']

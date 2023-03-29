@@ -1,7 +1,7 @@
 /* eslint-env browser */
 import { Component, html } from 'uland-isomorphic'
 
-import { archiveEntry } from '../archive-entry/index.js'
+import { archiveTitle } from '../archive-title/index.js'
 
 export const archiveView = Component(({
   archive: ar,
@@ -11,10 +11,10 @@ export const archiveView = Component(({
   return html`
     <div class="bc-archive-view">
 
-      ${archiveEntry({ archive: ar })}
+      ${archiveTitle({ archive: ar, big: fullView })}
 
       <div class="bc-archive-url-display">
-        <a href="${ar.url}">${ar.url}</a>
+        ${fullView ? '🗄️ ' : ''}<a href="${ar.url}">${ar.site_name || ar.url.replace(/^https?:\/\//, '')}</a>${ar.byline ? ` · ${ar.byline}` : null}
       </div>
 
       <div class="bc-archive-bookmark-title">
@@ -42,11 +42,15 @@ export const archiveView = Component(({
         : null
       }
 
-      <div>
-        <button onClick=${onEdit}>Edit</button>
-      </div>
-
-      ${html([ar?.html_content])}
+      ${
+        ar?.html_content
+        ? html`
+          <div class="bc-archive-html-content">
+            ${html([ar?.html_content])}
+          </div>
+        `
+        : null
+      }
     </div>
   `
 })

@@ -17,6 +17,7 @@ export const fullArchiveProps = {
   ...commonArchiveProps,
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' },
+  extraction_method: { enum: ['server', 'client'] },
   display_title: { type: 'string' }
 }
 

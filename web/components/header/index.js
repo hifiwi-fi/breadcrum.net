@@ -51,6 +51,7 @@ export const header = Component(() => {
             <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
             <div>🏷 <a href='/tags/'>tags</a></div>
             <div>📡 <a href='/feeds/'>feeds</a></div>
+            <div>🗄️ <a href='/archives/'>archives</a></div>
             <div class="bc-header-button">${toread({ toread: state.toread, onclick: handleToreadToggle })}</div>
             <div class="bc-header-button">${star({ starred: state.starred, onclick: handleStarToggle })}</div>
             <div class="bc-header-button">${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>

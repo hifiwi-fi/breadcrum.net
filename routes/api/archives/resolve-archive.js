@@ -28,6 +28,7 @@ export async function resolveArchive ({
     if ('title' in article) archiveData.push(SQL`title = ${article.title}`)
     if ('siteName' in article) archiveData.push(SQL`site_name = ${article.siteName}`)
     if ('content' in article) archiveData.push(SQL`html_content = ${article.content}`)
+    if ('textContent' in article) archiveData.push(SQL`text_content = ${article.textContent}`)
     if ('length' in article) archiveData.push(SQL`length = ${article.length}`)
     if ('excerpt' in article) archiveData.push(SQL`excerpt = ${article.excerpt}`)
     if ('byline' in article) archiveData.push(SQL`byline = ${article.byline}`)

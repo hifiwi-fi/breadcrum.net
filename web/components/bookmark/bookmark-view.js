@@ -7,7 +7,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import cn from 'classnames'
 import { episodeTitle } from '../episode-title/index.js'
-import { archiveEntry } from '../archive-entry/index.js'
+import { archiveTitle } from '../archive-title/index.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -56,6 +56,7 @@ export const bookmarkView = Component(({
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url.replace(/^https?:\/\//, '')}</a></div>
       ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
+      ${b.summary ? html`<div class='bc-bookmark-summary-display'>${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)}</div>` : null}
       <div>
       ${b.tags?.length > 0
         ? html`
@@ -73,7 +74,7 @@ export const bookmarkView = Component(({
       }
       ${b.archives?.length > 0
         ? html`${b.archives.map(
-            ar => html.for(ar, ar.id)`${archiveEntry({ archive: ar, small: true })}`
+            ar => html.for(ar, ar.id)`${archiveTitle({ archive: ar, small: true })}`
           )}`
         : null
       }

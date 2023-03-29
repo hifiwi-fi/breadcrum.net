@@ -3,11 +3,12 @@
 import { Component, html } from 'uland-isomorphic'
 import cn from 'classnames'
 
-export const archiveEntry = Component(
+export const archiveTitle = Component(
   (
     {
       archive: { id, url, title, site_name, length, excerpt, languange, byline, direction, error, ready } = {},
-      small
+      small,
+      big
     } = {}
   ) => {
     const href = small === true
@@ -20,20 +21,22 @@ export const archiveEntry = Component(
     })}">
       <div class='bc-archives-title-container'>
         ${
-          error
-            ? '❌'
-            : ''
+          big
+            ? html`
+            <h1 class='bc-archives-big-title'>
+              <a href="${href}" target="${small ? null : '_blank'}">
+                ${title}
+              </a>
+            </h1>
+            `
+            : html`🗄️ ${
+                error
+                  ? '❌'
+                  : null
+                }
+                <a href="${`/archives/view/?id=${id}`}" target="${small ? null : '_blank'}">${title}</a>`
         }
-        🗄️
-        <a href="${href}" target="${small ? null : '_blank'}">
-          ${title}
-        </a>
       </div>
-      ${excerpt
-        ? html`
-          <p class="bc-archives-excerpt">${excerpt}</p>`
-        : null
-      }
     </div>
   `
   }

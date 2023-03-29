@@ -6,11 +6,12 @@ export async function createArchive ({
   userID,
   bookmarkId,
   bookmarkTitle,
+  extractionMethod,
   url
 }) {
   const createArchiveQuery = SQL`
-          INSERT INTO archives (owner_id, bookmark_id, url, title)
-          VALUES (${userID}, ${bookmarkId}, ${url}, ${bookmarkTitle})
+          INSERT INTO archives (owner_id, bookmark_id, url, title, extraction_method)
+          VALUES (${userID}, ${bookmarkId}, ${url}, ${bookmarkTitle}, ${extractionMethod})
           returning id, url, title;
           `
 

@@ -24,6 +24,7 @@ export function getArchivesQuery ({
       ar.byline,
       ar.direction,
       ar.language,
+      ar.extraction_method,
       ar.ready,
       ar.error,
       jsonb_build_object(

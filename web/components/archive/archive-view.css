@@ -3,14 +3,14 @@
 @import '../episode-title';
 @import '../cors-media/cors-media.css';
 
-.bc-episode-view {
+.bc-archive-view {
   padding-bottom: 4px;
   margin-bottom: 4px;
   border-bottom: 1px solid var(--accent-background);
 }
 
 
-.bc-episode-url-display {
+.bc-archive-url-display {
   margin-bottom: 5px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -20,30 +20,18 @@
 }
 
 .bc-date,
-.bc-episode-url-display,
-.bc-episode-bookmark-title,
-.bc-episode-feed-title,
-.bc-episode-details-display {
+.bc-archive-url-display,
+.bc-archive-bookmark-title {
   font-size: 0.8em;
 }
 
-.bc-episode-feed-title-text {
-  color: var(--bc-feeds-color);
-}
-
 .bc-date a,
-.bc-episode-url-display a,
-.bc-episode-episodes-display {
+.bc-archive-url-display a,
+.bc-archive-episodes-display {
   color: var(--accent-foreground);
 }
 
 
-.bc-episode-video-preview,
-.bc-episode-audio-preview {
-  width: 100%;
-}
-
-.bc-episode-video-preview {
-  background-color: var(--accent-background);
-  border-radius: 5px;
+.bc-archive-html-content {
+  margin-top: 1.2em;
 }

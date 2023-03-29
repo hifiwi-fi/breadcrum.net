@@ -30,7 +30,7 @@ export const page = Component(() => {
       setBookmark({
         url: query.get('url'),
         title: query.get('title'),
-        note: query.get('note') || query.get('description'),
+        note: query.get('note'),
         tags: query.getAll('tags').filter(t => Boolean(t))
       })
     }
@@ -49,8 +49,10 @@ export const page = Component(() => {
 
       const payload = { url: queryUrl }
       if (query.get('title')) payload.title = query.get('title')
-      const queryNote = query.get('note') || query.get('description')
-      if (queryNote) payload.note = queryNote
+      if (query.get('note')) payload.note = query.get('note')
+
+      const summary = query.get('summary') || query.get('description')
+      if (summary) payload.summary = summary
       const queryTags = query.getAll('tags').filter(t => Boolean(t))
       if (queryTags.length > 0) payload.tags = queryTags
 

@@ -1,3 +1,6 @@
+@import '../archive-title';
+@import '../episode-title';
+
 .bc-bookmark-edit {
   & input[type="date"],
   & input[type="datetime-local"],
@@ -23,6 +26,7 @@
   min-width: 0;
 }
 
+.bc-bookmark-summary,
 .bc-bookmark-note {
   display: block;
   width: 100%;
@@ -44,6 +48,7 @@
   justify-content: space-between;
 }
 
+.bc-bookmark-summary-edit-details,
 .bc-bookmark-archive-url-edit-details {
   /* hack. Don't know why details parent padding isn't passing to the child */
   padding-inline-end: 0.9rem;

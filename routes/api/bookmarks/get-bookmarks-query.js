@@ -96,6 +96,7 @@ export const getBookmarksQuery = ({
               'byline', ar.byline,
               'direction', ar.direction,
               'language', ar.language,
+              'extraction_method', ar.extraction_method,
               'ready', ar.ready,
               'error', ar.error
             ))
@@ -118,6 +119,7 @@ export const getBookmarksQuery = ({
           b.toread,
           b.sensitive,
           b.starred,
+          b.summary,
           coalesce(array_to_json(tag_array), '[]'::json)::jsonb as tags,
           coalesce(episodes, '[]'::jsonb) as episodes,
           coalesce(archives, '[]'::jsonb) as archives,

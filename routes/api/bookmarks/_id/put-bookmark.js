@@ -72,6 +72,7 @@ export async function putBookmark (fastify, opts) {
       if (bookmark.url != null) updates.push(SQL`url = ${bookmark.url}`)
       if (bookmark.title != null) updates.push(SQL`title = ${bookmark.title}`)
       if (bookmark.note != null) updates.push(SQL`note = ${bookmark.note}`)
+      if (bookmark.summary != null) updates.push(SQL`summary = ${bookmark.summary}`)
       if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
       if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
       if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
@@ -183,7 +184,8 @@ export async function putBookmark (fastify, opts) {
           userID: userId,
           bookmarkId: createdBookmark.id,
           bookmarkTitle: createdBookmark.title,
-          url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url
+          url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url,
+          extractionMethod: 'server'
         })
 
         await client.query('commit')

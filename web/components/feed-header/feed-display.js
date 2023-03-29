@@ -52,7 +52,7 @@ export const feedDisplay = Component(({
         </div>
 
         <div class="bc-feed-feed-url-line">
-          <img height="32" src="/static/atom.svg">
+          <img width="32" src="/static/atom.svg">
           <input
             class="bc-feed-header-select"
             type="text"

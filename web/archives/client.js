@@ -33,7 +33,7 @@ export const page = Component(() => {
     }
   }, [user, loading])
 
-  // Load episodes
+  // Load archives
   useEffect(() => {
     async function getArchives () {
       setArchivesLoading(true)
@@ -118,7 +118,7 @@ export const page = Component(() => {
   ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
   ${archivesError ? html`<div>${archivesError.message}</div>` : null}
   ${Array.isArray(archives)
-      ? archives.map(e => html.for(e, e.id)`${archiveList({ episode: e, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
+      ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
       : null}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}

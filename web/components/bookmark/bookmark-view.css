@@ -2,7 +2,7 @@
 @import '../star';
 @import '../sensitive';
 @import '../episode-title';
-@import '../archive-entry';
+@import '../archive-title';
 
 .bc-bookmark-view {
   padding-bottom: 4px;
@@ -15,16 +15,25 @@
 }
 
 .bc-bookmark-title,
-.bc-bookmark-note-display {
+.bc-bookmark-note-display,
+.bc-bookmark-summary-display {
   word-break: break-word;
 }
 
-.bc-bookmark-note-display p:last-child {
+.bc-bookmark-note-display p:last-child,
+.bc-bookmark-summary-display p:last-child {
   margin-bottom: 0px;
 }
 
 
+.bc-bookmark-summary-display {
+  color: var(--bc-summary-accent);
+  font-style: italic;
+  margin-bottom: 0px;
+}
+
 .bc-bookmark-url-display {
+  
   margin-top: -0.5em;
   margin-bottom: 5px;
 }
@@ -67,8 +76,4 @@
 
 .bc-tags-display a {
   color:  var(--bc-tags-color);
-}
-
-.bc-bookmark-line {
-  
 }
