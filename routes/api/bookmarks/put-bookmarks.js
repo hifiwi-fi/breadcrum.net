@@ -233,7 +233,7 @@ export async function putBookmarks (fastify, opts) {
           client,
           userID: userId,
           bookmarkId: bookmark.id,
-          bookmarkTitle: title,
+          bookmarkTitle: title ?? serverMeta?.title ?? null,
           url: request?.body?.createArchive?.url ?? url,
           extractionMethod: 'server'
         })
@@ -245,7 +245,7 @@ export async function putBookmarks (fastify, opts) {
           return resolveArchive({
             fastify,
             userID: userId,
-            bookmarkTitle: title,
+            bookmarkTitle: title ?? serverMeta?.title ?? null,
             archiveID,
             url: archiveURL,
             initialHTML: serverMeta?.html,
