@@ -183,13 +183,6 @@ export const page = Component(() => {
           </div>
 
           <div class="bc-marketing-feature-block">
-            <h2>🐦 Twitter archive <div><small>(Coming soon)</small></div></h2>
-            <p>
-              Reader-mode archiving of twitter threads and media for the bird site.
-            </p>
-          </div>
-
-          <div class="bc-marketing-feature-block">
             <h2>✒️ Markdown notes <div><small>(Coming soon)</small></div></h2>
             <p>
               Rich formatting of bookmark notes with markdown.
