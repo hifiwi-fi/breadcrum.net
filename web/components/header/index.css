@@ -66,3 +66,9 @@
   justify-content: center;
   margin-left: 3px;
 }
+
+@media (max-width: 500px) {
+  .bc-header-link-text {
+    display: none;
+  }
+}

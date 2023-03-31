@@ -48,10 +48,10 @@ export const header = Component(() => {
       ${!user
           ? loginButtons()
           : html`
-            <div>🔖 <a onclick='${onPageNav}' href='/bookmarks/'>bookmarks</a></div>
-            <div>🏷 <a href='/tags/'>tags</a></div>
-            <div>📡 <a href='/feeds/'>feeds</a></div>
-            <div>🗄️ <a href='/archives/'>archives</a></div>
+            <div><a onclick='${onPageNav}' href='/bookmarks/'>🔖<span class='bc-header-link-text'> bookmarks</span></a></div>
+            <div><a href='/tags/'>🏷<span class='bc-header-link-text'> tags</span></a></div>
+            <div><a href='/feeds/'>📡<span class='bc-header-link-text'> feeds</span></a></div>
+            <div><a href='/archives/'>🗄️<span class='bc-header-link-text'> archives</span></a></div>
             <div class="bc-header-button">${toread({ toread: state.toread, onclick: handleToreadToggle })}</div>
             <div class="bc-header-button">${star({ starred: state.starred, onclick: handleStarToggle })}</div>
             <div class="bc-header-button">${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>

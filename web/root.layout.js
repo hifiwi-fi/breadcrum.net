@@ -68,6 +68,9 @@ export default function defaultRootLayout ({
             <a href="https://twitter.com/breadcrum_">@breadcrum_</a>
           </div>
           <div>
+            <a href="https://status.breadcrum.net">status</a>
+          </div>
+          <div>
             © <a href="https://hifiwi.fi">HifiWi.fi</a>
           </div>
           <div>

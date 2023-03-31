@@ -11,9 +11,7 @@ export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/helmet'), {
     contentSecurityPolicy: {
       directives: {
-        'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : [],
-        'connect-src': ["'self'", 'https://*.browser-intake-datadoghq.com'], // REMOVE if not using DD
-        'worker-src': ["'self'", 'blob:'] // REMOVE if not using DD
+        'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : []
       }
     }
   })
