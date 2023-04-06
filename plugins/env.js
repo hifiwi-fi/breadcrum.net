@@ -47,7 +47,7 @@ export const schema = {
     },
     PQUEUE_CONCURRENCY: {
       type: 'integer',
-      default: 1
+      default: 3
     },
     PQUEUE_TIMEOUT: {
       type: 'integer',

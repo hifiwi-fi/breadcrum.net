@@ -1,14 +1,9 @@
 
 FROM node:19-alpine
 
-## Make sure this matches build.args in fly.toml
-## These vars get baked into the image. Do not pass secrets here.
-ARG ENV
-ARG NODE_ENV
-ARG HOST
-ARG TRANSPORT
-
 LABEL maintainer="HifiWifi LLC"
+
+CMD if [[ ! -z "$SWAP" ]]; then fallocate -l $(($(stat -f -c "(%a*%s/10)*7" .))) _swapfile && mkswap _swapfile && swapon _swapfile && ls -hla; fi; free -m; /app/run
 
 # Set the working directory
 WORKDIR /usr/src/app

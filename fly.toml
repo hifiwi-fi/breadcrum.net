@@ -24,6 +24,9 @@ processes = []
   NODE_ENV = 'production'
   HOST = 'breadcrum.net'
   TRANSPORT='https'
+  NODE_OPTIONS="--max-old-space-size=192"
+  SWAP="true"
+  PQUEUE_CONCURRENCY="2"
 
 [deploy]
   release_command = "npm run migrate -- --no-config"
