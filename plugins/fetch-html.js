@@ -1,5 +1,8 @@
 import fp from 'fastify-plugin'
 import { request as undiciRequest } from 'undici'
+import { pipeline } from 'stream/promises'
+import concat from 'concat-stream'
+import gunzip from 'gunzip-maybe'
 
 // Sorry newspapers, no cheating
 const GOOGLE_BOT_UA = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36'
@@ -36,8 +39,19 @@ export default fp(async function (fastify, opts) {
       throw new Error(`Fetch HTML error (${response.statusCode}): ` + text)
     }
 
-    const html = await response.body.text()
+    let html
+    if (response.headers['content-encoding'] === 'gzip') {
+      await pipeline(response.body, gunzip(), concat(gotData))
 
+      function gotData (htmlData) {
+        html = htmlData.toString('utf8')
+      }
+    } else {
+      // If the content is not gzip-encoded, process it as usual
+      html = await response.body.text()
+    }
+
+    console.dir({ html })
     return html
   })
 }, {

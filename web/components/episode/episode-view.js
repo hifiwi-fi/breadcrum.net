@@ -23,7 +23,7 @@ export const episodeView = Component(({
       </div>
 
 
-      ${corsMedia({ id: e?.id, src: mediaLink, type: e?.src_type, clickForPreview })}
+      ${corsMedia({ id: e?.id, src: mediaLink, type: e?.src_type, clickForPreview, thumbnail: e?.thumbnail })}
 
       ${
         e?.ready
@@ -64,6 +64,14 @@ export const episodeView = Component(({
       ${e.explicit
         ? html`<div>${textIcon({ value: 'Explicit' })}</div>`
         : null
+      }
+
+      ${
+        e?.text_content // Watch your whitepsace here
+          ? html`
+            <div class="bc-episode-text-content">${e?.text_content}</div>
+          `
+          : null
       }
 
       <div class="bc-date">

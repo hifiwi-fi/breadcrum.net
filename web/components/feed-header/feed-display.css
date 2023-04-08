@@ -49,6 +49,11 @@
   gap: 5px;
 }
 
+.bc-feed-feed-url-line a {
+  display: flex;
+  align-items: center;
+}
+
 .bc-feed-feed-url-line .bc-feed-header-select {
   flex-grow: 1;
 }

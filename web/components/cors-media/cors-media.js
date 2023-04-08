@@ -5,7 +5,8 @@ export const corsMedia = Component(({
   id,
   src,
   type,
-  clickForPreview
+  clickForPreview,
+  thumbnail
 } = {}) => {
   const [previewActive, setPreviewActive] = useState(!clickForPreview)
   const [hadCorsError, setHadCorsError] = useState(false)
@@ -52,7 +53,7 @@ export const corsMedia = Component(({
   <div>
     ${previewActive && ['video', 'audio'].includes(type)
       ? type === 'video'
-        ? html`<video onkeydown="${handlePlayKeys}" ref="${ref}" class="bc-cors-video" onerror="${onerror}" ?controls="${true}" src="${src}" preload="none">
+        ? html`<video onkeydown="${handlePlayKeys}" ref="${ref}" class="bc-cors-video" onerror="${onerror}" ?controls="${true}" src="${src}" preload="none" poster="${thumbnail}">
                   <a href="${src}">View video</a>
               </video>`
         : html`
