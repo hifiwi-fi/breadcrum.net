@@ -19,7 +19,6 @@ export function getArchivesQuery ({
       coalesce (ar.title, bm.title) as display_title,
       ar.site_name,
       ${fullArchives ? SQL`ar.html_content,` : SQL``}
-      ${fullArchives ? SQL`ar.text_content,` : SQL``}
       ar.length,
       ar.excerpt,
       ar.byline,

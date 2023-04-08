@@ -12,6 +12,9 @@ export const commonEpisodeProps = {
   filename: { type: 'string' },
   ext: { type: 'string' },
   src_type: { type: 'string' },
+  thumbnail: { type: 'string' },
+  text_content: { type: 'string' },
+  author_url: { type: 'string' },
   ready: { type: 'boolean' },
   error: { type: 'string' }
 }

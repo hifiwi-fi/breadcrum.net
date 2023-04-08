@@ -26,9 +26,12 @@ export function getEpisodesQuery ({
       ep.mime_type,
       ep.explicit,
       ep.author_name,
+      ep.author_url,
       ep.filename,
       ep.ext,
       ep.src_type,
+      ep.thumbnail,
+      ep.text_content,
       ep.ready,
       ep.error,
       ${includeFeed

@@ -27,25 +27,33 @@ export async function resolveEpisode ({
 
   try {
     const metadata = await fastify.getYTDLPMetadata({ url, medium })
-
+    // console.dir({ metadata }, { depth: 999 })
     const videoData = []
 
     videoData.push(SQL`ready = true`)
     videoData.push(SQL`url = ${url}`)
-    if (metadata.filesize_approx != null) videoData.push(SQL`size_in_bytes = ${Math.round(metadata.filesize_approx)}`)
-    if (metadata.duration != null) videoData.push(SQL`duration_in_seconds = ${Math.round(metadata.duration)}`)
-    if (metadata.channel != null) videoData.push(SQL`author_name = ${metadata.channel}`)
-    if (metadata.title != null && metadata.ext != null) {
+    if ('filesize_approx' in metadata) videoData.push(SQL`size_in_bytes = ${Math.round(metadata.filesize_approx)}`)
+    if ('duration' in metadata) videoData.push(SQL`duration_in_seconds = ${Math.round(metadata.duration)}`)
+    if ('channel' in metadata) videoData.push(SQL`author_name = ${metadata.channel}`)
+    if ('title' in metadata && 'ext' in metadata) {
       const filename = `${metadata.title}.${metadata.ext}`
       videoData.push(SQL`filename = ${filename}`)
     }
 
-    if (metadata.title != null && metadata.title !== bookmarkTitle) {
-      // TODO: when bookmarks have auto-extract, maybe remove this
+    if ('title' in metadata && metadata.title !== bookmarkTitle) {
       videoData.push(SQL`title = ${metadata.title.trim().substring(0, 255)}`)
     }
-    if (metadata.ext != null) videoData.push(SQL`ext = ${metadata.ext}`)
-    if (metadata._type != null) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
+    if ('ext' in metadata) videoData.push(SQL`ext = ${metadata.ext}`)
+    if ('_type' in metadata) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
+    if ('description' in metadata) {
+      videoData.push(SQL`text_content = ${metadata.description}`)
+    }
+    if ('uploader_url' in metadata || 'channel_url' in metadata) {
+      videoData.push(SQL`author_url = ${metadata.uploader_url || metadata.channel_url}`)
+    }
+    if ('thumbnail' in metadata) {
+      videoData.push(SQL`thumbnail = ${metadata.thumbnail}`)
+    }
 
     const query = SQL`
         update episodes

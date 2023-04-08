@@ -44,6 +44,7 @@ export default fp(async function (fastify, opts) {
     contentSecurityPolicy: {
       directives: {
         'media-src': '*',
+        'img-src': '*',
         'upgrade-insecure-requests': upgradeInsecureRequests
       }
     }
