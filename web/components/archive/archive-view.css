@@ -32,6 +32,11 @@
 }
 
 
+.bc-archive-text-content,
 .bc-archive-html-content {
   margin-top: 1.2em;
+}
+
+.bc-archive-text-content {
+  white-space: pre-line;
 }

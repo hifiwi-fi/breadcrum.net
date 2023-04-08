@@ -49,7 +49,11 @@ export const archiveView = Component(({
             ${html([ar?.html_content])}
           </div>
         `
-        : null
+        : ar?.text_content // Watch your whitepsace here
+          ? html`
+            <div class="bc-archive-text-content">${ar?.text_content}</div>
+          `
+          : null
       }
     </div>
   `

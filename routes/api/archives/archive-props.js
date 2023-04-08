@@ -3,6 +3,7 @@ export const commonArchiveProps = {
   title: { type: 'string' },
   site_name: { type: 'string' },
   html_content: { type: 'string' },
+  text_content: { type: 'string' },
   length: { type: 'integer' },
   excerpt: { type: 'string' },
   byline: { type: 'string' },

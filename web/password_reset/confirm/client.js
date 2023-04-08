@@ -43,8 +43,7 @@ export const page = Component(() => {
       })
 
       if (response.ok && response.status === 202) {
-        const body = await response.json()
-        console.log({ body })
+        await response.json()
         setReset(true)
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
