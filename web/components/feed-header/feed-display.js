@@ -20,7 +20,7 @@ export const feedDisplay = Component(({
       console.error(e)
       copyButton.current.innerText = 'Error'
     }
-  }, [copyButton.current])
+  }, [copyButton.current, f.feed_url])
 
   const handleSelect = useCallback(async ev => {
     ev.target.select()
@@ -52,7 +52,7 @@ export const feedDisplay = Component(({
         </div>
 
         <div class="bc-feed-feed-url-line">
-          <img width="32" src="/static/atom.svg">
+          <a href=${`/api/feeds/${f.id}?format=json`}><img width="32" src="/static/atom.svg"></a>
           <input
             class="bc-feed-header-select"
             type="text"

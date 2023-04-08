@@ -25,15 +25,17 @@ export async function resolveArchive ({
 
     archiveData.push(SQL`ready = true`)
     archiveData.push(SQL`url = ${url}`)
-    if ('title' in article) archiveData.push(SQL`title = ${article.title}`)
-    if ('siteName' in article) archiveData.push(SQL`site_name = ${article.siteName}`)
-    if ('content' in article) archiveData.push(SQL`html_content = ${article.content}`)
-    if ('textContent' in article) archiveData.push(SQL`text_content = ${article.textContent}`)
-    if ('length' in article) archiveData.push(SQL`length = ${article.length}`)
-    if ('excerpt' in article) archiveData.push(SQL`excerpt = ${article.excerpt}`)
-    if ('byline' in article) archiveData.push(SQL`byline = ${article.byline}`)
-    if ('dir' in article) archiveData.push(SQL`direction = ${article.dir}`)
-    if ('lang' in article) archiveData.push(SQL`language = ${article.lang}`)
+
+    console.dir({ article }, { depth: 999 })
+    if (article.title != null) archiveData.push(SQL`title = ${article.title}`)
+    if (article.siteName != null) archiveData.push(SQL`site_name = ${article.siteName}`)
+    if (article.content != null) archiveData.push(SQL`html_content = ${article.content}`)
+    if (article.textContent != null) archiveData.push(SQL`text_content = ${article.textContent}`)
+    if (article.length != null) archiveData.push(SQL`length = ${article.length}`)
+    if (article.excerpt != null) archiveData.push(SQL`excerpt = ${article.excerpt}`)
+    if (article.byline != null) archiveData.push(SQL`byline = ${article.byline}`)
+    if (article.dir != null) archiveData.push(SQL`direction = ${article.dir}`)
+    if (article.lang != null) archiveData.push(SQL`language = ${article.lang}`)
 
     const query = SQL`
         update archives

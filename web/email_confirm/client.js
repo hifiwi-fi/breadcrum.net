@@ -41,7 +41,7 @@ export const page = Component(() => {
         })
 
         if (response.ok && response.status === 202) {
-          const body = await response.json()
+          await response.json()
           setConfirmed(true)
         } else {
           throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)

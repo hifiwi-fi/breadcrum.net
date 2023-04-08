@@ -47,3 +47,7 @@
   background-color: var(--accent-background);
   border-radius: 5px;
 }
+
+.bc-episode-text-content {
+  white-space: pre-line;
+}
