@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 import abstractCacheRedis from 'abstract-cache-redis'
-import LRU from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import assert from 'webassert'
 
 /**
@@ -18,7 +18,7 @@ export default fp(async function (fastify, opts) {
   // TODO: Maybe delete these mem caches or move them to redis
 
   // For caching file URLs
-  const memURLCache = new LRU({
+  const memURLCache = new LRUCache({
     max: 10000,
     ttl: 1000 * 60 * 5, // 20 mins,
     updateAgeOnGet: false,
@@ -60,7 +60,7 @@ export default fp(async function (fastify, opts) {
   })
 
   // For caching url metadata objects
-  const ytDLPMemMetaCache = new LRU({
+  const ytDLPMemMetaCache = new LRUCache({
     max: 200,
     ttl: 1000 * 60 * 5, // 20 mins,
     updateAgeOnGet: false,
@@ -92,7 +92,7 @@ export default fp(async function (fastify, opts) {
   })
 
   // For caching server extracted site metadata
-  const siteMetaCache = new LRU({
+  const siteMetaCache = new LRUCache({
     max: 200,
     ttl: 1000 * 60 * 5, // 20 mins,
     updateAgeOnGet: false,
@@ -122,7 +122,7 @@ export default fp(async function (fastify, opts) {
   })
 
   // For caching server extracted site metadata
-  const archiveCache = new LRU({
+  const archiveCache = new LRUCache({
     max: 50,
     ttl: 1000 * 60 * 5, // 20 mins,
     updateAgeOnGet: false,
