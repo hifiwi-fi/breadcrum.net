@@ -1,75 +1,73 @@
-# fly.toml file generated for breadcrum on 2022-03-30T19:41:08-07:00
+# fly.toml app configuration file generated for breadcrum on 2023-05-23T11:12:14-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = "breadcrum"
-
+primary_region = "lax"
 kill_signal = "SIGINT"
-kill_timeout = 5
-processes = []
+kill_timeout = "5s"
+
+[experimental]
+  auto_rollback = true
 
 [build]
   dockerfile = "Dockerfile"
-
-[build.args]
-  ENV = 'production'
-  NODE_ENV = 'production'
-  HOST = 'breadcrum.net'
-  TRANSPORT='https'
-
-[env]
-  PORT = "8080"
-  FASTIFY_ADDRESS = '0.0.0.0'
-  FASTIFY_LOG_LEVEL = 'info'
-  FASTIFY_OPTIONS = 'true'
-  ENV = 'production'
-  NODE_ENV = 'production'
-  HOST = 'breadcrum.net'
-  TRANSPORT='https'
-  NODE_OPTIONS="--max-old-space-size=192"
-  SWAP="true"
-  PQUEUE_CONCURRENCY="2"
+  [build.args]
+    ENV = "production"
+    HOST = "breadcrum.net"
+    NODE_ENV = "production"
+    TRANSPORT = "https"
 
 [deploy]
   release_command = "npm run migrate -- --no-config"
 
-[experimental]
-  allowed_public_ports = []
-  auto_rollback = true
-
-[metrics]
-  port = 9091 # default for most prometheus clients
-  path = "/metrics" # default for most prometheus clients
+[env]
+  ENV = "production"
+  FASTIFY_ADDRESS = "0.0.0.0"
+  FASTIFY_LOG_LEVEL = "info"
+  FASTIFY_OPTIONS = "true"
+  HOST = "breadcrum.net"
+  NODE_ENV = "production"
+  NODE_OPTIONS = "--max-old-space-size=192"
+  PORT = "8080"
+  PQUEUE_CONCURRENCY = "2"
+  SWAP = "true"
+  TRANSPORT = "https"
 
 [[services]]
+  protocol = "tcp"
   internal_port = 8080
   processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
 
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
   [services.concurrency]
+    type = "connections"
     hard_limit = 25
     soft_limit = 20
-    type = "connections"
-
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
 
   [[services.tcp_checks]]
-    grace_period = "1s"
     interval = "15s"
-    restart_limit = 0
     timeout = "2s"
+    grace_period = "1s"
+    restart_limit = 0
 
   [[services.http_checks]]
-    interval = 10000
+    interval = "10s"
+    timeout = "2s"
     grace_period = "5s"
+    restart_limit = 0
     method = "get"
     path = "/health"
     protocol = "http"
-    timeout = 2000
-    tls_skip_verify = false
+
+[metrics]
+  port = 9091
+  path = "/metrics"
