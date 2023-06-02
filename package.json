@@ -61,7 +61,7 @@
     "p-queue": "^7.2.0",
     "pg": "^8.6.0",
     "postgrator": "^7.0.0",
-    "postgrator-cli": "^6.0.0",
+    "postgrator-cli": "^7.0.0",
     "sodium-native": "^4.0.0",
     "uland-isomorphic": "^2.0.0",
     "undici": "^5.12.0",
