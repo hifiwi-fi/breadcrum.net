@@ -1,4 +1,3 @@
-
 export function diffArchive (oldArchive, newArchive) {
   const archiveDiff = {}
   for (const [key, newValue] of Object.entries(newArchive)) {

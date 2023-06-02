@@ -1,4 +1,3 @@
-
 export function diffEpisode (oldEpisode, newEpisode) {
   const episodeDiff = {}
   for (const [key, newValue] of Object.entries(newEpisode)) {
