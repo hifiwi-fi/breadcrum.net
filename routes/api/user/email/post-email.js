@@ -42,7 +42,7 @@ export async function postEmail (fastify, opts) {
     },
     async function postEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        const userID = request.user.id
+        const userId = request.user.id
         const { email } = request.body
 
         const existingUserEmailQuery = SQL`
@@ -68,7 +68,7 @@ export async function postEmail (fastify, opts) {
         const updateQuery = SQL`
           update users
           set ${SQL.glue(updates, ' , ')}
-          where id = ${userID}
+          where id = ${userId}
           returning username, email, pending_email_update, pending_email_update_token, pending_email_update_token_exp;
         `
 

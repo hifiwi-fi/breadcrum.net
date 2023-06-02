@@ -1,22 +1,19 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
+import { oneLineTrim } from 'common-tags'
+
 import { commnonBookmarkProps } from './bookmark-props.js'
+import { resolveEntities } from './resolve-entities.js'
 import { createEpisodeProp } from '../episodes/episode-props.js'
 import { createEpisode } from '../episodes/episode-query-create.js'
 import { createArchive } from '../archives/archive-query-create.js'
 import { createArchiveProp } from '../archives/archive-props.js'
-import { resolveEpisode } from '../episodes/resolve-episode.js'
-import { resolveArchive } from '../archives/resolve-archive.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
+import { putTagsQuery } from '../tags/put-tags-query.js'
 
-const autoEpisodeHostnames = {
-  'www.youtube.com': 'video',
-  'm.youtube.com': 'video',
-  'vimeo.com': 'video'
-}
-
-function normalizeURL (urlObj) {
+// TODO: make this normalization way more robust and use it everywhere.
+async function normalizeURL (urlObj) {
   if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com'
   return {
     normalizedURL: urlObj.toString()
@@ -44,22 +41,32 @@ export async function putBookmarks (fastify, opts) {
           update: {
             type: 'boolean',
             default: false,
-            description: 'If set to true, bookmarks that already exist at URL are redirected to to the specific bookmark endpoint which will process the request as a bookmark update. Otherwise, this creates or returns the existing bookmark.'
+            description: oneLineTrim`
+              If set to true, bookmarks that already exist at URL are redirected
+              to to the specific bookmark endpoint which will process the
+              request as a bookmark update. Otherwise, this creates or returns
+              the existing bookmark.
+            `
           },
           meta: {
             type: 'boolean',
             default: false,
             description: 'Extract page metadata on the server.'
           },
+          episode: {
+            type: 'boolean',
+            default: true,
+            description: 'Determines if an episode is optimistically created'
+          },
+          archive: {
+            type: 'boolean',
+            default: true,
+            description: 'Determines if an archive is optimistically created'
+          },
           normalize: {
             type: 'boolean',
             default: true,
             description: 'Normalize URLs when looking them up or creating them.'
-          },
-          autoEpisodes: {
-            type: 'boolean',
-            default: true,
-            description: 'Automatically create episodes on common episode sources.'
           }
         },
         response: {
@@ -98,7 +105,6 @@ export async function putBookmarks (fastify, opts) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
         const {
-          title,
           note,
           toread,
           sensitive,
@@ -106,18 +112,19 @@ export async function putBookmarks (fastify, opts) {
           archive_urls = [],
           summary
         } = request.body
-        let { url } = request.body
+        let { url, title } = request.body
         const urlObj = new URL(url)
 
         const {
           update,
           meta,
-          normalize,
-          autoEpisodes
+          episode,
+          archive,
+          normalize
         } = request.query
 
-        if (normalize) {
-          const { normalizedURL } = normalizeURL(urlObj)
+        if (normalize) { // This will be the one possibly slow step
+          const { normalizedURL } = await normalizeURL(urlObj)
           url = normalizedURL
         }
 
@@ -145,7 +152,8 @@ export async function putBookmarks (fastify, opts) {
           }
         }
 
-        const serverMeta = meta ? await fastify.getSiteMetaData({ url }) : {}
+        // Title will fallback to just being the URL on create
+        title = title ?? url
 
         const createBookmark = SQL`
         insert into bookmarks (
@@ -156,105 +164,95 @@ export async function putBookmarks (fastify, opts) {
           sensitive,
           archive_urls,
           summary,
-          owner_id
+          owner_id,
+          done
         ) values (
           ${url},
-          ${title ?? serverMeta?.title ?? null},
+          ${title ?? url ?? null},
           ${note ?? null},
           ${toread ?? false},
           ${sensitive ?? false},
           ${archive_urls.length > 0 ? archive_urls : SQL`'{}'`},
-          ${summary ?? serverMeta?.summary ?? null},
-          ${userId}
+          ${summary ?? null},
+          ${userId},
+          ${meta === false}
         )
         returning id, url, title, toread, sensitive, archive_urls, owner_id;`
 
         const results = await client.query(createBookmark)
         const bookmark = results.rows[0]
 
-        if (tags?.length > 0 || serverMeta?.tags?.length > 0) {
-          const activeTagSet = tags.length > 0 ? tags : serverMeta?.tags
-          const createTags = SQL`
-          INSERT INTO tags (name, owner_id)
-          VALUES
-             ${SQL.glue(
-                activeTagSet.map(tag => SQL`(${tag},${userId})`),
-                ' , '
-              )}
-          ON CONFLICT (name, owner_id)
-          DO UPDATE
-            SET name = EXCLUDED.name
-          returning id, name, created_at, updated_at;
-          `
-
-          const tagsResults = await client.query(createTags)
-
-          const applyTags = SQL`
-          INSERT INTO bookmarks_tags (bookmark_id, tag_id)
-          VALUES
-            ${SQL.glue(
-              tagsResults.rows.map(tag => SQL`(${bookmark.id},${tag.id})`),
-              ' , '
-            )};
-          `
-
-          await client.query(applyTags)
-
-          fastify.metrics.tagAppliedCounter.inc(tagsResults.rows.length)
+        if (tags?.length > 0) {
+          await putTagsQuery({
+            fastify,
+            pg: client,
+            userId,
+            bookmarkId: bookmark.id,
+            tags
+          })
         }
 
-        if (request?.body?.createEpisode || (autoEpisodes && autoEpisodeHostnames[urlObj.hostname])) {
-          const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
+        let episodeId, episodeMedium, episodeURL
+        if (episode) {
+          // TODO: ensure handling of createEpisode url is correct
+          const episodeEntity = await createEpisode({
             client,
             userId,
             bookmarkId: bookmark.id,
             type: request?.body?.createEpisode?.type ?? 'redirect',
-            medium: request?.body?.createEpisode?.medium ?? autoEpisodeHostnames[urlObj.hostname],
+            medium: request?.body?.createEpisode?.medium ?? 'video',
             url: request?.body?.createEpisode?.url ?? url
           })
+          episodeId = episodeEntity.id
+          episodeMedium = episodeEntity.medium
+          episodeURL = episodeEntity.url
+        }
 
-          await client.query('commit')
-          fastify.metrics.episodeCounter.inc()
+        let archiveId, archiveURL
+        if (archive) {
+          // TODO: ensure handling of createArchive url is correct
+          const archiveEntity = await createArchive({
+            client,
+            userId,
+            bookmarkId: bookmark.id,
+            bookmarkTitle: title ?? null,
+            url: request?.body?.createArchive?.url ?? url,
+            extractionMethod: 'server'
+          })
 
+          archiveId = archiveEntity.id
+          archiveURL = archiveEntity.url
+        }
+
+        // Commit bookmark, tags, archive and episode in their incomplete state
+        await client.query('commit')
+        fastify.metrics.episodeCounter.inc()
+        fastify.metrics.archiveCounter.inc()
+        fastify.metrics.bookmarkCreatedCounter.inc()
+
+        if (archive || episode || meta) {
           fastify.pqueue.add(() => {
-            return resolveEpisode({
+          // Resolve bookmark, episode and archives on every bookmark (with conditions)
+            return resolveEntities({
               fastify,
-              userID: userId,
-              bookmarkTitle: title,
-              episodeID: episodeId,
-              url: episodeURL,
-              medium: episodeMedium,
-              log: request.log
+              userId,
+              log: request.log,
+              resolveMeta: meta,
+              episode,
+              archive,
+              url,
+              title,
+              tags,
+              summary,
+              bookmarkId: bookmark.id,
+              archiveId,
+              archiveURL,
+              episodeId,
+              episodeURL,
+              episodeMedium
             })
           })
         }
-
-        const { id: archiveID, url: archiveURL } = await createArchive({
-          client,
-          userID: userId,
-          bookmarkId: bookmark.id,
-          bookmarkTitle: title ?? serverMeta?.title ?? null,
-          url: request?.body?.createArchive?.url ?? url,
-          extractionMethod: 'server'
-        })
-
-        await client.query('commit')
-        fastify.metrics.archiveCounter.inc()
-
-        fastify.pqueue.add(() => {
-          return resolveArchive({
-            fastify,
-            userID: userId,
-            bookmarkTitle: title ?? serverMeta?.title ?? null,
-            archiveID,
-            url: archiveURL,
-            initialHTML: serverMeta?.html,
-            log: request.log
-          })
-        })
-
-        await client.query('commit')
-        fastify.metrics.bookmarkCreatedCounter.inc()
 
         // Look up the newly created bookmark instead of trying to re-assemble it here.
         const bookmarkQuery = getBookmarksQuery({

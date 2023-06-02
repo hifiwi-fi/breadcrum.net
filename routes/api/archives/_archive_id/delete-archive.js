@@ -15,13 +15,13 @@ export async function deleteArchive (fastify, opts) {
     }
   },
   async function deleteArchiveHandler (request, reply) {
-    const ownerID = request.user.id
-    const archiveID = request.params.archive_id
+    const ownerId = request.user.id
+    const archiveId = request.params.archive_id
 
     const query = SQL`
       delete from archives
-      where id = ${archiveID}
-        and owner_id = ${ownerID}
+      where id = ${archiveId}
+        and owner_id = ${ownerId}
     `
 
     // TODO: check results

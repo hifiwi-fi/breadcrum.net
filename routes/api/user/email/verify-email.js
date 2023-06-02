@@ -48,12 +48,12 @@ export async function verifyEmail (fastify, opts) {
     async function verifyEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const now = new Date()
-        const userID = request.user.id
+        const userId = request.user.id
         const { token, update } = request.body
 
         if (update) {
           return await verifyEmailUpdateHandler({
-            userID,
+            userId,
             client,
             reply,
             token,
@@ -61,7 +61,7 @@ export async function verifyEmail (fastify, opts) {
           })
         } else {
           return await verifyEmailConfirmHandler({
-            userID,
+            userId,
             client,
             token,
             reply,

@@ -51,7 +51,7 @@ export default fp(async function (fastify, opts) {
       html = await response.body.text()
     }
 
-    console.dir({ html })
+    fastify.log.debug({ url, html })
     return html
   })
 }, {

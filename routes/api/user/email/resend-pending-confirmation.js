@@ -4,12 +4,12 @@ import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-to
 import { verifyEmailSubject, verifyEmailUpdateBody } from './post-email.js'
 
 export async function resendPendingEmailVerificationHandler ({
-  userID, client, reply, fastify
+  userId, client, reply, fastify
 }) {
   const verifyQuery = SQL`
           select id, email, username, pending_email_update, pending_email_update_token, pending_email_update_token_exp
           from users
-          where id = ${userID}
+          where id = ${userId}
           fetch first row only;
         `
 
@@ -28,7 +28,7 @@ export async function resendPendingEmailVerificationHandler ({
   const updateQuery = SQL`
           update users
           set ${SQL.glue(updates, ' , ')}
-          where id = ${userID}
+          where id = ${userId}
           returning username, email, pending_email_update_token, pending_email_update_token_exp;
         `
 

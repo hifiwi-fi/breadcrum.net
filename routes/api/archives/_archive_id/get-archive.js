@@ -33,13 +33,13 @@ export async function getArchive (fastify, opts) {
       }
     },
     async function getArchiveHandler (request, reply) {
-      const ownerID = request.user.id
-      const { archive_id: archiveID } = request.params
+      const ownerId = request.user.id
+      const { archive_id: archiveId } = request.params
       const { sensitive } = request.query
 
       const archiveQuery = getArchivesQuery({
-        ownerID,
-        archiveID,
+        ownerId,
+        archiveId,
         sensitive,
         perPage: 1,
         fullArchives: true

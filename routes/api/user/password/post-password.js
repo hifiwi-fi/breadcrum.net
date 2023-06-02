@@ -25,7 +25,7 @@ export async function postPassword (fastify, opts) {
               minLength: 64,
               maxLength: 64
             },
-            userID: {
+            userId: {
               type: 'string',
               format: 'uuid'
             }
@@ -47,12 +47,12 @@ export async function postPassword (fastify, opts) {
     async function postEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const now = new Date()
-        const { password, userID, token } = request.body
+        const { password, userId, token } = request.body
 
         const resetVerifyQuery = SQL`
           select id, email, username, email_confirmed, password_reset_token, password_reset_token_exp
           from users
-          where id = ${userID}
+          where id = ${userId}
           fetch first row only;
         `
 
@@ -79,7 +79,7 @@ export async function postPassword (fastify, opts) {
         const updateQuery = SQL`
           update users
           set ${SQL.glue(updates, ' , ')}
-          where id = ${userID};
+          where id = ${userId};
         `
 
         await client.query(updateQuery)

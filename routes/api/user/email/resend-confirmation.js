@@ -37,13 +37,13 @@ export async function resendEmailVerification (fastify, opts) {
     },
     async function resendEmailVerificationHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        const userID = request.user.id
+        const userId = request.user.id
         const { update } = request.body
 
         if (update) {
-          return await resendPendingEmailVerificationHandler({ userID, client, reply, fastify })
+          return await resendPendingEmailVerificationHandler({ userId, client, reply, fastify })
         } else {
-          return await resendAccountEmailVerificationHandler({ userID, client, reply, fastify })
+          return await resendAccountEmailVerificationHandler({ userId, client, reply, fastify })
         }
       })
     }

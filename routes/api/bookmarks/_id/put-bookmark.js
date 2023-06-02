@@ -168,8 +168,8 @@ export async function putBookmark (fastify, opts) {
         fastify.pqueue.add(() => {
           return resolveEpisode({
             fastify,
-            userID: userId,
-            episodeID: episodeId,
+            userId,
+            episodeId,
             bookmarkTitle: createdBookmark.title,
             medium: episodeMedium,
             url: episodeURL,
@@ -179,9 +179,9 @@ export async function putBookmark (fastify, opts) {
       }
 
       if (request?.body?.createArchive) {
-        const { id: archiveID, url: archiveURL } = await createArchive({
+        const { id: archiveId, url: archiveURL } = await createArchive({
           client,
-          userID: userId,
+          userId,
           bookmarkId: createdBookmark.id,
           bookmarkTitle: createdBookmark.title,
           url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url,
@@ -194,9 +194,9 @@ export async function putBookmark (fastify, opts) {
         fastify.pqueue.add(() => {
           return resolveArchive({
             fastify,
-            userID: userId,
+            userId,
             bookmarkTitle: createdBookmark.title,
-            archiveID,
+            archiveId,
             url: archiveURL,
             log: request.log
           })

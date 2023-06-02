@@ -4,11 +4,10 @@ export async function resolveArchive ({
   fastify,
   pg, // optional tx client
   log, // optional request logging instance
-  userID,
-  bookmarkTitle,
-  archiveID,
+  userId,
+  archiveId,
   url,
-  initialHTML
+  initialDocument
 }) {
   pg = pg ?? fastify.pg
   log = log ?? fastify.log
@@ -16,17 +15,15 @@ export async function resolveArchive ({
   try {
     const article = await fastify.extractArchive({
       url,
-      initialHTML
+      initialDocument
     })
 
     // log.info({ article })
 
     const archiveData = []
 
-    archiveData.push(SQL`ready = true`)
-    archiveData.push(SQL`url = ${url}`)
+    archiveData.push(SQL`done = true`)
 
-    console.dir({ article }, { depth: 999 })
     if (article.title != null) archiveData.push(SQL`title = ${article.title}`)
     if (article.siteName != null) archiveData.push(SQL`site_name = ${article.siteName}`)
     if (article.content != null) archiveData.push(SQL`html_content = ${article.content}`)
@@ -40,22 +37,22 @@ export async function resolveArchive ({
     const query = SQL`
         update archives
         set ${SQL.glue(archiveData, ' , ')}
-        where id = ${archiveID}
-        and owner_id =${userID};
+        where id = ${archiveId}
+        and owner_id =${userId};
       `
 
     const archiveResult = await pg.query(query)
     archiveResult.rows.pop()
 
-    log.info(`Archive ${archiveID} for ${url} is ready.`)
+    log.info(`Archive ${archiveId} for ${url} is done.`)
   } catch (err) {
-    log.error(`Error resolving archive ${archiveID}`)
+    log.error(`Error resolving archive ${archiveId}`)
     log.error(err)
     const errorQuery = SQL`
         update archives
-        set error = ${err.stack}
-        where id = ${archiveID}
-        and owner_id =${userID};`
+        set error = ${err.stack}, done = true
+        where id = ${archiveId}
+        and owner_id =${userId};`
     await pg.query(errorQuery)
   }
 }

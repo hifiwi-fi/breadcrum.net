@@ -73,7 +73,7 @@ export async function resetPassword (fastify, opts) {
           subject: 'Password reset request',
           text: passwordResetBody({
             token: password_reset_token,
-            userID: user.id,
+            userId: user.id,
             username: user.username,
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
@@ -95,12 +95,12 @@ export async function resetPassword (fastify, opts) {
   )
 }
 
-function passwordResetBody ({ userID, username, host, transport, token, email }) {
+function passwordResetBody ({ userId, username, host, transport, token, email }) {
   return `Hi ${username},
 
 Someone requested a password reset for your account. If you requested this reset, visit the following URL and update your password.
 
-${transport}://${host}/password_reset/confirm?token=${token}&user_id=${userID}
+${transport}://${host}/password_reset/confirm?token=${token}&user_id=${userId}
 
 If you did not request this change, delete this email. If you have furthur issues contact support@breadcrum.net.
 

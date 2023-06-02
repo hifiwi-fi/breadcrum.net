@@ -1,12 +1,12 @@
 import SQL from '@nearform/sql'
 
 export async function verifyEmailConfirmHandler ({
-  userID, client, token, reply, now
+  userId, client, token, reply, now
 }) {
   const verifyQuery = SQL`
     select id, email, username, email_confirmed, email_verify_token, email_verify_token_exp
     from users
-    where id = ${userID}
+    where id = ${userId}
     fetch first row only;
   `
 
@@ -38,7 +38,7 @@ export async function verifyEmailConfirmHandler ({
   const confirmQuery = SQL`
             update users
             set ${SQL.glue(updates, ' , ')}
-            where id = ${userID}
+            where id = ${userId}
           `
 
   await client.query(confirmQuery)
