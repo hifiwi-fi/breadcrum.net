@@ -29,7 +29,7 @@ export async function resolveBookmark ({
     bookmarkData.push(SQL`done = true`)
 
     if (metadata?.title && title === url) bookmarkData.push(SQL`title = ${metadata?.title}`)
-    if (metadata?.summary && !summary) bookmarkData.push(SQL`title = ${metadata?.summary}`)
+    if (metadata?.summary && !summary) bookmarkData.push(SQL`summary = ${metadata?.summary}`)
     log.info({ bookmarkData })
     const query = SQL`
         update bookmarks
