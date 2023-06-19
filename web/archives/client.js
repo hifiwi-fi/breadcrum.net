@@ -39,15 +39,17 @@ export const page = Component(() => {
       setArchivesLoading(true)
       setArchivesError(null)
       const pageParams = new URLSearchParams(query)
+      const reqParams = new URLSearchParams()
 
       // Transform date string to date object
-      if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
-      if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+      if (pageParams.get('before')) reqParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
+      if (pageParams.get('after')) reqParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+      if (pageParams.get('bid')) reqParams.set('bookmark_id', pageParams.get('bid'))
 
-      pageParams.set('sensitive', state.sensitive)
-      pageParams.set('full_archives', false)
+      reqParams.set('sensitive', state.sensitive)
+      reqParams.set('full_archives', false)
 
-      const response = await fetch(`${state.apiUrl}/archives?${pageParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/archives?${reqParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'

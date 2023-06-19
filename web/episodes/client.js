@@ -41,15 +41,17 @@ export const page = Component(() => {
       setEpisodesLoading(true)
       setEpisodesError(null)
       const pageParams = new URLSearchParams(query)
+      const requestParams = new URLSearchParams()
 
       // Transform date string to date object
-      if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
-      if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+      if (pageParams.get('before')) requestParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
+      if (pageParams.get('after')) requestParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+      if (pageParams.get('bid')) requestParams.set('bookmark_id', pageParams.get('bid'))
 
-      pageParams.set('sensitive', state.sensitive)
-      pageParams.set('include_feed', true)
+      requestParams.set('sensitive', state.sensitive)
+      requestParams.set('include_feed', true)
 
-      const response = await fetch(`${state.apiUrl}/episodes?${pageParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'

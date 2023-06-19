@@ -6,8 +6,6 @@ import { sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import cn from 'classnames'
-import { episodeTitle } from '../episode-title/index.js'
-import { archiveTitle } from '../archive-title/index.js'
 
 export const bookmarkView = Component(({
   bookmark: b,
@@ -66,18 +64,16 @@ export const bookmarkView = Component(({
           </div>`
         : null
       }
-      ${b.episodes?.length > 0
-        ? html`${b.episodes.map(
-            ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`
-          )}`
-        : null
-      }
-      ${b.archives?.length > 0
-        ? html`${b.archives.map(
-            ar => html.for(ar, ar.id)`${archiveTitle({ archive: ar, small: true })}`
-          )}`
-        : null
-      }
+      <div class='bc-bookmark-entity-enumeration'>
+        ${b.archives?.length > 0 && b.archives.some(a => a.ready)
+          ? html`<div class='bc-bookmark-entity bc-archive-entity'><a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">🗄️ archives: ${b.archives?.length}</a><div>`
+          : null
+        }
+        ${b.episodes?.length > 0 && b.episodes.some(e => e.ready)
+          ? html`<div class='bc-bookmark-entity bc-episode-entity'><a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">📼 episodes: ${b.episodes?.length}</a><div>`
+          : null
+        }
+      </div>
       ${b.archive_urls?.length > 0
         ? html`${b.archive_urls.map(
             url => html`<div class="bc-bookmark-archive-url-display">🫙 <a href="${url}">${url.replace(/^https?:\/\//, '')}</a></div>`
