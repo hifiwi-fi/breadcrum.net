@@ -27,8 +27,8 @@ export async function putArchive (fastify, opts) {
   },
   async function putArchiveHandler (request, reply) {
     return fastify.pg.transact(async client => {
-      const ownerID = request.user.id
-      const { archive_id: archiveID } = request.params
+      const ownerId = request.user.id
+      const { archive_id: archiveId } = request.params
       const archive = request.body
 
       const updates = []
@@ -41,8 +41,8 @@ export async function putArchive (fastify, opts) {
         const query = SQL`
           update archives
           set ${SQL.glue(updates, ' , ')}
-          where id = ${archiveID}
-          and owner_id =${ownerID};
+          where id = ${archiveId}
+          and owner_id =${ownerId};
           `
 
         await client.query(query)

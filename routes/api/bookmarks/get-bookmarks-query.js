@@ -137,6 +137,7 @@ export const getBookmarksQuery = ({
   return bookarmsQuery
 }
 
+// For doing offset pagination, this converts after queries to a before query
 export const afterToBeforeBookmarkQuery = ({
   perPage,
   tag,

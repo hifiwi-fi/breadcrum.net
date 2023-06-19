@@ -3,12 +3,12 @@ import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-tokens.js'
 
 export async function resendAccountEmailVerificationHandler ({
-  userID, client, reply, fastify
+  userId, client, reply, fastify
 }) {
   const verifyQuery = SQL`
           select id, email, username, email_confirmed, email_verify_token, email_verify_token_exp
           from users
-          where id = ${userID}
+          where id = ${userId}
           fetch first row only;
         `
 
@@ -27,7 +27,7 @@ export async function resendAccountEmailVerificationHandler ({
   const updateQuery = SQL`
           update users
           set ${SQL.glue(updates, ' , ')}
-          where id = ${userID}
+          where id = ${userId}
           returning username, email, email_verify_token, email_verify_token_exp;
         `
 

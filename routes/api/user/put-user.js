@@ -32,7 +32,7 @@ export async function putUser (fastify, opts) {
     },
     async function putUserHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        const userID = request.user.id
+        const userId = request.user.id
         const user = request.body
 
         const updates = []
@@ -45,7 +45,7 @@ export async function putUser (fastify, opts) {
           const query = SQL`
             update users
             set ${SQL.glue(updates, ' , ')}
-            where id = ${userID}
+            where id = ${userId}
           `
           await client.query(query)
         }

@@ -7,7 +7,8 @@ import { extractMeta } from '@breadcrum/extract-meta'
  */
 export default fp(async function (fastify, opts) {
   fastify.decorate('getSiteMetaData', async function getSiteMetaData ({
-    url
+    url,
+    initialDocument
   }) {
     const endTimer = fastify.metrics.siteMetaSeconds.startTimer()
     try {
@@ -19,14 +20,18 @@ export default fp(async function (fastify, opts) {
         return cachedMeta
       }
 
-      const html = await fastify.fetchHTML({ url })
+      let document = initialDocument
 
-      const { document } = (new JSDOM(html, { url })).window
+      if (!document) {
+        const html = await fastify.fetchHTML({ url })
+        document = (new JSDOM(html, { url })).window.document
+      }
+
       const metadata = extractMeta(document)
 
       fastify.siteMetaCache.set(cacheKey, metadata)
 
-      return { ...metadata, html }
+      return metadata
     } finally {
       endTimer()
     }

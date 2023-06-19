@@ -15,13 +15,13 @@ export async function deleteEpisode (fastify, opts) {
     }
   },
   async function deleteEpisodeHandler (request, reply) {
-    const ownerID = request.user.id
-    const episodeID = request.params.episode_id
+    const ownerId = request.user.id
+    const episodeId = request.params.episode_id
 
     const query = SQL`
       delete from episodes
-      where id = ${episodeID}
-        and owner_id = ${ownerID}
+      where id = ${episodeId}
+        and owner_id = ${ownerId}
     `
 
     // TODO: check results

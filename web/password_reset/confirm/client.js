@@ -22,10 +22,10 @@ export const page = Component(() => {
     setErrorMessage(null)
 
     const password = ev.currentTarget.password.value
-    const userID = query.get('user_id')
+    const userId = query.get('user_id')
     const token = query.get('token')
 
-    if (!userID) throw new Error('Missing userID in reset link. Did you modify the URL?')
+    if (!userId) throw new Error('Missing userId in reset link. Did you modify the URL?')
     if (!token) throw new Error('Missing token in reset link. Did you modify the URL?')
 
     try {
@@ -36,7 +36,7 @@ export const page = Component(() => {
         },
         body: JSON.stringify({
           password,
-          userID,
+          userId,
           token: query.get('token')
         }),
         credentials: 'omit'

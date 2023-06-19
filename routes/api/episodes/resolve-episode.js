@@ -5,9 +5,9 @@ import SQL from '@nearform/sql'
  * @param  {object} options.fastify   fastify instance
  * @param  {object} options.pg        a postgres client
  * @param  {object} options.log       a pino client, like from the request
- * @param  {string} options.userID    ID of user
+ * @param  {string} options.userId    ID of user
  * @param  {string} options.bookmarkTitle  Title of the bookmark
- * @param  {string} options.episodeID ID of episode
+ * @param  {string} options.episodeId ID of episode
  * @param  {string} options.url       The URL of the episode to resolve
  * @param  {string} options.medium    The medium to attempt to resolve
  * @return {}                   void
@@ -16,9 +16,9 @@ export async function resolveEpisode ({
   fastify,
   pg, // optional tx client
   log, // optional request logging instance
-  userID,
+  userId,
   bookmarkTitle,
-  episodeID,
+  episodeId,
   url,
   medium
 }) {
@@ -30,7 +30,7 @@ export async function resolveEpisode ({
     // console.dir({ metadata }, { depth: 999 })
     const videoData = []
 
-    videoData.push(SQL`ready = true`)
+    videoData.push(SQL`done = true`)
     videoData.push(SQL`url = ${url}`)
     if ('filesize_approx' in metadata) videoData.push(SQL`size_in_bytes = ${Math.round(metadata.filesize_approx)}`)
     if ('duration' in metadata) videoData.push(SQL`duration_in_seconds = ${Math.round(metadata.duration)}`)
@@ -58,8 +58,8 @@ export async function resolveEpisode ({
     const query = SQL`
         update episodes
         set ${SQL.glue(videoData, ' , ')}
-        where id = ${episodeID}
-        and owner_id =${userID}
+        where id = ${episodeId}
+        and owner_id =${userId}
         returning type, medium;
       `
 
@@ -69,22 +69,22 @@ export async function resolveEpisode ({
     // TODO: move this caching behavior into getYTDLPMetadata
     // Warm mem cache
     fastify.memURLCache.set({
-      userId: userID,
-      episodeId: episodeID,
+      userId,
+      episodeId,
       sourceUrl: url,
       type: episode.type,
       medium: episode.medium
     }, metadata.url)
 
-    log.info(`Episode ${episodeID} for ${url} is ready.`)
+    log.info(`Episode ${episodeId} for ${url} is ready.`)
   } catch (err) {
-    log.error(`Error extracting video for episode ${episodeID}`)
+    log.error(`Error extracting video for episode ${episodeId}`)
     log.error(err)
     const errorQuery = SQL`
         update episodes
-        set error = ${err.stack}
-        where id = ${episodeID}
-        and owner_id =${userID};`
+        set error = ${err.stack}, done = true
+        where id = ${episodeId}
+        and owner_id =${userId};`
     await pg.query(errorQuery)
   }
 }

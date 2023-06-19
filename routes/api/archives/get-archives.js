@@ -87,7 +87,7 @@ export async function getArchives (fastify, opts) {
           const perPageAfterOffset = perPage + 2
           const afterCalcQuery = afterToBeforeArchivesQuery({
             perPage,
-            ownerID: userId,
+            ownerId: userId,
             after,
             sensitive
           })
@@ -113,7 +113,7 @@ export async function getArchives (fastify, opts) {
         }
 
         const archivesQuery = getArchivesQuery({
-          ownerID: userId,
+          ownerId: userId,
           before,
           sensitive,
           perPage,

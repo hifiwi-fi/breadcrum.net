@@ -9,7 +9,7 @@ import createDOMPurify from 'dompurify'
 export default fp(async function (fastify, opts) {
   fastify.decorate('extractArchive', async function extractArchive ({
     url,
-    initialHTML // optinally pass html here if its already fetched before
+    initialDocument
   }) {
     const endTimer = fastify.metrics.archiveSeconds.startTimer()
     try {
@@ -21,8 +21,13 @@ export default fp(async function (fastify, opts) {
         return cachedRBArchive
       }
 
-      const html = initialHTML ?? await fastify.fetchHTML({ url })
-      const { document } = (new JSDOM(html, { url })).window
+      let document = initialDocument
+
+      if (!document) {
+        const html = await fastify.fetchHTML({ url })
+        document = (new JSDOM(html, { url })).window.document
+      }
+
       const reader = new Readability(document)
       const article = reader.parse()
 
