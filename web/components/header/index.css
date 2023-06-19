@@ -72,3 +72,7 @@
     display: none;
   }
 }
+
+.bc-decoration-none:hover {
+  text-decoration: none;
+}

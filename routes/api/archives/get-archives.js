@@ -31,6 +31,10 @@ export async function getArchives (fastify, opts) {
             full_archives: {
               type: 'boolean',
               default: false
+            },
+            bookmark_id: {
+              type: 'string',
+              format: 'uuid'
             }
           },
           dependencies: {
@@ -72,7 +76,8 @@ export async function getArchives (fastify, opts) {
         const {
           after,
           per_page: perPage,
-          sensitive
+          sensitive,
+          bookmark_id: bookmarkId
         } = request.query
         let {
           before
@@ -88,6 +93,7 @@ export async function getArchives (fastify, opts) {
           const afterCalcQuery = afterToBeforeArchivesQuery({
             perPage,
             ownerId: userId,
+            bookmarkId,
             after,
             sensitive
           })
@@ -114,6 +120,7 @@ export async function getArchives (fastify, opts) {
 
         const archivesQuery = getArchivesQuery({
           ownerId: userId,
+          bookmarkId,
           before,
           sensitive,
           perPage,

@@ -8,6 +8,7 @@ export function getEpisodesQuery ({
   ready,
   perPage,
   feedId,
+  bookmarkId,
   includeFeed
 }) {
   const episodesQuery = SQL`
@@ -74,6 +75,7 @@ export function getEpisodesQuery ({
     and bm.owner_id = ${ownerId}
     ${includeFeed ? SQL`and pf.owner_id = ${ownerId}` : SQL``}
     ${feedId ? SQL`and ep.podcast_feed_id = ${feedId}` : SQL``}
+    ${bookmarkId ? SQL`and ep.bookmark_id = ${bookmarkId}` : SQL``}
     ${episodeId ? SQL`and ep.id = ${episodeId}` : SQL``}
     ${before ? SQL`and ep.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
@@ -90,7 +92,8 @@ export function afterToBeforeEpisodesQuery ({
   ownerId,
   after,
   sensitive,
-  feedId
+  feedId,
+  bookmarkId
 }) {
   const perPageAfterOffset = perPage + 2
 
@@ -106,6 +109,7 @@ export function afterToBeforeEpisodesQuery ({
       where ep.owner_id = ${ownerId}
       and ep.created_at >= ${after}
       ${feedId ? SQL`and ep.podcast_feed_id = ${feedId}` : SQL``}
+      ${bookmarkId ? SQL`and ep.bookmark_ud = ${bookmarkId}` : SQL``}
       ${!sensitive
         ? SQL`
           and bm.owner_id = ${ownerId}

@@ -34,6 +34,10 @@ export async function getEpisodes (fastify, opts) {
               type: 'string',
               format: 'uri'
             },
+            bookmark_id: {
+              type: 'string',
+              format: 'uuid'
+            },
             default_feed: {
               type: 'boolean',
               default: false
@@ -84,7 +88,8 @@ export async function getEpisodes (fastify, opts) {
         const {
           after,
           per_page: perPage,
-          sensitive
+          sensitive,
+          bookmark_id: bookmarkId
         } = request.query
         let {
           before
@@ -106,7 +111,8 @@ export async function getEpisodes (fastify, opts) {
             ownerId: userId,
             after,
             sensitive,
-            feedId
+            feedId,
+            bookmarkId
           })
 
           const afterToBeforeResults = await fastify.pg.query(afterCalcQuery)
@@ -135,6 +141,7 @@ export async function getEpisodes (fastify, opts) {
           sensitive,
           perPage,
           feedId,
+          bookmarkId,
           includeFeed: request.query.include_feed
         })
 

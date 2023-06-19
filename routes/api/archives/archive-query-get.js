@@ -3,6 +3,7 @@ import SQL from '@nearform/sql'
 export function getArchivesQuery ({
   ownerId,
   archiveId,
+  bookmarkId,
   before,
   sensitive,
   ready,
@@ -45,6 +46,7 @@ export function getArchivesQuery ({
     where ar.owner_id = ${ownerId}
     and bm.owner_id = ${ownerId}
     ${archiveId ? SQL`and ar.id = ${archiveId}` : SQL``}
+    ${bookmarkId ? SQL`and ar.bookmark_id = ${bookmarkId}` : SQL``}
     ${before ? SQL`and ar.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
     ${ready != null ? SQL`and ready = ${ready}` : SQL``}
@@ -58,6 +60,7 @@ export function getArchivesQuery ({
 export function afterToBeforeArchivesQuery ({
   perPage,
   ownerId,
+  bookmarkId,
   after,
   sensitive
 }) {
@@ -74,6 +77,10 @@ export function afterToBeforeArchivesQuery ({
           : SQL``}
       where ar.owner_id = ${ownerId}
       and ar.created_at >= ${after}
+      ${bookmarkId
+        ? SQL`ar.bookmark_id = ${bookmarkId}`
+        : SQL``
+      }
       ${!sensitive
         ? SQL`
           and bm.owner_id = ${ownerId}

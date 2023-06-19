@@ -55,12 +55,14 @@
 .bc-tags-display,
 .bc-date,
 .bc-bookmark-url-display,
-.bc-bookmark-archive-url-display {
+.bc-bookmark-archive-url-display,
+.bc-bookmark-entity-enumeration {
   font-size: 0.8em;
 }
 
 .bc-date a,
-.bc-bookmark-url-display a {
+.bc-bookmark-url-display a,
+.bc-bookmark-entity-enumeration a {
   color: var(--accent-foreground);
 }
 
@@ -76,4 +78,17 @@
 
 .bc-tags-display a {
   color:  var(--bc-tags-color);
+}
+
+.bc-bookmark-entity-enumeration {
+  display: flex;
+  gap: 0.3em;
+}
+
+.bc-archive-entity a {
+  color: var(--bc-archives-color);
+}
+
+.bc-episode-entity a {
+  color: var(--bc-episodes-color);
 }
