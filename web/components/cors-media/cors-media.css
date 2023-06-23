@@ -3,12 +3,25 @@
   width: 100%;
 }
 
+.bc-cors-media-thumbnail-group,
 .bc-cors-media-placeholder,
 .bc-cors-video {
   border-radius: 10px;
   background-color: var(--accent-background);
+  overflow: hidden;
 }
 
+.bc-cors-media-thumbnail-group {
+  position: relative;
+  display: inline-block; /* <= shrinks container to image size */
+  transition: transform 150ms ease-in-out;
+}
+
+.bc-cors-media-thumbnail-group img { /* <= optional, for responsiveness */
+   display: block;
+   max-width: 100%;
+   height: auto;
+}
 
 .bc-cors-media-placeholder {
   cursor: pointer;

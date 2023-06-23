@@ -62,7 +62,15 @@ export const corsMedia = Component(({
               </audio>`
       : null
     }
-    ${!previewActive ? html`<div onkeydown="${handleKeydown}" tabindex="0" role="button" aria-pressed="false" onclick="${handlePreviewClick}" class='bc-cors-media-placeholder'>${playIcon()}</div>` : null}
+    ${!previewActive
+      ? thumbnail
+        ? html`
+          <div class="bc-cors-media-thumbnail-group">
+            <img onkeydown="${handleKeydown}" tabindex="0" role="button" aria-pressed="false" onclick="${handlePreviewClick}" class='bc-cors-media-thumbnail' src="${thumbnail}">
+          </div>`
+        : html`<div onkeydown="${handleKeydown}" tabindex="0" role="button" aria-pressed="false" onclick="${handlePreviewClick}" class='bc-cors-media-placeholder'>${playIcon()}</div>`
+      : null
+    }
   </div>
   `
 })
