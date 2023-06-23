@@ -4,6 +4,7 @@ import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkList } from '../../components/bookmark/bookmark-list.js'
+import { useTitle } from '../../hooks/useTitle.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -71,6 +72,9 @@ export const page = Component(() => {
         .finally(() => { setBookmarkLoading(false) })
     }
   }, [dataReload, state.apiUrl, state.sensitive])
+
+  const title = bookmark?.title ? ['🔖', bookmark?.title] : []
+  useTitle(...title)
 
   return html`
     <div>

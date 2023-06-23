@@ -66,11 +66,11 @@ export const bookmarkView = Component(({
       }
       <div class='bc-bookmark-entity-enumeration'>
         ${b.archives?.length > 0 && b.archives.some(a => a.ready)
-          ? html`<div class='bc-bookmark-entity bc-archive-entity'><a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">🗄️ archives: ${b.archives?.length}</a><div>`
+          ? html`<div class='bc-bookmark-entity bc-archive-entity'>🗄️ <a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">${b.archives?.length} archive${b.archives?.length > 1 ? 's' : ''}</a><div>`
           : null
         }
         ${b.episodes?.length > 0 && b.episodes.some(e => e.ready)
-          ? html`<div class='bc-bookmark-entity bc-episode-entity'><a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">📼 episodes: ${b.episodes?.length}</a><div>`
+          ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">${b.episodes?.length} episode${b.episodes?.length > 1 ? 's' : ''}</a><div>`
           : null
         }
       </div>

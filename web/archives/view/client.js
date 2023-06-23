@@ -3,6 +3,7 @@ import { Component, html, render, useEffect, useState, useCallback } from 'uland
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useTitle } from '../../hooks/useTitle.js'
 import { archiveList } from '../../components/archive/archive-list.js'
 
 export const page = Component(() => {
@@ -74,6 +75,9 @@ export const page = Component(() => {
         .finally(() => { setArchiveLoading(false) })
     }
   }, [archiveReload, state.apiUrl, state.sensitive])
+
+  const title = archive?.title ? ['🗄️', archive?.title] : []
+  useTitle(...title)
 
   return html`
     <div>

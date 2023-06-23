@@ -1,4 +1,3 @@
-
 FROM node:20-alpine
 
 ## Make sure this matches build.args in fly.toml

@@ -3,6 +3,7 @@ import { Component, html, render, useEffect, useState, useCallback } from 'uland
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useTitle } from '../../hooks/useTitle.js'
 import { episodeList } from '../../components/episode/episode-list.js'
 
 export const page = Component(() => {
@@ -77,6 +78,9 @@ export const page = Component(() => {
         .finally(() => { setEpisodeLoading(false) })
     }
   }, [episodeReload, state.apiUrl, state.sensitive])
+
+  const title = episode?.display_title ? ['📼', episode?.display_title] : []
+  useTitle(...title)
 
   return html`
     <div>

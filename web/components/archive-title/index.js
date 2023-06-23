@@ -15,6 +15,8 @@ export const archiveTitle = Component(
       ? `/archives/view/?id=${id}`
       : url
 
+    console.log({ small, big, url, href })
+
     return html`
     <div class="${cn({
       'bc-archives-title-container-small': small
@@ -34,7 +36,7 @@ export const archiveTitle = Component(
                   ? '❌'
                   : null
                 }
-                <a href="${`/archives/view/?id=${id}`}" target="${small ? null : '_blank'}">${title}</a>`
+                <a href="${`/archives/view/?id=${id}`}">${title}</a>`
         }
       </div>
     </div>
