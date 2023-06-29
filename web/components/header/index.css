@@ -34,7 +34,7 @@
 .bc-header-start {
   align-items: baseline;
   overflow: hidden;
-  min-width: 100px;
+  min-width: 50px;
 }
 
 .bc-header-start a {
@@ -67,7 +67,7 @@
   margin-left: 3px;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 300px) {
   .bc-header-link-text {
     display: none;
   }
