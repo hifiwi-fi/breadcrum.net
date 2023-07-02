@@ -96,8 +96,8 @@ export const emailView = Component(({ user, onEdit, reload }) => {
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
     <dd>
       ${user?.email}
-      <button onClick=${onEdit}>Edit</button>
-      ${user?.email_confirmed === false
+      ${!user?.pending_email_update ? html`<button onClick=${onEdit}>Edit</button>` : null}
+      ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
           onclick="${handleEmailConfirmRequest}"
           ?disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
