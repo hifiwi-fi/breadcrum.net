@@ -33,5 +33,14 @@ export default async function App (fastify, opts) {
 
 export const options = {
   trustProxy: true,
-  genReqId: function (req) { return hid() }
+  genReqId: function (req) { return hid() },
+  logger: {
+    mixin () {
+      return {
+        service: 'breadcrum.net',
+        ddsource: 'nodejs',
+        ddtags: 'env:prod'
+      }
+    }
+  }
 }
