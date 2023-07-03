@@ -29,14 +29,14 @@ export async function resendPendingEmailVerificationHandler ({
           update users
           set ${SQL.glue(updates, ' , ')}
           where id = ${userId}
-          returning username, email, pending_email_update_token, pending_email_update_token_exp;
+          returning username, email, pending_email_update, pending_email_update_token, pending_email_update_token_exp;
         `
 
   const queryResults = await client.query(updateQuery)
   const updatedUser = queryResults.rows.pop()
 
   const emailSendJob = fastify.sendEmail({
-    toEmail: updatedUser.email,
+    toEmail: updatedUser.pending_email_update,
     subject: verifyEmailSubject,
     text: verifyEmailUpdateBody({
       username: updatedUser.username,
