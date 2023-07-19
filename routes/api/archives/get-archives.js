@@ -28,6 +28,14 @@ export async function getArchives (fastify, opts) {
               type: 'boolean',
               default: false
             },
+            starred: {
+              type: 'boolean',
+              default: false
+            },
+            toread: {
+              type: 'boolean',
+              default: false
+            },
             full_archives: {
               type: 'boolean',
               default: false
@@ -35,6 +43,9 @@ export async function getArchives (fastify, opts) {
             bookmark_id: {
               type: 'string',
               format: 'uuid'
+            },
+            ready: {
+              type: 'boolean'
             }
           },
           dependencies: {
@@ -77,6 +88,9 @@ export async function getArchives (fastify, opts) {
           after,
           per_page: perPage,
           sensitive,
+          toread,
+          starred,
+          ready,
           bookmark_id: bookmarkId
         } = request.query
         let {
@@ -95,7 +109,10 @@ export async function getArchives (fastify, opts) {
             ownerId: userId,
             bookmarkId,
             after,
-            sensitive
+            sensitive,
+            toread,
+            starred,
+            ready
           })
 
           const afterToBeforeResults = await fastify.pg.query(afterCalcQuery)
@@ -123,6 +140,9 @@ export async function getArchives (fastify, opts) {
           bookmarkId,
           before,
           sensitive,
+          toread,
+          starred,
+          ready,
           perPage,
           fullArchives: request.query.full_archives
         })

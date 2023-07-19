@@ -47,7 +47,10 @@ export const page = Component(() => {
       if (pageParams.get('bid')) reqParams.set('bookmark_id', pageParams.get('bid'))
 
       reqParams.set('sensitive', state.sensitive)
+      reqParams.set('toread', state.toread)
+      reqParams.set('starred', state.starred)
       reqParams.set('full_archives', false)
+      reqParams.set('ready', true)
 
       const response = await fetch(`${state.apiUrl}/archives?${reqParams.toString()}`, {
         method: 'get',
@@ -90,7 +93,7 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setArchivesError(err) })
         .finally(() => { setArchivesLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, archiveReload])
+  }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archiveReload])
 
   const onPageNav = (ev) => {
     ev.preventDefault()

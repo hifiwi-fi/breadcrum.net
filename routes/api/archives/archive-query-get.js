@@ -6,6 +6,8 @@ export function getArchivesQuery ({
   bookmarkId,
   before,
   sensitive,
+  toread,
+  starred,
   ready,
   perPage,
   fullArchives
@@ -49,6 +51,8 @@ export function getArchivesQuery ({
     ${bookmarkId ? SQL`and ar.bookmark_id = ${bookmarkId}` : SQL``}
     ${before ? SQL`and ar.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
+    ${toread ? SQL`and toread = true` : SQL``}
+    ${starred ? SQL`and starred = true` : SQL``}
     ${ready != null ? SQL`and ready = ${ready}` : SQL``}
     order by ar.created_at desc, ar.url desc, bm.title desc
     ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
@@ -62,29 +66,50 @@ export function afterToBeforeArchivesQuery ({
   ownerId,
   bookmarkId,
   after,
-  sensitive
+  sensitive,
+  toread,
+  ready,
+  starred
 }) {
   const perPageAfterOffset = perPage + 2
+
+  const needsJoin = !sensitive || toread || starred
 
   const afterCalcArchivesQuery = SQL`
     with page as (
       select ar.id, ar.created_at
       from archives ar
-      ${!sensitive
+      ${needsJoin
           ? SQL`
               join bookmarks bm
               on ar.bookmark_id = bm.id`
           : SQL``}
       where ar.owner_id = ${ownerId}
       and ar.created_at >= ${after}
+      ${ready != null ? SQL`and ready = ${ready}` : SQL``}
       ${bookmarkId
         ? SQL`ar.bookmark_id = ${bookmarkId}`
         : SQL``
       }
+      ${needsJoin
+        ? SQL`and bm.owner_id = ${ownerId}`
+        : SQL``
+      }
       ${!sensitive
         ? SQL`
-          and bm.owner_id = ${ownerId}
           and bm.sensitive = false
+        `
+        : SQL``
+      }
+      ${toread
+        ? SQL`
+          and bm.toread = true
+        `
+        : SQL``
+      }
+      ${starred
+        ? SQL`
+          and bm.starred = true
         `
         : SQL``
       }
