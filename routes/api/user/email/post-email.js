@@ -2,6 +2,7 @@
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
 import { validatedUserProps } from '../user-props.js'
+import { resolveEmail } from 'resolve-email'
 
 // Update the email address by setting a pending_email_update field.
 export async function postEmail (fastify, opts) {
@@ -56,7 +57,20 @@ export async function postEmail (fastify, opts) {
         const hasExistingUserEmail = results.rows.length > 0
 
         if (hasExistingUserEmail) {
-          return reply.forbidden('An account already exists with the requested email address')
+          return reply.conflict('An account already exists with the requested email address')
+        }
+
+        const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
+
+        request.log[emailError ? 'error' : 'info']({
+          email,
+          emailResolves,
+          mxRecords,
+          emailError
+        })
+
+        if (!emailResolves) {
+          return reply.unprocessableEntity('Email address did not resolve.')
         }
 
         const updates = [

@@ -10,6 +10,7 @@ import {
   tokenWithUserProps,
   validatedUserProps
 } from '../user/user-props.js'
+import { resolveEmail } from 'resolve-email'
 
 export default async function registerRoutes (fastify, opts) {
   fastify.post(
@@ -59,8 +60,44 @@ export default async function registerRoutes (fastify, opts) {
         }
         const { username, email, password, newsletter_subscription } = request.body
 
-        // TODO: ensure not a duplicate user
-        // TODO: pre-validate email more (MX record lookup)
+        const usernameQuery = SQL`
+          select u.username
+          from users u
+          where u.username = ${username}
+          fetch first 1 row only;
+        `
+
+        const usernameResults = await client.query(usernameQuery)
+
+        if (usernameResults.rows.length > 0) {
+          return reply.conflict('Username is already taken.')
+        }
+
+        const emailQuery = SQL`
+          select u.email
+          from users u
+          where u.email = ${email}
+          fetch first 1 row only;
+        `
+
+        const emailResults = await client.query(emailQuery)
+
+        if (emailResults.rows.length > 0) {
+          return reply.conflict('Email is already taken.')
+        }
+
+        const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
+
+        request.log[emailError ? 'error' : 'info']({
+          email,
+          emailResolves,
+          mxRecords,
+          emailError
+        })
+
+        if (!emailResolves) {
+          return reply.unprocessableEntity('Email address did not resolve.')
+        }
 
         const query = SQL`
           insert into users (

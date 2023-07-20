@@ -37,7 +37,21 @@ export async function putUser (fastify, opts) {
 
         const updates = []
 
-        if ('username' in user) updates.push(SQL`username = ${user.username}`)
+        if ('username' in user) {
+          const usernameQuery = SQL`
+            select u.username
+            from users u
+            where u.username = ${user.username}
+            fetch first 1 row only;
+        `
+
+          const usernameResults = await client.query(usernameQuery)
+
+          if (usernameResults.rows.length > 0) {
+            return reply.conflict('Username is already taken.')
+          }
+          updates.push(SQL`username = ${user.username}`)
+        }
         if ('password' in user) updates.push(SQL`password = ${getPasswordHashQuery(user.password)}`)
         if ('newsletter_subscription' in user) updates.push(SQL`newsletter_subscription = ${user.newsletter_subscription}`)
 
