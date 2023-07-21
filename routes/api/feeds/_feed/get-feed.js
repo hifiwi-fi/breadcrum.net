@@ -107,6 +107,7 @@ export async function getFeed (fastify, opts) {
               title: ep.display_title,
               content_text: ep.bookmark.note,
               date_published: ep.created_at,
+              image: ep.thumbnail,
               attachments: cleanDeep([{
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: ep.id }),
                 mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
