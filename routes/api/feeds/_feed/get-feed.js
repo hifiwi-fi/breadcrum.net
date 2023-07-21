@@ -105,7 +105,7 @@ export async function getFeed (fastify, opts) {
               id: ep.id,
               url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
               title: ep.display_title,
-              content_text: ep.bookmark.note,
+              content_text: ep.text_content ?? ep.bookmark.note,
               date_published: ep.created_at,
               image: ep.thumbnail,
               attachments: cleanDeep([{
