@@ -31,7 +31,7 @@ jobs:
         # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
         registry-url: 'https://registry.npmjs.org'
     - name: Start Redis
-      uses: supercharge/redis-github-action@1.5.0
+      uses: supercharge/redis-github-action@1.6.0
       with:
         redis-version: ${{ env.redis-version }}
     - run: npm i
