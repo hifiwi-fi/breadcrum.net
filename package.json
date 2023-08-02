@@ -17,7 +17,7 @@
     "@fastify/caching": "^8.0.0",
     "@fastify/circuit-breaker": "^3.0.0",
     "@fastify/compress": "^6.0.0",
-    "@fastify/cookie": "^8.0.0",
+    "@fastify/cookie": "^9.0.1",
     "@fastify/cors": "^8.0.0",
     "@fastify/env": "^4.0.0",
     "@fastify/helmet": "^11.0.0",
