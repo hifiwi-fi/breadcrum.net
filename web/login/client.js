@@ -20,7 +20,7 @@ export const page = Component(() => {
         const url = new URL(pageParams.get('redirect'), 'https://example.com')
         destination = `${url.pathname}${url.search}`
       } else {
-        destination = '/bookmarks'
+        destination = '/bookmarks/'
       }
       window.location.replace(destination)
     }
@@ -46,6 +46,7 @@ export const page = Component(() => {
       if (response.ok && response.status === 201) {
         const body = await response.json()
         state.user = body?.user
+        state.token = body?.token
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }

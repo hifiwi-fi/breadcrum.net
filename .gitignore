@@ -9,3 +9,5 @@ public
 dependency-graph.html
 *.dbml
 .tap
+build
+ssc

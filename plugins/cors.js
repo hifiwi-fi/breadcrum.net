@@ -7,7 +7,7 @@ import fp from 'fastify-plugin'
  */
 export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/cors'), {
-    origin: ['http://localhost:3000', 'https://breadcrum.net'],
+    origin: ['http://localhost:3000', 'https://breadcrum.net', 'socket://com.hifiwifi.breadcrum'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
   })

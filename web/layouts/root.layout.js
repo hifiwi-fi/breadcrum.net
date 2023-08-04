@@ -31,6 +31,13 @@ export default function defaultRootLayout ({
       <meta name='description' content='${siteName} internet newspaper clippings and bookmarks. Podcast anything.'>
       <meta itemprop="publisher" content="${siteName}">
       <meta property="og:site_name" content="${siteName}">
+                
+      <meta http-equiv="Content-Security-Policy"
+            content="
+            connect-src http://localhost:8080  data://* ipc://* file://* socket:* https://breadcrum.net http://localhost:3000;
+            child-src 'none';
+            img-src https: data: file: socket:;"
+      >
 
       <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/json" href="/feed.json" />
       <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/feed+json" href="/feed.json" />

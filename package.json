@@ -101,6 +101,7 @@
   "scripts": {
     "build": "run-s clean && run-p build:*",
     "build:siteup": "siteup --src web --dest public",
+    "build:ssc": "siteup --src web --dest ssc &&  ssc build -r",
     "clean": "rm -rf public && mkdir -p public",
     "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg | depcruise-wrap-stream-in-html > dependency-graph.html",
     "migrate": "postgrator",

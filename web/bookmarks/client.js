@@ -30,7 +30,7 @@ export const page = Component(() => {
   useEffect(() => {
     if (!user && !loading) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+      window.location.replace(`/login/?redirect=${encodeURIComponent(redirectTarget)}`)
     }
   }, [user, loading])
 
@@ -54,8 +54,10 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
-        }
+          'accept-encoding': 'application/json',
+          authorization: `Bearer ${state.token}`
+        },
+        signal: controller.signal
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -85,13 +87,13 @@ export const page = Component(() => {
       }
     }
 
-    if (user) {
+    if (user && state.token) {
       getBookmarks()
         .then(() => { console.log('bookmarks done') })
         .catch(err => { console.error(err); setBookmarksError(err) })
         .finally(() => { setBookmarksLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
+  }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload, state.token])
 
   const onPageNav = useCallback((ev) => {
     ev.preventDefault()

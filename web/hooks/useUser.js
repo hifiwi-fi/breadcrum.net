@@ -23,8 +23,10 @@ export function useUser ({
       if (!userRequest) {
         userRequest = fetch(`${state.apiUrl}/user`, {
           method: 'get',
+          mode: 'cors',
           headers: {
-            'accept-encoding': 'application/json'
+            'accept-encoding': 'application/json',
+            authorization: `Bearer ${state.token}`
           }
         })
         requestor = true
@@ -58,7 +60,7 @@ export function useUser ({
       setLoading(false)
       if (requestor) userRequest = null
     })
-  }, [state.apiUrl, reload])
+  }, [state.apiUrl, state.token, reload])
 
   return {
     user: state.user,

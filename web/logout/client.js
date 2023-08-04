@@ -15,6 +15,7 @@ export const page = Component(() => {
         })
       } finally {
         state.user = null
+        state.token = null
         window.location.replace('/')
       }
     }

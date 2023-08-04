@@ -43,20 +43,22 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json'
+        'accept-encoding': 'application/json',
+        authorization: `Bearer ${state.token}`
       }
     })
 
     setDeleted(true)
     onDelete()
-  }, [state.apiUrl, bookmark.id, setDeleted, reload])
+  }, [state.apiUrl, state.token, bookmark.id, setDeleted, reload])
 
   const handleToggleToRead = useCallback(async (ev) => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        authorization: `Bearer ${state.token}`
       },
       body: JSON.stringify({
         toread: !bookmark.toread
@@ -65,14 +67,15 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.toread])
+  }, [state.apiUrl, state.token, bookmark.id, reload, bookmark.toread])
 
   const handleToggleStarred = useCallback(async (ev) => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        authorization: `Bearer ${state.token}`
       },
       body: JSON.stringify({
         starred: !bookmark.starred
@@ -81,14 +84,15 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.starred])
+  }, [state.apiUrl, state.token, bookmark.id, reload, bookmark.starred])
 
   const handleToggleSensitive = useCallback(async (ev) => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
+        authorization: `Bearer ${state.token}`
       },
       body: JSON.stringify({
         sensitive: !bookmark.sensitive
@@ -97,7 +101,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
 
     // TODO: optimistic updates without full reload
     reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.sensitive])
+  }, [state.apiUrl, state.token, bookmark.id, reload, bookmark.sensitive])
 
   return html`
   <div class="bc-bookmark">

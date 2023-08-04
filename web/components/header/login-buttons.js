@@ -9,7 +9,7 @@ export const loginButtons = Component(() => {
       window?.location?.pathname !== '/login/'
         ? html`
           <div>
-            <a href='/login'>login</a>
+            <a href='/login/'>login</a>
           </div>
         `
         : null
@@ -25,7 +25,7 @@ export const loginButtons = Component(() => {
       window?.location?.pathname !== '/register/'
         ? html`
           <div>
-            <a href='/register'>register</a>
+            <a href='/register/'>register</a>
           </div>
         `
         : null
