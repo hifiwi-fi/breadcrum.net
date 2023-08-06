@@ -13,6 +13,9 @@ export function getUserQuery ({
       u.updated_at,
       u.pending_email_update,
       u.newsletter_subscription,
+      u.admin,
+      u.disabled,
+      u.disabled_reason,
       coalesce(bh.disabled, false) as disabled_email
     from users u
     left join email_blackhole bh

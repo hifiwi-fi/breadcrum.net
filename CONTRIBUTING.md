@@ -22,7 +22,7 @@ Changelog, and releasing is automated with npm scripts and GitHub actions.  To c
 - Navigate to the actions tab in GitHub
 - Select the `npm bump` action.
 - Trigger an action, specifying the semantic version bump that is needed.
-- Changelog, Github release and npm publish is hanlded by the action.
+- Changelog, Github release and npm publish is handled by the action.
 - An in depth review of this system is documented here: [bret.io/projects/package-automation](https://bret.io/projects/package-automation/)
 
 If for some reason that isn't workoing or a local release is preferred, follow these steps:

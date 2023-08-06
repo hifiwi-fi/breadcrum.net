@@ -17,7 +17,7 @@ export const episodeEdit = Component(({
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const hanldeCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback((ev) => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
@@ -92,7 +92,7 @@ export const episodeEdit = Component(({
               ${onDeleteEpisode
                 ? deleteConfirm
                   ? html`
-                    <button onClick=${hanldeCancelDelete}>Cancel</button>
+                    <button onClick=${handleCancelDelete}>Cancel</button>
                     <button onClick=${handleDeleteEpisode}>Destroy</button>`
                   : html`<button onClick=${handleInitiateDelete}>Delete</button>`
                 : null

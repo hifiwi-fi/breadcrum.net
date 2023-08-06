@@ -17,7 +17,7 @@ export const feedEdit = Component(({
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const hanldeCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback((ev) => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
@@ -110,7 +110,7 @@ export const feedEdit = Component(({
               ${onDeleteFeed && !f?.default_feed
                 ? deleteConfirm
                   ? html`
-                    <button onClick=${hanldeCancelDelete}>Cancel</button>
+                    <button onClick=${handleCancelDelete}>Cancel</button>
                     <button onClick=${handleDeleteFeed}>Destroy</button>`
                   : html`<button onClick=${handleInitiateDelete}>Delete</button>`
                 : null

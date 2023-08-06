@@ -28,6 +28,20 @@ export const page = Component(() => {
   return html`
     <div>
       <dl>
+        ${user?.disabled
+          ? html`
+            <dt><marquee direction="right">Account Disabled</marquee></dt>
+            <dd>
+              <p>Your account has been disabled${user?.disabled_reason ? html`<span> for the following reason:</span>` : html`<span>.</span>`}</p>
+              ${user?.disabled_reason
+                ? html`<p>${user?.disabled_reason}</p>`
+                : null
+              }
+              <p>Please contact <a href="mailto:support@breadcrum.net">support@breadcrum.net</a> to resolve this issue.</p>
+            </dd>
+          `
+          : null
+        }
         ${usernameField({ user, reload })}
         ${passwordField()}
         ${emailField({ user, reload })}
@@ -38,6 +52,13 @@ export const page = Component(() => {
         <dd><time datetime="${user?.updated_at}">${user?.updated_at ? (new Date(user.updated_at)).toLocaleDateString() : null}</time></dd>
         <dt>id</dt>
         <dd><code>${user?.id}</code></dd>
+        ${user?.admin
+          ? html`
+            <dt>admin section</dt>
+            <dd><a href="/admin/">Admin pannel</a></dd>
+          `
+          : null
+        }
      </dl>
     </div>
 `

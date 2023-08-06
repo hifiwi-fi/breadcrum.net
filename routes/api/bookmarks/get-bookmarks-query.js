@@ -1,5 +1,28 @@
 import SQL from '@nearform/sql'
 
+/**
+ * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ */
+
+/**
+ * Generates an SQL query to retrieve bookmarks based on the provided criteria.
+ *
+ * @function getBookmarksQuery
+ * @exports
+ * @param {Object} params - Parameters to shape the query.
+ * @param {string} [params.tag] - Tag associated with the bookmarks.
+ * @param {number} params.ownerId - ID of the owner.
+ * @param {number} [params.bookmarkId] - Specific ID of the bookmark.
+ * @param {string} [params.before] - Date string to get bookmarks before this date.
+ * @param {string} [params.url] - URL of the bookmark.
+ * @param {boolean} [params.sensitive=false] - If true, includes sensitive bookmarks.
+ * @param {boolean} [params.starred] - If true, includes only starred bookmarks.
+ * @param {boolean} [params.toread] - If true, includes only 'to read' bookmarks.
+ * @param {number} [params.perPage] - Limits the number of returned rows.
+ * @param {boolean} [params.fullArchives=false] - If true, includes full archive content in the result.
+ * @returns {SqlStatement} SQL template literal representing the bookmarks query.
+ * @throws {Error} Throws an error if ownerId is not provided.
+ */
 export const getBookmarksQuery = ({
   tag,
   ownerId,
@@ -12,7 +35,7 @@ export const getBookmarksQuery = ({
   perPage,
   fullArchives
 }) => {
-  const bookarmsQuery = SQL`
+  const boomkmarksQuery = SQL`
         with bookmark_page as (
           select bm.*
           from bookmarks bm
@@ -134,7 +157,7 @@ export const getBookmarksQuery = ({
         order by b.created_at desc, b.title desc, b.url desc
       `
 
-  return bookarmsQuery
+  return boomkmarksQuery
 }
 
 // For doing offset pagination, this converts after queries to a before query

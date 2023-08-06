@@ -17,7 +17,7 @@ export const archiveEdit = Component(({
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const hanldeCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback((ev) => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
@@ -84,7 +84,7 @@ export const archiveEdit = Component(({
               ${onDeleteArchive
                 ? deleteConfirm
                   ? html`
-                    <button onClick=${hanldeCancelDelete}>Cancel</button>
+                    <button onClick=${handleCancelDelete}>Cancel</button>
                     <button onClick=${handleDeleteArchive}>Destroy</button>`
                   : html`<button onClick=${handleInitiateDelete}>Delete</button>`
                 : null

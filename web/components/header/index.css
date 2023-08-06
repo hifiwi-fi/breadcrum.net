@@ -46,17 +46,30 @@
   align-items: center;
 }
 
+
+.bc-header-email-disabled,
 .bc-header-email-warning {
   display: inline-flex;
   width: 100%;
   height: 100%;
   font-size: var(--small-font-size);
   justify-content: center;
+}
+
+.bc-header-email-warning {
   background-color: var(--mark-background);
+}
+
+.bc-header-email-disabled {
+  background-color: red;
 }
 
 .bc-header-email-warning a {
   color: var(--text);
+}
+
+.bc-header-email-disabled a {
+  color: var(--dark-text);
 }
 
 .bc-header-button {

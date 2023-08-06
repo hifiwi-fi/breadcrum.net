@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
-import { validatedUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../user-props.js'
 import { resolveEmail } from 'resolve-email'
 
 // Update the email address by setting a pending_email_update field.
@@ -20,9 +20,7 @@ export async function postEmail (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            email: {
-              ...validatedUserProps.email
-            }
+            email: userEditableUserProps.email
           },
           required: ['email']
         }
@@ -110,7 +108,6 @@ export async function postEmail (fastify, opts) {
             username: updatedUser.username,
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
-            token: updatedUser.pending_email_update_token,
             oldEmail: updatedUser.email,
             newEmail: updatedUser.pending_email_update
           })

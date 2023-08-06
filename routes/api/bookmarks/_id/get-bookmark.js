@@ -47,8 +47,6 @@ export async function getBookmark (fastify, opts) {
       if (!bookmark) {
         return reply.notFound('bookmark id not found')
       }
-      return {
-        ...bookmark
-      }
+      return bookmark
     })
 }

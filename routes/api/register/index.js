@@ -8,7 +8,7 @@ import {
 import { getPasswordHashQuery } from '../user/password/password-hash.js'
 import {
   tokenWithUserProps,
-  validatedUserProps
+  userEditableUserProps
 } from '../user/user-props.js'
 import { resolveEmail } from 'resolve-email'
 
@@ -32,7 +32,7 @@ export default async function registerRoutes (fastify, opts) {
             'newsletter_subscription'
           ],
           properties: {
-            ...validatedUserProps
+            ...userEditableUserProps
           }
         },
         response: {
@@ -129,7 +129,7 @@ export default async function registerRoutes (fastify, opts) {
 
         await client.query('commit')
 
-        const token = await reply.createJWTToken(user)
+        const token = await reply.createJWTToken({ id: user.id, username: user.username })
         reply.setJWTCookie(token)
 
         fastify.metrics.userCreatedCounter.inc()

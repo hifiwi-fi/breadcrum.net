@@ -65,5 +65,12 @@ export const header = Component(() => {
       </div>`
     : null
   }
+  ${user && user.disabled
+    ? html`
+      <div class="bc-header-email-disabled">
+        <a href="/account/">${['/account/'].includes(window?.location?.pathname) ? 'Your account is disabled' : 'Your account is disabled. Click for details'}</a>
+      </div>`
+    : null
+  }
   `
 })

@@ -89,7 +89,7 @@ export const bookmarkEdit = Component(({
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const hanldeCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback((ev) => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
@@ -455,7 +455,7 @@ export const bookmarkEdit = Component(({
             ${onDeleteBookmark
               ? deleteConfirm
                 ? html`
-                  <button onClick=${hanldeCancelDelete}>Cancel</button>
+                  <button onClick=${handleCancelDelete}>Cancel</button>
                   <button onClick=${handleDeleteBookmark}>Destroy</button>`
                 : html`<button onClick=${handleInitiateDelete}>Delete</button>`
               : null

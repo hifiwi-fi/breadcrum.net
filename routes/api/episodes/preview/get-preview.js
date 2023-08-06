@@ -5,7 +5,12 @@ export async function getPreview (fastify, opts) {
   fastify.get(
     '/',
     {
-      preHandler: fastify.auth([fastify.verifyJWT]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.notDisabled
+      ], {
+        relation: 'and'
+      }),
       schema: {
         querystring: {
           type: 'object',

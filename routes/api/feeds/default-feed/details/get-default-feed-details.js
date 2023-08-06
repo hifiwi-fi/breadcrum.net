@@ -7,7 +7,12 @@ export async function getDefaultFeedDetails (fastify, opts) {
   fastify.get(
     '/',
     {
-      preHandler: fastify.auth([fastify.verifyJWT]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.notDisabled
+      ], {
+        relation: 'and'
+      }),
       schema: {
         response: {
           200: {

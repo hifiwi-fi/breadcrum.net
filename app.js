@@ -1,5 +1,5 @@
 import AutoLoad from '@fastify/autoload'
-import { join } from 'path'
+import { join } from 'node:path'
 import desm from 'desm'
 import hyperid from 'hyperid'
 

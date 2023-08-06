@@ -5,7 +5,12 @@ import { commonEpisodeProps } from '../episode-props.js'
 
 export async function putEpisode (fastify, opts) {
   fastify.put('/', {
-    preHandler: fastify.auth([fastify.verifyJWT]),
+    preHandler: fastify.auth([
+      fastify.verifyJWT,
+      fastify.notDisabled
+    ], {
+      relation: 'and'
+    }),
     schema: {
       querystring: {},
       params: {
