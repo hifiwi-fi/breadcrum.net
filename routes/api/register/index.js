@@ -96,7 +96,7 @@ export default async function registerRoutes (fastify, opts) {
         })
 
         if (!emailResolves) {
-          return reply.unprocessableEntity('Email address did not resolve.')
+          return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
         }
 
         const query = SQL`
