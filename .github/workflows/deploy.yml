@@ -9,7 +9,7 @@ on:
         default: 'master'
 
 env:
-  node_version: 19
+  node_version: 20
   FORCE_COLOR: 1
   redis-version: 7
 
