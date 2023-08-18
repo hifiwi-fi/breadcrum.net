@@ -117,7 +117,8 @@
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:siteup": "npm run build:siteup -- --watch",
     "print-routes": "fastify print-routes app.js",
-    "print-plugins": "fastify print-plugins app.js"
+    "print-plugins": "fastify print-plugins app.js",
+    "generate-dbml": "npx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
   },
   "standard": {
     "ignore": []
