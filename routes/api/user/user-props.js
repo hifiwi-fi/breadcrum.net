@@ -7,7 +7,9 @@ export const userProps = {
   updated_at: { type: 'string', format: 'date-time' },
   pending_email_update: { type: 'string', format: 'email' },
   newsletter_subscription: { type: 'boolean' },
-  disabled_email: { type: 'boolean' }
+  disabled_email: { type: 'boolean', description: 'Indicates if the user\'s email address has been disabled due to abuse or delivery issues. Contact support to resolve.' },
+  disabled: { type: 'boolean', description: 'Indicates if the user account has been disabled by mods.' },
+  disabled_reason: { type: 'string', description: 'A note presented to the user regarding their account disabled status.' }
 }
 
 export const validatedUserProps = {
