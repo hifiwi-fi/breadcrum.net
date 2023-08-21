@@ -1,4 +1,4 @@
-import { userProps } from './user-props.js'
+import { fullSerializedUserProps } from './user-props.js'
 import { getUserQuery } from './user-query.js'
 
 export async function getUser (fastify, opts) {
@@ -8,7 +8,7 @@ export async function getUser (fastify, opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         response: {
-          200: userProps
+          200: fullSerializedUserProps
         }
       }
     },

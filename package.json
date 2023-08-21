@@ -76,7 +76,8 @@
     "gh-release": "^7.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
-    "tap": "^16.0.0"
+    "tap": "^16.0.0",
+    "typescript": "^5.1.6"
   },
   "engines": {
     "node": ">=18.0.0",

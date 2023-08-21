@@ -42,7 +42,7 @@ export default fp(async function (fastify, opts) {
     try {
       await request.jwtVerify()
     } catch (err) {
-      reply.deleteJWTCookie()
+      // reply.deleteJWTCookie()
       jwtVerifyFailCounter.inc()
       throw err
     }

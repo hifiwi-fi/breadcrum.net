@@ -1,6 +1,6 @@
-import SQL from '@nearform/sql'
-import { userProps } from '../../../../user/user-props.js'
-import { adminUserProps } from '../amin-user-props.js'
+// import SQL from '@nearform/sql'
+// import { fullSerializedUserProps } from '../../../../user/user-props.js'
+import { fullSerializedAdminUserProps } from '../admin-user-props.js'
 
 export async function putAdminUser (fastify, opts) {
   fastify.put(
@@ -15,7 +15,12 @@ export async function putAdminUser (fastify, opts) {
       schema: {
         hide: true,
         body: {
-
+          type: 'object',
+          additionalProperties: false,
+          minProperties: 1,
+          properties: {
+            fullSerializedAdminUserProps
+          }
         },
         response: {
           200: {
@@ -27,7 +32,7 @@ export async function putAdminUser (fastify, opts) {
     // PUT user with administrative fields
     async function putAdminUserHandler (request, reply) {
       return fastify.pg.transact(async client => {
-
+        throw new Error('NOT IMPLEMENTEd')
       })
     }
   )

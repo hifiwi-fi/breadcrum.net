@@ -1,5 +1,5 @@
-import { userProps } from '../../../../user/user-props.js'
-import { adminUserProps } from '../amin-user-props.js'
+import { fullSerializedAdminUserProps } from '../admin-user-props.js'
+import { getAdminUsersQuery } from '../get-admin-users-query.js'
 
 export async function getAdminUser (fastify, opts) {
   fastify.get(
@@ -13,21 +13,37 @@ export async function getAdminUser (fastify, opts) {
       }),
       schema: {
         hide: true,
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' }
+          },
+          required: ['id']
+        },
         response: {
           200: {
             type: 'object',
-            properties: {
-              ...userProps,
-              ...adminUserProps
-            }
+            properties: fullSerializedAdminUserProps
           }
         }
       }
     },
     // GET user with administrative fields
     async function getAdminUserHandler (request, reply) {
-      const adminFlags = await fastify.getFlags({ frontend: true, backend: true })
-      return adminFlags
+      const { id: userId } = request.params
+
+      const query = getAdminUsersQuery({
+        userId
+      })
+
+      const results = await fastify.pg.query(query)
+      const user = results.rows[0]
+
+      if (!user) {
+        return reply.notFound('user id not found')
+      }
+
+      return user
     }
   )
 }

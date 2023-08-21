@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { PASSWORD_RESET_EXP, PASSWORD_RESET_TOKEN } from './password-reset-token.js'
-import { validatedUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../user-props.js'
 
 export async function resetPassword (fastify, opts) {
   fastify.post(
@@ -17,9 +17,7 @@ export async function resetPassword (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            email: {
-              ...validatedUserProps.email
-            }
+            email: userEditableUserProps.email
           },
           required: ['email']
         }

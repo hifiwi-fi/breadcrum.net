@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password-hash.js'
-import { validatedUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../user-props.js'
 
 export async function postPassword (fastify, opts) {
   fastify.post(
@@ -17,9 +17,7 @@ export async function postPassword (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            password: {
-              ...validatedUserProps.password
-            },
+            password: userEditableUserProps.password,
             token: {
               type: 'string',
               minLength: 64,
@@ -110,7 +108,7 @@ export async function postPassword (fastify, opts) {
   )
 }
 
-function passwordUpdatedBody ({ username, host, transport, token, email }) {
+function passwordUpdatedBody ({ username, host, transport, email }) {
   return `Hi ${username},
 
 Your password on Breadcrum.net has been updated.

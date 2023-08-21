@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { validatedUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../user-props.js'
 
 // Unsubscribe an email address no matter what
 export async function unsubscribeEmail (fastify, opts) {
@@ -11,9 +11,7 @@ export async function unsubscribeEmail (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            email: {
-              ...validatedUserProps.email
-            }
+            email: userEditableUserProps.email
           },
           required: ['email']
         }

@@ -1,5 +1,5 @@
-import { userProps } from '../../../user/user-props.js'
-import { adminUserProps } from './admin-user-props.js'
+import { fullSerializedAdminUserProps } from './admin-user-props.js'
+import { userEditableUserProps } from '../../user/user-props.js'
 import { getAdminUsersQuery, afterToBeforeAdminUsersQuery } from './get-admin-users-query.js'
 
 export async function getAdminUsers (fastify, opts) {
@@ -30,7 +30,8 @@ export async function getAdminUsers (fastify, opts) {
               minimum: 1,
               maximum: 200,
               default: 20
-            }
+            },
+            username: userEditableUserProps.username
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after'] } }] },
@@ -45,10 +46,7 @@ export async function getAdminUsers (fastify, opts) {
                 type: 'array',
                 items: {
                   type: 'object',
-                  properties: {
-                    ...userProps,
-                    ...adminUserProps
-                  }
+                  properties: fullSerializedAdminUserProps
                 }
               },
               pagination: {
@@ -70,7 +68,8 @@ export async function getAdminUsers (fastify, opts) {
       return fastify.pg.transact(async client => {
         const {
           after,
-          per_page: perPage
+          per_page: perPage,
+          username
         } = request.query
         let {
           before
@@ -85,7 +84,8 @@ export async function getAdminUsers (fastify, opts) {
           const perPageAfterOffset = perPage + 2
           const afterCalcQuery = afterToBeforeAdminUsersQuery({
             perPage,
-            after
+            after,
+            username
           })
 
           const results = await client.query(afterCalcQuery)
@@ -107,7 +107,8 @@ export async function getAdminUsers (fastify, opts) {
 
         const adminUsersQuery = getAdminUsersQuery({
           before,
-          perPage
+          perPage,
+          username
         })
 
         const results = await client.query(adminUsersQuery)

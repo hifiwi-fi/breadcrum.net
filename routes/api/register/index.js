@@ -8,7 +8,7 @@ import {
 import { getPasswordHashQuery } from '../user/password/password-hash.js'
 import {
   tokenWithUserProps,
-  validatedUserProps
+  userEditableUserProps
 } from '../user/user-props.js'
 import { resolveEmail } from 'resolve-email'
 
@@ -32,7 +32,7 @@ export default async function registerRoutes (fastify, opts) {
             'newsletter_subscription'
           ],
           properties: {
-            ...validatedUserProps
+            ...userEditableUserProps
           }
         },
         response: {

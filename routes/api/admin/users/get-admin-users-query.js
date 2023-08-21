@@ -1,5 +1,27 @@
 import SQL from '@nearform/sql'
 
+/**
+ * Constructs a SQL query to fetch details of all user types for administrative purposes.
+ *
+ * @param {Object} options - Options for the query.
+ * @param {number} [options.userId] - The unique identifier of the user to filter by. Optional.
+ * @param {string} [options.username] - The username of the user to filter by. Optional.
+ * @param {Date|string} [options.before] - Filters users created before this date. Optional.
+ * @param {number} [options.perPage] - The number of users to fetch per page. If not provided, fetches all users. Optional.
+ * @returns {Object} The SQL query tailored for administrative usage to fetch details of users.
+ *
+ * @example
+ * // Fetch all users for admin
+ * getAdminUsersQuery({});
+ *
+ * // Fetch user with userId 5 for admin
+ * getAdminUsersQuery({ userId: 5 });
+ *
+ * // Fetch first 10 users created before '2023-08-21' for admin
+ * getAdminUsersQuery({ before: '2023-08-21', perPage: 10 });
+ *
+ * @note This function is intended for admin-only routes.
+ */
 export const getAdminUsersQuery = ({
   userId,
   username,
@@ -37,7 +59,8 @@ export const getAdminUsersQuery = ({
 // For doing offset pagination, this converts after queries to a before query
 export const afterToBeforeAdminUsersQuery = ({
   perPage,
-  after
+  after,
+  username
 }) => {
   const perPageAfterOffset = perPage + 2
   const afterCalcUsersQuery = SQL`
@@ -45,6 +68,7 @@ export const afterToBeforeAdminUsersQuery = ({
             select u.id, u.created_at
             from users u
             where u.created_at >= ${after}
+            ${username ? SQL`and u.username = ${username}` : SQL``}
             order by u.created_at asc, u.username asc
             fetch first ${perPageAfterOffset} rows only
           ),

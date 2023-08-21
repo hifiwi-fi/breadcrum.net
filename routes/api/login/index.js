@@ -2,7 +2,7 @@ import SQL from '@nearform/sql'
 
 import {
   tokenWithUserProps,
-  validatedUserProps
+  userEditableUserProps
 } from '../user/user-props.js'
 
 export default async function loginRoutes (fastify, opts) {
@@ -16,11 +16,11 @@ export default async function loginRoutes (fastify, opts) {
           properties: {
             user: {
               anyOf: [
-                validatedUserProps.username,
-                validatedUserProps.email
+                userEditableUserProps.username,
+                userEditableUserProps.email
               ]
             },
-            password: { ...validatedUserProps.password }
+            password: userEditableUserProps.password
           }
         },
         response: {
