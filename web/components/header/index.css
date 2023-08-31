@@ -89,3 +89,18 @@
 .bc-decoration-none:hover {
   text-decoration: none;
 }
+
+@media print {
+  .bc-username {
+    visibility: hidden;
+  }
+
+  .bc-username:after {
+    content:'Breadcrum';
+    visibility: visible;
+    display: block;
+    position: absolute;
+    padding: 5px;
+    top: 2px;
+  }
+}
