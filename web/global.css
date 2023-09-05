@@ -20,3 +20,18 @@
   color: var(--accent-foreground);
   font-size: 0.8em;
 }
+
+.rounded-icon {
+  border-radius: 3px;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid-center {
+  display: grid;
+  place-items: center;
+}

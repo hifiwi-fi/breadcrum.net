@@ -6,14 +6,20 @@ title: '📚 Docs'
 
 Learn about more about Breadcrum:
 
-- 🔰 [Tutorial](./tutorial)
-- 📑 [Bookmarklets](./bookmarklets)
-- 🦜 [Warrant Canary](./canary)
-- 🏳️ [Privacy](./privacy)
+- 🔰 [Tutorial](./tutorial/)
+- 📑 [Bookmarklets](./bookmarklets/)
+- 📜 [Blog](/blog/)
+- ℹ️ [About](/about/)
+- 🚦 [Status](https://status.breadcrum.net/)
 
 ## 👷‍♂️ Early access
 
-Breadcrum is still early in development by a one man team.
-Please be patient!
+Breadcrum is still early in development and is not feature complete!
 
+## Legal
 
+- 🧙‍♂️ [Source Code](https://github.com/hifiwi-fi/breadcrum.net/)
+- 👨‍⚖️ [LICENSE](https://github.com/hifiwi-fi/breadcrum.net/blob/master/LICENSE)
+- 👨‍💼 [HifiWi.fi](https://hifiwi.fi)
+- 🦜 [Warrant Canary](./canary/)
+- 🏳️ [Privacy](./privacy/)
