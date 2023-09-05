@@ -14,6 +14,14 @@ Connect with Breadcrum on the following channels:
 - 🌦️ BlueSky: [@breadcrum.net](https://bsky.app/profile/breadcrum.net)
 - 🐦 Twitter: [@breadcrum_](https://twitter.com/breadcrum_)
 
-Stay tuned for more posts about new featurs and additions and general thoughts relating to bookmarking things on the web.
+Stay tuned for more posts about new features and additions and general thoughts relating to bookmarking things on the web.
 
 See you soon 👋
+
+<p>
+  Published: <a href="/blog/2023/breadcrum-has-a-blog/">
+    <time datetime="2023-09-04T20:55:03.398Z">
+      2023-09-04T20:55:03.398Z
+    </time>
+  </a>
+</p>

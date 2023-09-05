@@ -29,6 +29,7 @@ export default function defaultRootLayout ({
       <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/json" href="/feed.json" />
       <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/feed+json" href="/feed.json" />
       <link rel="alternate" title="Breadcrum.net (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
+      <link rel="me" value="https://fosstodon.org/@breadcrum" />
 
       <link rel="shortcut icon" href="/static/bread-transformed.png">
 
