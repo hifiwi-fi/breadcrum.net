@@ -26,6 +26,10 @@ export default function defaultRootLayout ({
       <meta name='referrer' content='no-referrer'>
       <meta name='description' content='Breadcrum internet newspaper clippings and bookmarks. Podcast anything.'>
 
+      <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/json" href="/feed.json" />
+      <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/feed+json" href="/feed.json" />
+      <link rel="alternate" title="Breadcrum.net (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
+
       <link rel="shortcut icon" href="/static/bread-transformed.png">
 
       <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
@@ -62,10 +66,13 @@ export default function defaultRootLayout ({
         </main>
         <footer class="bc-footer">
           <div>
-            <a href="/docs">docs</a>
+            <a href="/docs/">docs</a>
           </div>
           <div>
-            <a href="https://twitter.com/breadcrum_">@breadcrum_</a>
+            <a href="/blog/">blog</a>
+          </div>
+          <div>
+            <a href="/about/">@breadcrum</a>
           </div>
           <div>
             <a href="https://status.breadcrum.net">status</a>
@@ -74,7 +81,7 @@ export default function defaultRootLayout ({
             © <a href="https://hifiwi.fi">HifiWi.fi</a>
           </div>
           <div>
-            <a href="https://github.com/hifiwi-fi/breadcrum.net/">
+            <a href="https://github.com/hifiwi-fi/breadcrum.net/blob/master/LICENSE">
               AGPL-3.0-or-later
             </a>
           </div>
@@ -83,6 +90,8 @@ export default function defaultRootLayout ({
               v${version}
             </a>
           </div>
+          <a class="flex-center" href="/feed.json"><img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg"></a>
+          <a class="flex-center" href="/feed.xml"><img height="16" width="16" src="/static/atom.svg"></a>
         </footer>
       </div>
     </body>

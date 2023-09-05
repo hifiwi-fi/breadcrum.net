@@ -8,7 +8,13 @@ const __dirname = desm(import.meta.url)
 export default async () => {
   return {
     siteName: 'Breadcrum',
-    version: JSON.parse(await readFile(new URL(join(__dirname, '../package.json'), import.meta.url))).version
+    version: JSON.parse(
+      await readFile(
+        new URL(
+          join(__dirname, '../package.json'),
+          import.meta.url),
+        'utf8')
+    ).version
   }
 }
 
