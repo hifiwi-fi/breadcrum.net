@@ -35,3 +35,7 @@
   display: grid;
   place-items: center;
 }
+
+.preserve-icon {
+  min-width: 14px;
+}
