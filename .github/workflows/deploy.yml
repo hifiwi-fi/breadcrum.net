@@ -21,7 +21,7 @@ jobs:
   flyctl_deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         ref: ${{ github.event.inputs.ref }}
     - name: Use Node.js ${{ env.node_version }}
