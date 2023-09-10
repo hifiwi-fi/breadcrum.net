@@ -15,7 +15,6 @@
     "target": "es2022",
     "module": "es2022",
     "lib": ["es2022", "dom"],
-    "types": ["@socketsupply/socket"],
 
     "removeComments": false,
 
@@ -31,10 +30,6 @@
     "declaration": true,
     "declarationMap": true,
 
-    "baseUrl": ".",
-
-    "paths": {
-      "socket:operator/deploy/*": ["src/socket/operator/deploy/*"]
-    }
+    "baseUrl": "."
   }
 }
