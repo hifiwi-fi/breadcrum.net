@@ -5,6 +5,7 @@ import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { episodeList } from '../components/episode/episode-list.js'
+import { search } from '../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -95,11 +96,15 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, state.sensitive, episodeReload])
 
-  const onPageNav = (ev) => {
+  const onPageNav = useCallback((ev) => {
     ev.preventDefault()
     pushState(ev.currentTarget.href)
     window.scrollTo({ top: 0 })
-  }
+  }, [window, pushState])
+
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+  }, [window])
 
   let beforeParams
   if (before) {
@@ -116,6 +121,10 @@ export const page = Component(() => {
   }
 
   return html`
+  ${search({
+    placeholder: 'Search Episodes...',
+    onSearch: handleSearch
+  })}
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}

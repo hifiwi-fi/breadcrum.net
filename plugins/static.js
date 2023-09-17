@@ -36,56 +36,6 @@ export default fp(async function (fastify, opts) {
       ...staticOpts
     })
   }, { prefix: '/admin' })
-
-  // Feed Routes modified CSP
-  const upgradeInsecureRequests = fastify.config.ENV !== 'production' ? null : []
-
-  const episodesHeaders = {
-    contentSecurityPolicy: {
-      directives: {
-        'media-src': '*',
-        'img-src': '*',
-        'upgrade-insecure-requests': upgradeInsecureRequests
-      }
-    }
-  }
-  fastify.register(async function (fastify, opts) {
-    fastify.register(import('@fastify/helmet'), episodesHeaders)
-    fastify.register(import('@fastify/static'), {
-      root: path.join(__dirname, '../public/feeds'),
-      prefix: '/',
-      ...staticOpts
-    })
-  }, { prefix: '/feeds' })
-  // Episodes routes
-  fastify.register(async function (fastify, opts) {
-    fastify.register(import('@fastify/helmet'), episodesHeaders)
-    fastify.register(import('@fastify/static'), {
-      root: path.join(__dirname, '../public/episodes'),
-      prefix: '/',
-      ...staticOpts
-    })
-  }, { prefix: '/episodes' })
-
-  // Archives Routes Modified CSP, COEP, CORP
-  fastify.register(async function (fastify, opts) {
-    fastify.register(import('@fastify/helmet'), {
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-      crossOriginEmbedderPolicy: { policy: 'credentialless' },
-      contentSecurityPolicy: {
-        directives: {
-          'media-src': '*',
-          'img-src': '*',
-          'upgrade-insecure-requests': upgradeInsecureRequests
-        }
-      }
-    })
-    fastify.register(import('@fastify/static'), {
-      root: path.join(__dirname, '../public/archives/view'),
-      prefix: '/',
-      ...staticOpts
-    })
-  }, { prefix: '/archives/view' })
 }, {
   name: 'static',
   dependencies: ['compress', 'auth', 'jwt', 'helmet']

@@ -1,6 +1,29 @@
 import SQL from '@nearform/sql'
 
-export function getEpisodesQuery ({
+/**
+ * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ */
+
+/**
+ * Generate an SQL query for fetching episode properties, including
+ * additional related information like podcast feed and bookmark details.
+ *
+ * @param {Object} options - Query options.
+ * @param {number|string} options.ownerId - ID of the episode owner.
+ * @param {number|string} [options.episodeId] - Specific ID of the episode to query.
+ * @param {Date|string} [options.before] - Timestamp to fetch episodes created before.
+ * @param {boolean} [options.sensitive] - Whether to include sensitive episodes.
+ * @param {boolean} [options.ready] - Whether to filter episodes by readiness.
+ * @param {number} [options.perPage] - Number of episodes to return per page (not used in current implementation).
+ * @param {number|string} [options.feedId] - ID of the podcast feed.
+ * @param {number|string} [options.bookmarkId] - ID of the bookmark.
+ * @param {boolean} [options.includeFeed] - Whether to include podcast feed details.
+ * @param {string} [options.query] - Text query for episode search.
+ * @param {boolean} [options.includeRank] - Include the rank column
+ *
+ * @returns {SqlStatement} Generated SQL query.
+ */
+export function episodePropsQuery ({
   ownerId,
   episodeId,
   before,
@@ -9,14 +32,17 @@ export function getEpisodesQuery ({
   perPage,
   feedId,
   bookmarkId,
-  includeFeed
+  includeFeed,
+  query,
+  includeRank
 }) {
-  const episodesQuery = SQL`
-    select
+  return SQL`
+  select
       ep.id,
       ep.podcast_feed_id,
       ep.created_at,
       ep.updated_at,
+      ${includeRank ? SQL`ts_rank(ep.tsv,  websearch_to_tsquery('english', ${query})) AS rank,` : SQL``}
       ep.url,
       ep.title,
       coalesce (ep.title, bm.title) as display_title,
@@ -80,6 +106,32 @@ export function getEpisodesQuery ({
     ${before ? SQL`and ep.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
     ${ready != null ? SQL`and ready = ${ready}` : SQL``}
+  `
+}
+
+export function getEpisodesQuery ({
+  ownerId,
+  episodeId,
+  before,
+  sensitive,
+  ready,
+  perPage,
+  feedId,
+  bookmarkId,
+  includeFeed
+}) {
+  const episodesQuery = SQL`
+    ${episodePropsQuery({
+        ownerId,
+        episodeId,
+        before,
+        sensitive,
+        ready,
+        perPage,
+        feedId,
+        bookmarkId,
+        includeFeed
+    })}
     order by ep.created_at desc, ep.url desc, bm.title desc
     ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
   `

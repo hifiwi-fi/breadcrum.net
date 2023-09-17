@@ -1,22 +1,48 @@
 import SQL from '@nearform/sql'
 
-export function getArchivesQuery ({
+/**
+ * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ */
+
+/**
+ * Generates an SQL query for fetching archive properties based on various filters.
+ *
+ * @export
+ * @param {Object} options - The options object containing filter and query properties.
+ * @param {boolean} [options.fullArchives] - Whether to include full HTML content of the archive.
+ * @param {string|number} options.ownerId - The owner ID to filter the archives and bookmarks.
+ * @param {boolean} [options.sensitive] - Whether to include sensitive bookmarks.
+ * @param {boolean} [options.toread] - Whether to include bookmarks marked "to read."
+ * @param {boolean} [options.starred] - Whether to include starred bookmarks.
+ * @param {boolean} [options.ready] - Whether the archive is ready.
+ * @param {string|number} [options.archiveId] - Specific archive ID to fetch.
+ * @param {string|number} [options.bookmarkId] - Specific bookmark ID associated with an archive to fetch.
+ * @param {string|number} [options.before] - Timestamp to fetch archives created before this time.
+ * @param {boolean} [options.withRank] - Whether to include ranking based on text search.
+ * @param {string} [options.query] - Text search query for ranking.
+ * @param {boolean} [options.includeRank] - Include rank column
+ *
+ * @returns {SqlStatement} The generated SQL query.
+ */
+export function archivePropsQuery ({
+  fullArchives,
   ownerId,
-  archiveId,
-  bookmarkId,
-  before,
   sensitive,
   toread,
   starred,
   ready,
-  perPage,
-  fullArchives
+  archiveId,
+  bookmarkId,
+  before,
+  query,
+  includeRank
 }) {
-  const archivesQuery = SQL`
+  return SQL`
     select
       ar.id,
       ar.created_at,
       ar.updated_at,
+      ${includeRank ? SQL`ts_rank(ar.tsv,  websearch_to_tsquery('english', ${query})) AS rank,` : SQL``}
       ar.url,
       ar.title,
       coalesce (ar.title, bm.title) as display_title,
@@ -47,13 +73,40 @@ export function getArchivesQuery ({
     on ar.bookmark_id = bm.id
     where ar.owner_id = ${ownerId}
     and bm.owner_id = ${ownerId}
-    ${archiveId ? SQL`and ar.id = ${archiveId}` : SQL``}
-    ${bookmarkId ? SQL`and ar.bookmark_id = ${bookmarkId}` : SQL``}
-    ${before ? SQL`and ar.created_at < ${before}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
     ${toread ? SQL`and toread = true` : SQL``}
     ${starred ? SQL`and starred = true` : SQL``}
     ${ready != null ? SQL`and ready = ${ready}` : SQL``}
+    ${archiveId ? SQL`and ar.id = ${archiveId}` : SQL``}
+    ${bookmarkId ? SQL`and ar.bookmark_id = ${bookmarkId}` : SQL``}
+    ${before ? SQL`and ar.created_at < ${before}` : SQL``}
+  `
+}
+
+export function getArchivesQuery ({
+  ownerId,
+  archiveId,
+  bookmarkId,
+  before,
+  sensitive,
+  toread,
+  starred,
+  ready,
+  perPage,
+  fullArchives
+}) {
+  const archivesQuery = SQL`
+    ${archivePropsQuery({
+      fullArchives,
+      ownerId,
+      sensitive,
+      toread,
+      starred,
+      ready,
+      archiveId,
+      bookmarkId,
+      before
+      })}
     order by ar.created_at desc, ar.url desc, bm.title desc
     ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
   `

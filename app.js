@@ -35,7 +35,7 @@ export const options = {
   trustProxy: true,
   genReqId: function (req) { return hid() },
   logger: {
-    mixin () {
+    mixin () { // TODO: move this to the log ingestor somehow?
       return {
         service: 'breadcrum.net',
         ddsource: 'nodejs',
