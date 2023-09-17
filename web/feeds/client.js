@@ -6,6 +6,7 @@ import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { episodeList } from '../components/episode/episode-list.js'
 import { feedHeader } from '../components/feed-header/feed-header.js'
+import { search } from '../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -180,11 +181,15 @@ export const page = Component(() => {
     }
   }, [state.apiUrl, feedReload])
 
-  const onPageNav = (ev) => {
+  const onPageNav = useCallback((ev) => {
     ev.preventDefault()
     pushState(ev.currentTarget.href)
     window.scrollTo({ top: 0 })
-  }
+  }, [window, pushState])
+
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+  }, [window])
 
   let beforeParams
   if (before) {
@@ -201,6 +206,10 @@ export const page = Component(() => {
   }
 
   return html`
+  ${search({
+    placeholder: 'Search Feed...',
+    onSearch: handleSearch
+  })}
   <div>
     ${feedHeader({ feed, feeds, reload: reloadFeed, loading: feedLoading && feedsLoading })}
     ${feedError ? html`<div>${feedError.message}</div>` : null}

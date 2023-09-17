@@ -10,6 +10,7 @@ Learn about more about Breadcrum:
 - 📑 [Bookmarklets](./bookmarklets/)
 - 📜 [Blog](/blog/)
 - ℹ️ [About](/about/)
+- 🙊 [Social Media](./social/)
 - 🚦 [Status](https://status.breadcrum.net/)
 
 ## 👷‍♂️ Early access

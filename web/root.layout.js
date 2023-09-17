@@ -73,7 +73,7 @@ export default function defaultRootLayout ({
             <a href="/blog/">blog</a>
           </div>
           <div>
-            <a href="/about/">@breadcrum</a>
+            <a href="/docs/social/">@breadcrum</a>
           </div>
           <div>
             <a href="https://status.breadcrum.net">status</a>

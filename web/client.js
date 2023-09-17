@@ -149,7 +149,7 @@ export const page = Component(() => {
           </div>
 
           <div class="bc-marketing-feature-block">
-            <h2>🔎 Full text search <div><small>(Coming soon)</small></div></h2>
+            <h2>🔎 Full text search</h2>
             <p>
               Find your old bookmarks by that one phrase or word.
             </p>

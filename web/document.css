@@ -7,6 +7,10 @@
   --bc-tags-color: hsla(24, 50%, 55%, 1);
 }
 
+input[type="search"] {
+  -webkit-appearance: none;
+}
+
 /* style.css site specific stuff */
 .serif { font-family: var(--system-serif); }
 .sans { font-family: var(--system-sans); }
@@ -53,13 +57,13 @@
   flex-grow: 1;
   width: 100%;
   max-width: 46em;
-  margin: 2em auto;
+  margin: 0 auto;
   padding: 0 1em;
   overflow: hidden;
   /* word-wrap: break-word; */
 }
 
-.bc-main > *:first-child { margin-top: 0 !important; }
+/* .bc-main > *:first-child { margin-top: 0 !important; } */
 .bc-main > *:last-child { margin-bottom: 0 !important; }
 
 .bc-footer {

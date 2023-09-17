@@ -6,6 +6,7 @@ import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { bookmarkList } from '../components/bookmark/bookmark-list.js'
+import { search } from '../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -35,8 +36,6 @@ export const page = Component(() => {
 
   // Load bookmarks
   useEffect(() => {
-    const controller = new AbortController()
-
     async function getBookmarks () {
       // TODO: port SWR or use https://usehooks.com/useAsync/
       setBookmarksLoading(true)
@@ -56,8 +55,7 @@ export const page = Component(() => {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json'
-        },
-        signal: controller.signal
+        }
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -95,11 +93,15 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
 
-  const onPageNav = (ev) => {
+  const onPageNav = useCallback((ev) => {
     ev.preventDefault()
     pushState(ev.currentTarget.href)
     window.scrollTo({ top: 0 })
-  }
+  }, [window, pushState])
+
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+  }, [window])
 
   let beforeParams
   if (before) {
@@ -120,6 +122,10 @@ export const page = Component(() => {
   tageFilterRemovedParams.delete('tag')
 
   return html`
+    ${search({
+      placeholder: 'Search Bookmarks...',
+      onSearch: handleSearch
+    })}
     <div>
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
       ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}

@@ -1,0 +1,15 @@
+
+.bc-search-container {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.bc-search-form {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bc-search-bar {
+  flex-grow: 1;
+}

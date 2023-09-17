@@ -23,7 +23,7 @@
     "noEmit": true,
 
     "alwaysStrict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
 
     "allowSyntheticDefaultImports": true,
 
