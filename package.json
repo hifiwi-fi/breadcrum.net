@@ -74,7 +74,7 @@
     "@types/node": "^20.5.2",
     "auto-changelog": "^2.0.0",
     "c8": "^8.0.0",
-    "dependency-cruiser": "^13.0.0",
+    "dependency-cruiser": "^14.0.0",
     "gh-release": "^7.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
