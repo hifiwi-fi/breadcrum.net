@@ -73,17 +73,16 @@
   "devDependencies": {
     "@types/node": "^20.5.2",
     "auto-changelog": "^2.0.0",
-    "c8": "^8.0.0",
     "dependency-cruiser": "^14.0.0",
     "gh-release": "^7.0.0",
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
-    "tap": "^16.0.0",
+    "tap": "^18.1.0",
     "typescript": "^5.1.6"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
   "funding": {
     "type": "individual",
@@ -113,7 +112,7 @@
     "test": "run-s test:*",
     "test:deptree": "depcruise --validate .dependency-cruiser.json app.js web routes plugins",
     "test:standard": "standard --verbose | snazzy",
-    "test:tap": "METRICS=0 c8 tap --no-coverage --color",
+    "test:tap": "tap",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
@@ -128,10 +127,16 @@
   "standard": {
     "ignore": []
   },
-  "c8": {
-    "reporter": [
-      "lcov",
-      "text"
+  "tap": {
+    "serial": [
+      "test",
+      "routes"
+    ],
+    "typecheck": false,
+    "allow-incomplete-coverage": true,
+    "coverage-report": [
+      "text",
+      "lcovonly"
     ]
   }
 }

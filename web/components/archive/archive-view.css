@@ -2,6 +2,7 @@
 @import '../text-icon';
 @import '../episode-title';
 @import '../cors-media/cors-media.css';
+@import '../expand-text/index.css';
 
 .bc-archive-view {
   padding-bottom: 4px;
@@ -39,4 +40,9 @@
 
 .bc-archive-text-content {
   white-space: pre-line;
+}
+
+.bc-archive-excerpt {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }

@@ -1,0 +1,16 @@
+
+.bc-epand-text {
+  max-height: 100px; /* default max-height */
+  overflow-y: auto;
+  cursor: pointer;
+  transition: max-height 0.3s ease-in-out;
+}
+
+
+.bc-expand-text-expanded {
+  max-height: 1000px; /* or set to none */
+}
+
+.bc-expand-text-pre {
+  white-space: pre-line;
+}

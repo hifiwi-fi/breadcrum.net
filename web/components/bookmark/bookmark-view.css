@@ -3,6 +3,7 @@
 @import '../sensitive';
 @import '../episode-title';
 @import '../archive-title';
+@import '../expand-text';
 
 .bc-bookmark-view {
   padding-bottom: 4px;

@@ -1,5 +1,9 @@
 @import '../components/search/index.css';
 
+.bc-main {
+  padding-top: 1em;
+}
+
 .bc-tags-list {
   font-size: 0.8em;
   display: inline-flex;

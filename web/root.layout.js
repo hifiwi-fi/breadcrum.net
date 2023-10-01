@@ -1,5 +1,6 @@
 import { html, render } from 'uland-isomorphic'
 import { header } from './components/header/index.js'
+import { footer } from './components/footer/index.js'
 
 /*
 
@@ -30,6 +31,8 @@ export default function defaultRootLayout ({
       <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/feed+json" href="/feed.json" />
       <link rel="alternate" title="Breadcrum.net (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
       <link rel="me" value="https://fosstodon.org/@breadcrum" />
+
+      <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="Breadcrum">
 
       <link rel="shortcut icon" href="/static/bread-transformed.png">
 
@@ -65,35 +68,7 @@ export default function defaultRootLayout ({
         <main class="bc-main">
           ${typeof children === 'string' ? html([children]) : children /* Support both uhtml and string children. Optional. */}
         </main>
-        <footer class="bc-footer">
-          <div>
-            <a href="/docs/">docs</a>
-          </div>
-          <div>
-            <a href="/blog/">blog</a>
-          </div>
-          <div>
-            <a href="/docs/social/">@breadcrum</a>
-          </div>
-          <div>
-            <a href="https://status.breadcrum.net">status</a>
-          </div>
-          <div>
-            © <a href="https://hifiwi.fi">HifiWi.fi</a>
-          </div>
-          <div>
-            <a href="https://github.com/hifiwi-fi/breadcrum.net/blob/master/LICENSE">
-              AGPL-3.0-or-later
-            </a>
-          </div>
-          <div>
-            <a href="https://github.com/hifiwi-fi/breadcrum.net/releases/tag/v${version}">
-              v${version}
-            </a>
-          </div>
-          <a class="flex-center preserve-icon" href="/feed.xml"><img height="16" width="16" src="/static/atom.svg"></a>
-          <a class="flex-center preserve-icon" href="/feed.json"><img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg"></a>
-        </footer>
+        ${footer({ version })}
       </div>
     </body>
     </html>

@@ -64,6 +64,8 @@ export const page = Component(() => {
 
       pageParams.set('sensitive', state.sensitive)
 
+      pageParams.set('ready', true)
+
       if (!pageParams.get('feed_id')) {
         pageParams.set('default_feed', true)
       }

@@ -9,3 +9,7 @@
   position: absolute;
   font-weight: 600;
 }
+
+.bc-badge a {
+  color: white;
+}

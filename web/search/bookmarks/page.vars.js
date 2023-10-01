@@ -1,3 +1,3 @@
 export default {
-  title: '🔖 Search Bookmarks'
+  title: '🔖 Bookmarks Search'
 }

@@ -1,0 +1,27 @@
+.bc-footer {
+  padding-top: var(--body-padding);
+  padding-bottom: max(var(--body-padding), env(safe-area-inset-bottom));
+  padding-left: max(var(--body-padding), env(safe-area-inset-left));
+  padding-right: max(var(--body-padding), env(safe-area-inset-right));
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  font-size: var(--small-font-size);
+  border-top: dotted 1px var(--accent-midground);
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space:nowrap;
+  scrollbar-width: none;
+}
+
+.bc-footer::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* fairly arbitrary. Just make sure the content justification */
+@media screen and (max-width: 500px) {
+  .bc-footer {
+    justify-content: start;
+  }
+}

@@ -5,6 +5,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { episodeList } from '../../components/episode/episode-list.js'
+import { search } from '../../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -82,8 +83,16 @@ export const page = Component(() => {
   const title = episode?.display_title ? ['📼', episode?.display_title] : []
   useTitle(...title)
 
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+  }, [window])
+
   return html`
     <div>
+      ${search({
+        placeholder: 'Search Episodes...',
+        onSearch: handleSearch
+      })}
       ${episodeLoading ? html`<div>...</div>` : null}
       ${episodeError ? html`<div>${episodeError.message}</div>` : null}
       ${episode ? episodeList({ episode, reload: reloadEpisode, onDelete: handleDelete, clickForPreview: false }) : null}

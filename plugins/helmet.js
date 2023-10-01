@@ -15,7 +15,7 @@ export default fp(async function (fastify, opts) {
       directives: {
         'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : [],
         'media-src': '*',
-        'img-src': '*'
+        'img-src': ['*', 'data:']
       }
     }
   })

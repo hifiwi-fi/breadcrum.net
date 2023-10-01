@@ -1,3 +1,3 @@
 export default {
-  title: '📼 Search Episodes'
+  title: '📼 Episodes Search'
 }

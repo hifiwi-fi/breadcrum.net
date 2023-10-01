@@ -4,6 +4,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useQuery } from '../../hooks/useQuery.js'
+import { useTitle } from '../../hooks/useTitle.js'
 import { search } from '../../components/search/index.js'
 import { bookmarkList } from '../../components/bookmark/bookmark-list.js'
 
@@ -99,6 +100,9 @@ export const page = Component(() => {
         .finally(() => { setBookmarksLoading(false) })
     }
   }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
+
+  const title = pageParams.get('query') ? ['🔖', pageParams.get('query'), '|', 'Bookmarks Search'] : []
+  useTitle(...title)
 
   const onPageNav = useCallback((ev) => {
     ev.preventDefault()

@@ -13,6 +13,15 @@ Learn about more about Breadcrum:
 - 🙊 [Social Media](./social/)
 - 🚦 [Status](https://status.breadcrum.net/)
 
+## All Pages
+
+- 🔖 [Bookmarks](/bookmarks/)
+- 🗄️ [Archives](/archives/)
+- 📼 [Episodes](/episodes/)
+- 📡 [Feeds](/feeds/)
+- 🏷️ [Tags](/tags/)
+- 🔎 [Search](/search/bookmarks)
+
 ## 👷‍♂️ Early access
 
 Breadcrum is still early in development and is not feature complete!

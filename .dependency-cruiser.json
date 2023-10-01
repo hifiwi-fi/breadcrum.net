@@ -59,7 +59,7 @@
       "from": {},
       "to": {
         "couldNotResolve": true,
-        "pathNot": "p-queue$"
+        "pathNot": "(p-queue|tap)$"
       }
     },
     {
@@ -90,7 +90,7 @@
           "npm-no-pkg",
           "npm-unknown"
         ],
-        "pathNot": "p-queue$"
+        "pathNot": "(p-queue|tap)$"
       }
     },
     {

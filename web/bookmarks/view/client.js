@@ -5,6 +5,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkList } from '../../components/bookmark/bookmark-list.js'
 import { useTitle } from '../../hooks/useTitle.js'
+import { search } from '../../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -76,8 +77,16 @@ export const page = Component(() => {
   const title = bookmark?.title ? ['🔖', bookmark?.title] : []
   useTitle(...title)
 
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+  }, [window])
+
   return html`
     <div>
+      ${search({
+        placeholder: 'Search Bookmarks...',
+        onSearch: handleSearch
+      })}
       ${bookmarkLoading ? html`<div>...</div>` : null}
       ${bookmarkError ? html`<div>${bookmarkError.message}</div>` : null}
       ${bookmark ? bookmarkList({ bookmark, reload, onDelete: handleDelete }) : null}

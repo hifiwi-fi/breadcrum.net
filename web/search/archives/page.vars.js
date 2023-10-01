@@ -1,3 +1,3 @@
 export default {
-  title: '🗄️ Search Archives'
+  title: '🗄️ Archives Search'
 }

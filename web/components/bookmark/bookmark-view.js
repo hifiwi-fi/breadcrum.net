@@ -5,6 +5,7 @@ import { star } from '../star/index.js'
 import { sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
+import { expandText } from '../expand-text/index.js'
 import cn from 'classnames'
 
 export const bookmarkView = Component(({
@@ -54,7 +55,13 @@ export const bookmarkView = Component(({
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url.replace(/^https?:\/\//, '')}</a></div>
       ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
-      ${b.summary ? html`<div class='bc-bookmark-summary-display'>${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)}</div>` : null}
+      ${b.summary
+        ? html`<div class='bc-bookmark-summary-display'>
+            ${expandText({
+              children: b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)
+            })}
+          </div>`
+        : null}
       <div>
       ${b.tags?.length > 0
         ? html`

@@ -5,6 +5,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { archiveList } from '../../components/archive/archive-list.js'
+import { search } from '../../components/search/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -79,8 +80,16 @@ export const page = Component(() => {
   const title = archive?.title ? ['🗄️', archive?.title] : []
   useTitle(...title)
 
+  const handleSearch = useCallback((query) => {
+    window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
+  }, [window])
+
   return html`
     <div>
+      ${search({
+        placeholder: 'Search Archives...',
+        onSearch: handleSearch
+      })}
       ${archiveLoading ? html`<div>...</div>` : null}
       ${archiveError ? html`<div>${archiveError.message}</div>` : null}
       ${archive ? archiveList({ archive, reload: reloadArchive, onDelete: handleDelete, fullView: true }) : null}

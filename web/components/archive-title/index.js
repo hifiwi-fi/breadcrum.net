@@ -15,8 +15,6 @@ export const archiveTitle = Component(
       ? `/archives/view/?id=${id}`
       : url
 
-    console.log({ small, big, url, href })
-
     return html`
     <div class="${cn({
       'bc-archives-title-container-small': small

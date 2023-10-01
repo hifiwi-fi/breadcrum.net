@@ -2,14 +2,20 @@
 .bc-search-container {
   margin-top: 1em;
   margin-bottom: 1em;
+
+  & .search-form {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  & .search-bar {
+    flex-grow: 1;
+  }
 }
 
-.bc-search-form {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.bc-search-bar {
-  flex-grow: 1;
+@media print {
+  .bc-search-container {
+      display: none;
+  }
 }

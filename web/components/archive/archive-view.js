@@ -2,6 +2,7 @@
 import { Component, html } from 'uland-isomorphic'
 
 import { archiveTitle } from '../archive-title/index.js'
+import { expandText } from '../expand-text/index.js'
 
 export const archiveView = Component(({
   archive: ar,
@@ -23,6 +24,18 @@ export const archiveView = Component(({
           ${ar.bookmark.title}
         </a>
       </div>
+
+      ${
+        ar?.excerpt && !fullView
+          ? html`
+            <div class="bc-archive-excerpt">
+              ${expandText({
+                children: ar?.excerpt
+              })}
+            </div?
+          `
+          : null
+      }
 
       <div class="bc-date">
         <a href="${`/archives/view/?id=${ar.id}`}">

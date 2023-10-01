@@ -17,10 +17,12 @@ export const search = Component(
 
     return html`
     <div class="bc-search-container">
-      <form onsubmit="${handleSearch}" class="bc-search-form">
-        <input value="${value}" class="bc-search-bar" placeholder="${placeholder}" type="search" name="search">
-        <input name="search-button" type="submit" value="search">
-      </form>
+      <search role="search">
+        <form onsubmit="${handleSearch}" class="search-form">
+          <input value="${value}" class="search-bar" placeholder="${placeholder}" type="search" name="search">
+          <input name="search-button" type="submit" value="search">
+        </form>
+      </search>
     </div>
     `
   }

@@ -1,10 +1,10 @@
 /* eslint-env browser */
-import { Component, html, render /*, useEffect */ } from 'uland-isomorphic'
+import { Component, html, render } from 'uland-isomorphic'
 // import { useUser } from './hooks/useUser.js'
 import { badge } from './components/badge/badge.js'
 
 export const page = Component(() => {
-  // const { user, loading } = useUser()
+  // const { user } = useUser()
 
   // useEffect(() => {
   //   if (user) window.location.replace('/bookmarks')
@@ -12,7 +12,7 @@ export const page = Component(() => {
 
   return html`
     <div class="bc-marketing">
-      ${badge('Pre-Launch Alpha!')}
+      ${badge(html`<a href="/register">Sign up for Alpha!</a>`)}
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png">
@@ -21,7 +21,7 @@ export const page = Component(() => {
           Breadcrum
         </h1>
         <p class="bc-marking-hero-description">
-          Breadcrum is a bookmaking website for collecting your
+          Breadcrum is a bookmaking service for collecting your
           links and articles with media super powers. Podcast anything.
         </p>
 
@@ -151,7 +151,7 @@ export const page = Component(() => {
           <div class="bc-marketing-feature-block">
             <h2>🔎 Full text search</h2>
             <p>
-              Find your old bookmarks by that one phrase or word.
+              Find your old bookmarks, archives and episodes by phrase or word.
             </p>
           </div>
 

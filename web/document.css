@@ -7,10 +7,6 @@
   --bc-tags-color: hsla(24, 50%, 55%, 1);
 }
 
-input[type="search"] {
-  -webkit-appearance: none;
-}
-
 /* style.css site specific stuff */
 .serif { font-family: var(--system-serif); }
 .sans { font-family: var(--system-sans); }
@@ -58,7 +54,10 @@ input[type="search"] {
   width: 100%;
   max-width: 46em;
   margin: 0 auto;
-  padding: 0 1em;
+  padding-top: 0;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
   overflow: hidden;
   /* word-wrap: break-word; */
 }
@@ -66,30 +65,3 @@ input[type="search"] {
 /* .bc-main > *:first-child { margin-top: 0 !important; } */
 .bc-main > *:last-child { margin-bottom: 0 !important; }
 
-.bc-footer {
-  padding-top: var(--body-padding);
-  padding-bottom: max(var(--body-padding), env(safe-area-inset-bottom));
-  padding-left: max(var(--body-padding), env(safe-area-inset-left));
-  padding-right: max(var(--body-padding), env(safe-area-inset-right));
-  display: flex;
-  justify-content: center;
-  gap: 1em;
-  font-size: var(--small-font-size);
-  border-top: dotted 1px var(--accent-midground);
-  overflow-x: scroll;
-  overflow-y: hidden;
-  white-space:nowrap;
-  scrollbar-width: none;
-}
-
-.bc-footer::-webkit-scrollbar {
-    display: none;
-}
-
-
-/* fairly arbitrary. Just make sure the content justification */
-@media screen and (max-width: 500px) {
-  .bc-footer {
-    justify-content: start;
-  }
-}

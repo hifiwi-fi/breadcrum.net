@@ -45,6 +45,9 @@ export async function getEpisodes (fastify, opts) {
             include_feed: {
               type: 'boolean',
               default: false
+            },
+            ready: {
+              type: 'boolean'
             }
           },
           dependencies: {
@@ -89,7 +92,8 @@ export async function getEpisodes (fastify, opts) {
           after,
           per_page: perPage,
           sensitive,
-          bookmark_id: bookmarkId
+          bookmark_id: bookmarkId,
+          ready
         } = request.query
         let {
           before
@@ -139,6 +143,7 @@ export async function getEpisodes (fastify, opts) {
           ownerId: userId,
           before,
           sensitive,
+          ready,
           perPage,
           feedId,
           bookmarkId,

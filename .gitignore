@@ -8,3 +8,4 @@ public
 .env
 dependency-graph.html
 *.dbml
+.tap
