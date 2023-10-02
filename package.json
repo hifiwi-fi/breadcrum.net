@@ -8,7 +8,7 @@
     "url": "https://github.com/hifiwi-fi/breadcrum.net/issues"
   },
   "dependencies": {
-    "@breadcrum/bookmarklet": "1.0.8",
+    "@breadcrum/bookmarklet": "^1.0.9",
     "@breadcrum/extract-meta": "^1.0.4",
     "@fastify/accepts": "^4.0.0",
     "@fastify/auth": "^4.0.0",
