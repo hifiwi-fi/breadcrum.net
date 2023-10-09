@@ -1,6 +1,6 @@
 import { html, render } from 'uland-isomorphic'
-import { header } from './components/header/index.js'
-import { footer } from './components/footer/index.js'
+import { header } from '../components/header/index.js'
+import { footer } from '../components/footer/index.js'
 
 /*
 

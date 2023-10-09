@@ -5,6 +5,14 @@ import { join } from 'path'
 
 const __dirname = desm(import.meta.url)
 
+const transport = process.env.TRANSPORT ?? 'https'
+const host = process.env.HOST ?? 'localhost:3000'
+
+export const browser = {
+  'process.env.TRANSPORT': transport,
+  'process.env.HOST': host
+}
+
 export default async () => {
   return {
     siteName: 'Breadcrum',
@@ -14,11 +22,12 @@ export default async () => {
           join(__dirname, '../package.json'),
           import.meta.url),
         'utf8')
-    ).version
+    ).version,
+    authorName: 'Bret Comnes',
+    authorUrl: 'https://bret.io',
+    authoImgUrl: 'https://www.gravatar.com/avatar/8d8b82740cb7ca994449cccd1dfdef5f?s=500',
+    authorImgAlt: 'Picture of author',
+    transport,
+    host
   }
-}
-
-export const browser = {
-  'process.env.TRANSPORT': process.env.TRANSPORT ?? 'https',
-  'process.env.HOST': process.env.HOST ?? 'localhost:3000'
 }

@@ -1,4 +1,8 @@
-# 🖨️ Improved Printing
+---
+title: 🖨️ Improved Printing
+publishDate: "2023-10-01T22:24:59.628Z"
+layout: "article"
+---
 
 This is just a small update to note that printing now has an improve print style.
 
@@ -27,12 +31,3 @@ A number of these improves have also been upstreamed into the base stylesheet fo
 It's open source and can be used on any HTML page that need a quick styling.
 
 Until next time!
-
-<p>
-  Published: <a href="/blog/2023/improved-printing/">
-    <time datetime="2023-10-01T22:24:59.628Z">
-      2023-10-01T22:24:59.628Z
-    </time>
-  </a>
-</p>
-

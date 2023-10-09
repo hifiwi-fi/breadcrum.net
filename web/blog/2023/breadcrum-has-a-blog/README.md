@@ -1,4 +1,8 @@
-# Breadcrum Has a Blog 🥖
+---
+title: "Breadcrum Has a Blog 🥖"
+publishDate: "2023-09-04T20:55:03.398Z"
+layout: "article"
+---
 
 Welcome to the newly added Breadcrum blog.
 
@@ -17,11 +21,3 @@ Connect with Breadcrum on the following channels:
 Stay tuned for more posts about new features and additions and general thoughts relating to bookmarking things on the web.
 
 See you soon 👋
-
-<p>
-  Published: <a href="/blog/2023/breadcrum-has-a-blog/">
-    <time datetime="2023-09-04T20:55:03.398Z">
-      2023-09-04T20:55:03.398Z
-    </time>
-  </a>
-</p>

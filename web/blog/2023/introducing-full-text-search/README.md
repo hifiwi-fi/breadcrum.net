@@ -1,4 +1,8 @@
-# 🔎 Introducing Full Text Search
+---
+title: 🔎 Introducing Full Text Search
+publishDate: "2023-09-17T22:09:09.206Z"
+layout: "article"
+---
 
 Breadcrum now has full text search!
 
@@ -13,12 +17,3 @@ Simply enter your query in the search bar at the top of the page, and then selec
 ## Feedback welcome
 
 Please feel free to provide any feedback you have on this feature. It is new so there could always be bugs.
-
-<p>
-  Published: <a href="/blog/2023/introducing-full-text-search/">
-    <time datetime="2023-09-17T22:09:09.206Z">
-      2023-09-17T22:09:09.206Z
-    </time>
-  </a>
-</p>
-

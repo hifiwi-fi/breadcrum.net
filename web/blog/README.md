@@ -1,5 +1,7 @@
-# Breadcrum.net Blog
-
+---
+title: Breadcrum.net Blog
+layout: blog-index
+---
 This is the [Breadcrum.net](/) blog.
 
 You can subscribe to the blog with RSS or JSONFeed: [RSS](/feed.xml), [JSONFeed](/feed.json)
