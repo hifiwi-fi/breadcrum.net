@@ -11,7 +11,8 @@ If you need to render components inside, you need attatch them in the global cli
 
 export default function defaultRootLayout ({
   title,
-  siteName = 'breadcrum.net',
+  siteName,
+  mastodonUrl,
   scripts,
   styles,
   children,
@@ -25,14 +26,15 @@ export default function defaultRootLayout ({
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
       <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1'>
       <meta name='referrer' content='no-referrer'>
-      <meta name='description' content='Breadcrum internet newspaper clippings and bookmarks. Podcast anything.'>
+      <meta name='description' content='${siteName} internet newspaper clippings and bookmarks. Podcast anything.'>
+      <meta itemprop="publisher" content="${siteName}">
+      <meta property="og:site_name" content="${siteName}">
 
-      <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/json" href="/feed.json" />
-      <link rel="alternate" title="Breadcrum.net (JSON Feed)" type="application/feed+json" href="/feed.json" />
-      <link rel="alternate" title="Breadcrum.net (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
-      <link rel="me" value="https://fosstodon.org/@breadcrum" />
+      <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/json" href="/feed.json" />
+      <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/feed+json" href="/feed.json" />
+      <link rel="alternate" title="${siteName} Blog (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
 
-      <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="Breadcrum">
+      <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="${siteName}">
 
       <link rel="shortcut icon" href="/static/bread-transformed.png">
 
@@ -51,7 +53,7 @@ export default function defaultRootLayout ({
       <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-icons/apple-icon-180x180.png">
       <link rel="apple-touch-icon" href="/static/apple-icons/apple-touch-icon-180x180.png">
 
-      <meta name="apple-mobile-web-app-title" content="Breadcrum">
+      <meta name="apple-mobile-web-app-title" content="${siteName}">
 
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
@@ -68,7 +70,7 @@ export default function defaultRootLayout ({
         <main class="bc-main">
           ${typeof children === 'string' ? html([children]) : children /* Support both uhtml and string children. Optional. */}
         </main>
-        ${footer({ version })}
+        ${footer({ version, mastodonUrl })}
       </div>
     </body>
     </html>

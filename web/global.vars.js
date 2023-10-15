@@ -16,6 +16,7 @@ export const browser = {
 export default async () => {
   return {
     siteName: 'Breadcrum',
+    mastodonUrl: 'https://fosstodon.org/@breadcrum',
     version: JSON.parse(
       await readFile(
         new URL(

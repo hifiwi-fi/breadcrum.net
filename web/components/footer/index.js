@@ -4,7 +4,8 @@ import { Component, html } from 'uland-isomorphic'
  * Footer component. STATIC. NOT CURRENTLTY CLIENT RENDERED
  */
 export const footer = Component(({
-  version
+  version,
+  mastodonUrl
 }) => {
   return html`
   <footer class="bc-footer">
@@ -12,7 +13,7 @@ export const footer = Component(({
       <a href="/docs/">docs</a>
     </div>
     <div>
-      <a href="/blog/">blog</a>
+      <a href="/blog/2023">blog</a>
     </div>
     <div>
       <a href="/docs/social/">@breadcrum</a>
@@ -35,6 +36,7 @@ export const footer = Component(({
     </div>
     <a class="flex-center preserve-icon" href="/feed.xml"><img height="16" width="16" src="/static/atom.svg"></a>
     <a class="flex-center preserve-icon" href="/feed.json"><img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg"></a>
+    <a class="flex-center preserve-icon" href="${mastodonUrl}" rel="me"><img height="16" width="16" src="/static/mastodon.svg"></a>
   </footer>
   `
 })
