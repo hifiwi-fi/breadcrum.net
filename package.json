@@ -67,8 +67,7 @@
     "sodium-native": "^4.0.0",
     "uland-isomorphic": "^2.0.0",
     "undici": "^5.12.0",
-    "webassert": "^3.0.2",
-    "generate-feed": "^1.1.13"
+    "webassert": "^3.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.5.2",
@@ -99,7 +98,6 @@
   "scripts": {
     "build": "npm run clean && run-s build:*",
     "build:siteup": "siteup --src web --dest public",
-    "build:feed": "generate-feed web/feed --dest public",
     "clean": "rm -rf public && mkdir -p public",
     "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg | depcruise-wrap-stream-in-html > dependency-graph.html",
     "migrate": "postgrator",
@@ -119,7 +117,6 @@
     "watch": "npm run clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:siteup": "npm run build:siteup -- --watch",
-    "watch:feed": "generate-feed web/feed --dest public",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js",
     "generate-dbml": "npx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
