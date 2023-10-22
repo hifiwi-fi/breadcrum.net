@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:21-alpine
 
 ## Make sure this matches build.args in fly.toml
 ## These vars get baked into the image/web bundle at build time.
