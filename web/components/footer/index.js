@@ -19,7 +19,7 @@ export const footer = Component(({
       <a href="/docs/social/">@breadcrum</a>
     </div>
     <div>
-      <a href="https://status.breadcrum.net">status</a>
+      <a href="https://breadcrum.betteruptime.com">status</a>
     </div>
     <div>
       © <a href="https://hifiwi.fi">HifiWi.fi</a>
