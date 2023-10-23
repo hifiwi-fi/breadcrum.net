@@ -4,8 +4,10 @@ import { breadcrumb } from '../components/breadcrumb/index.js'
 
 import defaultRootLayout from './root.layout.js'
 
-export default function blogIndexLayout (vars) {
-  const { children, page, ...rest } = vars
+export default function blogIndexLayout (args) {
+  const { children, ...rest } = args
+  const page = rest.page
+  const vars = rest.vars
   const pathSegments = page.path.split(sep)
   const wrappedChildren = html`
     ${breadcrumb({ pathSegments })}

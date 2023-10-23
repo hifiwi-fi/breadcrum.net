@@ -10,13 +10,15 @@ If you need to render components inside, you need attatch them in the global cli
 */
 
 export default function defaultRootLayout ({
-  title,
-  siteName,
-  mastodonUrl,
+  vars: {
+    title,
+    siteName,
+    mastodonUrl,
+    version
+  },
   scripts,
   styles,
-  children,
-  version
+  children
 }) {
   return render(String, html`
     <!DOCTYPE html>
