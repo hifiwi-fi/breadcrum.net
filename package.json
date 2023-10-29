@@ -46,6 +46,7 @@
     "fastify-healthcheck": "^4.0.0",
     "fastify-metrics": "^10.0.0",
     "fastify-plugin": "^4.0.0",
+    "fastify-user-agent": "^1.0.1",
     "fetch-undici": "^3.0.0",
     "format-duration": "^3.0.0",
     "fragmentions": "^1.1.4",
