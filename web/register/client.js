@@ -57,7 +57,14 @@ export const page = Component(() => {
         <div>
           <label class="block">
             Email:
-            <input class="block" minlength="1" maxlength="200" type="email" name="email" />
+            <input
+              class="block"
+              minlength="1"
+              maxlength="200"
+              type="email"
+              name="email"
+              autocomplete="email"
+            />
           </label>
         </div>
         <div>
@@ -73,13 +80,21 @@ export const page = Component(() => {
               autocorrect="off"
               autocapitalize="off"
               spellcheck="false"
+              autocomplete="username"
             />
           </label>
         </div>
         <div>
           <label class="block">
             Password:
-            <input class="block" type="password" name="password" minlength="8" maxlength="255">
+            <input
+              class="block"
+              type="password"
+              name="password"
+              minlength="8"
+              maxlength="255"
+              autocomplete="new-password"
+            >
           </label>
         </div>
         <div>

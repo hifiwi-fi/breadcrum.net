@@ -76,13 +76,21 @@ export const page = Component(() => {
                   autocorrect="off"
                   autocapitalize="off"
                   spellcheck="false"
+                  autocomplete="username"
                 />
               </label>
             </div>
             <div>
               <label class="block">
                 Password:
-                <input class="block" type="password" minlength="8" maxlength="255" name="password">
+                <input
+                  class="block"
+                  type="password"
+                  minlength="8"
+                  maxlength="255"
+                  name="password"
+                  autocomplete="current-password"
+                />
               </label>
             </div>
             <div class="button-cluster">
