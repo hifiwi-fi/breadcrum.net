@@ -31,7 +31,7 @@
     "@fastify/swagger-ui": "^1.3.0",
     "@mozilla/readability": "^0.4.2",
     "@nearform/sql": "^1.5.0",
-    "@siteup/cli": "^4.0.0-beta.0",
+    "@siteup/cli": "^4.0.0",
     "abstract-cache-redis": "^2.0.0",
     "classnames": "^2.3.1",
     "clean-deep": "^3.4.0",
@@ -119,7 +119,7 @@
     "version:git": "git add CHANGELOG.md",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
-    "watch:siteup": "run-s build:siteup -- --watch",
+    "watch:siteup": "npm run build:siteup -- --watch",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js",
     "generate-dbml": "npx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
