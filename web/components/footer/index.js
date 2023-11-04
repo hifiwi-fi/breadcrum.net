@@ -13,7 +13,7 @@ export const footer = Component(({
       <a href="/docs/">docs</a>
     </div>
     <div>
-      <a href="/blog/2023">blog</a>
+      <a href="/blog/">blog</a>
     </div>
     <div>
       <a href="/docs/social/">@breadcrum</a>

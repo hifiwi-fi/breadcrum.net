@@ -30,7 +30,7 @@ export default function articleLayout (args) {
           </address>
           ${vars.publishDate
             ? html`
-              <time class="dt-published" itemprop="datePublished" datetime="${vars.publishDate}">
+              <time class="date-time dt-published" itemprop="datePublished" datetime="${vars.publishDate}">
                 <a href="#" class="u-url">
                   ${(new Date(vars.publishDate)).toLocaleString()}
                 </a>
@@ -51,11 +51,9 @@ export default function articleLayout (args) {
         }
       </section>
 
-      <!--
-        <footer>
-            <p>Footer notes or related info here...</p>
-        </footer>
-      -->
+      <footer class="blog-footer">
+        <p>Wan't to follow along for future updates? Follow our <a href="/docs/social/">socials and feeds</a>!</p>
+      </footer>
     </article>
     ${breadcrumb({ pathSegments })}
   `

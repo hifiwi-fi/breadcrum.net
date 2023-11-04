@@ -31,4 +31,12 @@
     border-radius: 50%;
     padding: 4px;
   }
+
+  & .date-time {
+    font-family: var(--system-mono);
+  }
+
+  & .blog-footer {
+    color: var(--accent-foreground);
+  }
 }

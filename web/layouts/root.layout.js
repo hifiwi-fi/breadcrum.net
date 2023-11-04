@@ -9,6 +9,20 @@ If you need to render components inside, you need attatch them in the global cli
 
 */
 
+/**
+ * @template T
+ * @typedef {import('@siteup/cli').LayoutFunction<T>} LayoutFunction
+ */
+
+/**
+ * @typedef {{
+ *  title: string,
+ *  siteName: string,
+ *  [key: string]: any
+ * }} RootLayoutVars
+ */
+
+/** @type {LayoutFunction<RootLayoutVars>} */
 export default function defaultRootLayout ({
   vars: {
     title,

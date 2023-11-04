@@ -1,1 +1,17 @@
 @import '../components/breadcrumb/index.css';
+
+.blog-index-list {
+  padding-left: 0px;
+
+  & .blog-entry {
+    width: 100%;
+    display: inline-flex;
+    justify-content: space-between;
+  }
+  & .blog-entry-link {}
+  & .blog-entry-date {
+    color: var(--accent-foreground);
+    font-family: var(--font-code);
+    flex-shrink: 0;
+  }
+}
