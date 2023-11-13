@@ -2,8 +2,8 @@
 @import 'highlight.js/styles/github-dark-dimmed.css';
 @import 'fragmentions/fragmention.css';
 @import './document.css';
-@import './components/header';
-@import './components/footer';
+@import '../components/header';
+@import '../components/footer';
 
 :root {
   --bc-episodes-color: hsla(87, 74%, 44%, 0.9);

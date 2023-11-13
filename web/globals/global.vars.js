@@ -7,7 +7,7 @@ const __dirname = desm(import.meta.url)
 const version = JSON.parse(
   await readFile(
     new URL(
-      join(__dirname, '../package.json'),
+      join(__dirname, '../../package.json'),
       import.meta.url),
     'utf8')
 ).version
