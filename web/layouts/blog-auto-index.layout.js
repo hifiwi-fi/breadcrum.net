@@ -3,7 +3,7 @@ import { dirname } from 'node:path'
 
 /**
  * @template T
- * @typedef {import('@siteup/cli').LayoutFunction<T>} LayoutFunction
+ * @typedef {import('top-bun').LayoutFunction<T>} LayoutFunction
  */
 
 /**

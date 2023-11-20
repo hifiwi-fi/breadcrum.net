@@ -1,6 +1,6 @@
 /**
  * @template T
- * @typedef {import('@siteup/cli').PageFunction<T>} PageFunction
+ * @typedef {import('top-bun').PageFunction<T>} PageFunction
  */
 
 export const vars = {
