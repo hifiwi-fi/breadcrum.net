@@ -2,7 +2,7 @@ import pMap from 'p-map'
 import jsonfeedToAtom from 'jsonfeed-to-atom'
 
 /**
- * @typedef {import('@siteup/cli').TemplateFunction} TemplateFunction
+ * @typedef {import('top-bun').TemplateFunction} TemplateFunction
  */
 
 /**

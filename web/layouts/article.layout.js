@@ -15,15 +15,15 @@ export default function articleLayout (args) {
       <header class="article-header">
         <h1 class="p-name article-title" itemprop="headline">${vars.title}</h1>
         <div class="metadata">
-          <address class="author-info" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <address class="author-info p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
             ${vars.authorImgUrl
               ? html`<img height="40" width="40"  src="${vars.authorImgUrl}" alt="${vars.authorImgAlt}" class="u-photo" itemprop="image">`
               : null
             }
             ${vars.authorName && vars.authorUrl
               ? html`
-                  <a href="${vars.authorUrl}" class="p-author h-card" itemprop="url">
-                    <span itemprop="name">${vars.authorName}</span>
+                  <a href="${vars.authorUrl}" class="u-url" itemprop="url">
+                    <span itemprop="p-name name">${vars.authorName}</span>
                   </a>`
               : null
             }

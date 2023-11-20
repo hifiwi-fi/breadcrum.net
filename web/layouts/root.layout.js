@@ -11,7 +11,7 @@ If you need to render components inside, you need attatch them in the global cli
 
 /**
  * @template T
- * @typedef {import('@siteup/cli').LayoutFunction<T>} LayoutFunction
+ * @typedef {import('top-bun').LayoutFunction<T>} LayoutFunction
  */
 
 /**
@@ -42,13 +42,13 @@ export default function defaultRootLayout ({
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
       <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1'>
       <meta name='referrer' content='no-referrer'>
-      <meta name='description' content='${siteName} internet newspaper clippings and bookmarks. Podcast anything.'>
+      <meta name='description' content='${`${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}'>
       <meta itemprop="publisher" content="${siteName}">
       <meta property="og:site_name" content="${siteName}">
 
-      <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/json" href="/feed.json" />
-      <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/feed+json" href="/feed.json" />
-      <link rel="alternate" title="${siteName} Blog (RSS Feed)" type="application/rss+xml"  href="/feed.xml" />
+      <link rel="alternate" title="${`${siteName} Blog (JSON Feed)`}" type="application/json" href="/feed.json" />
+      <link rel="alternate" title="${`${siteName} Blog (JSON Feed)`}" type="application/feed+json" href="/feed.json" />
+      <link rel="alternate" title="${`${siteName} Blog (RSS Feed)`}" type="application/rss+xml"  href="/feed.xml" />
 
       <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="${siteName}">
 
