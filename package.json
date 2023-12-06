@@ -69,7 +69,7 @@
     "resolve-email": "2.0.6",
     "sodium-native": "^4.0.0",
     "uland-isomorphic": "^2.0.0",
-    "undici": "^5.12.0",
+    "undici": "^6.0.0",
     "webassert": "^3.0.2"
   },
   "devDependencies": {
