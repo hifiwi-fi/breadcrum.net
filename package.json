@@ -61,7 +61,7 @@
     "mine.css": "^9.0.2",
     "nodemailer": "^6.8.0",
     "npm-run-all2": "^6.0.0",
-    "p-map": "^6.0.0",
+    "p-map": "^7.0.0",
     "p-queue": "^7.2.0",
     "pg": "^8.6.0",
     "postgrator": "^7.0.0",
