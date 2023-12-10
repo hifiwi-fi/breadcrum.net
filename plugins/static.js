@@ -1,8 +1,7 @@
 import fp from 'fastify-plugin'
 import path from 'path'
-import desm from 'desm'
 
-const __dirname = desm(import.meta.url)
+const __dirname = import.meta.dirname
 
 /**
  * This plugins adds fastify-static

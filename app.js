@@ -1,9 +1,8 @@
 import AutoLoad from '@fastify/autoload'
 import { join } from 'node:path'
-import desm from 'desm'
 import hyperid from 'hyperid'
 
-const __dirname = desm(import.meta.url)
+const __dirname = import.meta.dirname
 const hid = hyperid()
 
 export default async function App (fastify, opts) {

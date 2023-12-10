@@ -1,10 +1,9 @@
 import sodium from 'sodium-native'
 import { writeFile } from 'fs/promises'
-import desm from 'desm'
 import { resolve } from 'path'
 import { schema } from '../plugins/env.js'
 
-const __dirname = desm(import.meta.url)
+const __dirname = import.meta.dirname
 
 // This script sets up a default .env dotenv file for use in development
 // Do not run this in production or when deploying.

@@ -8,7 +8,7 @@ on:
         required: true
 
 env:
-  node_version: 20
+  node_version: 21
   FORCE_COLOR: 1
   redis-version: 7
 

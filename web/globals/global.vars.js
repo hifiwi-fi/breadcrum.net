@@ -1,9 +1,8 @@
 import 'dotenv/config'
 import { readFile } from 'fs/promises'
-import desm from 'desm'
 import { join } from 'path'
 
-const __dirname = desm(import.meta.url)
+const __dirname = import.meta.dirname
 const version = JSON.parse(
   await readFile(
     new URL(
