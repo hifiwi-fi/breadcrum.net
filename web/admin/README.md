@@ -6,3 +6,4 @@ title: "👨‍💼 Admin Pages"
 - [Users](./users/)
 - [Flags](./flags/)
 - [Stats](./stats/)
+- [Deps](./deps/)
