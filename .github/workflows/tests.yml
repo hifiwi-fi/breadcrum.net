@@ -27,7 +27,7 @@ jobs:
         redis-version: ${{ matrix.redis-version }}
     - run: npm i
     - name: Archive lockfile
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: pacakge-lock.json
         path: package-lock.json
