@@ -29,7 +29,7 @@
     "@fastify/static": "^6.4.0",
     "@fastify/swagger": "^8.3.1",
     "@fastify/swagger-ui": "^2.0.1",
-    "@mozilla/readability": "^0.4.2",
+    "@mozilla/readability": "^0.5.0",
     "@nearform/sql": "^1.5.0",
     "top-bun": "^7.0.0",
     "abstract-cache-redis": "^2.0.0",
