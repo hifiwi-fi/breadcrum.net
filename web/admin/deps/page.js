@@ -22,8 +22,6 @@ async function npmList () {
       console.error(`Error: ${stderr}`)
       return stderr
     }
-
-    console.log(stdout)
     return stdout
   } catch (error) {
     console.error(`Execution error: ${error}`)

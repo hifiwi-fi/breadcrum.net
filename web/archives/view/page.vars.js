@@ -1,3 +1,4 @@
 export default {
-  title: '🗄️ View Archive'
+  title: '🗄️ View Archive',
+  noindex: true
 }

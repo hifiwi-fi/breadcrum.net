@@ -1,3 +1,4 @@
 export default {
-  title: '🏷️ Tags'
+  title: '🏷️ Tags',
+  noindex: true
 }

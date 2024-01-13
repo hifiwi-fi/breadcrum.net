@@ -1,3 +1,4 @@
 export default {
-  title: '📼 Episodes'
+  title: '📼 Episodes',
+  noindex: true
 }

@@ -1,3 +1,4 @@
 export default {
-  title: '👨‍💻 View User'
+  title: '👨‍💻 View User',
+  noindex: true
 }

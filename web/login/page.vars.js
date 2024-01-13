@@ -1,3 +1,4 @@
 export default {
-  title: '👋 Login'
+  title: '👋 Login',
+  noindex: true
 }

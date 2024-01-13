@@ -8,7 +8,8 @@ import { dirname, basename } from 'node:path'
 
 export const vars = {
   title: 'Breadcrum.net Blog',
-  layout: 'blog-index'
+  layout: 'blog-index',
+  noindex: true
 }
 
 /**

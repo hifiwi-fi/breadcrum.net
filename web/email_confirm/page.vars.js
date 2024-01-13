@@ -1,3 +1,4 @@
 export default {
-  title: '💌 Email Confirmation'
+  title: '💌 Email Confirmation',
+  noindex: true
 }

@@ -1,3 +1,4 @@
 export default {
-  title: '🔑 Password Reset'
+  title: '🔑 Password Reset',
+  noindex: true
 }

@@ -1,3 +1,4 @@
 export default {
-  title: '🗄️ Archives Search'
+  title: '🗄️ Archives Search',
+  noindex: true
 }

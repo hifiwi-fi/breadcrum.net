@@ -1,3 +1,4 @@
 export default {
-  title: '📚 Deps'
+  title: '📚 Deps',
+  noindex: true
 }

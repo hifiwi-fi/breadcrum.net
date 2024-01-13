@@ -31,6 +31,7 @@ export default async () => {
     authorImgUrl: `${baseUrl}/static/breadcrum-fill-red.png`,
     authorImgAlt: 'Picture of author',
     transport,
-    host
+    host,
+    baseUrl
   }
 }

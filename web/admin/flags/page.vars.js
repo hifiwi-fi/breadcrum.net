@@ -1,3 +1,4 @@
 export default {
-  title: '⛳️ Admin Flags'
+  title: '⛳️ Admin Flags',
+  noindex: true
 }

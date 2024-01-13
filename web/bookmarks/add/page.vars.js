@@ -1,3 +1,4 @@
 export default {
-  title: '✒️ Add/Edit Bookmark'
+  title: '✒️ Add/Edit Bookmark',
+  noindex: true
 }

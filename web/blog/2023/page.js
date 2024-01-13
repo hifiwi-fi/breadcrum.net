@@ -5,7 +5,8 @@
 
 export const vars = {
   title: 'Breadcrum.net 2023 Blogs',
-  layout: 'blog-auto-index'
+  layout: 'blog-auto-index',
+  noindex: true
 }
 
 /**

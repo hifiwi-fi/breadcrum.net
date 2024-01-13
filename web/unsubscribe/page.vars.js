@@ -1,3 +1,4 @@
 export default {
-  title: '✋ Unsubscibe'
+  title: '✋ Unsubscibe',
+  noindex: true
 }

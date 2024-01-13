@@ -1,5 +1,6 @@
 ---
 title: "👨‍💼 Admin Pages"
+noindex: true
 ---
 # Admin pannel
 

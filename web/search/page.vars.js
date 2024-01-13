@@ -1,3 +1,4 @@
 export default {
-  title: '🔎 Search'
+  title: '🔎 Search',
+  noindex: true
 }

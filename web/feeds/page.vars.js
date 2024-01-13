@@ -1,3 +1,4 @@
 export default {
-  title: '📡 Feeds'
+  title: '📡 Feeds',
+  noindex: true
 }
