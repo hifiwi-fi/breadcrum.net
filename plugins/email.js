@@ -60,10 +60,8 @@ export default fp(async function (fastify, opts) {
             to: toEmail,
             subject,
             text: addUnsubscribeLine({ text, toEmail }),
-            list: {
-              unsubscribe: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/user/email/unsubscribe?email=${toEmail}`
-            },
             headers: {
+              'List-Unsubscribe': `<${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/user/email/unsubscribe?email=${toEmail}>`,
               'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
             }
           })

@@ -4,9 +4,13 @@ import { userEditableUserProps } from '../../user-props.js'
 
 // Unsubscribe an email address no matter what
 export default async function unsubscribeEmailRoute (fastify, opts) {
-  fastify.post(
-    '/',
-    {
+  fastify.route({
+    url: '/',
+    method: [
+      'POST',
+      'GET'
+    ],
+    schema: {
       schema: {
         querystring: {
           type: 'object',
@@ -27,7 +31,7 @@ export default async function unsubscribeEmailRoute (fastify, opts) {
         }
       }
     },
-    async function unsubscribeEmailHandler (request, reply) {
+    handler: async function unsubscribeEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const { email } = request.query
 
@@ -46,5 +50,5 @@ export default async function unsubscribeEmailRoute (fastify, opts) {
         }
       })
     }
-  )
+  })
 }
