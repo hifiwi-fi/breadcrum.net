@@ -24,7 +24,8 @@ export const page = Component(() => {
         method: 'post',
         headers: {
           'content-type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ email })
       })
 
       if (response.ok) {
