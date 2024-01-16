@@ -21,7 +21,7 @@
     "@fastify/cors": "^8.0.0",
     "@fastify/env": "^4.0.0",
     "@fastify/helmet": "^11.0.0",
-    "@fastify/jwt": "^7.0.0",
+    "@fastify/jwt": "^8.0.0",
     "@fastify/postgres": "^5.0.0",
     "@fastify/rate-limit": "^9.0.0",
     "@fastify/redis": "^6.0.1",
