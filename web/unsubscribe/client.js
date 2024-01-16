@@ -20,12 +20,11 @@ export const page = Component(() => {
     try {
       const email = formRef.current.email.value
 
-      const response = await fetch(`${state.apiUrl}/user/email:unsubscribe`, {
+      const response = await fetch(`${state.apiUrl}/user/email:unsubscribe?email=${email}`, {
         method: 'post',
         headers: {
           'content-type': 'application/json'
-        },
-        body: JSON.stringify({ email })
+        }
       })
 
       if (response.ok) {

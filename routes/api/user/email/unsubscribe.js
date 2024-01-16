@@ -8,7 +8,7 @@ export async function unsubscribeEmail (fastify, opts) {
     '::unsubscribe',
     {
       schema: {
-        body: {
+        querystring: {
           type: 'object',
           properties: {
             email: userEditableUserProps.email
@@ -29,7 +29,7 @@ export async function unsubscribeEmail (fastify, opts) {
     },
     async function unsubscribeEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        const { email } = request.body
+        const { email } = request.query
 
         const query = SQL`
         update users

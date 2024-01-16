@@ -59,7 +59,13 @@ export default fp(async function (fastify, opts) {
             from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
             to: toEmail,
             subject,
-            text: addUnsubscribeLine({ text, toEmail })
+            text: addUnsubscribeLine({ text, toEmail }),
+            list: {
+              unsubscribe: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/user/email:unsubscribe?email=${toEmail}`
+            },
+            headers: {
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
           })
           fastify.log.info({ results }, `Sent email: ${toEmail}`)
           return results
