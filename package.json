@@ -52,7 +52,7 @@
     "gunzip-maybe": "^1.4.2",
     "highlight.js": "^11.5.0",
     "hyperid": "^3.1.1",
-    "jsdom": "^23.0.1",
+    "jsdom": "^24.0.0",
     "jsonfeed-to-atom": "^1.2.4",
     "jsonfeed-to-rss": "^3.0.6",
     "local-storage-proxy": "^4.0.3",
