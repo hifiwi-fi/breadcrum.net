@@ -18,6 +18,8 @@ If you need to render components inside, you need attatch them in the global cli
  * @typedef {{
  *  title: string,
  *  siteName: string,
+ *  noindex: boolean,
+ *  description: string,
  *  [key: string]: any
  * }} RootLayoutVars
  */
@@ -28,7 +30,9 @@ export default function defaultRootLayout ({
     title,
     siteName,
     mastodonUrl,
-    version
+    version,
+    noindex,
+    description
   },
   scripts,
   styles,
@@ -42,9 +46,10 @@ export default function defaultRootLayout ({
       <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
       <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1'>
       <meta name='referrer' content='no-referrer'>
-      <meta name='description' content='${`${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}'>
+      <meta name='description' content='${description ?? `${`${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}`}'>
       <meta itemprop="publisher" content="${siteName}">
       <meta property="og:site_name" content="${siteName}">
+      ${noindex ? html`<meta name="robots" content="noindex,nofollow">` : null}
 
       <link rel="alternate" title="${`${siteName} Blog (JSON Feed)`}" type="application/json" href="/feed.json" />
       <link rel="alternate" title="${`${siteName} Blog (JSON Feed)`}" type="application/feed+json" href="/feed.json" />
