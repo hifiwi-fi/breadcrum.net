@@ -18,6 +18,7 @@ kill_timeout = "5s"
     HOST = "breadcrum.net"
     NODE_ENV = "production"
     TRANSPORT = "https"
+    NODE_VERSION = "21"
 
 [deploy]
   release_command = "npm run migrate -- --no-config"
