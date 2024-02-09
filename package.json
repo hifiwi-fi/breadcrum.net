@@ -67,7 +67,6 @@
     "postgrator-cli": "^7.0.0",
     "resolve-email": "2.0.8",
     "sodium-native": "^4.0.0",
-    "top-bun": "^7.0.0",
     "uland-isomorphic": "^2.0.0",
     "undici": "^6.0.1",
     "webassert": "^3.0.2",
@@ -81,6 +80,7 @@
     "snazzy": "^9.0.0",
     "standard": "^17.0.0",
     "tap": "^18.1.0",
+    "top-bun": "^7.0.0",
     "typescript": "^5.1.6"
   },
   "engines": {
@@ -105,7 +105,6 @@
     "clean": "rm -rf public && mkdir -p public",
     "deps": "depcruise --exclude '^node_modules' --output-type dot . | dot -T svg | depcruise-wrap-stream-in-html > dependency-graph.html",
     "migrate": "postgrator",
-    "prepare": "run-s build",
     "generate-default-env": "node scripts/generate-default-env.js",
     "prepublishOnly": "git push --follow-tags && gh-releas -y",
     "prod-sim": "fastify start -l info app.js --address 0.0.0.0",
