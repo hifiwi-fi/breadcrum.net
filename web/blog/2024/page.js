@@ -4,7 +4,7 @@
  */
 
 export const vars = {
-  title: 'All 2023 Blog Posts',
+  title: 'All 2024 Blog Posts',
   layout: 'blog-auto-index',
   noindex: true
 }
@@ -15,6 +15,6 @@ export const vars = {
  *       publishDate: string
  * }>}
  */
-export default async function blogIndex2023 () {
+export default async function blogIndex2024 () {
   return ''
 }
