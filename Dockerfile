@@ -22,6 +22,12 @@ CMD if [[ ! -z "$SWAP" ]]; then fallocate -l $(($(stat -f -c "(%a*%s/10)*7" .)))
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+ARG ENV=production
+ARG NODE_ENV=production
+ARG HOST
+ARG TRANSPORT
+ARG NODE_VERSION
+
 # RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 # RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr yt-dlp
 
