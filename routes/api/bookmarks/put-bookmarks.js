@@ -236,6 +236,7 @@ export async function putBookmarks (fastify, opts) {
         fastify.metrics.bookmarkCreatedCounter.inc()
 
         if (archive || episode || meta) {
+          fastify.queues.populateBookmarkQ.add('test-add', { some: 'data' })
           fastify.pqueue.add(() => {
           // Resolve bookmark, episode and archives on every bookmark (with conditions)
             return resolveEntities({
