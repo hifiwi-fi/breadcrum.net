@@ -1,17 +1,16 @@
 {
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
-    "skipLibCheck": true
+    "noEmit": true
   },
-  "include": [
-    "routes/**/**/**/*.js",
-    "plugins/**/**/**/*.js",
-    "web/**/**/**/*.js",
-    "app.js"
-  ],
+  "include": [],
   "exclude": [
-    "node_modules",
-    "types",
-    "build"
+    "node_modules"
+  ],
+  "references": [
+    { "path": "./pacakges/resources" },
+    { "path": "./pacakges/server" },
+    { "path": "./packages/worker" }
   ]
 }
+

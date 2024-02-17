@@ -1,0 +1,35 @@
+{
+  "ignore": [],
+  "ignoreBinaries": ["fly"],
+  "ignoreDependencies": [],
+  "ignoreWorkspaces": [],
+  "workspaces": {
+    "packages/web": {
+      "entry": [
+        "app.js",
+        "client/**/*.js",
+        "plugins/**/*.js",
+        "routes/**/{index,autohooks}.js",
+        "scripts/**/*.js",
+        "test/**/*.js"
+      ],
+      "ignoreDependencies": ["highlight.js"],
+      "ignoreBinaries": ["pg-to-dbml", "postgres://postgres"],
+      "project": ["**/*.js"]
+    },
+    "packages/worker": {
+      "entry": [
+        "app.js",
+        "plugins/**/*.js",
+        "routes/**/index.js",
+        "scripts/**/*.js",
+        "test/**/*.js"
+      ],
+      "project": ["**/*.js"]
+    },
+    "packages/*": {
+      "entry": ["**/*.js"],
+      "project": ["**/*.js"]
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "extends": "@voxpelli/tsconfig/node20.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "routes/**/*.js",
+    "plugins/**/*.js",
+    "web/**/*.js",
+    "app.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "references": [ { "path": "./pacakges/resources" } ]
+}

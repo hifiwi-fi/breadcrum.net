@@ -7,6 +7,14 @@ on:
         description: 'ref to deploy'
         required: true
         default: 'master'
+      deploy-web:
+        type: boolean
+        description: 'Deploy web service'
+        default: true
+      deploy-worker:
+        type: boolean
+        description: 'Deploy worker service'
+        default: true
 
 env:
   node_version: 21
@@ -18,36 +26,75 @@ concurrency: # prevent concurrent releases
   cancel-in-progress: true
 
 jobs:
-  flyctl_deploy:
+  flyctl_deploy_web:
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deploy-web }}
+    defaults:
+      run:
+        working-directory: ./packages/web
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.inputs.ref }}
-    - name: Use Node.js ${{ env.node_version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.node_version }}
-        # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
-        registry-url: 'https://registry.npmjs.org'
-    - name: Start Redis
-      uses: supercharge/redis-github-action@1.8.0
-      with:
-        redis-version: ${{ env.redis-version }}
-    - run: npm i
-    - run: npm run generate-default-env
-    - run: npm test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
-    - run: rm .env
-    - run: git reset --hard && git clean -fd
-    - uses: superfly/flyctl-actions/setup-flyctl@master
-    - run: flyctl deploy --remote-only
-      env:
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-    - name: Archive lockfile
-      uses: actions/upload-artifact@v4
-      with:
-        name: pacakge-lock.json
-        path: package-lock.json
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token. REQUIRED
+          registry-url: 'https://registry.npmjs.org'
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.8.0
+        with:
+          redis-version: ${{ env.redis-version }}
+      - run: npm i --install-links --workspaces=false # Install only this package and its deps
+      - name: Archive lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: pacakge-lock.json
+          path: package-lock.json
+      - run: npm run generate-default-env
+      - run: npm test
+      - run: rm .env
+      - run: git reset --hard && git clean -fd
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile
+        working-directory: ./ # Run in the root context of the directory
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
+  flyctl_deploy_worker:
+    needs: flyctl_deploy_web
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.deploy-worker && always() }}
+    defaults:
+      run:
+        working-directory: ./packages/worker
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Use Node.js ${{ env.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node_version }}
+          # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token. REQUIRED
+          registry-url: 'https://registry.npmjs.org'
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.8.0
+        with:
+          redis-version: ${{ env.redis-version }}
+      - run: npm i --install-links --workspaces=false # Install only this package and its deps
+      - name: Archive lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: pacakge-lock.json
+          path: package-lock.json
+      - run: npm run generate-default-env
+      - run: npm test
+      - run: rm .env
+      - run: git reset --hard && git clean -fd
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile
+        working-directory: ./ # Run in the root context of the directory
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

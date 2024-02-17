@@ -31,15 +31,24 @@ jobs:
       with:
         name: pacakge-lock.json
         path: package-lock.json
-    - run: npm run generate-default-env
+    - run: npm run generate-default-env --workspaces --if-present
     - run: npm test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       with:
+        parallel: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        files: .tap/report/lcov.info
+        files: "packages/web/.tap/report/lcov.info packages/worker/.tap/report/lcov.info"
+
+  coverage:
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close parallel build=
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
 
   automerge:
     needs: test
