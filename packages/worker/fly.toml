@@ -1,0 +1,51 @@
+# fly.toml app configuration file generated for breadcrum on 2023-05-23T11:12:14-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "bc-worker"
+primary_region = "lax"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+swap_size_mb = 1024
+
+[experimental]
+  auto_rollback = true
+
+[build]
+  dockerfile = "Dockerfile"
+  [build.args]
+    ENV = "production"
+    NODE_ENV = "production"
+    NODE_VERSION = "21"
+
+[env]
+  ENV = "production"
+  FASTIFY_ADDRESS = "0.0.0.0"
+  FASTIFY_LOG_LEVEL = "info"
+  FASTIFY_OPTIONS = "true"
+  NODE_ENV = "production"
+  NODE_OPTIONS = "--max-old-space-size=256"
+  PORT = "8080"
+  METRICS = "1"
+
+[checks]
+  [checks.http_checks]
+    grace_period = "5s"
+    interval = "15s"
+    method = "get"
+    path = "/health"
+    port = 8080
+    timeout = "2s"
+    type = "http"
+
+  [checks.tcp_checks]
+    grace_period = "1s"
+    interval = "15s"
+    port = 8080
+    timeout = "2s"
+    type = "tcp"
+
+[metrics]
+  port = 9092 # TODO: make this consistent
+  path = "/metrics"

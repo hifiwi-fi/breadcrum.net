@@ -4,8 +4,8 @@
 
 Breadcrum.net internet newspaper clippings. Coming very soon.
 
-![](./web/static/screenshots/bookmark-window-dark.png#gh-dark-mode-only)
-![](./web/static/screenshots/bookmark-window-light.png#gh-light-mode-only)
+![](./packages/web/client/static/screenshots/bookmark-window-dark.png#gh-dark-mode-only)
+![](./packages/web/client/static/screenshots/bookmark-window-light.png#gh-light-mode-only)
 
 ## License
 

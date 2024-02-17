@@ -3,13 +3,11 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": [],
+  "include": [
+    "**/*.js"
+  ],
   "exclude": [
     "node_modules"
   ],
-  "references": [
-    { "path": "./pacakges/server" },
-    { "path": "./packages/worker" }
-  ]
+  "references": [ /* { "path": "../worker" }  */ ]
 }
-
