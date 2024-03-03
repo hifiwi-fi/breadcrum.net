@@ -42,20 +42,10 @@ export async function getAdminStats (fastify, opts) {
 
       const totalUsersQueryResults = await fastify.pg.query(totalUsersQuery)
 
-      const recentUsersQuery = SQL`
-        select u.id, u.username, u.email
-        from users u
-        where u.created_at >= NOW() - INTERVAL '3 month'
-        order by created_at desc;
-      `
-
-      const recentUsersResults = await fastify.pg.query(recentUsersQuery)
-
       return {
+        bookmarkStats: monthBookmarkCountResults.rows,
         totalUsers: totalUsersQueryResults.rows,
-        totalBookmarks: totalCountResults.rows,
-        recentUsers: recentUsersResults.rows,
-        bookmarkStats: monthBookmarkCountResults.rows
+        totalBookmarks: totalCountResults.rows
       }
     }
   )
