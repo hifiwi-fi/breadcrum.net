@@ -18,6 +18,7 @@ import SQL from '@nearform/sql'
  * @param {string|number} [options.archiveId] - Specific archive ID to fetch.
  * @param {string|number} [options.bookmarkId] - Specific bookmark ID associated with an archive to fetch.
  * @param {string|number} [options.before] - Timestamp to fetch archives created before this time.
+ * @param {string|number} [options.after] - Timestamp to fetch archives created after this time.
  * @param {boolean} [options.withRank] - Whether to include ranking based on text search.
  * @param {string} [options.query] - Text search query for ranking.
  * @param {boolean} [options.includeRank] - Include rank column
@@ -34,6 +35,7 @@ export function archivePropsQuery ({
   archiveId,
   bookmarkId,
   before,
+  after,
   query,
   includeRank
 }) {
@@ -80,14 +82,38 @@ export function archivePropsQuery ({
     ${archiveId ? SQL`and ar.id = ${archiveId}` : SQL``}
     ${bookmarkId ? SQL`and ar.bookmark_id = ${bookmarkId}` : SQL``}
     ${before ? SQL`and ar.created_at < ${before}` : SQL``}
+    ${after ? SQL`and ar.created_at >= ${after}` : SQL``}
   `
 }
 
+/**
+ * Generates an SQL query for fetching archive properties based on various filters.
+ *
+ * @export
+ * @param {Object} options - The options object containing filter and query properties.
+ * @param {boolean} [options.fullArchives] - Whether to include full HTML content of the archive.
+ * @param {string|number} options.ownerId - The owner ID to filter the archives and bookmarks.
+ * @param {boolean} [options.sensitive] - Whether to include sensitive bookmarks.
+ * @param {boolean} [options.toread] - Whether to include bookmarks marked "to read."
+ * @param {boolean} [options.starred] - Whether to include starred bookmarks.
+ * @param {boolean} [options.ready] - Whether the archive is ready.
+ * @param {string|number} [options.archiveId] - Specific archive ID to fetch.
+ * @param {string|number} [options.bookmarkId] - Specific bookmark ID associated with an archive to fetch.
+ * @param {string|number} [options.before] - Timestamp to fetch archives created before this time.
+ * @param {string|number} [options.after] - Timestamp to fetch archives created after this time.
+ * @param {string|number} [options.perPage] - Number of items per apge
+ * @param {boolean} [options.withRank] - Whether to include ranking based on text search.
+ * @param {string} [options.query] - Text search query for ranking.
+ * @param {boolean} [options.includeRank] - Include rank column
+ *
+ * @returns {SqlStatement} The generated SQL query.
+ */
 export function getArchivesQuery ({
   ownerId,
   archiveId,
   bookmarkId,
   before,
+  after,
   sensitive,
   toread,
   starred,
@@ -96,92 +122,30 @@ export function getArchivesQuery ({
   fullArchives
 }) {
   const archivesQuery = SQL`
-    ${archivePropsQuery({
-      fullArchives,
-      ownerId,
-      sensitive,
-      toread,
-      starred,
-      ready,
-      archiveId,
-      bookmarkId,
-      before
-      })}
-    order by ar.created_at desc, ar.url desc, bm.title desc
-    ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
+    with archive_page as (
+      ${archivePropsQuery({
+        fullArchives,
+        ownerId,
+        sensitive,
+        toread,
+        starred,
+        ready,
+        archiveId,
+        bookmarkId,
+        before,
+        after
+        })
+      }
+      order by ${after
+        ? SQL`ar.created_at asc, ar.url asc, ar.title asc`
+        : SQL`ar.created_at desc, ar.url desc, ar.title desc`
+      }
+      ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
+    )
+    select *
+    from archive_page ap
+    order by ap.created_at desc, ap.url desc, ap.title desc
   `
 
   return archivesQuery
-}
-
-export function afterToBeforeArchivesQuery ({
-  perPage,
-  ownerId,
-  bookmarkId,
-  after,
-  sensitive,
-  toread,
-  ready,
-  starred
-}) {
-  const perPageAfterOffset = perPage + 2
-
-  const needsJoin = !sensitive || toread || starred
-
-  const afterCalcArchivesQuery = SQL`
-    with page as (
-      select ar.id, ar.created_at
-      from archives ar
-      ${needsJoin
-          ? SQL`
-              join bookmarks bm
-              on ar.bookmark_id = bm.id`
-          : SQL``}
-      where ar.owner_id = ${ownerId}
-      and ar.created_at >= ${after}
-      ${ready != null ? SQL`and ready = ${ready}` : SQL``}
-      ${bookmarkId
-        ? SQL`ar.bookmark_id = ${bookmarkId}`
-        : SQL``
-      }
-      ${needsJoin
-        ? SQL`and bm.owner_id = ${ownerId}`
-        : SQL``
-      }
-      ${!sensitive
-        ? SQL`
-          and bm.sensitive = false
-        `
-        : SQL``
-      }
-      ${toread
-        ? SQL`
-          and bm.toread = true
-        `
-        : SQL``
-      }
-      ${starred
-        ? SQL`
-          and bm.starred = true
-        `
-        : SQL``
-      }
-      order by ar.created_at ASC, ar.url ASC
-      fetch first ${perPageAfterOffset} rows only
-    ),
-    archive_with_last_row_date as (
-      select last_value(page.created_at) over (
-        order by page.created_at
-        range between
-          UNBOUNDED PRECEDING AND
-          UNBOUNDED FOLLOWING
-      ) last_created_at
-      from page
-    )
-    select count(*)::int as archive_count, last_created_at
-    from archive_with_last_row_date
-    group by last_created_at
-  `
-
-  return afterCalcArchivesQuery
 }

@@ -1,5 +1,6 @@
 import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
-import { getArchivesQuery, afterToBeforeArchivesQuery } from './archive-query-get.js'
+import { getArchivesQuery } from './archive-query-get.js'
+import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 export async function getArchives (fastify, opts) {
   fastify.get(
@@ -85,6 +86,7 @@ export async function getArchives (fastify, opts) {
         const userId = request.user.id
 
         const {
+          before,
           after,
           per_page: perPage,
           sensitive,
@@ -93,69 +95,44 @@ export async function getArchives (fastify, opts) {
           ready,
           bookmark_id: bookmarkId
         } = request.query
-        let {
-          before
-        } = request.query
-
-        let top = false
-        let bottom = false
-
-        if (after) {
-        // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
-        // and we need to get the item before the next 'before' set.
-          const perPageAfterOffset = perPage + 2
-          const afterCalcQuery = afterToBeforeArchivesQuery({
-            perPage,
-            ownerId: userId,
-            bookmarkId,
-            after,
-            sensitive,
-            toread,
-            starred,
-            ready
-          })
-
-          const afterToBeforeResults = await fastify.pg.query(afterCalcQuery)
-
-          const {
-            archive_count: archiveCount,
-            last_created_at: lastCreatedAt
-          } = afterToBeforeResults.rows.pop()
-
-          if (archiveCount !== perPageAfterOffset) {
-            top = true
-            before = (new Date()).toISOString()
-          } else {
-            before = lastCreatedAt
-          }
-        }
-
-        if (!before && !after) {
-          top = true
-          before = (new Date()).toISOString()
-        }
 
         const archivesQuery = getArchivesQuery({
           ownerId: userId,
           bookmarkId,
           before,
+          after,
           sensitive,
           toread,
           starred,
           ready,
-          perPage,
+          perPage: perPage + 1,
           fullArchives: request.query.full_archives
         })
 
-        const archiveResults = await fastify.pg.query(archivesQuery)
+        const results = await fastify.pg.query(archivesQuery)
 
-        if (archiveResults.rows.length !== perPage) bottom = true
+        const top = Boolean(
+          (!before && !after) ||
+        (after && results.rows.length <= perPage)
+        )
+        const bottom = Boolean(
+          (before && results.rows.length <= perPage) ||
+        (!before && !after && results.rows.length <= perPage)
+        )
 
-        const nextPage = bottom ? null : archiveResults.rows.at(-1).created_at
-        const prevPage = top ? null : archiveResults.rows[0]?.created_at || before
+        if (results.rows.length > perPage) {
+          if (after) {
+            results.rows.shift()
+          } else {
+            results.rows.pop()
+          }
+        }
 
-        return {
-          data: archiveResults.rows,
+        const nextPage = bottom ? null : results.rows.at(-1)?.created_at
+        const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+
+        const response = {
+          data: results.rows,
           pagination: {
             before: nextPage,
             after: prevPage,
@@ -163,6 +140,7 @@ export async function getArchives (fastify, opts) {
             bottom
           }
         }
+        return response
       })
     }
   )

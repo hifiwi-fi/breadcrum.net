@@ -1,5 +1,6 @@
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
+import { addMillisecond } from './addMillisecond.js'
 
 export async function getBookmarks (fastify, opts) {
   fastify.get(
@@ -138,8 +139,4 @@ export async function getBookmarks (fastify, opts) {
       return response
     }
   )
-}
-
-function addMillisecond (dateObj) {
-  return new Date(dateObj.getTime() + 1)
 }
