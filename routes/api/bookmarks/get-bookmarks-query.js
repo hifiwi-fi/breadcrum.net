@@ -15,6 +15,7 @@ import SQL from '@nearform/sql'
  * @param {number} params.ownerId - ID of the owner.
  * @param {number} [params.bookmarkId] - Specific ID of the bookmark.
  * @param {string} [params.before] - Date string to get bookmarks before this date.
+ * @param {string} [params.after] - Date string to get bookmarks after this date.
  * @param {string} [params.url] - URL of the bookmark.
  * @param {boolean} [params.sensitive=false] - If true, includes sensitive bookmarks.
  * @param {boolean} [params.starred] - If true, includes only starred bookmarks.
@@ -29,6 +30,7 @@ export const getBookmarksQuery = ({
   ownerId,
   bookmarkId,
   before,
+  after,
   url,
   sensitive,
   starred,
@@ -41,21 +43,25 @@ export const getBookmarksQuery = ({
           select bm.*
           from bookmarks bm
           ${tag
-              ? SQL`
-                left join bookmarks_tags bt
-                on bm.id = bt.bookmark_id
-                left join tags t
-                on t.id = bt.tag_id`
-              : SQL``}
+            ? SQL`
+              left join bookmarks_tags bt
+              on bm.id = bt.bookmark_id
+              left join tags t
+              on t.id = bt.tag_id`
+            : SQL``}
           where bm.owner_id = ${ownerId}
           ${bookmarkId ? SQL`and bm.id = ${bookmarkId}` : SQL``}
           ${before ? SQL`and bm.created_at < ${before}` : SQL``}
+          ${after ? SQL`and bm.created_at >= ${after}` : SQL``}
           ${url ? SQL`and url = ${url}` : SQL``}
           ${!sensitive ? SQL`and sensitive = false` : SQL``}
           ${starred ? SQL`and starred = true` : SQL``}
           ${toread ? SQL`and toread = true` : SQL``}
           ${tag ? SQL`and t.name = ${tag} and t.owner_id = ${ownerId}` : SQL``}
-          order by bm.created_at desc, bm.title desc, bm.url desc
+          order by ${after
+            ? SQL`bm.created_at asc, bm.title asc, bm.url asc`
+            : SQL`bm.created_at desc, bm.title desc, bm.url desc`
+          }
           ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
         ),
         bookark_page_tags_array as (
@@ -184,55 +190,4 @@ export function bookmarkArchivesArray ({
   and ar.owner_id = ${ownerId}
   group by bm.id
 `
-}
-
-// For doing offset pagination, this converts after queries to a before query
-export const afterToBeforeBookmarkQuery = ({
-  perPage,
-  tag,
-  ownerId,
-  after,
-  sensitive,
-  starred,
-  toread
-}) => {
-  const perPageAfterOffset = perPage + 2
-  const afterCalcBookarksQuery = SQL`
-          with page as (
-            select bm.id, bm.url, bm.title, bm.created_at
-            from bookmarks bm
-            ${tag
-              ? SQL`
-                left join bookmarks_tags bt
-                on bm.id = bt.bookmark_id
-                left join tags t
-                on t.id = bt.tag_id`
-              : SQL``}
-            where bm.owner_id = ${ownerId}
-            and bm.created_at >= ${after}
-            ${!sensitive ? SQL`AND bm.sensitive = false` : SQL``}
-            ${starred ? SQL`AND bm.starred = true` : SQL``}
-            ${toread ? SQL`AND bm.toread = true` : SQL``}
-            ${tag
-              ? SQL`
-                and t.name = ${tag}
-                and t.owner_id = ${ownerId}`
-              : SQL``}
-            order by bm.created_at ASC, bm.title ASC, bm.url ASC
-            fetch first ${perPageAfterOffset} rows only
-          ),
-          bookmark_with_last_row_date as (
-            select last_value(page.created_at) over (
-                  order by page.created_at
-                  range between
-                      UNBOUNDED PRECEDING AND
-                      UNBOUNDED FOLLOWING
-              ) last_created_at
-            from page
-          )
-          select count(*)::int as bookmark_count, last_created_at
-          from bookmark_with_last_row_date
-          group by last_created_at`
-
-  return afterCalcBookarksQuery
 }

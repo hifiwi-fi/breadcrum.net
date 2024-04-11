@@ -1,5 +1,5 @@
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
-import { getBookmarksQuery, afterToBeforeBookmarkQuery } from './get-bookmarks-query.js'
+import { getBookmarksQuery } from './get-bookmarks-query.js'
 
 export async function getBookmarks (fastify, opts) {
   fastify.get(
@@ -81,6 +81,7 @@ export async function getBookmarks (fastify, opts) {
     async function getBookmarksHandler (request, reply) {
       const userId = request.user.id
       const {
+        before,
         after,
         per_page: perPage,
         url,
@@ -89,63 +90,42 @@ export async function getBookmarks (fastify, opts) {
         starred,
         toread
       } = request.query
-      let {
-        before
-      } = request.query
-
-      let top = false
-      let bottom = false
-
-      if (after) {
-        // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
-        // and we need to get the item before the next 'before' set.
-        const perPageAfterOffset = perPage + 2
-        const afterCalcQuery = afterToBeforeBookmarkQuery({
-          perPage,
-          tag,
-          ownerId: userId,
-          after,
-          sensitive,
-          starred,
-          toread
-        })
-
-        const results = await fastify.pg.query(afterCalcQuery)
-
-        const { bookmark_count: bookmarkCount, last_created_at: lastCreatedAt } = results.rows.pop() ?? {}
-
-        if (bookmarkCount !== perPageAfterOffset) {
-          top = true
-          before = (new Date()).toISOString()
-        } else {
-          before = lastCreatedAt
-        }
-      }
-
-      if (!before && !after) {
-        top = true
-        before = (new Date()).toISOString()
-      }
 
       const bookmarkQuery = getBookmarksQuery({
         tag,
         ownerId: userId,
         before,
+        after,
         url,
         sensitive,
         starred,
         toread,
-        perPage
+        perPage: perPage + 1
       })
 
       const results = await fastify.pg.query(bookmarkQuery)
 
-      if (results.rows.length !== perPage) bottom = true
+      const top = Boolean(
+        (!before && !after) ||
+        (after && results.rows.length <= perPage)
+      )
+      const bottom = Boolean(
+        (before && results.rows.length <= perPage) ||
+        (!before && !after && results.rows.length <= perPage)
+      )
 
-      const nextPage = bottom ? null : results.rows.at(-1).created_at
-      const prevPage = top ? null : results.rows[0]?.created_at || before
+      if (results.rows.length > perPage) {
+        if (after) {
+          results.rows.shift()
+        } else {
+          results.rows.pop()
+        }
+      }
 
-      return {
+      const nextPage = bottom ? null : results.rows.at(-1)?.created_at
+      const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+
+      const response = {
         data: results.rows,
         pagination: {
           before: nextPage,
@@ -154,6 +134,12 @@ export async function getBookmarks (fastify, opts) {
           bottom
         }
       }
+
+      return response
     }
   )
+}
+
+function addMillisecond (dateObj) {
+  return new Date(dateObj.getTime() + 1)
 }
