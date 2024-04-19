@@ -1,4 +1,8 @@
 {
+  "extends": "@voxpelli/tsconfig/node20.json",
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
   "include": [
     "routes/**/**/**/*.js",
     "plugins/**/**/**/*.js",
@@ -9,27 +13,5 @@
     "node_modules",
     "types",
     "build"
-  ],
-  "compilerOptions": {
-    "moduleResolution": "nodenext",
-    "target": "esnext",
-    "module": "NodeNext",
-    "lib": ["ESNext", "dom"],
-
-    "removeComments": false,
-
-    "checkJs": true,
-    "allowJs": true,
-    "noEmit": true,
-
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-
-    "allowSyntheticDefaultImports": true,
-
-    "declaration": true,
-    "declarationMap": true,
-
-    "baseUrl": "."
-  }
+  ]
 }
