@@ -16,7 +16,7 @@
     "gh-release": "^7.0.0",
     "knip": "^5.13.0",
     "npm-run-all2": "^6.0.0",
-    "typescript": "~5.4.0"
+    "typescript": "~5.5.0-dev.20240507"
   },
   "funding": {
     "type": "individual",
