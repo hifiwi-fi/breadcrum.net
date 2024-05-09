@@ -12,7 +12,7 @@ export const page = Component(() => {
 
   return html`
     <div class="bc-marketing">
-      ${badge(html`<a href="/register">Sign up for Alpha!</a>`)}
+      ${badge(html`<a href="/register">Early Access</a>`)}
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png">
