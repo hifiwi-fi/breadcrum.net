@@ -29,15 +29,21 @@ export default function defaultRootLayout ({
   vars: {
     title,
     siteName,
+    baseUrl,
     mastodonUrl,
     version,
     noindex,
-    description
+    description,
+    image,
+    siteTwitter
   },
   scripts,
   styles,
-  children
+  children,
+  page
 }) {
+  const resolvedURL = `${baseUrl}/${page.path}${page.path.endsWith('.html') ? '' : '/'}`
+
   return render(String, html`
     <!DOCTYPE html>
     <html lang="en">
@@ -48,7 +54,6 @@ export default function defaultRootLayout ({
       <meta name='referrer' content='no-referrer'>
       <meta name='description' content='${description ?? `${`${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}`}'>
       <meta itemprop="publisher" content="${siteName}">
-      <meta property="og:site_name" content="${siteName}">
       ${noindex ? html`<meta name="robots" content="noindex,nofollow">` : null}
 
       <link rel="alternate" title="${`${siteName} Blog (JSON Feed)`}" type="application/json" href="/feed.json" />
@@ -73,8 +78,21 @@ export default function defaultRootLayout ({
       <link rel="apple-touch-icon" sizes="152x152" href="/static/apple-icons/apple-icon-152x152.png">
       <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-icons/apple-icon-180x180.png">
       <link rel="apple-touch-icon" href="/static/apple-icons/apple-touch-icon-180x180.png">
-
       <meta name="apple-mobile-web-app-title" content="${siteName}">
+
+      <meta name="twitter:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">
+      <meta name="twitter:site" content="${siteTwitter}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="${title ?? siteName}">
+      <meta name="twitter:description" content="${description}">
+      <meta property="og:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">
+      <meta property="og:image:alt" content="${description}">
+      <meta property="og:site_name" content="${siteName}">
+      <meta property="og:type" content="object">
+      <meta property="og:title" content="${title ?? siteName}">
+      <meta property="og:url" content="${resolvedURL}">
+      <meta property="og:description" content="${description}">
+
 
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)

@@ -93,6 +93,7 @@
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address localhost app.js",
     "watch:tob-bun": "npm run build:top-bun -- --watch-only",
+    "top-bun-watch": "npm run build:top-bun -- --watch",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js",
     "generate-dbml": "npx pg-to-dbml --c postgres://postgres@localhost/breadcrum"

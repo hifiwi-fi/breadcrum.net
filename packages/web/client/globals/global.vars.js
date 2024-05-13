@@ -24,6 +24,8 @@ export default async () => {
   return {
     siteName: 'Breadcrum',
     siteDescription: 'Breadcrum.net: bookmarking with podcasting and archiving super powers.',
+    image: '/static/preview.png',
+    siteTwitter: '@breadcrum_',
     mastodonUrl: 'https://fosstodon.org/@breadcrum',
     version,
     authorName: 'Breadcrum',
