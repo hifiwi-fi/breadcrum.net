@@ -30,15 +30,31 @@ export default async function App (fastify, opts) {
   })
 }
 
+const PinoLevelToSeverityLookup = {
+  trace: 'DEBUG',
+  debug: 'DEBUG',
+  info: 'INFO',
+  warn: 'WARNING',
+  error: 'ERROR',
+  fatal: 'CRITICAL'
+}
+
 export const options = {
   trustProxy: true,
   genReqId: function (req) { return hid() },
   logger: {
     mixin () { // TODO: move this to the log ingestor somehow?
       return {
-        service: 'bc-worker',
-        ddsource: 'nodejs',
-        ddtags: 'env:prod'
+        service: 'bc-worker'
+      }
+    },
+    messageKey: 'message',
+    formatters: {
+      level (label, number) {
+        return {
+          level: PinoLevelToSeverityLookup[label] || PinoLevelToSeverityLookup.info,
+          levelN: number
+        }
       }
     }
   }
