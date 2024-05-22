@@ -15,7 +15,8 @@ export default fp(async function (fastify, opts) {
       directives: {
         'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : [],
         'media-src': '*',
-        'img-src': ['*', 'data:']
+        'img-src': ['*', 'data:'],
+        'frame-src': ['https://giscus.app']
       }
     }
   })

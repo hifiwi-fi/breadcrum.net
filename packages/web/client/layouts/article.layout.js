@@ -55,6 +55,21 @@ export default function articleLayout (args) {
         <p>Wan't to follow along for future updates? Follow our <a href="/docs/social/">socials and feeds</a>!</p>
       </footer>
     </article>
+    <giscus-widget
+      id="comments"
+      repo="hifiwi-fi/breadcrum.net"
+      repoid="MDEwOlJlcG9zaXRvcnkzMjIwMjk3OTk="
+      category="Announcements"
+      categoryid="DIC_kwDOEzHI584CN95V"
+      mapping="og:title"
+      strict="0"
+      reactionsenabled="1"
+      emitmetadata="0"
+      inputposition="top"
+      theme="preferred_color_scheme"
+      lang="en"
+      loading="lazy"
+    ></giscus-widget>
     ${breadcrumb({ pathSegments })}
   `
 
