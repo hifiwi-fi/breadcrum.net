@@ -17,7 +17,8 @@
     "gh-release": "^7.0.0",
     "knip": "^5.13.0",
     "npm-run-all2": "^6.0.0",
-    "typescript": "~5.4.0"
+    "typescript": "~5.4.0",
+    "patch-package": "^8.0.0"
   },
   "funding": {
     "type": "individual",
@@ -34,6 +35,7 @@
   "scripts": {
     "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules",
     "prepublishOnly": "git push --follow-tags && gh-release -y",
+    "postinstall": "patch-package",
     "release": "git push --follow-tags && gh-release -y",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
@@ -41,14 +43,14 @@
     "test": "run-s test:*",
     "test:web": "npm run test --workspace=@breadcrum/web",
     "test:worker": "npm run test --workspace=@breadcrum/worker",
-    "watch": "run-p watch:*",
+    "watch": "run-p -n watch:*",
     "watch:web": "npm run watch --workspace=@breadcrum/web",
     "watch:worker": "npm run watch --workspace=@breadcrum/worker",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run watch",
     "deploy": "run-s deploy:*",
-    "deploy:web": "fly deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
-    "deploy:worker": "fly deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
+    "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
+    "deploy:worker": "flyctl deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
     "knip": "knip --dependencies",
     "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg"
   }

@@ -35,7 +35,8 @@ export default function defaultRootLayout ({
     noindex,
     description,
     image,
-    siteTwitter
+    siteTwitter,
+    head
   },
   scripts,
   styles,
@@ -100,6 +101,7 @@ export default function defaultRootLayout ({
       ${styles
         ? styles.map(style => html`<link rel="stylesheet" href="${style}">`)
         : null}
+      ${head || null}
     </head>
     <body class="bc-body">
       <div class="bc-page-container">

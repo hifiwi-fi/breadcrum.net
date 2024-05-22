@@ -4,15 +4,24 @@ on:
   workflow_dispatch:
     inputs:
       newversion:
-        description: 'npm version {major,minor,patch}'
-        required: true
+        description: 'npm version (YYYY.MM.DD)'
+        required: false
+      deploy-web:
+        type: boolean
+        description: 'Deploy web service'
+        default: true
+      deploy-worker:
+        type: boolean
+        description: 'Deploy worker service'
+        default: true
 
 env:
   node_version: 21
-  FORCE_COLOR: 1
   redis-version: 7
+  FORCE_COLOR: 1
+  NPM_CONFIG_COLOR: always
 
-concurrency: # prevent concurrent releases
+concurrency:
   group: npm-bump
   cancel-in-progress: true
 
@@ -22,39 +31,47 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        # fetch full history so things like auto-changelog work properly
         fetch-depth: 0
     - name: Use Node.js ${{ env.node_version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.node_version }}
-        # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
         registry-url: 'https://registry.npmjs.org'
     - name: Start Redis
       uses: supercharge/redis-github-action@1.8.0
       with:
         redis-version: ${{ env.redis-version }}
-    - run: npm i
-    - run: npm run generate-default-env
-    - run: npm test
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for api access rate limiting
-    - run: rm .env
-    - run: git reset --hard && git clean -fd
-    - uses: bcomnes/npm-bump@v2.2.1
-      with:
-        git_email: bcomnes@gmail.com
-        git_username: ${{ github.actor }}
-        newversion: ${{ github.event.inputs.newversion }}
-        github_token: ${{ secrets.GITHUB_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
-        publish_cmd: npm run release
     - uses: superfly/flyctl-actions/setup-flyctl@master
-    - run: flyctl deploy --remote-only
-      env:
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    - run: npm i
     - name: Archive lockfile
       uses: actions/upload-artifact@v4
       with:
-        name: pacakge-lock.json
+        name: package-lock.json
         path: package-lock.json
-
+    - run: npm run generate-default-env --workspaces --if-present
+    - run: npm test
+    - name: Set NEW_VERSION
+      run: |
+        if [ -z "${{ github.event.inputs.newversion }}" ]; then
+          echo "NEW_VERSION=$(date -d "${{ github.event.repository.pushed_at }}" +%Y.%m.%d)" >> $GITHUB_ENV
+        else
+          echo "NEW_VERSION=${{ github.event.inputs.newversion }}" >> $GITHUB_ENV
+        fi
+        echo $NEW_VERSION
+    - uses: bcomnes/npm-bump@v2
+      with:
+        git_email: bcomnes@gmail.com
+        git_username: ${{ github.actor }}
+        newversion: ${{ env.NEW_VERSION }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_cmd: npm run release
+    - name: Deploy web
+      run: npm run deploy:web
+      if: ${{ github.event.inputs.deploy-web == 'true' }}
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    - name: Deploy worker
+      run: npm run deploy:worker
+      if: ${{ github.event.inputs.deploy-worker == 'true' }}
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

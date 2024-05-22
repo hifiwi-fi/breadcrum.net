@@ -9,7 +9,7 @@ import fp from 'fastify-plugin'
 export default fp(async function (fastify, opts) {
   // This is also customized in the ./static.js plugin
   fastify.register(import('@fastify/helmet'), {
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginResourcePolicy: { policy: 'same-origin' },
     crossOriginEmbedderPolicy: { policy: 'credentialless' },
     contentSecurityPolicy: {
       directives: {
