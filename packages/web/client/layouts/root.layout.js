@@ -33,8 +33,10 @@ export default function defaultRootLayout ({
     mastodonUrl,
     version,
     noindex,
+    siteDescription,
     description,
     image,
+    imageAlt,
     siteTwitter,
     head
   },
@@ -81,18 +83,18 @@ export default function defaultRootLayout ({
       <link rel="apple-touch-icon" href="/static/apple-icons/apple-touch-icon-180x180.png">
       <meta name="apple-mobile-web-app-title" content="${siteName}">
 
-      <meta name="twitter:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">
+      ${image && html`<meta name="twitter:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">`}
       <meta name="twitter:site" content="${siteTwitter}">
-      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
       <meta name="twitter:title" content="${title ?? siteName}">
-      <meta name="twitter:description" content="${description}">
-      <meta property="og:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">
-      <meta property="og:image:alt" content="${description}">
+      <meta name="twitter:description" content="${description ?? siteDescription}">
+      ${image && html`<meta property="og:image" content="${image.startsWith('/') ? `${baseUrl}${image}` : `${resolvedURL}${image}`}">`}
+      ${imageAlt && html`<meta property="og:image:alt" content="${imageAlt}">`}
       <meta property="og:site_name" content="${siteName}">
       <meta property="og:type" content="object">
       <meta property="og:title" content="${title ?? siteName}">
       <meta property="og:url" content="${resolvedURL}">
-      <meta property="og:description" content="${description}">
+      <meta property="og:description" content="${description ?? siteDescription}">
 
 
       ${scripts
