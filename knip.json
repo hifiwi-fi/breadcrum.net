@@ -1,6 +1,6 @@
 {
   "ignore": [],
-  "ignoreBinaries": ["fly"],
+  "ignoreBinaries": ["flyctl", "dot"],
   "ignoreDependencies": [],
   "ignoreWorkspaces": [],
   "workspaces": {
