@@ -7,6 +7,7 @@ import SQL from '@nearform/sql'
  * @param {number} [options.userId] - The unique identifier of the user to filter by. Optional.
  * @param {string} [options.username] - The username of the user to filter by. Optional.
  * @param {Date|string} [options.before] - Filters users created before this date. Optional.
+ * @param {Date|string} [options.after] - Filters users created after this date. Optional.
  * @param {number} [options.perPage] - The number of users to fetch per page. If not provided, fetches all users. Optional.
  * @returns {Object} The SQL query tailored for administrative usage to fetch details of users.
  *
@@ -26,10 +27,12 @@ export const getAdminUsersQuery = ({
   userId,
   username,
   before,
+  after,
   perPage
 }) => {
   const usersQuery = SQL`
-        select
+    with users_page as (
+      select
           u.id,
           u.email,
           u.username,
@@ -49,41 +52,17 @@ export const getAdminUsersQuery = ({
         ${userId ? SQL`and u.id = ${userId}` : SQL``}
         ${username ? SQL`and u.username = ${username}` : SQL``}
         ${before ? SQL`and u.created_at < ${before}` : SQL``}
-        order by u.created_at desc, u.username desc
+        ${after ? SQL`and u.created_at >= ${after}` : SQL``}
+        order by ${after
+          ? SQL`u.created_at asc, u.username asc`
+          : SQL`u.created_at desc, u.username desc`
+        }
         ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
-      `
+    )
+    select *
+    from users_page u
+    order by u.created_at desc, u.username desc
+  `
 
   return usersQuery
-}
-
-// For doing offset pagination, this converts after queries to a before query
-export const afterToBeforeAdminUsersQuery = ({
-  perPage,
-  after,
-  username
-}) => {
-  const perPageAfterOffset = perPage + 2
-  const afterCalcUsersQuery = SQL`
-          with page as (
-            select u.id, u.created_at
-            from users u
-            where u.created_at >= ${after}
-            ${username ? SQL`and u.username = ${username}` : SQL``}
-            order by u.created_at asc, u.username asc
-            fetch first ${perPageAfterOffset} rows only
-          ),
-          users_with_last_row_date as (
-            select last_value(page.created_at) over (
-                  order by page.created_at
-                  range between
-                      UNBOUNDED PRECEDING AND
-                      UNBOUNDED FOLLOWING
-              ) last_created_at
-            from page
-          )
-          select count(*)::int as user_count, last_created_at
-          from users_with_last_row_date
-          group by last_created_at`
-
-  return afterCalcUsersQuery
 }
