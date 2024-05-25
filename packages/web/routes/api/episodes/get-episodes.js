@@ -1,7 +1,8 @@
 import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
 import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
-import { getEpisodesQuery, afterToBeforeEpisodesQuery } from './episode-query-get.js'
+import { getEpisodesQuery } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
+import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 export async function getEpisodes (fastify, opts) {
   fastify.get(
@@ -89,77 +90,55 @@ export async function getEpisodes (fastify, opts) {
         const userId = request.user.id
 
         const {
+          before,
           after,
           per_page: perPage,
           sensitive,
           bookmark_id: bookmarkId,
           ready
         } = request.query
-        let {
-          before
-        } = request.query
 
         const feedId = request.query.feed_id ?? request.query.default_feed
           ? await getOrCreateDefaultFeed({ client, userId })
           : null
 
-        let top = false
-        let bottom = false
-
-        if (after) {
-        // We have to fetch the first 2 rows because > is inclusive on timestamps (μS)
-        // and we need to get the item before the next 'before' set.
-          const perPageAfterOffset = perPage + 2
-          const afterCalcQuery = afterToBeforeEpisodesQuery({
-            perPage,
-            ownerId: userId,
-            after,
-            sensitive,
-            feedId,
-            bookmarkId
-          })
-
-          const afterToBeforeResults = await fastify.pg.query(afterCalcQuery)
-
-          const {
-            episode_count: episodeCount,
-            last_created_at: lastCreatedAt
-          } = afterToBeforeResults.rows.pop()
-
-          if (episodeCount !== perPageAfterOffset) {
-            top = true
-            before = (new Date()).toISOString()
-          } else {
-            before = lastCreatedAt
-          }
-        }
-
-        if (!before && !after) {
-          top = true
-          before = (new Date()).toISOString()
-        }
-
         const episodeQuery = getEpisodesQuery({
           ownerId: userId,
           before,
+          after,
           sensitive,
           ready,
-          perPage,
+          perPage: perPage + 1,
           feedId,
           bookmarkId,
           includeFeed: request.query.include_feed
         })
 
-        const episodeResults = await fastify.pg.query(episodeQuery)
+        const results = await fastify.pg.query(episodeQuery)
 
-        if (episodeResults.rows.length !== perPage) bottom = true
+        const top = Boolean(
+          (!before && !after) ||
+          (after && results.rows.length <= perPage)
+        )
+        const bottom = Boolean(
+          (before && results.rows.length <= perPage) ||
+          (!before && !after && results.rows.length <= perPage)
+        )
 
-        const nextPage = bottom ? null : episodeResults.rows.at(-1).created_at
-        const prevPage = top ? null : episodeResults.rows[0]?.created_at || before
+        if (results.rows.length > perPage) {
+          if (after) {
+            results.rows.shift()
+          } else {
+            results.rows.pop()
+          }
+        }
+
+        const nextPage = bottom ? null : results.rows.at(-1)?.created_at
+        const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
 
         return {
           data: request.query.include_feed
-            ? episodeResults.rows.map(episode => {
+            ? results.rows.map(episode => {
               episode.podcast_feed = getFeedWithDefaults({
                 feed: episode.podcast_feed,
                 transport: fastify.config.TRANSPORT,
@@ -167,7 +146,7 @@ export async function getEpisodes (fastify, opts) {
               })
               return episode
             })
-            : episodeResults.rows,
+            : results.rows,
           pagination: {
             before: nextPage,
             after: prevPage,

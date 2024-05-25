@@ -5,31 +5,35 @@ import SQL from '@nearform/sql'
  */
 
 /**
+ * @typedef {Object} EpisodeQueryOptions
+ * @property {string} ownerId - ID of the episode owner.
+ * @property {string | null | undefined} [episodeId] - Specific ID of the episode to query.
+ * @property {Date | null | undefined} [before] - Timestamp to fetch episodes created before.
+ * @property {Date | null | undefined} [after] - Timestamp to fetch episodes created after.
+ * @property {boolean | null | undefined} [sensitive] - Whether to include sensitive episodes.
+ * @property {boolean | null | undefined} [ready] - Whether to filter episodes by readiness.
+ * @property {number | null | undefined} [perPage] - Number of episodes to return per page (not used in current implementation).
+ * @property {string | null | undefined} [feedId] - ID of the podcast feed.
+ * @property {string | null | undefined} [bookmarkId] - ID of the bookmark.
+ * @property {boolean | null | undefined} [includeFeed] - Whether to include podcast feed details.
+ * @property {string | null | undefined} [query] - Text query for episode search.
+ * @property {boolean | null | undefined} [includeRank] - Include the rank column.
+ */
+
+/**
  * Generate an SQL query for fetching episode properties, including
  * additional related information like podcast feed and bookmark details.
  *
- * @param {Object} options - Query options.
- * @param {number|string} options.ownerId - ID of the episode owner.
- * @param {number|string} [options.episodeId] - Specific ID of the episode to query.
- * @param {Date|string} [options.before] - Timestamp to fetch episodes created before.
- * @param {boolean} [options.sensitive] - Whether to include sensitive episodes.
- * @param {boolean} [options.ready] - Whether to filter episodes by readiness.
- * @param {number} [options.perPage] - Number of episodes to return per page (not used in current implementation).
- * @param {number|string} [options.feedId] - ID of the podcast feed.
- * @param {number|string} [options.bookmarkId] - ID of the bookmark.
- * @param {boolean} [options.includeFeed] - Whether to include podcast feed details.
- * @param {string} [options.query] - Text query for episode search.
- * @param {boolean} [options.includeRank] - Include the rank column
- *
+ * @param {EpisodeQueryOptions} options - Query options.
  * @returns {SqlStatement} Generated SQL query.
  */
 export function episodePropsQuery ({
   ownerId,
   episodeId,
   before,
+  after,
   sensitive,
   ready,
-  perPage,
   feedId,
   bookmarkId,
   includeFeed,
@@ -104,15 +108,24 @@ export function episodePropsQuery ({
     ${bookmarkId ? SQL`and ep.bookmark_id = ${bookmarkId}` : SQL``}
     ${episodeId ? SQL`and ep.id = ${episodeId}` : SQL``}
     ${before ? SQL`and ep.created_at < ${before}` : SQL``}
+    ${after ? SQL`and ep.created_at >= ${after}` : SQL``}
     ${!sensitive ? SQL`and sensitive = false` : SQL``}
     ${ready != null ? SQL`and ready = ${ready}` : SQL``}
   `
 }
 
+/**
+ * Generate an SQL query for fetching episode properties, including
+ * additional related information like podcast feed and bookmark details.
+ *
+ * @param {EpisodeQueryOptions} options - Query options.
+ * @returns {SqlStatement} Generated SQL query.
+ */
 export function getEpisodesQuery ({
   ownerId,
   episodeId,
   before,
+  after,
   sensitive,
   ready,
   perPage,
@@ -121,70 +134,30 @@ export function getEpisodesQuery ({
   includeFeed
 }) {
   const episodesQuery = SQL`
-    ${episodePropsQuery({
+    with episodes_page as (
+      ${episodePropsQuery({
         ownerId,
         episodeId,
         before,
+        after,
         sensitive,
         ready,
         perPage,
         feedId,
         bookmarkId,
         includeFeed
-    })}
-    order by ep.created_at desc, ep.url desc, bm.title desc
+        })
+      }
+      order by ${after
+      ? SQL`ep.created_at asc, ep.title asc, ep.url asc`
+      : SQL`ep.created_at desc, ep.title desc, ep.url desc`
+    }
     ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
+  )
+  select *
+  from episodes_page ep
+  order by ep.created_at desc, ep.url desc, ep.title desc
   `
 
   return episodesQuery
-}
-
-export function afterToBeforeEpisodesQuery ({
-  perPage,
-  ownerId,
-  after,
-  sensitive,
-  feedId,
-  bookmarkId
-}) {
-  const perPageAfterOffset = perPage + 2
-
-  const afterCalcEpisodesQuery = SQL`
-    with page as (
-      select ep.id, ep.created_at
-      from episodes ep
-      ${!sensitive
-          ? SQL`
-              join bookmarks bm
-              on ep.bookmark_id = bm.id`
-          : SQL``}
-      where ep.owner_id = ${ownerId}
-      and ep.created_at >= ${after}
-      ${feedId ? SQL`and ep.podcast_feed_id = ${feedId}` : SQL``}
-      ${bookmarkId ? SQL`and ep.bookmark_ud = ${bookmarkId}` : SQL``}
-      ${!sensitive
-        ? SQL`
-          and bm.owner_id = ${ownerId}
-          and bm.sensitive = false
-        `
-        : SQL``
-      }
-      order by ep.created_at ASC, ep.url ASC
-      fetch first ${perPageAfterOffset} rows only
-    ),
-    episode_with_last_row_date as (
-      select last_value(page.created_at) over (
-        order by page.created_at
-        range between
-          UNBOUNDED PRECEDING AND
-          UNBOUNDED FOLLOWING
-      ) last_created_at
-      from page
-    )
-    select count(*)::int as episode_count, last_created_at
-    from episode_with_last_row_date
-    group by last_created_at
-  `
-
-  return afterCalcEpisodesQuery
 }
