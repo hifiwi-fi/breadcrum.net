@@ -5,7 +5,7 @@ import fp from 'fastify-plugin'
  *
  * @see https://github.com/fastify/fastify-cookie
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/cookie'), {
     secret: fastify.config.COOKIE_SECRET
   })

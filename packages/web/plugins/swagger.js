@@ -5,13 +5,13 @@ import fp from 'fastify-plugin'
  *
  * @see https://github.com/fastify/fastify-swagger
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/swagger'), {
     openapi: {
       info: {
-        title: 'Test swagger',
-        description: 'testing the fastify swagger api',
-        version: '0.1.0'
+        title: 'Breadcrum API',
+        description: 'Breadcrum\'s (unstable) API',
+        version: '0.0.1'
       }
     }
   })

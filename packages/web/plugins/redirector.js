@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   fastify.addHook('onRequest', async (request, reply) => {
     if (
       fastify.config.ENV === 'production' &&

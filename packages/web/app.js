@@ -2,9 +2,17 @@ import AutoLoad from '@fastify/autoload'
 import { join } from 'node:path'
 import hyperid from 'hyperid'
 
+/**
+ * @import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
+ * @import { AutoloadPluginOptions } from '@fastify/autoload'
+ */
+
 const __dirname = import.meta.dirname
 const hid = hyperid()
 
+/**
+ * @type {FastifyPluginAsync<AppOptions>}
+ */
 export default async function App (fastify, opts) {
   const testPattern = /.*(test|spec).js/
   // This loads all plugins defined in plugins
@@ -30,20 +38,30 @@ export default async function App (fastify, opts) {
   })
 }
 
-const PinoLevelToSeverityLookup = {
+const PinoLevelToSeverityLookup = /** @type {const} */ ({
   trace: 'DEBUG',
   debug: 'DEBUG',
   info: 'INFO',
   warn: 'WARNING',
   error: 'ERROR',
   fatal: 'CRITICAL'
-}
+})
 
+/**
+ * @typedef { {} &
+ *   Partial<FastifyServerOptions> &
+ *   Partial<AutoloadPluginOptions>
+ * } AppOptions
+ */
+
+/**
+ * @type {AppOptions}
+ */
 export const options = {
   trustProxy: true,
-  genReqId: function (req) { return hid() },
+  genReqId: function (/* req */) { return hid() },
   logger: {
-    mixin () { // TODO: move this to the log ingestor somehow?
+    mixin () {
       return {
         service: 'bc-web'
       }
@@ -52,7 +70,10 @@ export const options = {
     formatters: {
       level (label, number) {
         return {
-          level: PinoLevelToSeverityLookup[label] || PinoLevelToSeverityLookup.info,
+          level: PinoLevelToSeverityLookup[
+            /** @type {keyof typeof PinoLevelToSeverityLookup} */
+            (label)
+          ] || PinoLevelToSeverityLookup.info,
           levelN: number
         }
       }

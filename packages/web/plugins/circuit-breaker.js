@@ -5,8 +5,8 @@ import fp from 'fastify-plugin'
  *
  * @see https://github.com/fastify/fastify-circuit-breaker
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/circuit-breaker'))
 }, {
-  name: 'curcuitBreaker'
+  name: 'circuitBreaker'
 })

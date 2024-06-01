@@ -6,7 +6,7 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-helmet
  */
 
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   // This is also customized in the ./static.js plugin
   fastify.register(import('@fastify/helmet'), {
     crossOriginResourcePolicy: { policy: 'same-origin' },

@@ -1,7 +1,15 @@
 import { defaultFrontendFlags } from '../../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
 
-// admin/flags route returns frontand and backend flags and requires admin to see
+/**
+ * @import { FastifyPluginAsync } from 'fastify'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsync}
+ * @returns {Promise<void>}
+ */
 export async function getAdminFlags (fastify, opts) {
   fastify.get(
     '/',

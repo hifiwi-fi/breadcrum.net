@@ -4,7 +4,7 @@ import { Queue } from 'bullmq'
 /**
  * This plugins adds bullMQ queues
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   const defaultJobOptions = {
     removeOnComplete: {
       age: 3600, // keep up to 1 hour
@@ -14,22 +14,29 @@ export default fp(async function (fastify, opts) {
       age: 24 * 3600 // keep up to 24 hours
     }
   }
-  const resolveEpisodeQ = new Queue('resolveEpisode', {
-    connection: fastify.redis.bullmq,
-    defaultJobOptions
-  })
 
-  const resolveDocumentQ = new Queue('resolveDocument', {
-    connection: fastify.redis.bullmq,
-    defaultJobOptions
-  })
+  // eslint-disable-next-line dot-notation
+  const queueRedis = fastify.redis['bullmq']
+  if (queueRedis !== undefined) {
+    const resolveEpisodeQ = new Queue('resolveEpisode', {
+      connection: queueRedis,
+      defaultJobOptions
+    })
 
-  const queues = {
-    resolveEpisodeQ,
-    resolveDocumentQ
+    const resolveDocumentQ = new Queue('resolveDocument', {
+      connection: queueRedis,
+      defaultJobOptions
+    })
+
+    const queues = {
+      resolveEpisodeQ,
+      resolveDocumentQ
+    }
+
+    fastify.decorate('queues', queues)
+  } else {
+    fastify.log.warn('Redis connection not found')
   }
-
-  fastify.decorate('queues', queues)
 },
 {
   dependencies: ['env', 'redis']

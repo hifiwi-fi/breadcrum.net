@@ -6,11 +6,5 @@
   "include": [],
   "exclude": [
     "node_modules"
-  ],
-  "references": [
-    { "path": "./pacakges/resources" },
-    { "path": "./pacakges/server" },
-    { "path": "./packages/worker" }
   ]
 }
-

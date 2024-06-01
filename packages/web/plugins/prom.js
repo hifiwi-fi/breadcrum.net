@@ -125,7 +125,7 @@ export default fp(async function (fastify, opts) {
     })
   }
 
-  fastify.addHook('onClose', async (instance) => {
+  fastify.addHook('onClose', async (_) => {
     await promServer.close()
   })
 },

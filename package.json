@@ -15,9 +15,8 @@
     "auto-changelog": "^2.0.0",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
-    "knip": "^5.13.0",
     "npm-run-all2": "^6.0.0",
-    "typescript": "~5.4.0",
+    "typescript": "~5.5.0-beta",
     "patch-package": "^8.0.0"
   },
   "funding": {
@@ -43,10 +42,11 @@
     "test": "run-s test:*",
     "test:web": "npm run test --workspace=@breadcrum/web",
     "test:worker": "npm run test --workspace=@breadcrum/worker",
-    "watch": "run-p -n watch:*",
+    "watch": "FORCE_COLOR=1 run-p -n -l watch:*",
     "watch:web": "npm run watch --workspace=@breadcrum/web",
     "watch:worker": "npm run watch --workspace=@breadcrum/worker",
     "build": "npm run build --workspaces --if-present",
+    "migrate": "npm run migrate --workspaces --if-present",
     "start": "npm run watch",
     "deploy": "run-s deploy:*",
     "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",

@@ -2,7 +2,12 @@ import fp from 'fastify-plugin'
 import { readFile } from 'fs/promises'
 import { join, resolve } from 'path'
 
-export const schema = {
+/**
+ * @import { FromSchema, JSONSchema } from "json-schema-to-ts"
+ * @typedef { FromSchema<typeof schema> } SchemaType
+ */
+
+export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   required: [
     'JWT_SECRET',
@@ -48,14 +53,6 @@ export const schema = {
       enum: ['http', 'https'],
       default: 'http'
     },
-    PQUEUE_CONCURRENCY: {
-      type: 'integer',
-      default: 3
-    },
-    PQUEUE_TIMEOUT: {
-      type: 'integer',
-      default: 60000
-    },
     SMTP_HOST: {
       type: 'string'
     },
@@ -93,14 +90,14 @@ export const schema = {
       default: true
     }
   }
-}
+})
 
 /**
  * This plugins adds config
  *
  * @see https://github.com/fastify/fastify-env
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/env'), {
     schema,
     dotenv: {

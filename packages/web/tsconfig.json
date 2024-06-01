@@ -4,16 +4,14 @@
     "noEmit": true
   },
   "include": [
-    "routes/**/*.js",
-    "plugins/**/*.js",
-    "workers/**/*.js",
-    "app.js"
+    "routes/**/*",
+    "plugins/**/*",
+    "workers/**/*",
+    "test/**/*",
   ],
   "exclude": [
     "node_modules",
-    "types",
-    "build",
-    "public"
-  ],
-  "references": [ { "path": "./pacakges/resources" } ]
+    "public",
+    ".tap"
+  ]
 }

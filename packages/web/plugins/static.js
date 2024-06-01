@@ -8,7 +8,7 @@ const __dirname = import.meta.dirname
  *
  * @see https://github.com/fastify/fastify-static
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   const staticOpts = {
     redirect: true,
     maxAge: fastify.config.ENV === 'production' ? 600000 : 0,
@@ -22,7 +22,7 @@ export default fp(async function (fastify, opts) {
   })
 
   // Admin Routes auth protection
-  fastify.register(async function (fastify, opts) {
+  fastify.register(async function (fastify, _) {
     fastify.addHook('preHandler', fastify.auth([
       fastify.verifyJWT,
       fastify.verifyAdmin

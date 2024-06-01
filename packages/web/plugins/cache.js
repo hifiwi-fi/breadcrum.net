@@ -1,17 +1,40 @@
 import fp from 'fastify-plugin'
+// @ts-ignore
 import abstractCacheRedis from 'abstract-cache-redis'
-import assert from 'webassert'
+
+/**
+ * @typedef {Object} FileKeyParams
+ * @property {string} userId - The user ID.
+ * @property {string} episodeId - The episode ID.
+ * @property {string} sourceUrl - The source URL of the file.
+ * @property {string} type - The type of the file.
+ * @property {string} medium - The medium of the file.
+ */
+
+/**
+ * @typedef {Object} YTDLPMetaKeyParams
+ * @property {string} url - The URL of the YTDLP source.
+ * @property {string} medium - The medium of the YTDLP source.
+ * @property {number} attempt - Cache busting attempt key.
+ */
 
 /**
  * This plugins adds fastify/fastify-caching
  *
  * @see https://github.com/fastify/fastify-caching
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _) {
   const cache = abstractCacheRedis({
-    client: fastify.redis.cache
+    // eslint-disable-next-line dot-notation
+    client: fastify.redis['cache']
   })
 
+  /**
+   * Generates a file key based on the provided parameters.
+   *
+   * @param {FileKeyParams} params - The parameters for generating the file key.
+   * @returns {string} The generated file key.
+   */
   function getFileKey ({
     userId,
     episodeId,
@@ -19,11 +42,6 @@ export default fp(async function (fastify, opts) {
     type,
     medium
   }) {
-    assert(userId, 'userId required')
-    assert(episodeId, 'episodeId required')
-    assert(sourceUrl, 'sourceUrl required')
-    assert(type, 'type required')
-    assert(medium, 'medium required')
     return [
       'file',
       userId,
@@ -37,41 +55,68 @@ export default fp(async function (fastify, opts) {
   const urlCacheTtl = 1000 * 60 * 20 // 20 mins
 
   fastify.decorate(cache, cache)
+
   fastify.decorate('urlCache', {
-    async get ({ userId, episodeId, sourceUrl, type, medium } = {}) {
+    /**
+     * @param {FileKeyParams} params - The parameters for retrieving the cached value.
+     * @returns {Promise<any>} The cached value.
+     */
+    async get ({ userId, episodeId, sourceUrl, type, medium }) {
       const key = getFileKey({ userId, episodeId, sourceUrl, type, medium })
       const results = await cache.get(key)
       return results?.item
     },
-    set ({ userId, episodeId, sourceUrl, type, medium } = {}, value) {
+
+    /**
+     * @param {FileKeyParams} params - The parameters for setting the cached value.
+     * @param {any} value - The value to cache.
+     * @returns {Promise<void>}
+     */
+    set ({ userId, episodeId, sourceUrl, type, medium }, value) {
       const key = getFileKey({ userId, episodeId, sourceUrl, type, medium })
       return cache.set(key, value, urlCacheTtl)
     }
   })
 
+  /**
+   * Generates a YTDLP meta key based on the provided parameters.
+   *
+   * @param {YTDLPMetaKeyParams} params - The parameters for generating the YTDLP meta key.
+   * @returns {string} The generated YTDLP meta key.
+   */
   function getYTDLPMetaKey ({
     url,
-    medium
+    medium,
+    attempt = 0
   }) {
-    assert(url, 'url required')
-    assert(medium, 'medium required')
     return [
       'meta',
       url,
-      medium
+      medium,
+      attempt
     ].join(':')
   }
 
-  const ytdlpTtl = 1000 * 60 * 20 // 20 mins,
+  const ytdlpTtl = 1000 * 60 * 20 // 20 mins
 
   fastify.decorate('ytdlpCache', {
-    async get ({ url, medium } = {}) {
-      const key = getYTDLPMetaKey({ url, medium })
+  /**
+   * @param {YTDLPMetaKeyParams} params - The parameters for retrieving the cached value.
+   * @returns {Promise<any>} The cached value.
+   */
+    async get ({ url, medium, attempt }) {
+      const key = getYTDLPMetaKey({ url, medium, attempt })
       const results = await cache.get(key)
       return results?.item
     },
-    set ({ url, medium } = {}, value) {
-      const key = getYTDLPMetaKey({ url, medium })
+
+    /**
+   * @param {YTDLPMetaKeyParams} params - The parameters for setting the cached value.
+   * @param {any} value - The value to cache.
+   * @returns {Promise<void>}
+   */
+    set ({ url, medium, attempt }, value) {
+      const key = getYTDLPMetaKey({ url, medium, attempt })
       return cache.set(key, value, ytdlpTtl)
     }
   })
