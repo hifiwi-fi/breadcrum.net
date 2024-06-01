@@ -25,7 +25,7 @@ Changelog, and releasing is automated with npm scripts and GitHub actions.  To c
 - Changelog, Github release and npm publish is handled by the action.
 - An in depth review of this system is documented here: [bret.io/projects/package-automation](https://bret.io/projects/package-automation/)
 
-If for some reason that isn't workoing or a local release is preferred, follow these steps:
+If for some reason that isn't working or a local release is preferred, follow these steps:
 
 - Ensure a clean working git workspace.
 - Run `npm version {patch,minor,major}`.

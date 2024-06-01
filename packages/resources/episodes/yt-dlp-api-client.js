@@ -6,11 +6,13 @@ export async function getYTDLPMetadata ({
   url,
   medium,
   ytDLPEndpoint,
+  attempt = 0,
   cache
 }) {
   const cacheKey = {
     url,
-    medium
+    medium,
+    attempt
   }
   const cachedMeta = await cache?.get(cacheKey)
 

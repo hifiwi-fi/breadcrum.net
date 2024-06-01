@@ -1,6 +1,7 @@
 import SQL from '@nearform/sql'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
+import { DelayedError } from 'bullmq'
 
 /**
  * @import { Processor} from 'bullmq'
@@ -14,7 +15,7 @@ export function makeEpisodeWorker ({ fastify }) {
   const logger = fastify.log
 
   /** @type {Processor} */
-  async function episodeWorker (job) {
+  async function episodeWorker (job, token) {
     const log = logger.child({
       jobId: job.id
     })
@@ -35,8 +36,31 @@ export function makeEpisodeWorker ({ fastify }) {
           url,
           medium,
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
+          attempt: job.attemptsMade,
           cache: fastify.ytdlpCache
         })
+
+        if (metadata.live_status === 'is_upcoming' && metadata.release_timestamp) {
+          const releaseTimestamp = metadata.release_timestamp * 1000 // Convert seconds to milliseconds
+          const threeMinutesInMilliseconds = 3 * 60 * 1000 // 3 minutes in milliseconds
+
+          const delayedTimestamp = releaseTimestamp + threeMinutesInMilliseconds
+
+          const releaseDate = new Date(releaseTimestamp)
+          const delayedDate = new Date(delayedTimestamp)
+          const isoTimestamp = delayedDate.toISOString()
+
+          log.info(`Episode ${episodeId} for ${url} is scheduled at ${releaseDate.toLocaleString()} and will be processed at ${isoTimestamp}.`)
+
+          job.moveToDelayed(delayedTimestamp, token)
+
+          throw new DelayedError()
+        }
+
+        if (!metadata?.url) {
+          throw new Error('No video URL was found in discovery step')
+        }
+
         const videoData = []
 
         videoData.push(SQL`done = true`)
@@ -77,6 +101,10 @@ export function makeEpisodeWorker ({ fastify }) {
 
         log.info(`Episode ${episodeId} for ${url} is ready.`)
       } catch (err) {
+        if (err instanceof DelayedError) {
+          // TODO make this not janky
+          throw err
+        }
         log.error(`Error extracting video for episode ${episodeId}`)
         log.error(err)
         const errorQuery = SQL`

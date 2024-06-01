@@ -1,4 +1,4 @@
-export const defaultFrontendFlags = {
+export const defaultFrontendFlags = /** @type {const} */ {
   registration: {
     type: 'boolean',
     default: false,

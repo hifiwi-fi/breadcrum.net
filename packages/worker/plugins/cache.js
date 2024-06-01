@@ -14,14 +14,16 @@ export default fp(async function (fastify, opts) {
 
   function getYTDLPMetaKey ({
     url,
-    medium
+    medium,
+    attempt = 0
   }) {
     assert(url, 'url required')
     assert(medium, 'medium required')
     return [
       'meta',
       url,
-      medium
+      medium,
+      attempt
     ].join(':')
   }
 

@@ -4,17 +4,29 @@ import { defaultFrontendFlags } from './frontend-flags.js'
 import { defaultBackendFlags } from './backend-flags.js'
 
 /**
- * This plugins adds a flags system avaialble to all routes
- *
+ * @import { FastifyInstance } from 'fastify'
  */
-export default fp(async function (fastify, opts) {
-  fastify.decorate('getFlags', async function ({
-    pgClient,
-    frontend = true, // get frontend flags
-    backend = true // get backend flags
-  }) {
-    // TODO: enable cache
-    const flagsQuery = SQL`
+
+/**
+ * This plugins adds a flags system available to all routes
+ */
+export default fp(async function (fastify, _) {
+  fastify.decorate('getFlags',
+    /**
+     * Retrieves the feature flags.
+     *
+     * @param {Object} options - The options for retrieving flags.
+     * @param {FastifyInstance['pg']} [options.pgClient] - The PostgreSQL client instance.
+     * @param {boolean} [options.frontend=true] - Whether to retrieve frontend flags.
+     * @param {boolean} [options.backend=true] - Whether to retrieve backend flags.
+     * @returns {Promise<Object>} The retrieved flag set.
+     */
+    async function ({
+      pgClient,
+      frontend = true,
+      backend = true
+    }) {
+      const flagsQuery = SQL`
         select
           ff.name,
           ff.value
@@ -22,24 +34,25 @@ export default fp(async function (fastify, opts) {
         order by ff.name
       `
 
-    const client = pgClient ?? fastify.pg
+      const client = pgClient ?? fastify.pg
 
-    const flagsResults = await client.query(flagsQuery)
-    const actualFlagSet = {}
+      const flagsResults = await client.query(flagsQuery)
+      const actualFlagSet = {}
 
-    const flagset = {
-      ...(frontend ? defaultFrontendFlags : {}),
-      ...(backend ? defaultBackendFlags : {})
+      const flagset = {
+        ...(frontend ? defaultFrontendFlags : {}),
+        ...(backend ? defaultBackendFlags : {})
+      }
+
+      for (const [flag, flagProps] of Object.entries(flagset)) {
+        actualFlagSet[flag] = flagsResults.rows.find(
+          flagRow => flagRow.name === flag
+        )?.value ??
+          flagProps.default
+      }
+      return actualFlagSet
     }
-
-    for (const [flag, flagProps] of Object.entries(flagset)) {
-      actualFlagSet[flag] = flagsResults.rows.find(
-        flagRow => flagRow.name === flag
-      )?.value ??
-        flagProps.default
-    }
-    return actualFlagSet
-  })
+  )
 }, {
   name: 'flags',
   dependencies: ['pg']
