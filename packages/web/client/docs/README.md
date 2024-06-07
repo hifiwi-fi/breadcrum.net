@@ -26,6 +26,17 @@ Learn about more about Breadcrum:
 
 Breadcrum is still early in development and is not feature complete!
 
+### ⚠️ Data Safety
+
+Breadcrum is still an early access product, so data guarantees are limited.
+
+- Data is backed up nightly.
+- Hardware failure is a rare, but real reality.
+- If hardware failure occurs, at worst, the last 24 hours or less of data could be lost.
+- Service availability could be affected by hosting downtime during early access.
+- High availability and redundant data guarantees will be offered for paid accounts when available.
+- High availability and multi-region service points will be added for paid accounts when available.
+
 ## Legal
 
 - 🧙‍♂️ [Source Code](https://github.com/hifiwi-fi/breadcrum.net/)
