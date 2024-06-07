@@ -1,25 +1,6 @@
 /* eslint-env browser */
 import { useEffect, useState } from 'uland-isomorphic'
-import lsp from 'local-storage-proxy'
-import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
-
-export const state = lsp('breadcrum', {
-  defaults: {
-    user: null,
-    apiUrl: '/api',
-    host: process.env.HOST,
-    transport: process.env.TRANSPORT,
-    sensitive: false,
-    toread: false,
-    starred: false,
-    flags: defaultFrontendFlags
-  },
-  lspReset: 6
-})
-
-if (typeof window !== 'undefined') {
-  window.state = state
-}
+import { state } from './state.js'
 
 export function useLSP () {
   const [lsp, setLSP] = useState(state)

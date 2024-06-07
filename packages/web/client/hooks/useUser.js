@@ -12,6 +12,23 @@ export function useUser ({
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [refresh, setRefresh] = useState(0)
+
+  useEffect(() => {
+    // TODO: set cache header correctly for authenticated pages and remove this
+
+    // Refresh the page on back nav
+    function pageNavHandler (event) {
+      if (event.persisted) {
+        console.log('refreshing state')
+        setRefresh(refresh + 1)
+      }
+    }
+    window.addEventListener('pageshow', pageNavHandler)
+    return () => {
+      window.removeEventListener('pageshow', pageNavHandler)
+    }
+  })
 
   useEffect(() => {
     setLoading(true)
@@ -58,7 +75,7 @@ export function useUser ({
       setLoading(false)
       if (requestor) userRequest = null
     })
-  }, [state.apiUrl, reload])
+  }, [state.apiUrl, reload, refresh])
 
   return {
     user: state.user,

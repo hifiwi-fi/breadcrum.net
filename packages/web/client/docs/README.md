@@ -28,7 +28,7 @@ Breadcrum is still early in development and is not feature complete!
 
 ### ⚠️ Data Safety
 
-Breadcrum is still an early access product, so data guarantees are limited.
+Breadcrum is still an early access product, so data guarantees are slightly reduced.
 
 - Data is backed up nightly.
 - Hardware failure is a rare, but real reality.
