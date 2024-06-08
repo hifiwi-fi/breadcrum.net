@@ -6,7 +6,7 @@ export const feedDisplay = Component(({
   loading,
   feed: f = {},
   feeds = [],
-  onEdit = () => {}
+  onEdit = () => {},
 } = {}) => {
   const copyButton = useRef()
 

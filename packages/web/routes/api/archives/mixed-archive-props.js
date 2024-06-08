@@ -6,7 +6,7 @@ export const fullArchivePropsWithBookmark = {
   bookmark: {
     type: 'object',
     properties: {
-      ...fullBookmarkProps
-    }
-  }
+      ...fullBookmarkProps,
+    },
+  },
 }

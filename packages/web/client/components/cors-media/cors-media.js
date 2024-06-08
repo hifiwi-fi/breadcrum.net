@@ -6,7 +6,7 @@ export const corsMedia = Component(({
   src,
   type,
   clickForPreview,
-  thumbnail
+  thumbnail,
 } = {}) => {
   const [previewActive, setPreviewActive] = useState(!clickForPreview)
   const [hadCorsError, setHadCorsError] = useState(false)

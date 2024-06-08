@@ -4,9 +4,9 @@ export default async function podcastFeedsRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.basicAuth
+        fastify.basicAuth,
       ], {
-        relation: 'or'
+        relation: 'or',
       }),
       schema: {
         hide: true,
@@ -15,12 +15,12 @@ export default async function podcastFeedsRoutes (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed']
-        }
-      }
+          required: ['feed'],
+        },
+      },
     },
     async function placeholderHandler (request, reply) {
       const feedTokenUser = request.feedTokenUser
@@ -40,7 +40,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       const flags = await fastify.getFlags({ frontend: false, backend: true })
       const metadata = await fastify.getYTDLPMetadataWrapper({
         url: flags.placeholder_url,
-        medium: 'video'
+        medium: 'video',
       })
 
       if (!metadata.url) throw new Error('metadata is missing url')

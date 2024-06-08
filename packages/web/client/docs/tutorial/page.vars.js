@@ -1,3 +1,3 @@
 export default {
-  title: '🔰 Docs > Tutorial'
+  title: '🔰 Docs > Tutorial',
 }

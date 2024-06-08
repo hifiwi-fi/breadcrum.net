@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { userEditableUserProps } from '../../user-props.js'
 
@@ -8,28 +7,28 @@ export default async function unsubscribeEmailRoute (fastify, opts) {
     url: '/',
     method: [
       'POST',
-      'GET'
+      'GET',
     ],
     schema: {
       schema: {
         querystring: {
           type: 'object',
           properties: {
-            email: userEditableUserProps.email
+            email: userEditableUserProps.email,
           },
-          required: ['email']
-        }
+          required: ['email'],
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
-            }
-          }
-        }
-      }
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     handler: async function unsubscribeEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -46,9 +45,9 @@ export default async function unsubscribeEmailRoute (fastify, opts) {
         // TODO: log rows unsubscribing
 
         return {
-          status: 'ok'
+          status: 'ok',
         }
       })
-    }
+    },
   })
 }

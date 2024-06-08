@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export async function deleteBookmark (fastify, opts) {
@@ -8,11 +7,11 @@ export async function deleteBookmark (fastify, opts) {
       params: {
         type: 'object',
         properties: {
-          id: { type: 'string', format: 'uuid' }
+          id: { type: 'string', format: 'uuid' },
         },
-        required: ['id']
-      }
-    }
+        required: ['id'],
+      },
+    },
   },
   async function deleteBookmarkHandler (request, reply) {
     const userId = request.user.id
@@ -30,7 +29,7 @@ export async function deleteBookmark (fastify, opts) {
     reply.status = 202
     fastify.metrics.bookmarkDeleteCounter.inc()
     return {
-      status: 'ok'
+      status: 'ok',
     }
   })
 }

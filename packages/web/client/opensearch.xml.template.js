@@ -2,8 +2,8 @@ export default ({
   vars: {
     transport,
     host,
-    siteName
-  }
+    siteName,
+  },
 }) => {
   const baseUrl = `${transport}://${host}`
   return /* xml */`<?xml version="1.0" encoding="UTF-8"?>

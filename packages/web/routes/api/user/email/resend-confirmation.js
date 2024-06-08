@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { resendAccountEmailVerificationHandler } from './resend-account-confirmation.js'
 import { resendPendingEmailVerificationHandler } from './resend-pending-confirmation.js'
 
@@ -11,29 +10,29 @@ export async function resendEmailVerification (fastify, opts) {
       config: {
         rateLimit: {
           max: 5,
-          timeWindow: '1 minute'
-        }
+          timeWindow: '1 minute',
+        },
       },
       schema: {
         body: {
           type: 'object',
           properties: {
             update: {
-              type: 'boolean'
-            }
-          }
-        }
+              type: 'boolean',
+            },
+          },
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
-            }
-          }
-        }
-      }
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     async function resendEmailVerificationHandler (request, reply) {
       return fastify.pg.transact(async client => {

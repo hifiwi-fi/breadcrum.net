@@ -2,7 +2,7 @@ import SQL from '@nearform/sql'
 
 export function getFeedQuery ({
   feedId,
-  ownerId
+  ownerId,
 }) {
   const feedQuery = SQL`
           select

@@ -13,14 +13,14 @@ export default async function tagsMergeRoutes (fastify, opts) {
             source: {
               type: ['array', 'null'],
               items: {
-                type: 'string', minLength: 1, maxLength: 255
-              }
+                type: 'string', minLength: 1, maxLength: 255,
+              },
             },
-            target: { type: 'string', minLength: 1, maxLength: 255 }
+            target: { type: 'string', minLength: 1, maxLength: 255 },
           },
-          required: ['name']
-        }
-      }
+          required: ['name'],
+        },
+      },
     },
     async function (request, reply) {
       return reply.notImplemented()

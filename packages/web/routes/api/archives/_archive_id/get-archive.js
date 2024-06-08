@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import { getArchivesQuery } from '../archive-query-get.js'
 import { fullArchivePropsWithBookmark } from '../mixed-archive-props.js'
 
@@ -12,25 +10,25 @@ export async function getArchive (fastify, opts) {
         querystring: {
           sensitive: {
             type: 'boolean',
-            default: false
-          }
+            default: false,
+          },
         },
         params: {
           type: 'object',
           properties: {
-            archive_id: { type: 'string', format: 'uuid' }
+            archive_id: { type: 'string', format: 'uuid' },
           },
-          required: ['archive_id']
+          required: ['archive_id'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
-              ...fullArchivePropsWithBookmark
-            }
-          }
-        }
-      }
+              ...fullArchivePropsWithBookmark,
+            },
+          },
+        },
+      },
     },
     async function getArchiveHandler (request, reply) {
       const ownerId = request.user.id
@@ -42,7 +40,7 @@ export async function getArchive (fastify, opts) {
         archiveId,
         sensitive,
         perPage: 1,
-        fullArchives: true
+        fullArchives: true,
       })
 
       const results = await fastify.pg.query(archiveQuery)
@@ -53,7 +51,7 @@ export async function getArchive (fastify, opts) {
       }
 
       return {
-        ...archive
+        ...archive,
       }
     }
   )

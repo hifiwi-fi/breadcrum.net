@@ -7,10 +7,10 @@ import fp from 'fastify-plugin'
  */
 export default fp(async function (fastify, opts) {
   fastify.register(import('@fastify/postgres'), {
-    connectionString: fastify.config.DATABASE_URL
+    connectionString: fastify.config.DATABASE_URL,
   })
 },
 {
   name: 'pg',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

@@ -11,7 +11,7 @@ export default fp(async function (fastify, opts) {
     family: 6,
     connectTimeout: 500,
     maxRetriesPerRequest: 1,
-    namespace: 'cache'
+    namespace: 'cache',
   })
 
   fastify.register(import('@fastify/redis'), {
@@ -19,10 +19,10 @@ export default fp(async function (fastify, opts) {
     family: 6,
     connectTimeout: 500,
     maxRetriesPerRequest: null,
-    namespace: 'bullmq'
+    namespace: 'bullmq',
   })
 },
 {
   name: 'redis',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

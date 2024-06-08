@@ -11,11 +11,11 @@ export default fp(async function (fastify, opts) {
     defaultMetrics: { enabled: true },
     endpoint: null,
     name: 'metrics',
-    routeMetrics: { enabled: true }
+    routeMetrics: { enabled: true },
   })
 
   const promServer = Fastify({
-    logger: true
+    logger: true,
   })
 
   promServer.route({
@@ -24,18 +24,18 @@ export default fp(async function (fastify, opts) {
     logLevel: 'info',
     schema: {
       // hide route from swagger plugins
-      hide: true
+      hide: true,
     },
     handler: async (_, reply) => {
       reply.type('text/plain').send(await fastify.metrics.client.register.metrics())
-    }
+    },
   })
 
   const start = async () => {
     try {
       await promServer.listen({
         port: 9092,
-        host: '0.0.0.0'
+        host: '0.0.0.0',
       })
     } catch (err) {
       promServer.log.error(err)
@@ -56,5 +56,5 @@ export default fp(async function (fastify, opts) {
 },
 {
   name: 'prom',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

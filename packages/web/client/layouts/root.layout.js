@@ -38,12 +38,12 @@ export default function defaultRootLayout ({
     image,
     imageAlt,
     siteTwitter,
-    head
+    head,
   },
   scripts,
   styles,
   children,
-  page
+  page,
 }) {
   const resolvedURL = `${baseUrl}/${page.path}${page.path.endsWith('.html') ? '' : '/'}`
 

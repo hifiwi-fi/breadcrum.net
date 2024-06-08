@@ -26,9 +26,9 @@ export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     reload()
@@ -50,13 +50,13 @@ export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
             onDeleteFeed,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${feed?.id}</code>`,
-            loading
+            loading,
           })
         : feedDisplay({
             feed,
             feeds,
             onEdit: handleEdit,
-            loading
+            loading,
           })
     }
   </div>`

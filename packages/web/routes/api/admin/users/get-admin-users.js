@@ -9,9 +9,9 @@ export async function getAdminUsers (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
@@ -20,24 +20,24 @@ export async function getAdminUsers (fastify, opts) {
           properties: {
             before: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             after: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 200,
-              default: 20
+              default: 20,
             },
-            username: userEditableUserProps.username
+            username: userEditableUserProps.username,
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after'] } }] },
-            after: { allOf: [{ not: { required: ['before'] } }] }
-          }
+            after: { allOf: [{ not: { required: ['before'] } }] },
+          },
         },
         response: {
           200: {
@@ -47,8 +47,8 @@ export async function getAdminUsers (fastify, opts) {
                 type: 'array',
                 items: {
                   type: 'object',
-                  properties: fullSerializedAdminUserProps
-                }
+                  properties: fullSerializedAdminUserProps,
+                },
               },
               pagination: {
                 type: 'object',
@@ -56,13 +56,13 @@ export async function getAdminUsers (fastify, opts) {
                   before: { type: 'string', format: 'date-time' },
                   after: { type: 'string', format: 'date-time' },
                   top: { type: 'boolean' },
-                  bottom: { type: 'boolean' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  bottom: { type: 'boolean' },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     // GET users with administrative fields
     async function getAdminUsersHandler (request, reply) {
@@ -71,14 +71,14 @@ export async function getAdminUsers (fastify, opts) {
           before,
           after,
           per_page: perPage,
-          username
+          username,
         } = request.query
 
         const adminUsersQuery = getAdminUsersQuery({
           before,
           after,
           perPage: perPage + 1,
-          username
+          username,
         })
 
         const results = await client.query(adminUsersQuery)
@@ -109,8 +109,8 @@ export async function getAdminUsers (fastify, opts) {
             before: nextPage,
             after: prevPage,
             top,
-            bottom
-          }
+            bottom,
+          },
         }
       })
     }

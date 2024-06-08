@@ -21,9 +21,9 @@ export const usernameField = Component(({ user, reload }) => {
     const response = await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify({ username })
+      body: JSON.stringify({ username }),
     })
 
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -41,11 +41,11 @@ export const usernameField = Component(({ user, reload }) => {
     ? usernameEdit({
       user,
       onSave: handleSave,
-      onCancelEdit: handleCancelEdit
+      onCancelEdit: handleCancelEdit,
     })
     : usernameView({
       user,
-      onEdit: handleEdit
+      onEdit: handleEdit,
     })
   }
   `

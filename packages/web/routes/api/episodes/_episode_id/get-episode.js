@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import { getEpisodesQuery } from '../episode-query-get.js'
 import { fullEpisodePropsWithBookmarkAndFeed } from '../mixed-episode-props.js'
 
@@ -12,25 +10,25 @@ export async function getEpisode (fastify, opts) {
         querystring: {
           sensitive: {
             type: 'boolean',
-            default: false
-          }
+            default: false,
+          },
         },
         params: {
           type: 'object',
           properties: {
-            episode_id: { type: 'string', format: 'uuid' }
+            episode_id: { type: 'string', format: 'uuid' },
           },
-          required: ['episode_id']
+          required: ['episode_id'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
-              ...fullEpisodePropsWithBookmarkAndFeed
-            }
-          }
-        }
-      }
+              ...fullEpisodePropsWithBookmarkAndFeed,
+            },
+          },
+        },
+      },
     },
     async function getEpisodeHandler (request, reply) {
       const ownerId = request.user.id
@@ -42,7 +40,7 @@ export async function getEpisode (fastify, opts) {
         episodeId,
         sensitive,
         perPage: 1,
-        includeFeed: true
+        includeFeed: true,
       })
 
       const results = await fastify.pg.query(episodeQuery)
@@ -53,7 +51,7 @@ export async function getEpisode (fastify, opts) {
       }
 
       return {
-        ...episode
+        ...episode,
       }
     }
   )

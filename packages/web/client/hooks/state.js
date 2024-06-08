@@ -10,9 +10,9 @@ export const state = lsp('breadcrum', {
     sensitive: false,
     toread: false,
     starred: false,
-    flags: defaultFrontendFlags
+    flags: defaultFrontendFlags,
   },
-  lspReset: 6
+  lspReset: 6,
 })
 
 if (typeof window !== 'undefined') {

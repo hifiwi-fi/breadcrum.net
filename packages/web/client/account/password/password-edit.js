@@ -22,7 +22,7 @@ export const passwordEdit = Component(({ onSave, onCancelEdit }) => {
     }
 
     const formState = {
-      password
+      password,
     }
 
     try {

@@ -32,14 +32,14 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/user/password`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
         body: JSON.stringify({
           password,
           userId,
-          token: query.get('token')
+          token: query.get('token'),
         }),
-        credentials: 'omit'
+        credentials: 'omit',
       })
 
       if (response.ok && response.status === 202) {

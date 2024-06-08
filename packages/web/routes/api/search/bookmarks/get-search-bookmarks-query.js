@@ -2,7 +2,7 @@ import SQL from '@nearform/sql'
 import {
   bookmarkTagsArray,
   bookmarkEpisodesArray,
-  bookmarkArchivesArray
+  bookmarkArchivesArray,
 } from '../../bookmarks/get-bookmarks-query.js'
 
 /**
@@ -18,7 +18,7 @@ export function getSearchBookmarksQuery ({
   toread,
   lastRank,
   lastId,
-  reverse = false // Add reverse argument, default to false
+  reverse = false, // Add reverse argument, default to false
 }) {
   const searchBookmarksQuery = SQL`
     with bookmark_page as (

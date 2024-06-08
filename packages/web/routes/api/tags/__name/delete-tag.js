@@ -9,11 +9,11 @@ export async function deleteTag (fastify, opts) {
         params: {
           type: 'object',
           properties: {
-            name: { type: 'string' }
+            name: { type: 'string' },
           },
-          required: ['name']
-        }
-      }
+          required: ['name'],
+        },
+      },
     },
     async function deleteTagHandler (request, reply) {
       const userId = request.user.id
@@ -29,7 +29,7 @@ export async function deleteTag (fastify, opts) {
 
       reply.status = 202
       return {
-        status: 'ok'
+        status: 'ok',
       }
     }
   )

@@ -6,6 +6,6 @@ export default async function adminUserRoutes (fastify, opts) {
   await Promise.all([
     getAdminUser(fastify, opts),
     putAdminUser(fastify, opts),
-    deleteAdminUser(fastify, opts)
+    deleteAdminUser(fastify, opts),
   ])
 }

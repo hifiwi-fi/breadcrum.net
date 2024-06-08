@@ -57,8 +57,8 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/search/bookmarks?${queryParams.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
-        }
+          'accept-encoding': 'application/json',
+        },
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -136,7 +136,7 @@ export const page = Component(() => {
     ${search({
       placeholder: 'Search Bookmarks...',
       value: pageParams.get('query'),
-      onSearch: handleSearch
+      onSearch: handleSearch,
     })}
 
     <div>

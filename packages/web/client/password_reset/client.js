@@ -25,10 +25,10 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/user/password:reset`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
         body: JSON.stringify({ email }),
-        credentials: 'omit'
+        credentials: 'omit',
       })
 
       if (response.ok && response.status === 202) {

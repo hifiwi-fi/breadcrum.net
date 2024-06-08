@@ -31,7 +31,7 @@ export const page = Component(() => {
         url: query.get('url'),
         title: query.get('title'),
         note: query.get('note'),
-        tags: query.getAll('tags').filter(t => Boolean(t))
+        tags: query.getAll('tags').filter(t => Boolean(t)),
       })
     }
 
@@ -65,8 +65,8 @@ export const page = Component(() => {
         method: 'put',
         body: JSON.stringify(payload),
         headers: {
-          'content-type': 'application/json'
-        }
+          'content-type': 'application/json',
+        },
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -109,9 +109,9 @@ export const page = Component(() => {
     const response = await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     if (response.ok) {
@@ -146,7 +146,7 @@ export const page = Component(() => {
         ? newlyCreated
           ? html`created: <code>${bookmark?.id}</code>`
           : html`edit: <code>${bookmark?.id}</code>`
-        : 'New bookmark'
+        : 'New bookmark',
     })}
   `
 })

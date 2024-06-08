@@ -26,9 +26,9 @@ export const userRow = Component(({ user, reload, onDelete }) => {
     const response = await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     if (response.ok) {
@@ -43,8 +43,8 @@ export const userRow = Component(({ user, reload, onDelete }) => {
     const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json'
-      }
+        'accept-encoding': 'application/json',
+      },
     })
 
     if (!response.ok) {
@@ -65,11 +65,11 @@ export const userRow = Component(({ user, reload, onDelete }) => {
             user,
             onSave: handleSave,
             onDelete: handleDelete,
-            onCancelEdit: handleCancelEdit
+            onCancelEdit: handleCancelEdit,
           })
       : userRowView({
             user,
-            onEdit: handleEdit
+            onEdit: handleEdit,
       })
     }
     `

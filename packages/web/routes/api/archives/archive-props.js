@@ -10,7 +10,7 @@ export const commonArchiveProps = {
   direction: { type: 'string' },
   language: { type: 'string' },
   ready: { type: 'boolean' },
-  error: { type: 'string' }
+  error: { type: 'string' },
 }
 
 export const fullArchiveProps = {
@@ -19,7 +19,7 @@ export const fullArchiveProps = {
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' },
   extraction_method: { enum: ['server', 'client'] },
-  display_title: { type: 'string' }
+  display_title: { type: 'string' },
 }
 
 export const createArchiveProp = {
@@ -28,18 +28,18 @@ export const createArchiveProp = {
       {
         type: 'object',
         properties: {
-          url: { type: 'string', format: 'uri' }
+          url: { type: 'string', format: 'uri' },
         },
         required: [
-          'uri'
-        ]
+          'uri',
+        ],
       },
       {
-        type: 'boolean'
+        type: 'boolean',
       },
       {
-        type: 'null'
-      }
-    ]
-  }
+        type: 'null',
+      },
+    ],
+  },
 }

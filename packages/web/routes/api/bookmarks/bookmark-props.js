@@ -8,22 +8,22 @@ export const commnonBookmarkProps = {
   tags: {
     type: 'array',
     items: {
-      type: 'string', minLength: 1, maxLength: 255
-    }
+      type: 'string', minLength: 1, maxLength: 255,
+    },
   },
   archive_urls: {
     type: 'array',
     items: {
       type: 'string',
-      format: 'uri'
-    }
+      format: 'uri',
+    },
   },
-  summary: { type: 'string' } // for client side extracted descriptions as fallbacks
+  summary: { type: 'string' }, // for client side extracted descriptions as fallbacks
 }
 
 export const fullBookmarkProps = {
   id: { type: 'string', format: 'uuid' },
   ...commnonBookmarkProps,
   created_at: { type: 'string', format: 'date-time' },
-  updated_at: { type: 'string', format: 'date-time' }
+  updated_at: { type: 'string', format: 'date-time' },
 }

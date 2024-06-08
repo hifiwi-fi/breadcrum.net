@@ -2,7 +2,7 @@
 import { Component, html } from 'uland-isomorphic'
 
 export const feedSelect = Component(({
-  feeds
+  feeds,
 }) => {
   return html`
   <form class="bc-feed-select-form">

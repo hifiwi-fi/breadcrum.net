@@ -8,5 +8,5 @@ export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/accepts'))
 }, {
   name: 'accepts',
-  dependencies: []
+  dependencies: [],
 })

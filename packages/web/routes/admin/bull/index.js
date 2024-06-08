@@ -8,9 +8,9 @@ export default async function adminFlagsRoutes (fastify, opts) {
   createBullBoard({
     queues: [
       new BullMQAdapter(fastify.queues.resolveEpisodeQ),
-      new BullMQAdapter(fastify.queues.resolveDocumentQ)
+      new BullMQAdapter(fastify.queues.resolveDocumentQ),
     ],
-    serverAdapter
+    serverAdapter,
   })
 
   serverAdapter.setBasePath('/admin/bull')

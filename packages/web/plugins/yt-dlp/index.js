@@ -8,7 +8,7 @@ export default fp(async function (fastify, opts) {
   fastify.decorate('getYTDLPMetadataWrapper', async function getYTDLPMetadataWrapper ({
     url,
     medium,
-    attempt = 0
+    attempt = 0,
   }) {
     const endTimer = fastify.metrics.ytdlpSeconds.startTimer()
     try {
@@ -17,7 +17,7 @@ export default fp(async function (fastify, opts) {
         medium,
         attempt,
         ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
-        cache: fastify.ytdlpCache
+        cache: fastify.ytdlpCache,
       })
     } finally {
       endTimer()
@@ -25,5 +25,5 @@ export default fp(async function (fastify, opts) {
   })
 }, {
   name: 'yt-dlp',
-  dependencies: ['env', 'prom', 'cache']
+  dependencies: ['env', 'prom', 'cache'],
 })

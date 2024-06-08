@@ -9,7 +9,7 @@ import { dirname, basename } from 'node:path'
 export const vars = {
   title: 'Breadcrum.net Blog',
   layout: 'blog-index',
-  noindex: true
+  noindex: true,
 }
 
 /**
@@ -27,7 +27,7 @@ export const vars = {
  */
 export default async function blogIndex2023 ({
   pages,
-  page
+  page,
 }) {
   const blogPosts = pages
     .filter(page => page.vars.layout === 'article')

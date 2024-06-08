@@ -28,7 +28,7 @@ export const getAdminUsersQuery = ({
   username,
   before,
   after,
-  perPage
+  perPage,
 }) => {
   const usersQuery = SQL`
     with users_page as (

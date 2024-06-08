@@ -3,7 +3,7 @@ import { Readability } from '@mozilla/readability'
 import createDOMPurify from 'dompurify'
 
 export async function extractArchive ({
-  document
+  document,
 }) {
   const reader = new Readability(document)
   const article = reader.parse()

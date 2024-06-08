@@ -6,9 +6,9 @@ export default async function podcastFeedsRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.basicAuth
+        fastify.basicAuth,
       ], {
-        relation: 'or'
+        relation: 'or',
       }),
       schema: {
         parms: {
@@ -16,16 +16,16 @@ export default async function podcastFeedsRoutes (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
+              format: 'uuid',
             },
             episodes: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed', 'episode']
-        }
-      }
+          required: ['feed', 'episode'],
+        },
+      },
     },
     async function episodeHandler (request, reply) {
       const feedTokenUser = request.feedTokenUser
@@ -79,7 +79,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         episodeId: episode.id,
         sourceUrl: episode.src_url,
         type: episode.type,
-        medium: episode.medium
+        medium: episode.medium,
       }
 
       const cachedUrl = await fastify.urlCache.get(cacheKey)
@@ -93,7 +93,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
 
       const metadata = await fastify.getYTDLPMetadataWrapper({
         url: episode.src_url,
-        medium: episode.medium
+        medium: episode.medium,
       })
 
       if (!metadata.url) throw new Error('metadata is missing url')

@@ -1,7 +1,7 @@
 import SQL from '@nearform/sql'
 
 export async function verifyEmailUpdateHandler ({
-  userId, client, reply, token, now
+  userId, client, reply, token, now,
 }) {
   const updateVerifyQuery = SQL`
     select id, email, username, email_confirmed, pending_email_update, pending_email_update_token, pending_email_update_token_exp
@@ -47,7 +47,7 @@ export async function verifyEmailUpdateHandler ({
     SQL`email_verify_token_exp = null`,
     SQL`pending_email_update = null`,
     SQL`pending_email_update_token = null`,
-    SQL`pending_email_update_token_exp = null`
+    SQL`pending_email_update_token_exp = null`,
   ]
 
   const updateQuery = SQL`
@@ -66,6 +66,6 @@ export async function verifyEmailUpdateHandler ({
     status: 'ok',
     email: updatedUser.email,
     updated: true,
-    confirmed: updatedUser.email_confirmed
+    confirmed: updatedUser.email_confirmed,
   }
 }

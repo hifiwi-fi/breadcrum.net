@@ -8,8 +8,8 @@
  * }>} */
 export default async ({
   vars: {
-    baseUrl
-  }
+    baseUrl,
+  },
 }) => `User-agent: *
 Allow: /
 

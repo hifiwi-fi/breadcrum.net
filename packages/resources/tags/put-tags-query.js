@@ -5,7 +5,7 @@ export async function putTagsQuery ({
   pg,
   userId,
   bookmarkId,
-  tags
+  tags,
 }) {
   pg = pg ?? fastify.pg
 

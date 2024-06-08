@@ -1,12 +1,12 @@
 /* eslint-env browser */
-/* eslint-disable camelcase */
+
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 export const episodeEdit = Component(({
   episode: e,
   onSave,
   onDeleteEpisode,
   onCancelEdit,
-  legend
+  legend,
 } = {}) => {
   const [error, setError] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -45,7 +45,7 @@ export const episodeEdit = Component(({
 
     const formState = {
       title,
-      explicit
+      explicit,
     }
 
     try {

@@ -6,7 +6,7 @@ export const expandText = Component(({
   children,
   defaultExpandState,
   classNames = [],
-  pre
+  pre,
 }) => {
   const window = useWindow()
   const expandRef = useRef()
@@ -35,7 +35,7 @@ export const expandText = Component(({
           'bc-epand-text',
           {
             'bc-expand-text-expanded': expanded,
-            'bc-expand-text-pre': pre
+            'bc-expand-text-pre': pre,
           },
           ...classNames
         )

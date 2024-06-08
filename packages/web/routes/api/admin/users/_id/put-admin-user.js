@@ -8,9 +8,9 @@ export async function putAdminUser (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
@@ -19,17 +19,17 @@ export async function putAdminUser (fastify, opts) {
           additionalProperties: false,
           minProperties: 1,
           properties: {
-            ...adminEditableUserProps
-          }
+            ...adminEditableUserProps,
+          },
         },
         params: {
           type: 'object',
           properties: {
-            id: { type: 'string', format: 'uuid' }
+            id: { type: 'string', format: 'uuid' },
           },
-          required: ['id']
-        }
-      }
+          required: ['id'],
+        },
+      },
     },
     // PUT user with administrative fields
     async function putAdminUserHandler (request, reply) {
@@ -79,7 +79,7 @@ export async function putAdminUser (fastify, opts) {
         reply.status(202)
 
         return {
-          status: 'updated'
+          status: 'updated',
         }
       })
     }

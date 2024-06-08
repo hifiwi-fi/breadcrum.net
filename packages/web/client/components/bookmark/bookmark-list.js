@@ -26,9 +26,9 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     const response = await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     if (response.ok) {
@@ -43,8 +43,8 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json'
-      }
+        'accept-encoding': 'application/json',
+      },
     })
 
     setDeleted(true)
@@ -56,11 +56,11 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
-        toread: !bookmark.toread
-      })
+        toread: !bookmark.toread,
+      }),
     })
 
     // TODO: optimistic updates without full reload
@@ -72,11 +72,11 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
-        starred: !bookmark.starred
-      })
+        starred: !bookmark.starred,
+      }),
     })
 
     // TODO: optimistic updates without full reload
@@ -88,11 +88,11 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
       body: JSON.stringify({
-        sensitive: !bookmark.sensitive
-      })
+        sensitive: !bookmark.sensitive,
+      }),
     })
 
     // TODO: optimistic updates without full reload
@@ -109,14 +109,14 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
             onSave: handleSave,
             onDeleteBookmark: handleDeleteBookmark,
             onCancelEdit: handleCancelEdit,
-            legend: html`edit: <code>${bookmark?.id}</code>`
+            legend: html`edit: <code>${bookmark?.id}</code>`,
           })
         : bookmarkView({
             bookmark,
             onEdit: handleEdit,
             onToggleToread: handleToggleToRead,
             onToggleStarred: handleToggleStarred,
-            onToggleSensitive: handleToggleSensitive
+            onToggleSensitive: handleToggleSensitive,
           })
     }
   </div>`

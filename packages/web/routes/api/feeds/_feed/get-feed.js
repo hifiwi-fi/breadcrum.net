@@ -14,9 +14,9 @@ export async function getFeed (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.basicAuth
+        fastify.basicAuth,
       ], {
-        relation: 'or'
+        relation: 'or',
       }),
       schema: {
         parms: {
@@ -24,20 +24,20 @@ export async function getFeed (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed']
+          required: ['feed'],
         },
         querystring: {
           type: 'object',
           properties: {
             format: {
-              enum: ['json', 'rss']
-            }
-          }
-        }
-      }
+              enum: ['json', 'rss'],
+            },
+          },
+        },
+      },
     },
     async function getFeedHandler (request, reply) {
       // const { userId, token: userProvidedToken } = request.feedTokenUser
@@ -54,14 +54,14 @@ export async function getFeed (fastify, opts) {
         feedId,
         sensitive: true,
         ready: true,
-        perPage: 100
+        perPage: 100,
       })
 
       const feedQuery = getFeedQuery({ feedId, ownerId: userId })
 
       const [episodesResults, feedResults] = await Promise.all([
         fastify.pg.query(episodesQuery),
-        fastify.pg.query(feedQuery)
+        fastify.pg.query(feedQuery),
       ])
 
       const pf = feedResults.rows.pop()
@@ -90,14 +90,14 @@ export async function getFeed (fastify, opts) {
         author: {
           name: pf.username,
           url: getBookmarksUrl({ transport, host }),
-          avatar: getFeedImageUrl({ transport, host, imageUrl: pf.image_url })
+          avatar: getFeedImageUrl({ transport, host, imageUrl: pf.image_url }),
         },
         _itunes: {
           explicit: pf.explicit,
-          block: true
+          block: true,
         },
         _breadcrum: {
-          default_feed: pf.default_feed
+          default_feed: pf.default_feed,
         },
         items: episodes.length > 0
           ? episodes.map(ep => {
@@ -112,8 +112,8 @@ export async function getFeed (fastify, opts) {
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: ep.id }),
                 mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
                 title: ep.filename,
-                duration_in_seconds: ep.duration_in_seconds
-              }])
+                duration_in_seconds: ep.duration_in_seconds,
+              }]),
             }
           })
           : [{ // Placeholder show so people can subscribe to empty feeds.
@@ -126,9 +126,9 @@ export async function getFeed (fastify, opts) {
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: 'placeholder' }),
                 mime_type: 'video/mp4',
                 title: 'never-gonna-give-you-up.mp4',
-                duration_in_seconds: 212
-              }])
-            }]
+                duration_in_seconds: 212,
+              }]),
+            }],
       }
 
       // Querystring overrides accept header

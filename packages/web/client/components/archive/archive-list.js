@@ -26,9 +26,9 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     reload()
@@ -39,8 +39,8 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     await fetch(`${state.apiUrl}/archives/${archive.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json'
-      }
+        'accept-encoding': 'application/json',
+      },
     })
 
     setDeleted(true)
@@ -57,12 +57,12 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
             onSave: handleSave,
             onDeleteArchive: handleDeleteArchive,
             onCancelEdit: handleCancelEdit,
-            legend: html`edit: <code>${archive?.id}</code>`
+            legend: html`edit: <code>${archive?.id}</code>`,
           })
         : archiveView({
             archive,
             onEdit: handleEdit,
-            fullView
+            fullView,
           })
     }
   </div>`

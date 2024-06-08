@@ -9,13 +9,13 @@ import assert from 'webassert'
  */
 export default fp(async function (fastify, opts) {
   const cache = abstractCacheRedis({
-    client: fastify.redis.cache
+    client: fastify.redis.cache,
   })
 
   function getYTDLPMetaKey ({
     url,
     medium,
-    attempt = 0
+    attempt = 0,
   }) {
     assert(url, 'url required')
     assert(medium, 'medium required')
@@ -23,7 +23,7 @@ export default fp(async function (fastify, opts) {
       'meta',
       url,
       medium,
-      attempt
+      attempt,
     ].join(':')
   }
 
@@ -39,9 +39,9 @@ export default fp(async function (fastify, opts) {
     set ({ url, medium } = {}, value) {
       const key = getYTDLPMetaKey({ url, medium })
       return cache.set(key, value, ytdlpTtl)
-    }
+    },
   })
 }, {
   name: 'cache',
-  dependencies: ['redis']
+  dependencies: ['redis'],
 })

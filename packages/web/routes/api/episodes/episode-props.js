@@ -16,7 +16,7 @@ export const commonEpisodeProps = {
   text_content: { type: 'string' },
   author_url: { type: 'string' },
   ready: { type: 'boolean' },
-  error: { type: 'string' }
+  error: { type: 'string' },
 }
 
 export const fullEpisodeProps = {
@@ -24,7 +24,7 @@ export const fullEpisodeProps = {
   ...commonEpisodeProps,
   created_at: { type: 'string', format: 'date-time' },
   updated_at: { type: 'string', format: 'date-time' },
-  display_title: { type: 'string', minLength: 1, maxLength: 255 }
+  display_title: { type: 'string', minLength: 1, maxLength: 255 },
 }
 
 export const createEpisodeProp = {
@@ -35,15 +35,15 @@ export const createEpisodeProp = {
         properties: {
           type: { enum: ['redirect'] },
           medium: { enum: ['video', 'audio'] },
-          url: { type: 'string', format: 'uri' }
+          url: { type: 'string', format: 'uri' },
         },
         required: [
-          'type', 'medium'
-        ]
+          'type', 'medium',
+        ],
       },
       {
-        type: 'null'
-      }
-    ]
-  }
+        type: 'null',
+      },
+    ],
+  },
 }

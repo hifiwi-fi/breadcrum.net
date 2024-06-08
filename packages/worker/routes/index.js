@@ -6,7 +6,7 @@ export default async function rootRoute (fastify, opts) {
       return {
         hello: 'world',
         name: 'bc-worker',
-        version: fastify.pkg.version
+        version: fastify.pkg.version,
       }
     }
   )

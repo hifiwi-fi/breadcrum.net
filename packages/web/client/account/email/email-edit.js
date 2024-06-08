@@ -20,7 +20,7 @@ export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
     }
 
     const formState = {
-      email
+      email,
     }
 
     try {

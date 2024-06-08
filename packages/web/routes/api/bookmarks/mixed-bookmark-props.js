@@ -9,17 +9,17 @@ export const fullBookmarkPropsWithEpisodes = {
     items: {
       type: 'object',
       properties: {
-        ...fullEpisodeProps
-      }
-    }
+        ...fullEpisodeProps,
+      },
+    },
   },
   archives: {
     type: 'array',
     items: {
       type: 'object',
       properties: {
-        ...fullArchiveProps
-      }
-    }
-  }
+        ...fullArchiveProps,
+      },
+    },
+  },
 }

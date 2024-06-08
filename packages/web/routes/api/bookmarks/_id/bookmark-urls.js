@@ -1,7 +1,7 @@
 export function getBookmarkUrl ({
   transport,
   host,
-  bookmarkId
+  bookmarkId,
 }) {
   return `${transport}://${host}/bookmarks/view/?id=${bookmarkId}`
 }

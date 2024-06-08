@@ -1,7 +1,7 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
 import {
-  userEditableUserProps
+  userEditableUserProps,
 } from '../user/user-props.js'
 
 export async function putUser (fastify, opts) {
@@ -17,18 +17,18 @@ export async function putUser (fastify, opts) {
           properties: {
             username: userEditableUserProps.username,
             password: userEditableUserProps.password,
-            newsletter_subscription: userEditableUserProps.newsletter_subscription
-          }
+            newsletter_subscription: userEditableUserProps.newsletter_subscription,
+          },
         },
         response: {
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string' }
-            }
-          }
-        }
-      }
+              status: { type: 'string' },
+            },
+          },
+        },
+      },
     },
     async function putUserHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -65,7 +65,7 @@ export async function putUser (fastify, opts) {
         }
 
         return {
-          status: 'ok'
+          status: 'ok',
         }
       })
     }

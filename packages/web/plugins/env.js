@@ -11,85 +11,85 @@ export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   required: [
     'JWT_SECRET',
-    'COOKIE_SECRET'
+    'COOKIE_SECRET',
   ],
   properties: {
     ENV: {
       type: 'string',
-      default: 'development'
+      default: 'development',
     },
     METRICS: {
       type: 'integer', // 0 or 1
-      default: 1
+      default: 1,
     },
     JWT_SECRET: {
-      type: 'string'
+      type: 'string',
     },
     COOKIE_SECRET: {
-      type: 'string'
+      type: 'string',
     },
     COOKIE_NAME: {
       type: 'string',
-      default: 'breadcrum_token'
+      default: 'breadcrum_token',
     },
     DATABASE_URL: {
       type: 'string',
-      default: 'postgres://postgres@localhost/breadcrum'
+      default: 'postgres://postgres@localhost/breadcrum',
     },
     REDIS_CACHE_URL: {
       type: 'string',
-      default: 'redis://localhost:6379/1'
+      default: 'redis://localhost:6379/1',
     },
     REDIS_QUEUE_URL: {
       type: 'string',
-      default: 'redis://localhost:6379/2'
+      default: 'redis://localhost:6379/2',
     },
     HOST: {
       // Hostname and port (if needed)
       type: 'string',
-      default: 'localhost:3000'
+      default: 'localhost:3000',
     },
     TRANSPORT: {
       enum: ['http', 'https'],
-      default: 'http'
+      default: 'http',
     },
     SMTP_HOST: {
-      type: 'string'
+      type: 'string',
     },
     SMTP_PORT: {
       type: 'integer',
-      default: 465
+      default: 465,
     },
     SMTP_SECURE: {
       type: 'boolean',
-      default: true
+      default: true,
     },
     SMTP_USER: {
-      type: 'string'
+      type: 'string',
     },
     SMTP_PASS: {
-      type: 'string'
+      type: 'string',
     },
     APP_EMAIL: {
       type: 'string',
-      default: 'support@breadcrum.net'
+      default: 'support@breadcrum.net',
     },
     SNS_USER: {
       type: 'string',
-      default: 'sns-user'
+      default: 'sns-user',
     },
     SNS_PASS: {
-      type: 'string'
+      type: 'string',
     },
     YT_DLP_API_URL: {
       type: 'string',
-      default: 'http://user:pass@127.0.0.1:5000'
+      default: 'http://user:pass@127.0.0.1:5000',
     },
     SWAGGER: {
       type: 'boolean',
-      default: true
-    }
-  }
+      default: true,
+    },
+  },
 })
 
 /**
@@ -102,8 +102,8 @@ export default fp(async function (fastify, _) {
     schema,
     dotenv: {
       path: resolve(import.meta.dirname, '../.env'),
-      debug: false
-    }
+      debug: false,
+    },
   })
 
   const __dirname = import.meta.dirname
@@ -111,5 +111,5 @@ export default fp(async function (fastify, _) {
 
   fastify.decorate('pkg', pkg)
 }, {
-  name: 'env'
+  name: 'env',
 })

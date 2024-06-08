@@ -21,9 +21,9 @@ export const passwordField = Component(() => {
     const response = await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify({ password })
+      body: JSON.stringify({ password }),
     })
 
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -39,10 +39,10 @@ export const passwordField = Component(() => {
     editing
     ? passwordEdit({
       onSave: handleSave,
-      onCancelEdit: handleCancelEdit
+      onCancelEdit: handleCancelEdit,
     })
     : passwordView({
-      onEdit: handleEdit
+      onEdit: handleEdit,
     })
   }
   `

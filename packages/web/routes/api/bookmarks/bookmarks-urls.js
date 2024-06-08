@@ -1,6 +1,6 @@
 export function getBookmarksUrl ({
   transport,
-  host
+  host,
 }) {
   return `${transport}://${host}/bookmarks`
 }

@@ -14,7 +14,7 @@ export function getSearchEpisodesQuery ({
   perPage,
   lastRank,
   lastId,
-  reverse = false // Add reverse argument, default to false
+  reverse = false, // Add reverse argument, default to false
 }) {
   const searchEpisodeQuery = SQL`
     ${episodePropsQuery({
@@ -23,7 +23,7 @@ export function getSearchEpisodesQuery ({
       ownerId,
       sensitive,
       query,
-      includeRank: true
+      includeRank: true,
       })}
     and ep.tsv @@ plainto_tsquery('english', ${query})
     ${

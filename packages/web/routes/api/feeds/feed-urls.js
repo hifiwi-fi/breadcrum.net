@@ -3,7 +3,7 @@ export function getFeedUrl ({
   host,
   userId,
   token,
-  feedId
+  feedId,
 }) {
   return `${transport}://${userId}:${token}@${host}/api/feeds/${feedId}`
 }
@@ -11,7 +11,7 @@ export function getFeedUrl ({
 export function getFeedHtmlUrl ({
   transport,
   host,
-  feedId
+  feedId,
 }) {
   return `${transport}://${host}/feeds?id=${feedId}`
 }
@@ -19,7 +19,7 @@ export function getFeedHtmlUrl ({
 export function getFeedImageUrl ({
   imageUrl,
   transport,
-  host
+  host,
 }) {
   return imageUrl ?? `${transport}://${host}/static/bread.png`
 }

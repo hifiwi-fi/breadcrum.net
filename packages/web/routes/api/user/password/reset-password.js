@@ -10,28 +10,28 @@ export async function resetPassword (fastify, opts) {
       config: {
         rateLimit: {
           max: 5,
-          timeWindow: '1 minute'
-        }
+          timeWindow: '1 minute',
+        },
       },
       schema: {
         body: {
           type: 'object',
           properties: {
-            email: userEditableUserProps.email
+            email: userEditableUserProps.email,
           },
-          required: ['email']
-        }
+          required: ['email'],
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
-            }
-          }
-        }
-      }
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     async function resetPasswordHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -53,7 +53,7 @@ export async function resetPassword (fastify, opts) {
 
         const updates = [
           SQL`password_reset_token = ${PASSWORD_RESET_TOKEN}`,
-          SQL`password_reset_token_exp = ${PASSWORD_RESET_EXP}`
+          SQL`password_reset_token_exp = ${PASSWORD_RESET_EXP}`,
         ]
 
         const updateQuery = SQL`
@@ -75,14 +75,14 @@ export async function resetPassword (fastify, opts) {
             username: user.username,
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
-            email: user.email
-          })
+            email: user.email,
+          }),
         })
 
         await client.query('commit')
         reply.code(202)
         reply.send({
-          status: 'ok'
+          status: 'ok',
         })
         await reply
         // Request finished

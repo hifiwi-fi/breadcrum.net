@@ -3,8 +3,8 @@ export default async function deltaRoutes (fastify, opts) {
     '/last_update',
     {
       schema: {
-        hide: true // TODO: remove when implemented
-      }
+        hide: true, // TODO: remove when implemented
+      },
     },
     async function (request, reply) {
       return reply.notImplemented()
@@ -15,8 +15,8 @@ export default async function deltaRoutes (fastify, opts) {
     '/bookmarks',
     {
       schema: {
-        hide: true // TODO: remove when implemented
-      }
+        hide: true, // TODO: remove when implemented
+      },
     },
     async function (request, reply) {
       return reply.notImplemented()

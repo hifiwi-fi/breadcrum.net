@@ -7,7 +7,7 @@ import { expandText } from '../expand-text/index.js'
 export const archiveView = Component(({
   archive: ar,
   onEdit = () => {},
-  fullView
+  fullView,
 } = {}) => {
   return html`
     <div class="bc-archive-view">
@@ -30,7 +30,7 @@ export const archiveView = Component(({
           ? html`
             <div class="bc-archive-excerpt">
               ${expandText({
-                children: ar?.excerpt
+                children: ar?.excerpt,
               })}
             </div?
           `

@@ -13,46 +13,46 @@ export async function getArchives (fastify, opts) {
           properties: {
             before: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             after: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 50,
-              default: 20
+              default: 20,
             },
             sensitive: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             starred: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             toread: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             full_archives: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             bookmark_id: {
               type: 'string',
-              format: 'uuid'
+              format: 'uuid',
             },
             ready: {
-              type: 'boolean'
-            }
+              type: 'boolean',
+            },
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after', 'url'] } }] },
-            after: { allOf: [{ not: { required: ['before', 'url'] } }] }
-          }
+            after: { allOf: [{ not: { required: ['before', 'url'] } }] },
+          },
         },
         response: {
           200: {
@@ -63,9 +63,9 @@ export async function getArchives (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullArchivePropsWithBookmark
-                  }
-                }
+                    ...fullArchivePropsWithBookmark,
+                  },
+                },
               },
               pagination: {
                 type: 'object',
@@ -73,13 +73,13 @@ export async function getArchives (fastify, opts) {
                   before: { type: 'string', format: 'date-time' },
                   after: { type: 'string', format: 'date-time' },
                   top: { type: 'boolean' },
-                  bottom: { type: 'boolean' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  bottom: { type: 'boolean' },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function getArchivesHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -93,7 +93,7 @@ export async function getArchives (fastify, opts) {
           toread,
           starred,
           ready,
-          bookmark_id: bookmarkId
+          bookmark_id: bookmarkId,
         } = request.query
 
         const archivesQuery = getArchivesQuery({
@@ -106,7 +106,7 @@ export async function getArchives (fastify, opts) {
           starred,
           ready,
           perPage: perPage + 1,
-          fullArchives: request.query.full_archives
+          fullArchives: request.query.full_archives,
         })
 
         const results = await fastify.pg.query(archivesQuery)
@@ -137,8 +137,8 @@ export async function getArchives (fastify, opts) {
             before: nextPage,
             after: prevPage,
             top,
-            bottom
-          }
+            bottom,
+          },
         }
         return response
       })

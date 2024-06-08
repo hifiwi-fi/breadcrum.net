@@ -21,14 +21,14 @@ export async function getFeeds (fastify, opts) {
                   properties: {
                     ...fullFeedProps,
                     default_feed: { type: 'boolean' },
-                    episode_count: { type: 'integer' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    episode_count: { type: 'integer' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function getFeedsHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -46,7 +46,7 @@ export async function getFeeds (fastify, opts) {
 
         const [feedsResults, userResults] = await Promise.all([
           client.query(feedsQuery),
-          client.query(userQuery)
+          client.query(userQuery),
         ])
 
         const { username: ownerName } = userResults.rows.pop()
@@ -57,7 +57,7 @@ export async function getFeeds (fastify, opts) {
         const resultsWithDefaults = feedsResults.rows.map(feed => getFeedWithDefaults({ feed, ownerName, transport, host }))
 
         return {
-          data: resultsWithDefaults
+          data: resultsWithDefaults,
         }
       })
     })

@@ -8,7 +8,7 @@ export const archiveTitle = Component(
     {
       archive: { id, url, title, site_name, length, excerpt, languange, byline, direction, error, ready } = {},
       small,
-      big
+      big,
     } = {}
   ) => {
     const href = small === true
@@ -17,7 +17,7 @@ export const archiveTitle = Component(
 
     return html`
     <div class="${cn({
-      'bc-archives-title-container-small': small
+      'bc-archives-title-container-small': small,
     })}">
       <div class='bc-archives-title-container'>
         ${

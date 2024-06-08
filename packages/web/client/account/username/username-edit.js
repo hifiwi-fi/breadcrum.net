@@ -15,7 +15,7 @@ export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
     const username = form.username.value
 
     const formState = {
-      username
+      username,
     }
 
     try {

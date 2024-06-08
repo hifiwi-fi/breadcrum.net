@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password-hash.js'
 import { userEditableUserProps } from '../user-props.js'
@@ -10,8 +9,8 @@ export async function postPassword (fastify, opts) {
       config: {
         rateLimit: {
           max: 5,
-          timeWindow: '1 minute'
-        }
+          timeWindow: '1 minute',
+        },
       },
       schema: {
         body: {
@@ -21,26 +20,26 @@ export async function postPassword (fastify, opts) {
             token: {
               type: 'string',
               minLength: 64,
-              maxLength: 64
+              maxLength: 64,
             },
             userId: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['password', 'token']
-        }
+          required: ['password', 'token'],
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
-            }
-          }
-        }
-      }
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     async function postEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -71,7 +70,7 @@ export async function postPassword (fastify, opts) {
         const updates = [
           SQL`password = ${getPasswordHashQuery(password)}`,
           SQL`password_reset_token = null`,
-          SQL`password_reset_token_exp = null`
+          SQL`password_reset_token_exp = null`,
         ]
 
         const updateQuery = SQL`
@@ -89,14 +88,14 @@ export async function postPassword (fastify, opts) {
             username: user.username,
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
-            email: user.email
-          })
+            email: user.email,
+          }),
         })
 
         await client.query('commit')
         reply.code(202)
         reply.send({
-          status: 'ok'
+          status: 'ok',
         })
 
         await reply

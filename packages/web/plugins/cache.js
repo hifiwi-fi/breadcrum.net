@@ -25,8 +25,8 @@ import abstractCacheRedis from 'abstract-cache-redis'
  */
 export default fp(async function (fastify, _) {
   const cache = abstractCacheRedis({
-    // eslint-disable-next-line dot-notation
-    client: fastify.redis['cache']
+
+    client: fastify.redis['cache'],
   })
 
   /**
@@ -40,7 +40,7 @@ export default fp(async function (fastify, _) {
     episodeId,
     sourceUrl,
     type,
-    medium
+    medium,
   }) {
     return [
       'file',
@@ -48,7 +48,7 @@ export default fp(async function (fastify, _) {
       episodeId,
       sourceUrl,
       type,
-      medium
+      medium,
     ].join(':')
   }
 
@@ -75,7 +75,7 @@ export default fp(async function (fastify, _) {
     set ({ userId, episodeId, sourceUrl, type, medium }, value) {
       const key = getFileKey({ userId, episodeId, sourceUrl, type, medium })
       return cache.set(key, value, urlCacheTtl)
-    }
+    },
   })
 
   /**
@@ -87,13 +87,13 @@ export default fp(async function (fastify, _) {
   function getYTDLPMetaKey ({
     url,
     medium,
-    attempt = 0
+    attempt = 0,
   }) {
     return [
       'meta',
       url,
       medium,
-      attempt
+      attempt,
     ].join(':')
   }
 
@@ -118,9 +118,9 @@ export default fp(async function (fastify, _) {
     set ({ url, medium, attempt }, value) {
       const key = getYTDLPMetaKey({ url, medium, attempt })
       return cache.set(key, value, ytdlpTtl)
-    }
+    },
   })
 }, {
   name: 'cache',
-  dependencies: ['redis']
+  dependencies: ['redis'],
 })

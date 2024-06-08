@@ -26,9 +26,9 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
     await fetch(endpoint, {
       method: 'put',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     })
 
     reload()
@@ -39,8 +39,8 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
     await fetch(`${state.apiUrl}/episodes/${episode.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json'
-      }
+        'accept-encoding': 'application/json',
+      },
     })
 
     setDeleted(true)
@@ -57,12 +57,12 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
             onSave: handleSave,
             onDeleteEpisode: handleDeleteEpisode,
             onCancelEdit: handleCancelEdit,
-            legend: html`edit: <code>${episode?.id}</code>`
+            legend: html`edit: <code>${episode?.id}</code>`,
           })
         : episodeView({
             episode,
             onEdit: handleEdit,
-            clickForPreview
+            clickForPreview,
           })
     }
   </div>`

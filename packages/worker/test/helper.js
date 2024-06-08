@@ -33,5 +33,5 @@ async function build (t) {
 
 export {
   config,
-  build
+  build,
 }

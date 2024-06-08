@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { fullFeedProps } from '../../feed-props.js'
 import { getOrCreateDefaultFeed } from '../default-feed-query.js'
 import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
@@ -9,9 +8,9 @@ export async function getDefaultFeedDetails (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         response: {
@@ -21,13 +20,13 @@ export async function getDefaultFeedDetails (fastify, opts) {
               data: {
                 type: 'object',
                 properties: {
-                  ...fullFeedProps
-                }
-              }
-            }
-          }
-        }
-      }
+                  ...fullFeedProps,
+                },
+              },
+            },
+          },
+        },
+      },
     },
 
     async function getDefaultFeedDetailsHandler (request, reply) {
@@ -39,7 +38,7 @@ export async function getDefaultFeedDetails (fastify, opts) {
         request,
         reply,
         userId,
-        feedId
+        feedId,
       })
     })
 }

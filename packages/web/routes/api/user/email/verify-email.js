@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
 import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 
@@ -15,35 +14,35 @@ export async function verifyEmail (fastify, opts) {
             token: {
               type: 'string',
               minLength: 64,
-              maxLength: 64
+              maxLength: 64,
             },
             update: {
-              type: 'boolean'
-            }
+              type: 'boolean',
+            },
           },
-          required: ['token', 'update']
-        }
+          required: ['token', 'update'],
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
+              type: 'string',
             },
             email: {
               type: 'string',
-              format: 'email'
+              format: 'email',
             },
             updated: {
-              type: 'boolean'
+              type: 'boolean',
             },
             confirmed: {
-              type: 'boolean'
-            }
-          }
-        }
-      }
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     async function verifyEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -57,7 +56,7 @@ export async function verifyEmail (fastify, opts) {
             client,
             reply,
             token,
-            now
+            now,
           })
         } else {
           return await verifyEmailConfirmHandler({
@@ -65,7 +64,7 @@ export async function verifyEmail (fastify, opts) {
             client,
             token,
             reply,
-            now
+            now,
           })
         }
       })

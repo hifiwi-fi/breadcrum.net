@@ -5,37 +5,28 @@
   "version": "0.0.0",
   "scripts": {
     "test": "run-s test:*",
-    "test:standard": "standard --verbose | snazzy",
-    "test:tap": "tap"
+    "test:eslint": "eslint .",
+    "test-skip:tap": "tap"
+  },
+  "dependencies": {
+    "@nearform/sql": "^1.10.5",
+    "undici": "^6.16.0"
   },
   "devDependencies": {
     "@types/node": "^20.5.2",
     "@voxpelli/tsconfig": "^12.0.0",
     "npm-run-all2": "^6.0.0",
-    "snazzy": "^9.0.0",
-    "standard": "^17.0.0",
+    "neostandard": "^0.6.0",
     "tap": "^19.0.0",
     "typescript": "~5.5.0-beta"
   },
-  "standard": {
-    "ignore": [
-      "public"
-    ]
-  },
   "tap": {
-    "serial": [
-      "test",
-      "routes"
-    ],
+    "serial": [],
     "typecheck": false,
     "allow-incomplete-coverage": true,
     "coverage-report": [
       "text",
       "lcovonly"
     ]
-  },
-  "dependencies": {
-    "@nearform/sql": "^1.10.5",
-    "undici": "^6.16.0"
   }
 }

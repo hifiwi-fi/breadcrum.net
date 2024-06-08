@@ -17,7 +17,7 @@ export function makeEpisodeWorker ({ fastify }) {
   /** @type {Processor} */
   async function episodeWorker (job, token) {
     const log = logger.child({
-      jobId: job.id
+      jobId: job.id,
     })
 
     const {
@@ -25,7 +25,7 @@ export function makeEpisodeWorker ({ fastify }) {
       bookmarkTitle,
       episodeId,
       url,
-      medium
+      medium,
     } = job.data
 
     await fastify.pg.transact(async client => {
@@ -37,7 +37,7 @@ export function makeEpisodeWorker ({ fastify }) {
           medium,
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
           attempt: job.attemptsMade,
-          cache: fastify.ytdlpCache
+          cache: fastify.ytdlpCache,
         })
 
         if (metadata.live_status === 'is_upcoming' && metadata.release_timestamp) {

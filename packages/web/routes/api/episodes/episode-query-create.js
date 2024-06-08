@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
 
@@ -8,7 +7,7 @@ export async function createEpisode ({
   bookmarkId,
   type,
   medium,
-  url
+  url,
 }) {
   const defaultFeedId = await getOrCreateDefaultFeed({ client, userId })
 

@@ -23,9 +23,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/user/email/unsubscribe?email=${email}`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       })
 
       if (response.ok) {

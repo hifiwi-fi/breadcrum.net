@@ -10,11 +10,11 @@ export async function getFlags (fastify, opts) {
           200: {
             type: 'object',
             properties: {
-              ...defaultFrontendFlags
-            }
-          }
-        }
-      }
+              ...defaultFrontendFlags,
+            },
+          },
+        },
+      },
     },
     // Get flags
     async function getFlagsHandler (request, reply) {

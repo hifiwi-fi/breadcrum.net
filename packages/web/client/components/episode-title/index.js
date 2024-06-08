@@ -7,7 +7,7 @@ export const episodeTitle = Component(
   (
     {
       episode: { id, url, error, ready, type, medium, display_title } = {},
-      small
+      small,
     } = {}
   ) => {
     const href = small === true
@@ -17,7 +17,7 @@ export const episodeTitle = Component(
     return html`
     <div class="${cn({
       'bc-episode-title-container': true,
-      'bc-episode-title-container-small': small
+      'bc-episode-title-container-small': small,
     })}">
         ${
           error

@@ -12,30 +12,30 @@ export default fp(async function (fastify, _) {
   const staticOpts = {
     redirect: true,
     maxAge: fastify.config.ENV === 'production' ? 600000 : 0,
-    lastModified: true
+    lastModified: true,
   }
 
   fastify.register(import('@fastify/static'), {
     root: path.join(__dirname, '../public'),
     prefix: '/',
-    ...staticOpts
+    ...staticOpts,
   })
 
   // Admin Routes auth protection
   fastify.register(async function (fastify, _) {
     fastify.addHook('preHandler', fastify.auth([
       fastify.verifyJWT,
-      fastify.verifyAdmin
+      fastify.verifyAdmin,
     ], {
-      relation: 'and'
+      relation: 'and',
     }))
     fastify.register(import('@fastify/static'), {
       root: path.join(__dirname, '../public/admin'),
       prefix: '/',
-      ...staticOpts
+      ...staticOpts,
     })
   }, { prefix: '/admin' })
 }, {
   name: 'static',
-  dependencies: ['compress', 'auth', 'jwt', 'helmet']
+  dependencies: ['compress', 'auth', 'jwt', 'helmet'],
 })

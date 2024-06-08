@@ -37,7 +37,7 @@ export function archivePropsQuery ({
   before,
   after,
   query,
-  includeRank
+  includeRank,
 }) {
   return SQL`
     select
@@ -119,7 +119,7 @@ export function getArchivesQuery ({
   starred,
   ready,
   perPage,
-  fullArchives
+  fullArchives,
 }) {
   const archivesQuery = SQL`
     with archive_page as (
@@ -133,7 +133,7 @@ export function getArchivesQuery ({
         archiveId,
         bookmarkId,
         before,
-        after
+        after,
         })
       }
       order by ${after

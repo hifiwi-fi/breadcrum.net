@@ -15,7 +15,7 @@ export const bookmarkEdit = Component(({
   onSave,
   onDeleteBookmark,
   onCancelEdit,
-  legend
+  legend,
 } = {}) => {
   const window = useWindow()
   const state = useLSP()
@@ -53,9 +53,9 @@ export const bookmarkEdit = Component(({
         searchParams.set('medium', form.episodeMedium.value)
         const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
           headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
           },
-          signal: controller.signal
+          signal: controller.signal,
         })
 
         if (response.ok) {
@@ -192,7 +192,7 @@ export const bookmarkEdit = Component(({
       ? {
           type: 'redirect',
           medium: episodeMedium,
-          url: episodeURL
+          url: episodeURL,
         }
       : null
 
@@ -207,7 +207,7 @@ export const bookmarkEdit = Component(({
       sensitive,
       archive_urls,
       createArchive,
-      createEpisode
+      createEpisode,
     }
 
     try {
@@ -394,7 +394,7 @@ export const bookmarkEdit = Component(({
 
         <div class="${cn({
           'bc-create-episode-details': true,
-          'bc-create-episode-hidden': !createEpisodeChecked
+          'bc-create-episode-hidden': !createEpisodeChecked,
         })}">
           <div id="bc-podcast-radio">
             <label>
@@ -426,7 +426,7 @@ export const bookmarkEdit = Component(({
 
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
-            'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked
+            'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked,
           })}" type="url" name="createEpisodeURL" value="${b?.url}">
 
           ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}

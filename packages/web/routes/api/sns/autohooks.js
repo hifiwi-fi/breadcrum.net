@@ -4,7 +4,7 @@ export default async function (fastify, opts) {
   // Add basic auth for feed and feed episode routes
   fastify.register(import('@fastify/basic-auth'), {
     validate,
-    authenticate: true
+    authenticate: true,
   })
 
   async function validate (snsUser, snsPass, request, reply) {

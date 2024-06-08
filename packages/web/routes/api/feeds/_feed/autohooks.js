@@ -4,7 +4,7 @@ export default async function (fastify, opts) {
   // Add basic auth for feed and feed episode routes
   fastify.register(import('@fastify/basic-auth'), {
     validate,
-    authenticate: true
+    authenticate: true,
   })
 
   fastify.decorateRequest('feedTokenUser', null)
@@ -28,7 +28,7 @@ export default async function (fastify, opts) {
     if (results.rowCount === 1) {
       request.feedTokenUser = {
         userId: uuid,
-        token
+        token,
       }
     } else {
       throw new Error('Unauthorized feed token')

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export async function deleteEpisode (fastify, opts) {
@@ -8,11 +7,11 @@ export async function deleteEpisode (fastify, opts) {
       params: {
         type: 'object',
         properties: {
-          episode_id: { type: 'string', format: 'uuid' }
+          episode_id: { type: 'string', format: 'uuid' },
         },
-        required: ['episode_id']
-      }
-    }
+        required: ['episode_id'],
+      },
+    },
   },
   async function deleteEpisodeHandler (request, reply) {
     const ownerId = request.user.id
@@ -31,7 +30,7 @@ export async function deleteEpisode (fastify, opts) {
     fastify.metrics.episodeDeleteCounter.inc()
 
     return {
-      status: 'ok'
+      status: 'ok',
     }
   })
 }

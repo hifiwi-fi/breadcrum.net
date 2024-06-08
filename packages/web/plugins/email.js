@@ -31,11 +31,11 @@ export default fp(async function (fastify, _) {
       secure: fastify.config.SMTP_SECURE,
       auth: {
         user: fastify.config.SMTP_USER,
-        pass: fastify.config.SMTP_PASS
+        pass: fastify.config.SMTP_PASS,
       },
       // @ts-ignore
       logger: fastify.log,
-      pool: false // Throws errors when the pool times out
+      pool: false, // Throws errors when the pool times out
     }
     transport = nodemailer.createTransport(opts)
   }
@@ -67,7 +67,7 @@ export default fp(async function (fastify, _) {
     async function sendEmail ({
       toEmail,
       subject,
-      text
+      text,
     }) {
       if (transport) {
       // If A transport is configured
@@ -86,8 +86,8 @@ export default fp(async function (fastify, _) {
               text: addUnsubscribeLine({ text, toEmail }),
               headers: {
                 'List-Unsubscribe': `<${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/user/email/unsubscribe?email=${toEmail}>`,
-                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
-              }
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+              },
             })
             fastify.log.info({ results }, `Sent email: ${toEmail}`)
             return results
@@ -105,5 +105,5 @@ export default fp(async function (fastify, _) {
     })
 }, {
   name: 'email',
-  dependencies: ['env', 'pg']
+  dependencies: ['env', 'pg'],
 })

@@ -7,10 +7,10 @@ import fp from 'fastify-plugin'
  */
 export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/rate-limit'), {
-    // eslint-disable-next-line dot-notation
-    redis: fastify.redis['cache']
+
+    redis: fastify.redis['cache'],
   })
 }, {
   name: 'rateLimit',
-  dependencies: ['redis']
+  dependencies: ['redis'],
 })

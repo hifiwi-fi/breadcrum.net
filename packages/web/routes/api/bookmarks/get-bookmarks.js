@@ -13,42 +13,42 @@ export async function getBookmarks (fastify, opts) {
           properties: {
             before: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             after: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 200,
-              default: 20
+              default: 20,
             },
             url: {
               type: 'string',
-              format: 'uri'
+              format: 'uri',
             },
             tag: {
-              type: 'string', minLength: 1, maxLength: 255
+              type: 'string', minLength: 1, maxLength: 255,
             },
             sensitive: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             starred: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             toread: {
               type: 'boolean',
-              default: false
-            }
+              default: false,
+            },
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after', 'url'] } }] },
-            after: { allOf: [{ not: { required: ['before', 'url'] } }] }
-          }
+            after: { allOf: [{ not: { required: ['before', 'url'] } }] },
+          },
         },
         response: {
           200: {
@@ -59,9 +59,9 @@ export async function getBookmarks (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullBookmarkPropsWithEpisodes
-                  }
-                }
+                    ...fullBookmarkPropsWithEpisodes,
+                  },
+                },
               },
               pagination: {
                 type: 'object',
@@ -69,14 +69,14 @@ export async function getBookmarks (fastify, opts) {
                   before: { type: 'string', format: 'date-time' },
                   after: { type: 'string', format: 'date-time' },
                   top: { type: 'boolean' },
-                  bottom: { type: 'boolean' }
-                }
-              }
-            }
-          }
-        }
+                  bottom: { type: 'boolean' },
+                },
+              },
+            },
+          },
+        },
 
-      }
+      },
     },
     // Get Bookmarks
     async function getBookmarksHandler (request, reply) {
@@ -89,7 +89,7 @@ export async function getBookmarks (fastify, opts) {
         tag,
         sensitive,
         starred,
-        toread
+        toread,
       } = request.query
 
       const bookmarkQuery = getBookmarksQuery({
@@ -101,7 +101,7 @@ export async function getBookmarks (fastify, opts) {
         sensitive,
         starred,
         toread,
-        perPage: perPage + 1
+        perPage: perPage + 1,
       })
 
       const results = await fastify.pg.query(bookmarkQuery)
@@ -132,8 +132,8 @@ export async function getBookmarks (fastify, opts) {
           before: nextPage,
           after: prevPage,
           top,
-          bottom
-        }
+          bottom,
+        },
       }
 
       return response

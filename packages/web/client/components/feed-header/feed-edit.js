@@ -1,12 +1,12 @@
 /* eslint-env browser */
-/* eslint-disable camelcase */
+
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 export const feedEdit = Component(({
   feed: f,
   onSave,
   onDeleteFeed,
   onCancelEdit,
-  legend
+  legend,
 } = {}) => {
   const [error, setError] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -47,7 +47,7 @@ export const feedEdit = Component(({
     const formState = {
       title,
       description,
-      explicit
+      explicit,
     }
 
     try {

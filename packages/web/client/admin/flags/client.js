@@ -34,9 +34,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
+          'accept-encoding': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -78,9 +78,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {
         method: 'put',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       })
 
       if (response.ok) {
@@ -109,7 +109,7 @@ export const page = Component(() => {
                 flag,
                 flagMeta,
                 serverValue: serverFlags?.[flag],
-                disabled: serverFlagsLoading
+                disabled: serverFlagsLoading,
               })}`
             })
           }
@@ -131,7 +131,7 @@ function flagEntry ({
   flag,
   flagMeta,
   serverValue,
-  disabled
+  disabled,
 }) {
   return html`
   <div>

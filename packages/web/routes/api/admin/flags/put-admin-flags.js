@@ -4,7 +4,7 @@ import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
 
 const defaultFlags = {
   ...defaultFrontendFlags,
-  ...defaultBackendFlags
+  ...defaultBackendFlags,
 }
 
 export async function putAdminFlags (fastify, opts) {
@@ -13,9 +13,9 @@ export async function putAdminFlags (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
@@ -23,22 +23,22 @@ export async function putAdminFlags (fastify, opts) {
           type: 'object',
           properties: defaultFlags,
           additionalProperties: false,
-          minProperties: 1
+          minProperties: 1,
         },
         response: {
           200: {
             type: 'object',
             properties: {
               updateCount: {
-                type: 'integer'
+                type: 'integer',
               },
               deleteCount: {
-                type: 'integer'
-              }
-            }
-          }
-        }
-      }
+                type: 'integer',
+              },
+            },
+          },
+        },
+      },
     },
     // Get flags
     async function putAdminFlagsHandler (request, reply) {
@@ -52,7 +52,7 @@ export async function putAdminFlags (fastify, opts) {
             const value = requestFlags[flag]
             updateFlags.push({
               flag,
-              value
+              value,
             })
           } else {
             deleteFlags.push(flag)
@@ -61,7 +61,7 @@ export async function putAdminFlags (fastify, opts) {
 
         const returnStats = {
           updateCount: 0,
-          deleteCount: 0
+          deleteCount: 0,
         }
 
         if (updateFlags.length > 0) {

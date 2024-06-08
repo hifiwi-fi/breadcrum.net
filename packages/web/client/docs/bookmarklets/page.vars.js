@@ -1,3 +1,3 @@
 export default {
-  title: '📑️ Docs > Bookmarklets'
+  title: '📑️ Docs > Bookmarklets',
 }

@@ -6,6 +6,6 @@ export default async function episodeRoutes (fastify, opts) {
   await Promise.all([
     getEpisode(fastify, opts),
     putEpisode(fastify, opts),
-    deleteEpisode(fastify, opts)
+    deleteEpisode(fastify, opts),
   ])
 }

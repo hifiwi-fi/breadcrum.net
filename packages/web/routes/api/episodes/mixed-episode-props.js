@@ -7,13 +7,13 @@ export const fullEpisodePropsWithBookmarkAndFeed = {
   bookmark: {
     type: 'object',
     properties: {
-      ...fullBookmarkProps
-    }
+      ...fullBookmarkProps,
+    },
   },
   podcast_feed: {
     type: 'object',
     properties: {
-      ...fullFeedProps
-    }
-  }
+      ...fullFeedProps,
+    },
+  },
 }

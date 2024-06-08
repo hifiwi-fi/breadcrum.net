@@ -7,8 +7,8 @@ export default async function snsRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.basicAuth]),
       schema: {
-        hide: true
-      }
+        hide: true,
+      },
     },
     async function postSNSHandler (request, reply) {
       const data = request.body
@@ -36,19 +36,19 @@ export default async function snsRoutes (fastify, opts) {
           statusCode,
           headers,
           trailers,
-          body
+          body,
         } = await undiciRequest(data.SubscribeURL, { autoSelectFamily: true })
         fastify.log.info({
           statusCode,
           headers,
           textBody: await body.text(),
-          trailers
+          trailers,
         })
       } else if (data.Type === 'Notification') {
         switch (data.Message?.notificationType) {
           case 'Bounce': {
             fastify.log.info({
-              ...data.Message?.bounce
+              ...data.Message?.bounce,
             }, 'Bounced email')
 
             if (data.Message?.bounce?.bounceType === 'Permanent') {

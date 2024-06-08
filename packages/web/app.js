@@ -22,7 +22,7 @@ export default async function App (fastify, opts) {
     dir: join(__dirname, 'plugins'),
     dirNameRoutePrefix: false,
     ignorePattern: testPattern,
-    options: Object.assign({}, opts)
+    options: Object.assign({}, opts),
   })
 
   // This loads all plugins defined in routes
@@ -34,7 +34,7 @@ export default async function App (fastify, opts) {
     cascadeHooks: true,
     overwriteHooks: true,
     ignorePattern: testPattern,
-    options: Object.assign({}, opts)
+    options: Object.assign({}, opts),
   })
 }
 
@@ -44,7 +44,7 @@ const PinoLevelToSeverityLookup = /** @type {const} */ ({
   info: 'INFO',
   warn: 'WARNING',
   error: 'ERROR',
-  fatal: 'CRITICAL'
+  fatal: 'CRITICAL',
 })
 
 /**
@@ -63,7 +63,7 @@ export const options = {
   logger: {
     mixin () {
       return {
-        service: 'bc-web'
+        service: 'bc-web',
       }
     },
     messageKey: 'message',
@@ -74,9 +74,9 @@ export const options = {
             /** @type {keyof typeof PinoLevelToSeverityLookup} */
             (label)
           ] || PinoLevelToSeverityLookup.info,
-          levelN: number
+          levelN: number,
         }
-      }
-    }
-  }
+      },
+    },
+  },
 }

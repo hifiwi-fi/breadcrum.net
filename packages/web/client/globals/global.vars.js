@@ -17,7 +17,7 @@ const baseUrl = `${transport}://${host}`
 
 export const browser = {
   'process.env.TRANSPORT': transport,
-  'process.env.HOST': host
+  'process.env.HOST': host,
 }
 
 export default async () => {
@@ -34,6 +34,6 @@ export default async () => {
     authorImgAlt: 'Picture of author',
     transport,
     host,
-    baseUrl
+    baseUrl,
   }
 }

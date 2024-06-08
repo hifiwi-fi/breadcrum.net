@@ -8,38 +8,38 @@ export const schema = {
   properties: {
     ENV: {
       type: 'string',
-      default: 'development'
+      default: 'development',
     },
     METRICS: {
       type: 'integer', // 0 or 1
-      default: 1
+      default: 1,
     },
     HOST: {
       // Hostname and port (if needed)
       type: 'string',
-      default: 'localhost:3001'
+      default: 'localhost:3001',
     },
     TRANSPORT: {
       enum: ['http', 'https'],
-      default: 'http'
+      default: 'http',
     },
     DATABASE_URL: {
       type: 'string',
-      default: 'postgres://postgres@localhost/breadcrum'
+      default: 'postgres://postgres@localhost/breadcrum',
     },
     REDIS_CACHE_URL: {
       type: 'string',
-      default: 'redis://localhost:6379/1'
+      default: 'redis://localhost:6379/1',
     },
     REDIS_QUEUE_URL: {
       type: 'string',
-      default: 'redis://localhost:6379/2'
+      default: 'redis://localhost:6379/2',
     },
     YT_DLP_API_URL: {
       type: 'string',
-      default: 'http://user:pass@127.0.0.1:5000'
-    }
-  }
+      default: 'http://user:pass@127.0.0.1:5000',
+    },
+  },
 }
 
 /**
@@ -52,8 +52,8 @@ export default fp(async function (fastify, opts) {
     schema,
     dotenv: {
       path: resolve(import.meta.dirname, '../.env'),
-      debug: false
-    }
+      debug: false,
+    },
   })
 
   const __dirname = import.meta.dirname
@@ -61,5 +61,5 @@ export default fp(async function (fastify, opts) {
 
   fastify.decorate('pkg', pkg)
 }, {
-  name: 'env'
+  name: 'env',
 })

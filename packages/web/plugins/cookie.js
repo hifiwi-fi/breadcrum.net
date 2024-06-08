@@ -7,9 +7,9 @@ import fp from 'fastify-plugin'
  */
 export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/cookie'), {
-    secret: fastify.config.COOKIE_SECRET
+    secret: fastify.config.COOKIE_SECRET,
   })
 }, {
   name: 'cookie',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

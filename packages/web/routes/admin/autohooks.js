@@ -1,8 +1,8 @@
 export default async function (fastify, opts) {
   fastify.addHook('preHandler', fastify.auth([
     fastify.verifyJWT,
-    fastify.verifyAdmin
+    fastify.verifyAdmin,
   ], {
-    relation: 'and'
+    relation: 'and',
   }))
 }

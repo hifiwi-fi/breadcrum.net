@@ -11,14 +11,14 @@ export async function resolveBookmark ({
   title,
   tags,
   summary,
-  initialDocument
+  initialDocument,
 }) {
   const pg = fastify.pg
   log = log ?? fastify.log
 
   try {
     const metadata = await getSiteMetadata({
-      document: initialDocument
+      document: initialDocument,
     })
 
     log.info({ metadata, bookmarkId, url, title, tags, summary })
@@ -48,7 +48,7 @@ export async function resolveBookmark ({
         pg,
         userId,
         bookmarkId,
-        tags: metadata.tags
+        tags: metadata.tags,
       })
     }
 

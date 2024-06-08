@@ -24,7 +24,7 @@ export default fp(async function (fastify, _) {
     async function ({
       pgClient,
       frontend = true,
-      backend = true
+      backend = true,
     }) {
       const flagsQuery = SQL`
         select
@@ -41,7 +41,7 @@ export default fp(async function (fastify, _) {
 
       const flagset = {
         ...(frontend ? defaultFrontendFlags : {}),
-        ...(backend ? defaultBackendFlags : {})
+        ...(backend ? defaultBackendFlags : {}),
       }
 
       for (const [flag, flagProps] of Object.entries(flagset)) {
@@ -55,5 +55,5 @@ export default fp(async function (fastify, _) {
   )
 }, {
   name: 'flags',
-  dependencies: ['pg']
+  dependencies: ['pg'],
 })

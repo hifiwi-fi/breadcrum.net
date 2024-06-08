@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export const EMAIL_CONFIRM_TOKEN_EXP = SQL`now() + interval '7 days'`

@@ -14,7 +14,7 @@ export function getSearchArchivesQuery ({
   perPage,
   lastRank,
   lastId,
-  reverse = false // Add reverse argument, default to false
+  reverse = false, // Add reverse argument, default to false
 }) {
   const searchBookmarksQuery = SQL`
     ${archivePropsQuery({
@@ -24,7 +24,7 @@ export function getSearchArchivesQuery ({
       toread,
       starred,
       query,
-      includeRank: true
+      includeRank: true,
       })}
     and ar.tsv @@ plainto_tsquery('english', ${query})
     ${

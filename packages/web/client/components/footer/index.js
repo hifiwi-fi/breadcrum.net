@@ -5,7 +5,7 @@ import { Component, html } from 'uland-isomorphic'
  */
 export const footer = Component(({
   version,
-  mastodonUrl
+  mastodonUrl,
 }) => {
   return html`
   <footer class="bc-footer">

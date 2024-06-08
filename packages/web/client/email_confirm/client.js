@@ -35,9 +35,9 @@ export const page = Component(() => {
         const response = await fetch(`${state.apiUrl}/user/email:verify`, {
           method: 'post',
           headers: {
-            'content-type': 'application/json'
+            'content-type': 'application/json',
           },
-          body: JSON.stringify({ token, update })
+          body: JSON.stringify({ token, update }),
         })
 
         if (response.ok && response.status === 202) {

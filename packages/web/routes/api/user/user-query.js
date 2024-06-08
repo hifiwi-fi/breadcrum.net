@@ -1,7 +1,7 @@
 import SQL from '@nearform/sql'
 
 export function getUserQuery ({
-  userId
+  userId,
 }) {
   const query = SQL`
     select

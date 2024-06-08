@@ -1,4 +1,3 @@
-/* eslint-disable dot-notation */
 import fp from 'fastify-plugin'
 import SQL from '@nearform/sql'
 
@@ -27,7 +26,7 @@ export default fp(async function (fastify, _) {
     secret: fastify.config.JWT_SECRET,
     cookie: {
       cookieName: fastify.config.COOKIE_NAME,
-      signed: true
+      signed: true,
     },
     trusted: async (_, decodedToken) => {
       const query = SQL`
@@ -37,17 +36,17 @@ export default fp(async function (fastify, _) {
       `
       const results = await fastify.pg.query(query)
       return results.rowCount === 1
-    }
+    },
   })
 
   const jwtVerifyCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_jwt_verify_total',
-    help: 'The number of times a jwt token attempts verification'
+    help: 'The number of times a jwt token attempts verification',
   })
 
   const jwtVerifyFailCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_jwt_verify_fail_total',
-    help: 'The number of times a jwt token attempts verification'
+    help: 'The number of times a jwt token attempts verification',
   })
 
   fastify.decorate('verifyJWT',
@@ -70,7 +69,7 @@ export default fp(async function (fastify, _) {
 
   const jwtCreatedCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_jwt_created_total',
-    help: 'The number of times a jwt token is created'
+    help: 'The number of times a jwt token is created',
   })
 
   fastify.decorateReply('createJWTToken',
@@ -101,7 +100,7 @@ export default fp(async function (fastify, _) {
       /** @type {JwtUserWithTokenId} */
       const tokenBody = {
         ...user,
-        jti
+        jti,
       }
       const token = await this.jwtSign(tokenBody)
 
@@ -126,7 +125,7 @@ export default fp(async function (fastify, _) {
           secure: fastify.config.ENV !== 'development',
           sameSite: fastify.config.ENV !== 'development',
           httpOnly: true,
-          signed: true
+          signed: true,
         }
       )
     })
@@ -139,11 +138,11 @@ export default fp(async function (fastify, _) {
       this.clearCookie(
         fastify.config.COOKIE_NAME,
         {
-          path: '/'
+          path: '/',
         }
       )
     })
 }, {
   name: 'jwt',
-  dependencies: ['env', 'cookie', 'pg', 'prom']
+  dependencies: ['env', 'cookie', 'pg', 'prom'],
 })

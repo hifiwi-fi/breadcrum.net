@@ -36,7 +36,7 @@ export const getBookmarksQuery = ({
   starred,
   toread,
   perPage,
-  fullArchives
+  fullArchives,
 }) => {
   const boomkmarksQuery = SQL`
         with bookmark_page as (
@@ -102,7 +102,7 @@ export const getBookmarksQuery = ({
 }
 
 export function bookmarkTagsArray ({
-  ownerId
+  ownerId,
 }) {
   return SQL`
     select bm.id as bookmark_id, array_agg(t.name) as tag_array
@@ -118,7 +118,7 @@ export function bookmarkTagsArray ({
 }
 
 export function bookmarkEpisodesArray ({
-  ownerId
+  ownerId,
 }) {
   return SQL`
     select bm.id as bookmark_id, jsonb_strip_nulls(jsonb_agg(
@@ -158,7 +158,7 @@ export function bookmarkEpisodesArray ({
 
 export function bookmarkArchivesArray ({
   fullArchives,
-  ownerId
+  ownerId,
 }) {
   return SQL`
     select bm.id as bookmark_id, jsonb_strip_nulls(jsonb_agg(

@@ -3,12 +3,12 @@ import SQL from '@nearform/sql'
 import { verifyEmailBody } from '../user/email/resend-account-confirmation.js'
 import {
   EMAIL_CONFIRM_TOKEN,
-  EMAIL_CONFIRM_TOKEN_EXP
+  EMAIL_CONFIRM_TOKEN_EXP,
 } from '../user/email/email-confirm-tokens.js'
 import { getPasswordHashQuery } from '../user/password/password-hash.js'
 import {
   tokenWithUserProps,
-  userEditableUserProps
+  userEditableUserProps,
 } from '../user/user-props.js'
 import { resolveEmail } from 'resolve-email'
 
@@ -19,8 +19,8 @@ export default async function registerRoutes (fastify, opts) {
       config: {
         rateLimit: {
           max: 5,
-          timeWindow: '1 minute'
-        }
+          timeWindow: '1 minute',
+        },
       },
       schema: {
         body: {
@@ -29,33 +29,33 @@ export default async function registerRoutes (fastify, opts) {
             'username',
             'email',
             'password',
-            'newsletter_subscription'
+            'newsletter_subscription',
           ],
           properties: {
-            ...userEditableUserProps
-          }
+            ...userEditableUserProps,
+          },
         },
         response: {
           201: {
             type: 'object',
             properties: {
-              ...tokenWithUserProps
-            }
-          }
-        }
-      }
+              ...tokenWithUserProps,
+            },
+          },
+        },
+      },
     },
     async function (request, reply) {
       return fastify.pg.transact(async client => {
         const { registration } = await fastify.getFlags({
           pgClient: client,
           frontend: true,
-          backend: false
+          backend: false,
         })
         if (!registration) {
           reply.code(403)
           return {
-            error: 'Registration is closed. Please try again later.'
+            error: 'Registration is closed. Please try again later.',
           }
         }
         const { username, email, password, newsletter_subscription } = request.body
@@ -92,7 +92,7 @@ export default async function registerRoutes (fastify, opts) {
           email,
           emailResolves,
           mxRecords,
-          emailError
+          emailError,
         })
 
         if (!emailResolves) {
@@ -142,15 +142,15 @@ export default async function registerRoutes (fastify, opts) {
             username: user.username,
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
-            token: email_verify_token
-          })
+            token: email_verify_token,
+          }),
         })
 
         await client.query('commit')
         reply.code(201)
         reply.send({
           token,
-          user
+          user,
         })
 
         await reply

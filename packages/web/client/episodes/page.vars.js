@@ -1,4 +1,4 @@
 export default {
   title: '📼 Episodes',
-  noindex: true
+  noindex: true,
 }

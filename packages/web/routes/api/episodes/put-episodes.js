@@ -5,9 +5,9 @@ export async function putEpisodes (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         querystring: {
@@ -15,31 +15,31 @@ export async function putEpisodes (fastify, opts) {
           properties: {
             before: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             after: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 200,
-              default: 20
+              default: 20,
             },
             sensitive: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             feed_id: {
               type: 'string',
-              format: 'uri'
-            }
+              format: 'uri',
+            },
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after', 'url'] } }] },
-            after: { allOf: [{ not: { required: ['before', 'url'] } }] }
-          }
+            after: { allOf: [{ not: { required: ['before', 'url'] } }] },
+          },
         },
         response: {
           200: {
@@ -50,14 +50,14 @@ export async function putEpisodes (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    ...fullEpisodePropsWithBookmarkAndFeed,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function putEpisodesHandler (request, reply) {
       return reply.notImplemented()

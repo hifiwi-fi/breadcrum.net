@@ -1,9 +1,8 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-tokens.js'
 
 export async function resendAccountEmailVerificationHandler ({
-  userId, client, reply, fastify
+  userId, client, reply, fastify,
 }) {
   const verifyQuery = SQL`
           select id, email, username, email_confirmed, email_verify_token, email_verify_token_exp
@@ -21,7 +20,7 @@ export async function resendAccountEmailVerificationHandler ({
 
   const updates = [
     SQL`email_verify_token = ${EMAIL_CONFIRM_TOKEN}`,
-    SQL`email_verify_token_exp = ${EMAIL_CONFIRM_TOKEN_EXP}`
+    SQL`email_verify_token_exp = ${EMAIL_CONFIRM_TOKEN_EXP}`,
   ]
 
   const updateQuery = SQL`
@@ -42,14 +41,14 @@ export async function resendAccountEmailVerificationHandler ({
       transport: fastify.config.TRANSPORT,
       host: fastify.config.HOST,
       token: updatedUser.email_verify_token,
-      email: updatedUser.email
-    })
+      email: updatedUser.email,
+    }),
   })
 
   await client.query('commit')
   reply.code(202)
   reply.send({
-    status: 'ok'
+    status: 'ok',
   })
 
   await reply

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 import { commonArchiveProps } from '../archive-props.js'
@@ -7,28 +6,28 @@ export async function putArchive (fastify, opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,
-      fastify.notDisabled
+      fastify.notDisabled,
     ], {
-      relation: 'and'
+      relation: 'and',
     }),
     schema: {
       querystring: {},
       params: {
         type: 'object',
         properties: {
-          archive_id: { type: 'string', format: 'uuid' }
+          archive_id: { type: 'string', format: 'uuid' },
         },
-        required: ['archive_id']
+        required: ['archive_id'],
       },
       body: {
         type: 'object',
         properties: {
-          ...commonArchiveProps
+          ...commonArchiveProps,
         },
         minProperties: 1,
-        additionalProperties: false
-      }
-    }
+        additionalProperties: false,
+      },
+    },
   },
   async function putArchiveHandler (request, reply) {
     return fastify.pg.transact(async client => {
@@ -56,7 +55,7 @@ export async function putArchive (fastify, opts) {
       fastify.metrics.archiveEditCounter.inc()
 
       return {
-        status: 'ok'
+        status: 'ok',
       }
     })
   })

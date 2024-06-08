@@ -26,7 +26,7 @@ export const userTable = Component(({ users, reload, onDelete }) => {
         ${users.map(u => html.for(u, u.id)`${userRow({
           user: u,
           reload,
-          onDelete
+          onDelete,
         })}`)}
       </tbody>
     </table>

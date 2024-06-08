@@ -15,7 +15,7 @@ export const newsletterField = Component(({ user, reload }) => {
     const newSubscriptionState = !user.newsletter_subscription
 
     const formState = {
-      newsletter_subscription: newSubscriptionState
+      newsletter_subscription: newSubscriptionState,
     }
 
     try {
@@ -23,9 +23,9 @@ export const newsletterField = Component(({ user, reload }) => {
       const response = await fetch(endpoint, {
         method: 'put',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify(formState)
+        body: JSON.stringify(formState),
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {

@@ -18,9 +18,9 @@ export function useFlags () {
       const response = await fetch(`${state.apiUrl}/flags`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
+          'accept-encoding': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {

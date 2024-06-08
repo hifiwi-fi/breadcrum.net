@@ -69,9 +69,8 @@
     "mine.css": "^9.0.2",
     "npm-run-all2": "^6.0.0",
     "p-map": "^7.0.0",
-    "snazzy": "^9.0.0",
-    "standard": "^17.0.0",
     "tap": "^19.0.0",
+    "neostandard": "^0.6.0",
     "top-bun": "^7.0.0",
     "typescript": "~5.5.0-beta",
     "uland-isomorphic": "^2.0.0",
@@ -90,7 +89,7 @@
     "prod-sim": "fastify start -l info app.js --address 0.0.0.0",
     "start": "run-s watch",
     "test": "run-s test:*",
-    "test:standard": "standard --verbose | snazzy",
+    "test:eslint": "eslint . --ignore-pattern 'public/*'",
     "test:tap": "tap",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address localhost app.js",
@@ -99,11 +98,6 @@
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js",
     "generate-dbml": "npx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
-  },
-  "standard": {
-    "ignore": [
-      "public"
-    ]
   },
   "tap": {
     "serial": [

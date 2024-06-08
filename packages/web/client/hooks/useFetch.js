@@ -6,7 +6,7 @@ export function useFetch (url, options) {
 
   const initialState = {
     error: undefined,
-    data: undefined
+    data: undefined,
   }
 
   const reducer = (state, action) => {

@@ -2,11 +2,11 @@ export const defaultFrontendFlags = /** @type {const} */ {
   registration: {
     type: 'boolean',
     default: false,
-    description: 'Enable or disable user registration'
+    description: 'Enable or disable user registration',
   },
   registration_invite_required: {
     type: 'boolean',
     default: false,
-    description: 'Require an invite code to register'
-  }
+    description: 'Require an invite code to register',
+  },
 }

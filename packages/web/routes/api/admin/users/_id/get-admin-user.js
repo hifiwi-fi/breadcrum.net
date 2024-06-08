@@ -7,33 +7,33 @@ export async function getAdminUser (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
         params: {
           type: 'object',
           properties: {
-            id: { type: 'string', format: 'uuid' }
+            id: { type: 'string', format: 'uuid' },
           },
-          required: ['id']
+          required: ['id'],
         },
         response: {
           200: {
             type: 'object',
-            properties: fullSerializedAdminUserProps
-          }
-        }
-      }
+            properties: fullSerializedAdminUserProps,
+          },
+        },
+      },
     },
     // GET user with administrative fields
     async function getAdminUserHandler (request, reply) {
       const { id: userId } = request.params
 
       const query = getAdminUsersQuery({
-        userId
+        userId,
       })
 
       const results = await fastify.pg.query(query)

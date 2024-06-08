@@ -7,7 +7,7 @@ export async function resolveArchive ({
   userId,
   archiveId,
   url,
-  initialDocument
+  initialDocument,
 }) {
   const pg = fastify.pg
   log = log ?? fastify.log

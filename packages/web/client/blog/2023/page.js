@@ -6,7 +6,7 @@
 export const vars = {
   title: 'All 2023 Blog Posts',
   layout: 'blog-auto-index',
-  noindex: true
+  noindex: true,
 }
 
 /**

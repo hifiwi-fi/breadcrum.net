@@ -6,20 +6,20 @@ export async function deleteAdminUser (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
         params: {
           type: 'object',
           properties: {
-            id: { type: 'string', format: 'uuid' }
+            id: { type: 'string', format: 'uuid' },
           },
-          required: ['id']
-        }
-      }
+          required: ['id'],
+        },
+      },
     },
     // DELETE user as an admin
     async function deleteAdminUserHandler (request, reply) {
@@ -38,7 +38,7 @@ export async function deleteAdminUser (fastify, opts) {
       await fastify.pg.query(query)
 
       return {
-        status: 'ok'
+        status: 'ok',
       }
     }
   )

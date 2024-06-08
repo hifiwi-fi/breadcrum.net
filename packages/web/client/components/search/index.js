@@ -1,5 +1,5 @@
 /* eslint-env browser */
-/* eslint-disable camelcase */
+
 import { Component, html, useCallback } from 'uland-isomorphic'
 // import cn from 'classnames'
 
@@ -7,7 +7,7 @@ export const search = Component(
   ({
     placeholder = 'Search...',
     value,
-    onSearch = (query) => {}
+    onSearch = (query) => {},
   }) => {
     const handleSearch = useCallback((ev) => {
       ev.preventDefault()

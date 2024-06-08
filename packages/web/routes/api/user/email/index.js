@@ -8,6 +8,6 @@ export default async function bookmarksRoutes (fastify, opts) {
     resendEmailVerification(fastify, opts),
     verifyEmail(fastify, opts),
     postEmail(fastify, opts),
-    deleteEmail(fastify, opts)
+    deleteEmail(fastify, opts),
   ])
 }

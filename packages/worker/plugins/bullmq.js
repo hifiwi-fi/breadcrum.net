@@ -10,7 +10,7 @@ import { makeDocumentWorker } from '../workers/document-processor/index.js'
 export default fp(async function (fastify, opts) {
   const defautOpts = {
     connection: fastify.redis.bullmq,
-    autorun: false
+    autorun: false,
   }
 
   // Running both workers in a single process
@@ -28,7 +28,7 @@ export default fp(async function (fastify, opts) {
 
   const workers = {
     createEpisodeWorker,
-    resolveDocumentWorker
+    resolveDocumentWorker,
   }
 
   fastify.decorate('workers', workers)
@@ -41,7 +41,7 @@ export default fp(async function (fastify, opts) {
     worker.on('failed', (job, error) => {
       fastify.log.warn({
         job,
-        error
+        error,
       }, 'Job failed')
     })
   })
@@ -65,5 +65,5 @@ export default fp(async function (fastify, opts) {
   })
 },
 {
-  dependencies: ['env', 'redis']
+  dependencies: ['env', 'redis'],
 })

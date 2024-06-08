@@ -3,7 +3,7 @@ import SQL from '@nearform/sql'
 
 export async function getOrCreateDefaultFeed ({
   client,
-  userId
+  userId,
 }) {
   const getDefaultFeed = SQL`
     SELECT default_podcast_feed_id

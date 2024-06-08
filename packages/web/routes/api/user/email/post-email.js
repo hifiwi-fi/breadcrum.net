@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
 import { userEditableUserProps } from '../user-props.js'
@@ -13,31 +12,31 @@ export async function postEmail (fastify, opts) {
       config: {
         rateLimit: {
           max: 5,
-          timeWindow: '1 minute'
-        }
+          timeWindow: '1 minute',
+        },
       },
       schema: {
         body: {
           type: 'object',
           properties: {
-            email: userEditableUserProps.email
+            email: userEditableUserProps.email,
           },
-          required: ['email']
-        }
+          required: ['email'],
+        },
       },
       respose: {
         202: {
           type: 'object',
           properties: {
             status: {
-              type: 'string'
+              type: 'string',
             },
             oldEmail: { type: 'string', format: 'email' },
             newEmail: { type: 'string', format: 'email' },
-            message: { type: 'string ' }
-          }
-        }
-      }
+            message: { type: 'string ' },
+          },
+        },
+      },
     },
     async function postEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -64,7 +63,7 @@ export async function postEmail (fastify, opts) {
           email,
           emailResolves,
           mxRecords,
-          emailError
+          emailError,
         })
 
         if (!emailResolves) {
@@ -74,7 +73,7 @@ export async function postEmail (fastify, opts) {
         const updates = [
           SQL`pending_email_update = ${email}`,
           SQL`pending_email_update_token = ${EMAIL_CONFIRM_TOKEN}`,
-          SQL`pending_email_update_token_exp = ${EMAIL_CONFIRM_TOKEN_EXP}`
+          SQL`pending_email_update_token_exp = ${EMAIL_CONFIRM_TOKEN_EXP}`,
         ]
 
         const updateQuery = SQL`
@@ -97,8 +96,8 @@ export async function postEmail (fastify, opts) {
             transport: fastify.config.TRANSPORT,
             token: updatedUser.pending_email_update_token,
             oldEmail: updatedUser.email,
-            newEmail: updatedUser.pending_email_update
-          })
+            newEmail: updatedUser.pending_email_update,
+          }),
         })
 
         const notifyEmailSendJob = fastify.sendEmail({
@@ -109,8 +108,8 @@ export async function postEmail (fastify, opts) {
             host: fastify.config.HOST,
             transport: fastify.config.TRANSPORT,
             oldEmail: updatedUser.email,
-            newEmail: updatedUser.pending_email_update
-          })
+            newEmail: updatedUser.pending_email_update,
+          }),
         })
 
         await client.query('commit')
@@ -119,7 +118,7 @@ export async function postEmail (fastify, opts) {
           status: 'ok',
           oldEmail: updatedUser.email,
           newEmail: updatedUser.pending_email_update,
-          message: 'The newEmail will replace the active oldEmail after the user clicks the confirmation link sent to their newEmail addreess.'
+          message: 'The newEmail will replace the active oldEmail after the user clicks the confirmation link sent to their newEmail addreess.',
         })
 
         await reply
@@ -127,7 +126,7 @@ export async function postEmail (fastify, opts) {
 
         await Promise.all([
           verifyEmailSendJob,
-          notifyEmailSendJob
+          notifyEmailSendJob,
         ])
       })
     }

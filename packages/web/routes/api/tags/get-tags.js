@@ -11,10 +11,10 @@ export async function getTags (fastify, opts) {
           properties: {
             sensitive: {
               type: 'boolean',
-              default: false
-            }
-          }
-        }
+              default: false,
+            },
+          },
+        },
       },
       response: {
         200: {
@@ -26,13 +26,13 @@ export async function getTags (fastify, opts) {
                 type: 'object',
                 properties: {
                   name: { type: 'string' },
-                  count: { type: 'integer' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  count: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function getTagsHandler (request, reply) {
       const userId = request.user.id
@@ -52,7 +52,7 @@ export async function getTags (fastify, opts) {
       const results = await fastify.pg.query(query)
 
       return {
-        data: results.rows
+        data: results.rows,
       }
     }
   )

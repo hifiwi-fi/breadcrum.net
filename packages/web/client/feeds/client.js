@@ -73,9 +73,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/episodes?${pageParams.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
+          'accept-encoding': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -130,9 +130,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}${requestURL}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
+          'accept-encoding': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -162,9 +162,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/feeds/`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json'
+          'accept-encoding': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -210,7 +210,7 @@ export const page = Component(() => {
   return html`
   ${search({
     placeholder: 'Search Feed...',
-    onSearch: handleSearch
+    onSearch: handleSearch,
   })}
   <div>
     ${feedHeader({ feed, feeds, reload: reloadFeed, loading: feedLoading && feedsLoading })}

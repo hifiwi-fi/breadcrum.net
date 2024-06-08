@@ -15,48 +15,48 @@ export async function getEpisodes (fastify, opts) {
           properties: {
             before: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             after: {
               type: 'string',
-              format: 'date-time'
+              format: 'date-time',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 200,
-              default: 20
+              default: 20,
             },
             sensitive: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             feed_id: {
               type: 'string',
-              format: 'uri'
+              format: 'uri',
             },
             bookmark_id: {
               type: 'string',
-              format: 'uuid'
+              format: 'uuid',
             },
             default_feed: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             include_feed: {
               type: 'boolean',
-              default: false
+              default: false,
             },
             ready: {
-              type: 'boolean'
-            }
+              type: 'boolean',
+            },
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after', 'url'] } }] },
             after: { allOf: [{ not: { required: ['before', 'url'] } }] },
             feed_id: { allOf: [{ not: { required: ['default_feed'] } }] },
-            default_feed: { allOf: [{ not: { required: ['feed_id'] } }] }
-          }
+            default_feed: { allOf: [{ not: { required: ['feed_id'] } }] },
+          },
         },
         response: {
           200: {
@@ -67,9 +67,9 @@ export async function getEpisodes (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed
-                  }
-                }
+                    ...fullEpisodePropsWithBookmarkAndFeed,
+                  },
+                },
               },
               pagination: {
                 type: 'object',
@@ -77,13 +77,13 @@ export async function getEpisodes (fastify, opts) {
                   before: { type: 'string', format: 'date-time' },
                   after: { type: 'string', format: 'date-time' },
                   top: { type: 'boolean' },
-                  bottom: { type: 'boolean' }
-                }
-              }
-            }
-          }
-        }
-      }
+                  bottom: { type: 'boolean' },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function getEpisodesHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -95,7 +95,7 @@ export async function getEpisodes (fastify, opts) {
           per_page: perPage,
           sensitive,
           bookmark_id: bookmarkId,
-          ready
+          ready,
         } = request.query
 
         const feedId = request.query.feed_id ?? request.query.default_feed
@@ -111,7 +111,7 @@ export async function getEpisodes (fastify, opts) {
           perPage: perPage + 1,
           feedId,
           bookmarkId,
-          includeFeed: request.query.include_feed
+          includeFeed: request.query.include_feed,
         })
 
         const results = await fastify.pg.query(episodeQuery)
@@ -142,7 +142,7 @@ export async function getEpisodes (fastify, opts) {
               episode.podcast_feed = getFeedWithDefaults({
                 feed: episode.podcast_feed,
                 transport: fastify.config.TRANSPORT,
-                host: fastify.config.HOST
+                host: fastify.config.HOST,
               })
               return episode
             })
@@ -151,8 +151,8 @@ export async function getEpisodes (fastify, opts) {
             before: nextPage,
             after: prevPage,
             top,
-            bottom
-          }
+            bottom,
+          },
         }
       })
     }

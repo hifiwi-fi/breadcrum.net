@@ -17,12 +17,12 @@ export default async function * feedsTemplate (args) {
       transport,
       authorName,
       authorUrl,
-      authorImgUrl
+      authorImgUrl,
     },
-    pages
+    pages,
   } = args
   const blogPosts = pages
-    // eslint-disable-next-line dot-notation
+
     .filter(page => page.vars['layout'] === 'article')
     // @ts-ignore
     .sort((a, b) => new Date(b.vars.publishDate) - new Date(a.vars.publishDate))
@@ -39,7 +39,7 @@ export default async function * feedsTemplate (args) {
     author: {
       name: authorName,
       url: authorUrl,
-      avatar: authorImgUrl
+      avatar: authorImgUrl,
     },
     items: await pMap(blogPosts, async (page) => {
       return {
@@ -47,18 +47,18 @@ export default async function * feedsTemplate (args) {
         title: page.vars.title,
         url: `${baseUrl}/${page.pageInfo.path}/`,
         id: `${baseUrl}/${page.pageInfo.path}/#${page.vars.publishDate}`,
-        content_html: await page.renderInnerPage({ pages })
+        content_html: await page.renderInnerPage({ pages }),
       }
-    }, { concurrency: 4 })
+    }, { concurrency: 4 }),
   }
 
   yield {
     content: JSON.stringify(jsonFeed, null, '  '),
-    outputName: 'feed.json'
+    outputName: 'feed.json',
   }
 
   yield {
     content: jsonfeedToAtom(jsonFeed),
-    outputName: 'feed.xml'
+    outputName: 'feed.xml',
   }
 }

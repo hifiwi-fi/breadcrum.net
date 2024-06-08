@@ -21,9 +21,9 @@ export const emailView = Component(({ user, onEdit, reload }) => {
       const response = await fetch(`${state.apiUrl}/user/email:resend`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify({ update: false })
+        body: JSON.stringify({ update: false }),
       })
 
       if (response.ok && response.status === 202) {
@@ -49,9 +49,9 @@ export const emailView = Component(({ user, onEdit, reload }) => {
       const response = await fetch(`${state.apiUrl}/user/email:resend`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify({ update: true })
+        body: JSON.stringify({ update: true }),
       })
 
       if (response.ok && response.status === 202) {
@@ -75,7 +75,7 @@ export const emailView = Component(({ user, onEdit, reload }) => {
 
     try {
       const response = await fetch(`${state.apiUrl}/user/email`, {
-        method: 'delete'
+        method: 'delete',
       })
 
       if (response.ok && response.status === 204) {

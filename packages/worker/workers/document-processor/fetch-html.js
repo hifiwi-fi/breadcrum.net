@@ -7,7 +7,7 @@ const GOOGLE_BOT_UA = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compat
 
 const uaHacks = {
   'twitter.com': GOOGLE_BOT_UA,
-  'mobile.twitter.com': GOOGLE_BOT_UA
+  'mobile.twitter.com': GOOGLE_BOT_UA,
 }
 
 export async function fetchHTML ({ url, fastify }) {
@@ -17,12 +17,12 @@ export async function fetchHTML ({ url, fastify }) {
   const response = await undiciRequest(requestURL, {
     headers: {
       Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'user-agent': ua
+      'user-agent': ua,
     },
     maxRedirections: 3,
     autoSelectFamily: true,
     headersTimeout: 15000,
-    bodyTimeout: 15000
+    bodyTimeout: 15000,
   })
 
   if (response.statusCode > 299) {

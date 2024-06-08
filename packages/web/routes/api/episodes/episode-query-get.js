@@ -38,7 +38,7 @@ export function episodePropsQuery ({
   bookmarkId,
   includeFeed,
   query,
-  includeRank
+  includeRank,
 }) {
   return SQL`
   select
@@ -131,7 +131,7 @@ export function getEpisodesQuery ({
   perPage,
   feedId,
   bookmarkId,
-  includeFeed
+  includeFeed,
 }) {
   const episodesQuery = SQL`
     with episodes_page as (
@@ -145,7 +145,7 @@ export function getEpisodesQuery ({
         perPage,
         feedId,
         bookmarkId,
-        includeFeed
+        includeFeed,
         })
       }
       order by ${after

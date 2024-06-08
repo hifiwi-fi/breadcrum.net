@@ -3,7 +3,7 @@ import { Component, html } from 'uland-isomorphic'
 
 export const userRowView = Component(({
   user: u,
-  onEdit = () => {}
+  onEdit = () => {},
 }) => {
   return html`
   <tr class="bc-user-row-view">

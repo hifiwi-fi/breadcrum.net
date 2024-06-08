@@ -1,4 +1,4 @@
 export default {
   title: '📈 Stats',
-  noindex: true
+  noindex: true,
 }

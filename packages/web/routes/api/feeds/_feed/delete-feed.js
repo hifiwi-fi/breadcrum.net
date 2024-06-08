@@ -1,10 +1,9 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export async function deleteFeed (fastify, opts) {
   const podcastFeedDeleteCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_podcast_feed_delete_total',
-    help: 'The number of times podcast feeds are deleted'
+    help: 'The number of times podcast feeds are deleted',
   })
 
   fastify.delete(
@@ -17,12 +16,12 @@ export async function deleteFeed (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed']
-        }
-      }
+          required: ['feed'],
+        },
+      },
     },
     async function deleteFeedHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -72,7 +71,7 @@ export async function deleteFeed (fastify, opts) {
         reply.status = 202
         podcastFeedDeleteCounter.inc()
         return {
-          status: 'ok'
+          status: 'ok',
         }
       })
     })

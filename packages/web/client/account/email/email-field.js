@@ -21,9 +21,9 @@ export const emailField = Component(({ user, reload }) => {
     const response = await fetch(endpoint, {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json',
       },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email }),
     })
 
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -41,12 +41,12 @@ export const emailField = Component(({ user, reload }) => {
       user,
       onSave: handleSave,
       onCancelEdit: handleCancelEdit,
-      reload
+      reload,
     })
     : emailView({
       user,
       onEdit: handleEdit,
-      reload
+      reload,
     })
   }
   `

@@ -1,14 +1,14 @@
 import { getFeedImageUrl } from './feed-urls.js'
 
 export function getFeedTitle ({
-  title
+  title,
 }) {
   return title ?? 'breadcrum.net'
 }
 
 export function getFeedDescription ({
   description,
-  defaultFeed
+  defaultFeed,
 }) {
   return description ?? `This is a ${defaultFeed ? 'default' : 'custom'} podcast feed. Customize this description on the feed's home page.
 Feed and episode URLs contain a feed secret, so don't share it with anyone you don't want to have access to the entire feed. You can edit this feeds description and title on its feed page.
@@ -18,7 +18,7 @@ Feed and episode URLs contain a feed secret, so don't share it with anyone you d
 export function getFeedWithDefaults ({
   feed,
   transport,
-  host
+  host,
 }) {
   const feedWithDefaults = { ...feed }
 

@@ -1,4 +1,4 @@
 export default {
   title: '✍️ Register',
-  noindex: true
+  noindex: true,
 }

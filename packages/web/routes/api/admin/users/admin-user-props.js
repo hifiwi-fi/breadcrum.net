@@ -3,13 +3,13 @@ import { fullSerializedUserProps, userEditableUserProps } from '../../user/user-
 const adminUserProps = {
   internal_note: {
     type: 'string',
-    description: 'Any notes related to a user account. This value is private to the moderation of the website and should not be sent to users.'
-  }
+    description: 'Any notes related to a user account. This value is private to the moderation of the website and should not be sent to users.',
+  },
 }
 
 export const fullSerializedAdminUserProps = {
   ...fullSerializedUserProps,
-  ...adminUserProps
+  ...adminUserProps,
 }
 
 export const adminEditableUserProps = {
@@ -21,5 +21,5 @@ export const adminEditableUserProps = {
   disabled_email: fullSerializedUserProps.disabled_email,
   disabled: fullSerializedUserProps.disabled,
   disabled_reason: fullSerializedUserProps.disabled_reason,
-  internal_note: adminUserProps.internal_note
+  internal_note: adminUserProps.internal_note,
 }

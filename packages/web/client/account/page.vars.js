@@ -1,4 +1,4 @@
 export default {
   title: '👨🏻 Account',
-  noindex: true
+  noindex: true,
 }

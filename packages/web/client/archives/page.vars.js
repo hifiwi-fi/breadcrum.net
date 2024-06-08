@@ -1,4 +1,4 @@
 export default {
   title: '🗄️ Archives',
-  noindex: true
+  noindex: true,
 }

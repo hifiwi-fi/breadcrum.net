@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export async function deleteArchive (fastify, opts) {
@@ -8,11 +7,11 @@ export async function deleteArchive (fastify, opts) {
       params: {
         type: 'object',
         properties: {
-          archive_id: { type: 'string', format: 'uuid' }
+          archive_id: { type: 'string', format: 'uuid' },
         },
-        required: ['archive_id']
-      }
-    }
+        required: ['archive_id'],
+      },
+    },
   },
   async function deleteArchiveHandler (request, reply) {
     const ownerId = request.user.id
@@ -31,7 +30,7 @@ export async function deleteArchive (fastify, opts) {
     fastify.metrics.episodeDeleteCounter.inc()
 
     return {
-      status: 'ok'
+      status: 'ok',
     }
   })
 }

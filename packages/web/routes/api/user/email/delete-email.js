@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 // Delete any pendig email updates
@@ -6,7 +5,7 @@ export async function deleteEmail (fastify, opts) {
   fastify.delete(
     '/',
     {
-      preHandler: fastify.auth([fastify.verifyJWT])
+      preHandler: fastify.auth([fastify.verifyJWT]),
     },
     async function deleteEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -15,7 +14,7 @@ export async function deleteEmail (fastify, opts) {
         const updates = [
           SQL`pending_email_update = null`,
           SQL`pending_email_update_token = null`,
-          SQL`pending_email_update_token_exp = null`
+          SQL`pending_email_update_token_exp = null`,
         ]
 
         const updateQuery = SQL`

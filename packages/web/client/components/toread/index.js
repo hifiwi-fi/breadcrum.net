@@ -3,7 +3,7 @@ import cn from 'classnames'
 
 export const toread = Component(({
   toread = false,
-  onclick = () => {}
+  onclick = () => {},
 }) => {
   return html`
     <span class="${cn({ 'bc-unread': toread, 'bc-read': !toread, 'bc-toread': true })}" onclick=${onclick}>

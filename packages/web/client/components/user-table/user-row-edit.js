@@ -6,7 +6,7 @@ export const userRowEdit = Component(({
   user: u,
   onSave,
   onDelete,
-  onCancelEdit
+  onCancelEdit,
 }) => {
   const [error, setError] = useState(null)
 
@@ -65,7 +65,7 @@ export const userRowEdit = Component(({
       disabled_email,
       disabled,
       disabled_reason,
-      internal_note
+      internal_note,
     }
 
     try {

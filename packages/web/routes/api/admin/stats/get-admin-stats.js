@@ -6,13 +6,13 @@ export async function getAdminStats (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
-        hide: true
-      }
+        hide: true,
+      },
     },
     // Get admin flags
     async function getAdminFlagsHandler (request, reply) {
@@ -45,7 +45,7 @@ export async function getAdminStats (fastify, opts) {
       return {
         bookmarkStats: monthBookmarkCountResults.rows,
         totalUsers: totalUsersQueryResults.rows,
-        totalBookmarks: totalCountResults.rows
+        totalBookmarks: totalCountResults.rows,
       }
     }
   )

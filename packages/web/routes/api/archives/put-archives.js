@@ -5,9 +5,9 @@ export async function putArchives (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         querystring: {},
@@ -20,14 +20,14 @@ export async function putArchives (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullArchivePropsWithBookmark
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    ...fullArchivePropsWithBookmark,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function putArchivesHandler (request, reply) {
       return reply.notImplemented()

@@ -11,17 +11,17 @@ export default fp(async function (fastify, _) {
       info: {
         title: 'Breadcrum API',
         description: 'Breadcrum\'s (unstable) API',
-        version: '0.0.1'
-      }
-    }
+        version: '0.0.1',
+      },
+    },
   })
 
   if (fastify.config.SWAGGER) {
     fastify.register(import('@fastify/swagger-ui'), {
-      routePrefix: '/openapi'
+      routePrefix: '/openapi',
     })
   }
 }, {
   name: 'swagger',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

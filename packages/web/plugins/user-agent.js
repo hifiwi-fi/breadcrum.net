@@ -10,5 +10,5 @@ export default fp(async function (fastify, _) {
   fastify.register(import('fastify-user-agent'))
 }, {
   name: 'user-agent',
-  dependencies: []
+  dependencies: [],
 })

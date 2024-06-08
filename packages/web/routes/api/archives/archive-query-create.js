@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 export async function createArchive ({
@@ -7,7 +6,7 @@ export async function createArchive ({
   bookmarkId,
   bookmarkTitle,
   extractionMethod,
-  url
+  url,
 }) {
   const createArchiveQuery = SQL`
           INSERT INTO archives (owner_id, bookmark_id, url, title, extraction_method)

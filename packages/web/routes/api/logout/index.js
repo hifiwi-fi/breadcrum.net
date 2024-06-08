@@ -10,11 +10,11 @@ export default async function logoutRoute (fastify, opts) {
             type: 'object',
             required: ['logged_out'],
             properties: {
-              logged_out: { type: 'boolean' }
-            }
-          }
-        }
-      }
+              logged_out: { type: 'boolean' },
+            },
+          },
+        },
+      },
     },
     async function (request, reply) {
       let validJWT
@@ -42,11 +42,11 @@ export default async function logoutRoute (fastify, opts) {
 
       if (validJWT) {
         return {
-          logged_out: true
+          logged_out: true,
         }
       } else {
         return {
-          logged_out: false
+          logged_out: false,
         }
       }
     }

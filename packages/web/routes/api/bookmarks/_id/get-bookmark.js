@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { getBookmarksQuery } from '../get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 
@@ -10,25 +9,25 @@ export async function getBookmark (fastify, opts) {
         querystring: {
           sensitive: {
             type: 'boolean',
-            default: false
-          }
+            default: false,
+          },
         },
         params: {
           type: 'object',
           properties: {
-            id: { type: 'string', format: 'uuid' }
+            id: { type: 'string', format: 'uuid' },
           },
-          required: ['id']
+          required: ['id'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
-              ...fullBookmarkPropsWithEpisodes
-            }
-          }
-        }
-      }
+              ...fullBookmarkPropsWithEpisodes,
+            },
+          },
+        },
+      },
     },
     async function getBookmarkHandler (request, reply) {
       const ownerId = request.user.id
@@ -39,7 +38,7 @@ export async function getBookmark (fastify, opts) {
         ownerId,
         bookmarkId,
         perPage: 1,
-        sensitive
+        sensitive,
       })
 
       const results = await fastify.pg.query(query)

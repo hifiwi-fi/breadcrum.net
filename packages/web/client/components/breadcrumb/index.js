@@ -2,7 +2,7 @@ import { Component, html } from 'uland-isomorphic'
 import cn from 'classnames'
 
 export const breadcrumb = Component(({
-  pathSegments
+  pathSegments,
 }) => {
   return html`
   <nav class="bc-breadcrumb-nav" aria-label="breadcrumb">

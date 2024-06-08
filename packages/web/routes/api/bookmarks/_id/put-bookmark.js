@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { createEpisode } from '../../episodes/episode-query-create.js'
 import { commnonBookmarkProps } from '../bookmark-props.js'
@@ -12,27 +11,27 @@ export async function putBookmark (fastify, opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,
-      fastify.notDisabled
+      fastify.notDisabled,
     ], {
-      relation: 'and'
+      relation: 'and',
     }),
     schema: {
       params: {
         type: 'object',
         properties: {
-          id: { type: 'string', format: 'uuid' }
+          id: { type: 'string', format: 'uuid' },
         },
-        required: ['id']
+        required: ['id'],
       },
       body: {
         type: 'object',
         properties: {
           ...commnonBookmarkProps,
           ...createEpisodeProp,
-          ...createArchiveProp
+          ...createArchiveProp,
         },
         minProperties: 1,
-        additionalProperties: false
+        additionalProperties: false,
       },
       response: {
         200: {
@@ -44,13 +43,13 @@ export async function putBookmark (fastify, opts) {
             data: {
               type: 'object',
               properties: {
-                ...fullBookmarkPropsWithEpisodes
-              }
-            }
-          }
-        }
-      }
-    }
+                ...fullBookmarkPropsWithEpisodes,
+              },
+            },
+          },
+        },
+      },
+    },
   },
   async function putBookmarkHandler (request, reply) {
     return fastify.pg.transact(async client => {
@@ -149,7 +148,7 @@ export async function putBookmark (fastify, opts) {
         ownerId: userId,
         bookmarkId,
         sensitive: true,
-        perPage: 1
+        perPage: 1,
       })
 
       const createdResults = await fastify.pg.query(updatedBookmarkQuery)
@@ -162,7 +161,7 @@ export async function putBookmark (fastify, opts) {
           bookmarkId,
           type: bookmark.createEpisode.type,
           medium: bookmark.createEpisode.medium,
-          url: request?.body?.createEpisode.url ?? bookmark.url ?? existingBookmark.url
+          url: request?.body?.createEpisode.url ?? bookmark.url ?? existingBookmark.url,
         })
 
         await client.query('commit')
@@ -175,7 +174,7 @@ export async function putBookmark (fastify, opts) {
             bookmarkTitle: createdBookmark.title,
             episodeId,
             url: episodeURL,
-            medium: episodeMedium
+            medium: episodeMedium,
           }
         )
       }
@@ -187,7 +186,7 @@ export async function putBookmark (fastify, opts) {
           bookmarkId: createdBookmark.id,
           bookmarkTitle: createdBookmark.title,
           url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url,
-          extractionMethod: 'server'
+          extractionMethod: 'server',
         })
 
         await client.query('commit')
@@ -200,7 +199,7 @@ export async function putBookmark (fastify, opts) {
             userId,
             archive: true,
             archiveId,
-            archiveURL
+            archiveURL,
           }
         )
       }
@@ -210,7 +209,7 @@ export async function putBookmark (fastify, opts) {
       return {
         status: 'updated',
         site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${createdBookmark.id}`,
-        data: createdBookmark
+        data: createdBookmark,
       }
     })
   })

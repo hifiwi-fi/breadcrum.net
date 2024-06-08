@@ -6,7 +6,7 @@ import { useLSP } from './useLSP.js'
 let userRequest = null
 
 export function useUser ({
-  reload
+  reload,
 } = {}) {
   const state = useLSP()
 
@@ -41,8 +41,8 @@ export function useUser ({
         userRequest = fetch(`${state.apiUrl}/user`, {
           method: 'get',
           headers: {
-            'accept-encoding': 'application/json'
-          }
+            'accept-encoding': 'application/json',
+          },
         })
         requestor = true
       }
@@ -80,6 +80,6 @@ export function useUser ({
   return {
     user: state.user,
     loading,
-    error
+    error,
   }
 }

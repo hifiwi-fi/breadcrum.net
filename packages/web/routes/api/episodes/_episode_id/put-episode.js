@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 
 import { commonEpisodeProps } from '../episode-props.js'
@@ -7,28 +6,28 @@ export async function putEpisode (fastify, opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,
-      fastify.notDisabled
+      fastify.notDisabled,
     ], {
-      relation: 'and'
+      relation: 'and',
     }),
     schema: {
       querystring: {},
       params: {
         type: 'object',
         properties: {
-          episode_id: { type: 'string', format: 'uuid' }
+          episode_id: { type: 'string', format: 'uuid' },
         },
-        required: ['episode_id']
+        required: ['episode_id'],
       },
       body: {
         type: 'object',
         properties: {
-          ...commonEpisodeProps
+          ...commonEpisodeProps,
         },
         minProperties: 1,
-        additionalProperties: false
-      }
-    }
+        additionalProperties: false,
+      },
+    },
   },
   async function putEpisodeHandler (request, reply) {
     return fastify.pg.transact(async client => {
@@ -59,7 +58,7 @@ export async function putEpisode (fastify, opts) {
       fastify.metrics.episodeEditCounter.inc()
 
       return {
-        status: 'ok'
+        status: 'ok',
       }
     })
   })

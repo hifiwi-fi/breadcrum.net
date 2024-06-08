@@ -9,9 +9,9 @@ export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/cors'), {
     origin: ['http://localhost:3000', 'https://breadcrum.net'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 }, {
   name: 'cors',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

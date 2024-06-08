@@ -59,5 +59,5 @@ export default fp(async function (fastify, _) {
     })
 }, {
   name: 'auth',
-  dependencies: ['env', 'jwt', 'pg']
+  dependencies: ['env', 'jwt', 'pg'],
 })

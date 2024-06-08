@@ -10,11 +10,11 @@ export default async function tagsRenameRoutes (fastify, opts) {
           type: 'object',
           properties: {
             old: { type: 'string', minLength: 1, maxLength: 255 },
-            new: { type: 'string', minLength: 1, maxLength: 255 }
+            new: { type: 'string', minLength: 1, maxLength: 255 },
           },
-          required: ['name']
-        }
-      }
+          required: ['name'],
+        },
+      },
     },
     async function (request, reply) {
       return reply.notImplemented()

@@ -8,12 +8,12 @@ export async function feedDetailsHandler ({
   request,
   reply,
   userId,
-  feedId
+  feedId,
 }) {
   const feedQuery = getFeedQuery({
     ownerId: userId,
     feedId,
-    perPage: 1
+    perPage: 1,
   })
 
   const userQuery = SQL`
@@ -24,7 +24,7 @@ export async function feedDetailsHandler ({
 
   const [feedResults, userResults] = await Promise.all([
     fastify.pg.query(feedQuery),
-    fastify.pg.query(userQuery)
+    fastify.pg.query(userQuery),
   ])
 
   const feed = feedResults.rows.pop()
@@ -45,8 +45,8 @@ export async function feedDetailsHandler ({
         host,
         userId,
         token: feed.token,
-        feedId: feed.id
-      })
-    }
+        feedId: feed.id,
+      }),
+    },
   }
 }

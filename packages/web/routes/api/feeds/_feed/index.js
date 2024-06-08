@@ -6,6 +6,6 @@ export default async function podcastFeedsRoutes (fastify, opts) {
   await Promise.all([
     getFeed(fastify, opts),
     putFeed(fastify, opts),
-    deleteFeed(fastify, opts)
+    deleteFeed(fastify, opts),
   ])
 }

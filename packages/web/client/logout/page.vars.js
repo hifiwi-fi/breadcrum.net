@@ -1,4 +1,4 @@
 export default {
   title: '✌️ Logout',
-  noindex: true
+  noindex: true,
 }

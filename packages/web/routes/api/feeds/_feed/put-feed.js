@@ -5,7 +5,7 @@ import { commonFeedProps, fullFeedProps } from '../feed-props.js'
 export async function putFeed (fastify, opts) {
   const podcastFeedEditCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_podcast_feed_edit_total',
-    help: 'The number of times podcast feeds are edited'
+    help: 'The number of times podcast feeds are edited',
   })
 
   fastify.put(
@@ -13,9 +13,9 @@ export async function putFeed (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         parms: {
@@ -23,18 +23,18 @@ export async function putFeed (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed']
+          required: ['feed'],
         },
         body: {
           type: 'object',
           properties: {
-            ...commonFeedProps
+            ...commonFeedProps,
           },
           minProperties: 1,
-          additionalProperties: false
+          additionalProperties: false,
         },
         response: {
           200: {
@@ -45,14 +45,14 @@ export async function putFeed (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullFeedProps
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    ...fullFeedProps,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function putFeedHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -62,7 +62,7 @@ export async function putFeed (fastify, opts) {
           title,
           description,
           image_url,
-          explicit
+          explicit,
         } = request.body
 
         const updates = []
@@ -86,7 +86,7 @@ export async function putFeed (fastify, opts) {
         }
 
         return {
-          status: 'ok'
+          status: 'ok',
         }
       })
     })

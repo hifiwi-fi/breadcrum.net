@@ -15,9 +15,10 @@
     "auto-changelog": "^2.0.0",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
+    "neostandard": "^0.6.0",
     "npm-run-all2": "^6.0.0",
-    "typescript": "~5.5.0-beta",
-    "patch-package": "^8.0.0"
+    "patch-package": "^8.0.0",
+    "typescript": "~5.5.0-beta"
   },
   "funding": {
     "type": "individual",
@@ -39,9 +40,9 @@
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
-    "test": "run-s test:*",
-    "test:web": "npm run test --workspace=@breadcrum/web",
-    "test:worker": "npm run test --workspace=@breadcrum/worker",
+    "test": "npm run test --workspaces --if-present",
+    "test-web": "npm run test --workspace=@breadcrum/web",
+    "test-worker": "npm run test --workspace=@breadcrum/worker",
     "watch": "FORCE_COLOR=1 run-p -n -l watch:*",
     "watch:web": "npm run watch --workspace=@breadcrum/web",
     "watch:worker": "npm run watch --workspace=@breadcrum/worker",

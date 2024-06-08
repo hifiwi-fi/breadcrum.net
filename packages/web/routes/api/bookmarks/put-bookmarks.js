@@ -15,7 +15,7 @@ import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 async function normalizeURL (urlObj) {
   if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com'
   return {
-    normalizedURL: urlObj.toString()
+    normalizedURL: urlObj.toString(),
   }
 }
 
@@ -26,9 +26,9 @@ export async function putBookmarks (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         body: {
@@ -36,10 +36,10 @@ export async function putBookmarks (fastify, opts) {
           properties: {
             ...commnonBookmarkProps,
             ...createEpisodeProp,
-            ...createArchiveProp
+            ...createArchiveProp,
           },
           additionalProperties: false,
-          required: ['url']
+          required: ['url'],
         },
         query: {
           update: {
@@ -50,28 +50,28 @@ export async function putBookmarks (fastify, opts) {
               to to the specific bookmark endpoint which will process the
               request as a bookmark update. Otherwise, this creates or returns
               the existing bookmark.
-            `
+            `,
           },
           meta: {
             type: 'boolean',
             default: false,
-            description: 'Extract page metadata on the server.'
+            description: 'Extract page metadata on the server.',
           },
           episode: {
             type: 'boolean',
             default: true,
-            description: 'Determines if an episode is optimistically created'
+            description: 'Determines if an episode is optimistically created',
           },
           archive: {
             type: 'boolean',
             default: true,
-            description: 'Determines if an archive is optimistically created'
+            description: 'Determines if an archive is optimistically created',
           },
           normalize: {
             type: 'boolean',
             default: true,
-            description: 'Normalize URLs when looking them up or creating them.'
-          }
+            description: 'Normalize URLs when looking them up or creating them.',
+          },
         },
         response: {
           201: {
@@ -83,10 +83,10 @@ export async function putBookmarks (fastify, opts) {
               data: {
                 type: 'object',
                 properties: {
-                  ...fullBookmarkPropsWithEpisodes
-                }
-              }
-            }
+                  ...fullBookmarkPropsWithEpisodes,
+                },
+              },
+            },
           },
           200: {
             type: 'object',
@@ -97,13 +97,13 @@ export async function putBookmarks (fastify, opts) {
               data: {
                 type: 'object',
                 properties: {
-                  ...fullBookmarkPropsWithEpisodes
-                }
-              }
-            }
-          }
-        }
-      }
+                  ...fullBookmarkPropsWithEpisodes,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function createBookmark (request, reply) {
       return fastify.pg.transact(async client => {
@@ -114,7 +114,7 @@ export async function putBookmarks (fastify, opts) {
           sensitive,
           tags = [],
           archive_urls = [],
-          summary
+          summary,
         } = request.body
         let { url, title } = request.body
         const urlObj = new URL(url)
@@ -124,7 +124,7 @@ export async function putBookmarks (fastify, opts) {
           meta,
           episode,
           archive,
-          normalize
+          normalize,
         } = request.query
 
         if (normalize) { // This will be the one possibly slow step
@@ -136,7 +136,7 @@ export async function putBookmarks (fastify, opts) {
           ownerId: userId,
           url,
           sensitive: true,
-          perPage: 1
+          perPage: 1,
         })
 
         const existingResults = await client.query(checkForExistingQuery)
@@ -151,7 +151,7 @@ export async function putBookmarks (fastify, opts) {
             return {
               status: 'nochange',
               site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
-              data: maybeResult
+              data: maybeResult,
             }
           }
         }
@@ -192,7 +192,7 @@ export async function putBookmarks (fastify, opts) {
             pg: client,
             userId,
             bookmarkId: bookmark.id,
-            tags
+            tags,
           })
         }
 
@@ -205,7 +205,7 @@ export async function putBookmarks (fastify, opts) {
             bookmarkId: bookmark.id,
             type: request?.body?.createEpisode?.type ?? 'redirect',
             medium: request?.body?.createEpisode?.medium ?? 'video',
-            url: request?.body?.createEpisode?.url ?? url
+            url: request?.body?.createEpisode?.url ?? url,
           })
           episodeId = episodeEntity.id
           episodeMedium = episodeEntity.medium
@@ -218,7 +218,7 @@ export async function putBookmarks (fastify, opts) {
               bookmarkTitle: bookmark.title,
               episodeId,
               url: episodeURL,
-              medium: episodeMedium
+              medium: episodeMedium,
             }
           )
         }
@@ -232,7 +232,7 @@ export async function putBookmarks (fastify, opts) {
             bookmarkId: bookmark.id,
             bookmarkTitle: title ?? null,
             url: request?.body?.createArchive?.url ?? url,
-            extractionMethod: 'server'
+            extractionMethod: 'server',
           })
 
           archiveId = archiveEntity.id
@@ -258,7 +258,7 @@ export async function putBookmarks (fastify, opts) {
               summary,
               bookmarkId: bookmark.id,
               archiveId,
-              archiveURL
+              archiveURL,
             }
           )
         }
@@ -268,7 +268,7 @@ export async function putBookmarks (fastify, opts) {
           ownerId: userId,
           url,
           sensitive: true,
-          perPage: 1
+          perPage: 1,
         })
 
         const createdResults = await fastify.pg.query(bookmarkQuery)
@@ -278,7 +278,7 @@ export async function putBookmarks (fastify, opts) {
         return {
           status: 'ok',
           site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`,
-          data: createdBookmark
+          data: createdBookmark,
         }
       })
     }

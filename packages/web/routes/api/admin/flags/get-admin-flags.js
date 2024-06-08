@@ -16,9 +16,9 @@ export async function getAdminFlags (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.verifyAdmin
+        fastify.verifyAdmin,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         hide: true,
@@ -27,11 +27,11 @@ export async function getAdminFlags (fastify, opts) {
             type: 'object',
             properties: {
               ...defaultFrontendFlags,
-              ...defaultBackendFlags
-            }
-          }
-        }
-      }
+              ...defaultBackendFlags,
+            },
+          },
+        },
+      },
     },
     // Get admin flags
     async function getAdminFlagsHandler (request, reply) {

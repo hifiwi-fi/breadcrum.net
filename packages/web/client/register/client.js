@@ -31,9 +31,9 @@ export const page = Component(() => {
       const response = await fetch(`${state.apiUrl}/register`, {
         method: 'post',
         headers: {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify({ email, username, password, newsletter_subscription }) // eslint-disable-line camelcase
+        body: JSON.stringify({ email, username, password, newsletter_subscription }), // eslint-disable-line camelcase
       })
 
       if (response.ok && response.status === 201) {

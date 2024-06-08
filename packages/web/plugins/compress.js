@@ -8,5 +8,5 @@ import fp from 'fastify-plugin'
 export default fp(async function (fastify, _) {
   fastify.register(import('@fastify/compress'))
 }, {
-  name: 'compress'
+  name: 'compress',
 })

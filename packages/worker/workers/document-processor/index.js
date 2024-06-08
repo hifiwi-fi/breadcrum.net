@@ -16,7 +16,7 @@ export function makeDocumentWorker ({ fastify }) {
       summary,
       bookmarkId,
       archiveId,
-      archiveURL
+      archiveURL,
     } = job.data
     const log = fastify.log.child({ jobId: job.id })
     const pg = fastify.pg
@@ -38,7 +38,7 @@ export function makeDocumentWorker ({ fastify }) {
             title,
             tags,
             summary,
-            initialDocument
+            initialDocument,
           })
         )
       }
@@ -52,7 +52,7 @@ export function makeDocumentWorker ({ fastify }) {
             userId,
             archiveId,
             url: archiveURL,
-            initialDocument
+            initialDocument,
           }))
       }
 

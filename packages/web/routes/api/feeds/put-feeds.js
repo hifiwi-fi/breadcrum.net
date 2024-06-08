@@ -8,17 +8,17 @@ export async function putFeeds (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         body: {
           type: 'object',
           properties: {
-            ...commonFeedProps
+            ...commonFeedProps,
           },
-          required: ['title', 'explicit', 'description']
+          required: ['title', 'explicit', 'description'],
         },
         response: {
           200: {
@@ -29,14 +29,14 @@ export async function putFeeds (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullFeedProps
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    ...fullFeedProps,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async function createFeedHandler (request, reply) {
       return fastify.pg.transact(async client => {
@@ -46,7 +46,7 @@ export async function putFeeds (fastify, opts) {
           title,
           description,
           image_url,
-          explicit
+          explicit,
         } = request.body
 
         const createFeed = SQL`
@@ -79,7 +79,7 @@ export async function putFeeds (fastify, opts) {
 
         return {
           status: 'ok',
-          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/feeds/${feed.id}/`
+          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/feeds/${feed.id}/`,
         }
       })
     })

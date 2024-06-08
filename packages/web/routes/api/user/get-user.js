@@ -8,9 +8,9 @@ export async function getUser (fastify, opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         response: {
-          200: fullSerializedUserProps
-        }
-      }
+          200: fullSerializedUserProps,
+        },
+      },
     },
     async function (request, reply) {
       const userId = request.user.id

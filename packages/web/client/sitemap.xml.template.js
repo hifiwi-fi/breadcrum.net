@@ -11,17 +11,17 @@ import builder from 'xmlbuilder'
  * }>} */
 export default async ({
   vars: {
-    baseUrl
+    baseUrl,
   },
-  pages
+  pages,
 }) => {
   const sitemapObj = {
     urlset: {
       '@xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
       url: pages.filter(page => !page.vars.noindex).map(page => ({
-        loc: `${baseUrl}/${page.pageInfo.path}${page.pageInfo.path && !page.pageInfo.path.endsWith('.html') ? '/' : ''}`
-      }))
-    }
+        loc: `${baseUrl}/${page.pageInfo.path}${page.pageInfo.path && !page.pageInfo.path.endsWith('.html') ? '/' : ''}`,
+      })),
+    },
   }
   const feed = builder.create(sitemapObj, { encoding: 'utf-8' })
   return feed.end({ pretty: true, allowEmpty: false })

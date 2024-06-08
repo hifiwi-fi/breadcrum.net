@@ -10,7 +10,7 @@ import { expandText } from '../expand-text/index.js'
 export const episodeView = Component(({
   episode: e,
   clickForPreview,
-  onEdit = () => {}
+  onEdit = () => {},
 } = {}) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
 
@@ -72,7 +72,7 @@ export const episodeView = Component(({
           ? html`
             ${expandText({
               children: e?.text_content,
-              pre: true
+              pre: true,
             })}
           `
           : null

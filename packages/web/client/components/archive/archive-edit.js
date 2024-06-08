@@ -1,12 +1,12 @@
 /* eslint-env browser */
-/* eslint-disable camelcase */
+
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 export const archiveEdit = Component(({
   archive: ar,
   onSave,
   onDeleteArchive,
   onCancelEdit,
-  legend
+  legend,
 } = {}) => {
   const [error, setError] = useState(null)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -43,7 +43,7 @@ export const archiveEdit = Component(({
     const title = form.title.value
 
     const formState = {
-      title
+      title,
     }
 
     try {

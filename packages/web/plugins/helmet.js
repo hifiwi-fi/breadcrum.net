@@ -16,11 +16,11 @@ export default fp(async function (fastify, _) {
         'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : [],
         'media-src': '*',
         'img-src': ['*', 'data:'],
-        'frame-src': ['https://giscus.app']
-      }
-    }
+        'frame-src': ['https://giscus.app'],
+      },
+    },
   })
 }, {
   name: 'helmet',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

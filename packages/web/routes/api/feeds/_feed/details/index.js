@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { fullFeedProps } from '../../feed-props.js'
 import { feedDetailsHandler } from './feed-details-handler.js'
 
@@ -13,10 +12,10 @@ export default async function getFeedDetails (fastify, opts) {
           properties: {
             feed: {
               type: 'string',
-              format: 'uuid'
-            }
+              format: 'uuid',
+            },
           },
-          required: ['feed']
+          required: ['feed'],
         },
         response: {
           200: {
@@ -25,13 +24,13 @@ export default async function getFeedDetails (fastify, opts) {
               data: {
                 type: 'object',
                 properties: {
-                  ...fullFeedProps
-                }
-              }
-            }
-          }
-        }
-      }
+                  ...fullFeedProps,
+                },
+              },
+            },
+          },
+        },
+      },
     },
 
     async function getFeedHandler (request, reply) {
@@ -43,7 +42,7 @@ export default async function getFeedDetails (fastify, opts) {
         request,
         reply,
         userId,
-        feedId
+        feedId,
       })
     })
 }

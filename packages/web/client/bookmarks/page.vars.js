@@ -1,4 +1,4 @@
 export default {
   title: '🔖 Bookmarks',
-  noindex: true
+  noindex: true,
 }

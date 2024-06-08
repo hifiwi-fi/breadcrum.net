@@ -11,5 +11,5 @@ export default fp(async function (fastify, _) {
   })
 }, {
   name: 'redirector',
-  dependencies: ['env']
+  dependencies: ['env'],
 })

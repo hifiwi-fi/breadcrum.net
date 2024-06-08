@@ -13,7 +13,7 @@ export const bookmarkView = Component(({
   onEdit = () => {},
   onToggleToread = () => {},
   onToggleStarred = () => {},
-  onToggleSensitive = () => {}
+  onToggleSensitive = () => {},
 } = {}) => {
   const window = useWindow()
   const { pushState } = useQuery()
@@ -33,19 +33,19 @@ export const bookmarkView = Component(({
       <div class="bc-bookmark-title-line">
         ${toread({
           toread: b.toread,
-          onclick: onToggleToread
+          onclick: onToggleToread,
         })}
         ${star({
           starred: b.starred,
-          onclick: onToggleStarred
+          onclick: onToggleStarred,
         })}
         ${sensitive({
           sensitive: b.sensitive,
-          onclick: onToggleSensitive
+          onclick: onToggleSensitive,
         })}
         <a class="${cn({
           'bc-bookmark-title': true,
-          'bc-bookmark-title-toread': b.toread
+          'bc-bookmark-title-toread': b.toread,
         })}"
            href="${b.url}"
            target="_blank"
@@ -58,7 +58,7 @@ export const bookmarkView = Component(({
       ${b.summary
         ? html`<div class='bc-bookmark-summary-display'>
             ${expandText({
-              children: b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)
+              children: b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`),
             })}
           </div>`
         : null}

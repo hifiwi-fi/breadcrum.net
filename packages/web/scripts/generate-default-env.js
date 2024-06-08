@@ -11,7 +11,7 @@ const __dirname = import.meta.dirname
 if (process.env.ENV !== 'production') {
   const varsNeedingDevKeys = [
     'COOKIE_SECRET',
-    'JWT_SECRET'
+    'JWT_SECRET',
   ]
 
   const dotenv = []

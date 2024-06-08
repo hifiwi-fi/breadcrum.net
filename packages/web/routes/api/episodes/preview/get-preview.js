@@ -7,48 +7,48 @@ export async function getPreview (fastify, opts) {
     {
       preHandler: fastify.auth([
         fastify.verifyJWT,
-        fastify.notDisabled
+        fastify.notDisabled,
       ], {
-        relation: 'and'
+        relation: 'and',
       }),
       schema: {
         querystring: {
           type: 'object',
           properties: {
             medium: { enum: ['video', 'audio'], default: 'video' },
-            url: { type: 'string', format: 'uri' }
+            url: { type: 'string', format: 'uri' },
           },
-          required: ['url']
+          required: ['url'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
               title: {
-                type: 'string'
+                type: 'string',
               },
               ext: {
-                type: 'string'
+                type: 'string',
               },
               url: {
-                type: 'string'
+                type: 'string',
               },
               duration: {
-                type: 'number'
+                type: 'number',
               },
               channel: {
-                type: 'string'
+                type: 'string',
               },
               src_type: {
-                type: 'string'
+                type: 'string',
               },
               filesize_approx: {
-                type: 'number'
-              }
-            }
-          }
-        }
-      }
+                type: 'number',
+              },
+            },
+          },
+        },
+      },
     },
     async function getPreviewHandler (request, reply) {
       const { url, medium } = request.query
@@ -59,7 +59,7 @@ export async function getPreview (fastify, opts) {
         ext,
         duration,
         channel,
-        filesize_approx
+        filesize_approx,
       } = metadata
       const src_type = resolveType(metadata)
 
@@ -71,7 +71,7 @@ export async function getPreview (fastify, opts) {
         duration,
         channel,
         src_type,
-        filesize_approx
+        filesize_approx,
       }
     }
   )

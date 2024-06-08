@@ -7,12 +7,12 @@ export async function getYTDLPMetadata ({
   medium,
   ytDLPEndpoint,
   attempt = 0,
-  cache
+  cache,
 }) {
   const cacheKey = {
     url,
     medium,
-    attempt
+    attempt,
   }
   const cachedMeta = await cache?.get(cacheKey)
 
@@ -30,9 +30,9 @@ export async function getYTDLPMetadata ({
   const response = await undiciRequest(requestURL, {
     headers: {
       Accept: 'application/json',
-      Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password)
+      Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password),
     },
-    autoSelectFamily: true
+    autoSelectFamily: true,
   })
 
   if (response.statusCode !== 200) {

@@ -12,45 +12,45 @@ export async function getSearchArchives (fastify, opts) {
           properties: {
             query: {
               type: 'string',
-              description: 'The search query'
+              description: 'The search query',
             },
             rank: {
               type: 'string',
-              description: 'The rank use for paginating'
+              description: 'The rank use for paginating',
             },
             id: {
               type: 'string',
               format: 'uuid',
-              description: 'The id use for paginating'
+              description: 'The id use for paginating',
             },
             reverse: {
               type: 'boolean',
               default: 'false',
-              description: 'Reverse direction of pagination. Use the first id and rank in the page when set to true. Use the last rank and id when paging in the forward direction.'
+              description: 'Reverse direction of pagination. Use the first id and rank in the page when set to true. Use the last rank and id when paging in the forward direction.',
             },
             per_page: {
               type: 'integer',
               minimum: 1,
               maximum: 50,
               default: 20,
-              description: 'The number of search results per page'
+              description: 'The number of search results per page',
             },
             sensitive: {
               type: 'boolean',
               default: false,
-              description: 'Include sensitive bookmkarks in search results when true'
+              description: 'Include sensitive bookmkarks in search results when true',
             },
             starred: {
               type: 'boolean',
               default: false,
-              description: 'Only include starred bookmarks in search results when true'
+              description: 'Only include starred bookmarks in search results when true',
             },
             toread: {
               type: 'boolean',
               default: false,
-              description: 'Only include unread bookmarks in search results when true'
-            }
-          }
+              description: 'Only include unread bookmarks in search results when true',
+            },
+          },
         },
         response: {
           200: {
@@ -63,62 +63,62 @@ export async function getSearchArchives (fastify, opts) {
                   properties: {
                     ...fullArchivePropsWithBookmark,
                     rank: {
-                      type: 'number'
-                    }
-                  }
-                }
+                      type: 'number',
+                    },
+                  },
+                },
               },
               pagination: {
                 type: 'object',
                 properties: {
                   top: {
-                    type: 'boolean'
+                    type: 'boolean',
                   },
                   bottom: {
-                    type: 'boolean'
+                    type: 'boolean',
                   },
                   next: {
                     type: 'object',
                     properties: {
                       rank: {
-                        type: 'string'
+                        type: 'string',
                       },
                       id: {
                         type: 'string',
-                        format: 'uuid'
+                        format: 'uuid',
                       },
                       query: {
-                        type: 'string'
+                        type: 'string',
                       },
                       reverse: {
-                        type: 'boolean'
-                      }
-                    }
+                        type: 'boolean',
+                      },
+                    },
                   },
                   prev: {
                     type: 'object',
                     properties: {
                       rank: {
-                        type: 'string'
+                        type: 'string',
                       },
                       id: {
                         type: 'string',
-                        format: 'uuid'
+                        format: 'uuid',
                       },
                       query: {
-                        type: 'string'
+                        type: 'string',
                       },
                       reverse: {
-                        type: 'boolean'
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                        type: 'boolean',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     // Get Bookmarks
     async function getSearchArchivesHandler (request, reply) {
@@ -131,7 +131,7 @@ export async function getSearchArchives (fastify, opts) {
         sensitive,
         starred,
         toread,
-        reverse
+        reverse,
       } = request.query
 
       const archivesQuery = getSearchArchivesQuery({
@@ -143,7 +143,7 @@ export async function getSearchArchives (fastify, opts) {
         perPage: perPage + 1,
         lastRank: rank,
         lastId: id,
-        reverse
+        reverse,
       })
 
       const results = await fastify.pg.query(archivesQuery)
@@ -161,7 +161,7 @@ export async function getSearchArchives (fastify, opts) {
 
       const pagination = {
         top,
-        bottom
+        bottom,
       }
 
       if (!top) {
@@ -171,7 +171,7 @@ export async function getSearchArchives (fastify, opts) {
             rank: firstResult.rank,
             id: firstResult.id,
             reverse: true,
-            query
+            query,
           }
         }
       }
@@ -183,14 +183,14 @@ export async function getSearchArchives (fastify, opts) {
             rank: lastResult.rank,
             id: lastResult.id,
             reverse: false,
-            query
+            query,
           }
         }
       }
 
       return {
         data: results.rows,
-        pagination
+        pagination,
       }
     }
   )
