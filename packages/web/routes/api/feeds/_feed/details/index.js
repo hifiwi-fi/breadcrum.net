@@ -7,6 +7,7 @@ export default async function getFeedDetails (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['feeds'],
         parms: {
           type: 'object',
           properties: {

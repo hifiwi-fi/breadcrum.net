@@ -6,6 +6,7 @@ export async function getBookmark (fastify, opts) {
     '/', {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['bookmarks'],
         querystring: {
           sensitive: {
             type: 'boolean',

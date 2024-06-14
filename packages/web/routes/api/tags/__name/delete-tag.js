@@ -6,6 +6,7 @@ export async function deleteTag (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['tags'],
         params: {
           type: 'object',
           properties: {

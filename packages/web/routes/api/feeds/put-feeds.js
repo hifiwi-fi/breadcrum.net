@@ -13,6 +13,7 @@ export async function putFeeds (fastify, opts) {
         relation: 'and',
       }),
       schema: {
+        tags: ['feeds'],
         body: {
           type: 'object',
           properties: {

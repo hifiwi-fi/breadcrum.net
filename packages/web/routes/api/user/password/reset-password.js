@@ -14,6 +14,7 @@ export async function resetPassword (fastify, opts) {
         },
       },
       schema: {
+        tags: ['user'],
         body: {
           type: 'object',
           properties: {

@@ -5,6 +5,7 @@ export default async function logoutRoute (fastify, opts) {
     '/',
     {
       schema: {
+        tags: ['auth'],
         response: {
           200: {
             type: 'object',

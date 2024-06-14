@@ -4,6 +4,7 @@ export async function deleteEpisode (fastify, opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
+      tags: ['episodes'],
       params: {
         type: 'object',
         properties: {

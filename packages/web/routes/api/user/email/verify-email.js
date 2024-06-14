@@ -8,6 +8,7 @@ export async function verifyEmail (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['user'],
         body: {
           type: 'object',
           properties: {

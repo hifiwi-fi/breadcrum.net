@@ -10,6 +10,7 @@ export async function putArchives (fastify, opts) {
         relation: 'and',
       }),
       schema: {
+        tags: ['archives'],
         querystring: {},
         response: {
           201: {

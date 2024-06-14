@@ -10,14 +10,13 @@ export default async function unsubscribeEmailRoute (fastify, opts) {
       'GET',
     ],
     schema: {
-      schema: {
-        querystring: {
-          type: 'object',
-          properties: {
-            email: userEditableUserProps.email,
-          },
-          required: ['email'],
+      tags: ['user'],
+      querystring: {
+        type: 'object',
+        properties: {
+          email: userEditableUserProps.email,
         },
+        required: ['email'],
       },
       respose: {
         202: {

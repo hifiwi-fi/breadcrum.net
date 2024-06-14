@@ -7,6 +7,7 @@ export async function getSearchEpisodes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['search', 'episodes'],
         querystring: {
           type: 'object',
           properties: {

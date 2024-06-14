@@ -7,6 +7,7 @@ export async function getSearchArchives (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['search', 'archives'],
         querystring: {
           type: 'object',
           properties: {

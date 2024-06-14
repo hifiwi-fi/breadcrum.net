@@ -7,6 +7,7 @@ export async function getEpisode (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['episodes'],
         querystring: {
           sensitive: {
             type: 'boolean',

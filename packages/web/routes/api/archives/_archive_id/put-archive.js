@@ -11,6 +11,7 @@ export async function putArchive (fastify, opts) {
       relation: 'and',
     }),
     schema: {
+      tags: ['archives'],
       querystring: {},
       params: {
         type: 'object',

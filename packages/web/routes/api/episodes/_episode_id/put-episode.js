@@ -11,6 +11,7 @@ export async function putEpisode (fastify, opts) {
       relation: 'and',
     }),
     schema: {
+      tags: ['episodes'],
       querystring: {},
       params: {
         type: 'object',

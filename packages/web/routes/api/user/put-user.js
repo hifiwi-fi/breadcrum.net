@@ -10,6 +10,7 @@ export async function putUser (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['user'],
         body: {
           type: 'object',
           additionalProperties: false,

@@ -6,6 +6,9 @@ export async function deleteEmail (fastify, opts) {
     '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
+      schema: {
+        tags: ['user'],
+      },
     },
     async function deleteEmailHandler (request, reply) {
       return fastify.pg.transact(async client => {

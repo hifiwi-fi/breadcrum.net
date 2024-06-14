@@ -4,6 +4,7 @@ export async function deleteBookmark (fastify, opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
+      tags: ['bookmarks'],
       params: {
         type: 'object',
         properties: {

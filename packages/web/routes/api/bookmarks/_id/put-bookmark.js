@@ -16,6 +16,7 @@ export async function putBookmark (fastify, opts) {
       relation: 'and',
     }),
     schema: {
+      tags: ['bookmarks'],
       params: {
         type: 'object',
         properties: {

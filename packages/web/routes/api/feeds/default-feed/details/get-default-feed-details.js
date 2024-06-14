@@ -13,6 +13,7 @@ export async function getDefaultFeedDetails (fastify, opts) {
         relation: 'and',
       }),
       schema: {
+        tags: ['feeds'],
         response: {
           200: {
             type: 'object',

@@ -7,6 +7,7 @@ export async function getUser (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['user'],
         response: {
           200: fullSerializedUserProps,
         },

@@ -10,6 +10,7 @@ export async function getFeeds (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['feeds'],
         response: {
           200: {
             type: 'object',

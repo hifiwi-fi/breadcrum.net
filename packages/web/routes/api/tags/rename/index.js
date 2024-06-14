@@ -6,6 +6,8 @@ export default async function tagsRenameRoutes (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['tags'],
+        hide: true,
         body: {
           type: 'object',
           properties: {

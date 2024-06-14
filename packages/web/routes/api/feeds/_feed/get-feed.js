@@ -19,6 +19,7 @@ export async function getFeed (fastify, opts) {
         relation: 'or',
       }),
       schema: {
+        tags: ['feeds'],
         parms: {
           type: 'object',
           properties: {

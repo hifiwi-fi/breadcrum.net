@@ -23,6 +23,7 @@ export default async function registerRoutes (fastify, opts) {
         },
       },
       schema: {
+        tags: ['auth'],
         body: {
           type: 'object',
           required: [

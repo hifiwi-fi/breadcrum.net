@@ -12,6 +12,7 @@ export async function getPreview (fastify, opts) {
         relation: 'and',
       }),
       schema: {
+        tags: ['episodes'],
         querystring: {
           type: 'object',
           properties: {

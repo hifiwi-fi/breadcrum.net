@@ -10,6 +10,7 @@ export default async function loginRoutes (fastify, opts) {
     '/',
     {
       schema: {
+        tags: ['auth'],
         body: {
           type: 'object',
           required: ['user', 'password'],

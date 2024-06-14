@@ -7,6 +7,7 @@ export async function getSearchBookmarks (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['search', 'bookmarks'],
         querystring: {
           type: 'object',
           properties: {

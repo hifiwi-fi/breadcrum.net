@@ -7,6 +7,7 @@ export async function getArchive (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['archives'],
         querystring: {
           sensitive: {
             type: 'boolean',

@@ -9,6 +9,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
         relation: 'or',
       }),
       schema: {
+        tags: ['feeds', 'episodes'],
         hide: true,
         parms: {
           type: 'object',

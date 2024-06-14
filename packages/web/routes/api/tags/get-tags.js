@@ -6,6 +6,7 @@ export async function getTags (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['tags'],
         querystring: {
           type: 'object',
           properties: {

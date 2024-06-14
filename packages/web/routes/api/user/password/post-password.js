@@ -13,6 +13,7 @@ export async function postPassword (fastify, opts) {
         },
       },
       schema: {
+        tags: ['user'],
         body: {
           type: 'object',
           properties: {

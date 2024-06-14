@@ -8,6 +8,7 @@ export async function getArchives (fastify, opts) {
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
+        tags: ['archives'],
         querystring: {
           type: 'object',
           properties: {
@@ -113,11 +114,11 @@ export async function getArchives (fastify, opts) {
 
         const top = Boolean(
           (!before && !after) ||
-        (after && results.rows.length <= perPage)
+          (after && results.rows.length <= perPage)
         )
         const bottom = Boolean(
           (before && results.rows.length <= perPage) ||
-        (!before && !after && results.rows.length <= perPage)
+          (!before && !after && results.rows.length <= perPage)
         )
 
         if (results.rows.length > perPage) {

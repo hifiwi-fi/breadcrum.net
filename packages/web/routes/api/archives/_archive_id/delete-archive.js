@@ -4,6 +4,7 @@ export async function deleteArchive (fastify, opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
+      tags: ['archives'],
       params: {
         type: 'object',
         properties: {
