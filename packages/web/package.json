@@ -70,7 +70,7 @@
     "npm-run-all2": "^6.0.0",
     "p-map": "^7.0.0",
     "tap": "^19.0.0",
-    "neostandard": "^0.7.0",
+    "neostandard": "^0.8.0",
     "top-bun": "^7.0.0",
     "typescript": "~5.5.0-beta",
     "uland-isomorphic": "^2.0.0",
