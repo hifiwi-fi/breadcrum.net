@@ -2,15 +2,34 @@ import SQL from '@nearform/sql'
 import { episodePropsQuery } from '../../episodes/episode-query-get.js'
 
 /**
- * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ * Constructs a SQL query for searching episodes based on various filters and pagination options.
+ *
+ * This function generates a dynamic SQL query using the `@nearform/sql` library to safely
+ * construct a query with parameters. It incorporates filters such as ownership, sensitivity,
+ * read status, and starred status. Additionally, it supports pagination through `lastRank`,
+ * `lastId`, and `perPage` parameters, and allows results to be ordered in reverse.
+ *
+ * The core of the search functionality relies on PostgreSQL's full-text search capabilities,
+ * specifically using the `plainto_tsquery` function to match episodes against the provided query.
+ *
+ * @param {Object} params - The parameters for the query.
+ * @param {string} params.query - The search query string.
+ * @param {string} params.ownerId - The ID of the owner of the episodes.
+ * @param {boolean} params.sensitive - Flag to include sensitive episodes.
+ * @param {boolean} params.toread - Flag to filter episodes marked as "to read".
+ * @param {boolean} params.starred - Flag to filter episodes marked as starred.
+ * @param {number} [params.perPage] - The maximum number of episodes to return. If not provided, all matching episodes are returned.
+ * @param {number} [params.lastRank] - The rank of the last episode in the previous query result, used for pagination.
+ * @param {number} [params.lastId] - The ID of the last episode in the previous query result, used for pagination.
+ * @param {boolean} [params.reverse=false] - Whether to reverse the order of the results.
+ * @returns {import('@nearform/sql').SqlStatement} The constructed SQL query statement ready to be executed.
  */
-
 export function getSearchEpisodesQuery ({
   query,
   ownerId,
   sensitive,
-  toread,
-  starred,
+  // toread,
+  // starred,
   perPage,
   lastRank,
   lastId,

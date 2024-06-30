@@ -1,4 +1,13 @@
-export default async function deltaRoutes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function deltaRoutes (fastify, _opts) {
   fastify.get(
     '/last_update',
     {

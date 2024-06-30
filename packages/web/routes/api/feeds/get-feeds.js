@@ -4,7 +4,16 @@ import { fullFeedProps } from './feed-props.js'
 import { getFeedsQuery } from './feeds-query.js'
 import { getFeedWithDefaults } from './feed-defaults.js'
 
-export async function getFeeds (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getFeeds (fastify, _opts) {
   fastify.get(
     '/',
     {

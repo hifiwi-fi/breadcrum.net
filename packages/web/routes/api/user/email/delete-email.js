@@ -1,7 +1,15 @@
 import SQL from '@nearform/sql'
 
-// Delete any pendig email updates
-export async function deleteEmail (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * Delete any pending email updates
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function deleteEmail (fastify, _opts) {
   fastify.delete(
     '/',
     {

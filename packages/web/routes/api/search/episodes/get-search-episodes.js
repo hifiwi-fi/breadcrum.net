@@ -1,7 +1,16 @@
 import { getSearchEpisodesQuery } from './get-search-episodes-query.js'
 import { fullEpisodePropsWithBookmarkAndFeed } from '../../episodes/mixed-episode-props.js'
 
-export async function getSearchEpisodes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getSearchEpisodes (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -122,7 +131,7 @@ export async function getSearchEpisodes (fastify, opts) {
       },
     },
     // Get Bookmarks
-    async function getSearchEpisodesHandler (request, reply) {
+    async function getSearchEpisodesHandler (request, _reply) {
       const userId = request.user.id
       const {
         rank,

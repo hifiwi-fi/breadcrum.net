@@ -2,7 +2,16 @@ import SQL from '@nearform/sql'
 
 import { commonEpisodeProps } from '../episode-props.js'
 
-export async function putEpisode (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putEpisode (fastify, _opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,

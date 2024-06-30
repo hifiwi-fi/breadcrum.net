@@ -1,8 +1,16 @@
 import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
 import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 
-// Verify an email address or a pending email address
-export async function verifyEmail (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * Verify an email address or a pending email address
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function verifyEmail (fastify, _opts) {
   fastify.post(
     '::verify',
     {
@@ -23,23 +31,23 @@ export async function verifyEmail (fastify, opts) {
           },
           required: ['token', 'update'],
         },
-      },
-      respose: {
-        202: {
-          type: 'object',
-          properties: {
-            status: {
-              type: 'string',
-            },
-            email: {
-              type: 'string',
-              format: 'email',
-            },
-            updated: {
-              type: 'boolean',
-            },
-            confirmed: {
-              type: 'boolean',
+        respose: {
+          202: {
+            type: 'object',
+            properties: {
+              status: {
+                type: 'string',
+              },
+              email: {
+                type: 'string',
+                format: 'email',
+              },
+              updated: {
+                type: 'boolean',
+              },
+              confirmed: {
+                type: 'boolean',
+              },
             },
           },
         },

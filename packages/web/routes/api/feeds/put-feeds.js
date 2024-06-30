@@ -2,7 +2,16 @@
 import SQL from '@nearform/sql'
 import { fullFeedProps, commonFeedProps } from './feed-props.js'
 
-export async function putFeeds (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putFeeds (fastify, _opts) {
   fastify.put(
     '/',
     {

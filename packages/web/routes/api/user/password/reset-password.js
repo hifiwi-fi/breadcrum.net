@@ -3,7 +3,16 @@ import SQL from '@nearform/sql'
 import { PASSWORD_RESET_EXP, PASSWORD_RESET_TOKEN } from './password-reset-token.js'
 import { userEditableUserProps } from '../user-props.js'
 
-export async function resetPassword (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function resetPassword (fastify, _opts) {
   fastify.post(
     '::reset',
     {
@@ -22,13 +31,13 @@ export async function resetPassword (fastify, opts) {
           },
           required: ['email'],
         },
-      },
-      respose: {
-        202: {
-          type: 'object',
-          properties: {
-            status: {
-              type: 'string',
+        respose: {
+          202: {
+            type: 'object',
+            properties: {
+              status: {
+                type: 'string',
+              },
             },
           },
         },

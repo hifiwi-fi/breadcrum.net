@@ -1,6 +1,15 @@
 // import SQL from '@nearform/sql'
 
-export default async function tagsRenameRoutes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function tagsRenameRoutes (fastify, _opts) {
   fastify.post(
     '/',
     {
@@ -18,7 +27,7 @@ export default async function tagsRenameRoutes (fastify, opts) {
         },
       },
     },
-    async function (request, reply) {
+    async function (_request, reply) {
       return reply.notImplemented()
     }
   )

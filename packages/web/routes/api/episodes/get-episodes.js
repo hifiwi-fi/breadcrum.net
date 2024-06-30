@@ -4,7 +4,16 @@ import { getEpisodesQuery } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
-export async function getEpisodes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getEpisodes (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -86,7 +95,7 @@ export async function getEpisodes (fastify, opts) {
         },
       },
     },
-    async function getEpisodesHandler (request, reply) {
+    async function getEpisodesHandler (request, _reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
 

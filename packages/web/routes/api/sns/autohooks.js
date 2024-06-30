@@ -1,6 +1,15 @@
 import jsonParser from 'fast-json-body'
 
-export default async function (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function (fastify, _opts) {
   // Add basic auth for feed and feed episode routes
   fastify.register(import('@fastify/basic-auth'), {
     validate,

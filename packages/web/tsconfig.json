@@ -7,7 +7,7 @@
     "routes/**/*",
     "plugins/**/*",
     "workers/**/*",
-    "test/**/*",
+    "test/**/*"
   ],
   "exclude": [
     "node_modules",

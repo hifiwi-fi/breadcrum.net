@@ -1,6 +1,15 @@
 import SQL from '@nearform/sql'
 
-export async function deleteArchive (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function deleteArchive (fastify, _opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {

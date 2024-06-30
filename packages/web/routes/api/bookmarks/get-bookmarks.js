@@ -2,7 +2,16 @@ import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { addMillisecond } from './addMillisecond.js'
 
-export async function getBookmarks (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getBookmarks (fastify) {
   fastify.get(
     '/',
     {
@@ -80,7 +89,7 @@ export async function getBookmarks (fastify, opts) {
       },
     },
     // Get Bookmarks
-    async function getBookmarksHandler (request, reply) {
+    async function getBookmarksHandler (request, _reply) {
       const userId = request.user.id
       const {
         before,

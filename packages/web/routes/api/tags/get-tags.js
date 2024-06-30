@@ -1,6 +1,15 @@
 import SQL from '@nearform/sql'
 
-export async function getTags (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getTags (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -16,18 +25,18 @@ export async function getTags (fastify, opts) {
             },
           },
         },
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            data: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  name: { type: 'string' },
-                  count: { type: 'integer' },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    count: { type: 'integer' },
+                  },
                 },
               },
             },
@@ -35,7 +44,7 @@ export async function getTags (fastify, opts) {
         },
       },
     },
-    async function getTagsHandler (request, reply) {
+    async function getTagsHandler (request, _reply) {
       const userId = request.user.id
       const { sensitive } = request.query
 

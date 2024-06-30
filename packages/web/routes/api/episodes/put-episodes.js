@@ -1,5 +1,15 @@
 import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
-export async function putEpisodes (fastify, opts) {
+
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putEpisodes (fastify, _opts) {
   fastify.put(
     '/',
     {

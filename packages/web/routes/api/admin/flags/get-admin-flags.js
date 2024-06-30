@@ -2,15 +2,15 @@ import { defaultFrontendFlags } from '../../../../plugins/flags/frontend-flags.j
 import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
 
 /**
- * @import { FastifyPluginAsync } from 'fastify'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**
  * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsync}
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
-export async function getAdminFlags (fastify, opts) {
+export async function getAdminFlags (fastify) {
   fastify.get(
     '/',
     {
@@ -34,7 +34,7 @@ export async function getAdminFlags (fastify, opts) {
       },
     },
     // Get admin flags
-    async function getAdminFlagsHandler (request, reply) {
+    async function getAdminFlagsHandler (_request, _reply) {
       const adminFlags = await fastify.getFlags({ frontend: true, backend: true })
       return adminFlags
     }

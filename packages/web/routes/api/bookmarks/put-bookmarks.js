@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { oneLineTrim } from 'common-tags'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
@@ -10,16 +9,19 @@ import { createArchive } from '../archives/archive-query-create.js'
 import { createArchiveProp } from '../archives/archive-props.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
+import { normalizeURL } from './normalizeURL.js'
 
-// TODO: make this normalization way more robust and use it everywhere.
-async function normalizeURL (urlObj) {
-  if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com'
-  return {
-    normalizedURL: urlObj.toString(),
-  }
-}
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import {JSONSchema} from 'json-schema-to-ts'
+ */
 
-export async function putBookmarks (fastify, opts) {
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putBookmarks (fastify, _opts) {
   // Create bookmark
   fastify.put(
     '/',
@@ -32,7 +34,7 @@ export async function putBookmarks (fastify, opts) {
       }),
       schema: {
         tags: ['bookmarks'],
-        body: {
+        body: /** @type {const} @satisfies {JSONSchema} */ ({
           type: 'object',
           properties: {
             ...commnonBookmarkProps,
@@ -41,8 +43,8 @@ export async function putBookmarks (fastify, opts) {
           },
           additionalProperties: false,
           required: ['url'],
-        },
-        query: {
+        }),
+        querystring: {
           update: {
             type: 'boolean',
             default: false,
@@ -107,6 +109,9 @@ export async function putBookmarks (fastify, opts) {
       },
     },
     async function createBookmark (request, reply) {
+      const n = request.body.note
+
+      console.log({ n })
       return fastify.pg.transact(async client => {
         const userId = request.user.id
         const {

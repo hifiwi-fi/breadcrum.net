@@ -1,7 +1,15 @@
 import SQL from '@nearform/sql'
 import { userEditableUserProps } from '../../user-props.js'
 
-// Unsubscribe an email address no matter what
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * Unsubscribe an email address no matter what
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
 export default async function unsubscribeEmailRoute (fastify, opts) {
   fastify.route({
     url: '/',

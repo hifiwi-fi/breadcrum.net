@@ -1,5 +1,15 @@
 import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
-export async function putArchives (fastify, opts) {
+
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putArchives (fastify, _opts) {
   fastify.put(
     '/',
     {
@@ -30,7 +40,7 @@ export async function putArchives (fastify, opts) {
         },
       },
     },
-    async function putArchivesHandler (request, reply) {
+    async function putArchivesHandler (_request, reply) {
       return reply.notImplemented()
     }
   )

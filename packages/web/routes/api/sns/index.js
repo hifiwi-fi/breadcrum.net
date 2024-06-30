@@ -1,6 +1,15 @@
 import SQL from '@nearform/sql'
 import { request as undiciRequest } from 'undici'
 
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
 export default async function snsRoutes (fastify, opts) {
   fastify.post(
     '/',

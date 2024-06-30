@@ -12,8 +12,8 @@ import SQL from '@nearform/sql'
  * @exports
  * @param {Object} params - Parameters to shape the query.
  * @param {string} [params.tag] - Tag associated with the bookmarks.
- * @param {number} params.ownerId - ID of the owner.
- * @param {number} [params.bookmarkId] - Specific ID of the bookmark.
+ * @param {string} params.ownerId - ID of the owner.
+ * @param {string} [params.bookmarkId] - Specific ID of the bookmark.
  * @param {string} [params.before] - Date string to get bookmarks before this date.
  * @param {string} [params.after] - Date string to get bookmarks after this date.
  * @param {string} [params.url] - URL of the bookmark.

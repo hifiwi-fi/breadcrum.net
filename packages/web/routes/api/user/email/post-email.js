@@ -3,7 +3,15 @@ import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-to
 import { userEditableUserProps } from '../user-props.js'
 import { resolveEmail } from 'resolve-email'
 
-// Update the email address by setting a pending_email_update field.
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * Update the email address by setting a pending_email_update field.
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
 export async function postEmail (fastify, opts) {
   fastify.post(
     '/',

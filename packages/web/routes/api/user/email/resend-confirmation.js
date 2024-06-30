@@ -1,7 +1,15 @@
 import { resendAccountEmailVerificationHandler } from './resend-account-confirmation.js'
 import { resendPendingEmailVerificationHandler } from './resend-pending-confirmation.js'
 
-// Request a email verification email
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * Request a email verification email
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
 export async function resendEmailVerification (fastify, opts) {
   fastify.post(
     '::resend',

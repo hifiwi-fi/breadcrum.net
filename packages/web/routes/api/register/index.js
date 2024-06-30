@@ -12,7 +12,16 @@ import {
 } from '../user/user-props.js'
 import { resolveEmail } from 'resolve-email'
 
-export default async function registerRoutes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function registerRoutes (fastify, _opts) {
   fastify.post(
     '/',
     {

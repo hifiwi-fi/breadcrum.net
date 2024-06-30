@@ -2,7 +2,16 @@ import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
 import { getArchivesQuery } from './archive-query-get.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
-export async function getArchives (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * admin/flags route returns frontend and backend flags and requires admin to see
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getArchives (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -82,7 +91,7 @@ export async function getArchives (fastify, opts) {
         },
       },
     },
-    async function getArchivesHandler (request, reply) {
+    async function getArchivesHandler (request, _reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
 
@@ -110,7 +119,7 @@ export async function getArchives (fastify, opts) {
           fullArchives: request.query.full_archives,
         })
 
-        const results = await fastify.pg.query(archivesQuery)
+        const results = await client.query(archivesQuery)
 
         const top = Boolean(
           (!before && !after) ||
