@@ -1,4 +1,7 @@
 import fp from 'fastify-plugin'
+import { stripIndent } from 'common-tags'
+import fsp from 'node:fs/promises'
+import path from 'node:path'
 
 /**
  * This plugins adds fastify-swagger
@@ -10,8 +13,13 @@ export default fp(async function (fastify, _) {
     openapi: {
       info: {
         title: 'Breadcrum API',
-        description: 'Breadcrum\'s (unstable) API',
-        version: '0.0.1',
+        description: stripIndent`
+        Breadcrum\'s (unstable) API.
+
+        Implementing against this API is not recomended unless you are eager track breaking changes.
+        You have been warned!
+        `,
+        version: '0.0.0',
       },
     },
   })
@@ -19,6 +27,10 @@ export default fp(async function (fastify, _) {
   if (fastify.config.SWAGGER) {
     fastify.register(import('@fastify/swagger-ui'), {
       routePrefix: '/openapi',
+      logo: {
+        type: 'image/png',
+        content: await fsp.readFile(path.join(import.meta.dirname, '../client/static/bread.png')),
+      },
     })
   }
 }, {

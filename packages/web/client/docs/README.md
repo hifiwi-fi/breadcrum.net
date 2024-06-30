@@ -12,6 +12,7 @@ Learn about more about Breadcrum:
 - ℹ️ [About](/about/)
 - 🙊 [Social Media](./social/)
 - 🚦 [Status](https://status.breadcrum.net/)
+- ⌨️ [API](/openapi)
 
 ## All Pages
 
