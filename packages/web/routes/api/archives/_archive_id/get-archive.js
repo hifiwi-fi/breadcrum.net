@@ -23,8 +23,8 @@ export async function getArchive (fastify, _opts) {
             sensitive: {
               type: 'boolean',
               default: false,
-            }
-          }
+            },
+          },
         },
         params: {
           type: 'object',

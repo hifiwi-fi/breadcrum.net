@@ -5,9 +5,9 @@
  * @param {URL} urlObj - The URL object to be normalized.
  * @returns {Promise<{normalizedURL: string}>} An object containing the normalized URL string.
  */
-export async function normalizeURL(urlObj) {
-  if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com';
+export async function normalizeURL (urlObj) {
+  if (urlObj.host === 'm.youtube.com') urlObj.host = 'www.youtube.com'
   return {
     normalizedURL: urlObj.toString(),
-  };
+  }
 }
