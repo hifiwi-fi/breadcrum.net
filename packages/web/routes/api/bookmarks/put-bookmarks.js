@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 import SQL from '@nearform/sql'
 import { oneLineTrim } from 'common-tags'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
