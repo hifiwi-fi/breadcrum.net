@@ -13,7 +13,7 @@
     "undici": "^6.16.0"
   },
   "devDependencies": {
-    "@types/node": "^20.5.2",
+    "@types/node": "^22.0.0",
     "@voxpelli/tsconfig": "^12.0.0",
     "npm-run-all2": "^6.0.0",
     "neostandard": "^0.11.0",
