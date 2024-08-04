@@ -33,5 +33,5 @@ export async function putTagsQuery ({
 
   await pg.query(applyTags)
 
-  fastify.metrics.tagAppliedCounter.inc(tagsResults.rows.length)
+  fastify.prom.tagAppliedCounter.inc(tagsResults.rows.length)
 }

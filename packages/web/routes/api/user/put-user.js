@@ -1,40 +1,31 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
-import {
-  userEditableUserProps,
-} from '../user/user-props.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaUserUpdate } from './schemas/schema-user-update.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
  */
-export async function putUser (fastify, opts) {
+export async function putUserRoute (fastify, _opts) {
   fastify.put(
     '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         tags: ['user'],
-        body: {
-          type: 'object',
-          additionalProperties: false,
-          minProperties: 1,
-          properties: {
-            username: userEditableUserProps.username,
-            password: userEditableUserProps.password,
-            newsletter_subscription: userEditableUserProps.newsletter_subscription,
-          },
-        },
+        body: /** @type {SchemaUserUpdate} */(fastify.getSchema('schema:breadcrum:user:update')),
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
             properties: {
-              status: { type: 'string' },
+              status: { type: 'string', enum: ['ok'] },
             },
           },
         },
@@ -74,9 +65,9 @@ export async function putUser (fastify, opts) {
           await client.query(query)
         }
 
-        return {
+        return /** @type {const} */ ({
           status: 'ok',
-        }
+        })
       })
     }
   )

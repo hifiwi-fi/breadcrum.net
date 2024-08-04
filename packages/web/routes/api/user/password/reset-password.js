@@ -1,18 +1,16 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { PASSWORD_RESET_EXP, PASSWORD_RESET_TOKEN } from './password-reset-token.js'
-import { userEditableUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../schemas/user-base.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function resetPassword (fastify, _opts) {
+export async function resetPasswordRoute (fastify, _opts) {
   fastify.post(
     '::reset',
     {
@@ -26,17 +24,19 @@ export async function resetPassword (fastify, _opts) {
         tags: ['user'],
         body: {
           type: 'object',
+          additionalProperties: false,
           properties: {
-            email: userEditableUserProps.email,
+            email: userEditableUserProps.properties.email,
           },
           required: ['email'],
         },
-        respose: {
+        response: {
           202: {
             type: 'object',
+            additionalProperties: false,
             properties: {
               status: {
-                type: 'string',
+                type: 'string', enum: ['ok']
               },
             },
           },
@@ -103,7 +103,17 @@ export async function resetPassword (fastify, _opts) {
   )
 }
 
-function passwordResetBody ({ userId, username, host, transport, token, email }) {
+/**
+ * @param  {object} params
+ * @param  {string} params.userId
+ * @param  {string} params.username
+ * @param  {string} params.host
+ * @param  {'http' | 'https'} params.transport
+ * @param  {string} params.token
+ * @param  {string} params.email
+ * @return {string}
+ */
+function passwordResetBody ({ userId, username, host, transport, token, email: _email }) {
   return `Hi ${username},
 
 Someone requested a password reset for your account. If you requested this reset, visit the following URL and update your password.

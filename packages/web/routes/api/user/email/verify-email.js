@@ -8,9 +8,8 @@ import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 /**
  * Verify an email address or a pending email address
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function verifyEmail (fastify, _opts) {
+export async function verifyEmailRoute (fastify, _opts) {
   fastify.post(
     '::verify',
     {
@@ -19,6 +18,7 @@ export async function verifyEmail (fastify, _opts) {
         tags: ['user'],
         body: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             token: {
               type: 'string',
@@ -31,9 +31,10 @@ export async function verifyEmail (fastify, _opts) {
           },
           required: ['token', 'update'],
         },
-        respose: {
+        response: {
           202: {
             type: 'object',
+            additionalProperties: false,
             properties: {
               status: {
                 type: 'string',

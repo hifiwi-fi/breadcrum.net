@@ -1,18 +1,18 @@
-import SQL from '@nearform/sql'
-import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
-import { userEditableUserProps } from '../user-props.js'
-import { resolveEmail } from 'resolve-email'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
+import SQL from '@nearform/sql'
+import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
+import { userEditableUserProps } from '../schemas/user-base.js'
+// @ts-ignore
+import { resolveEmail } from 'resolve-email'
+
 /**
  * Update the email address by setting a pending_email_update field.
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function postEmail (fastify, opts) {
+export async function postEmailRoute (fastify, _opts) {
   fastify.post(
     '/',
     {
@@ -27,22 +27,24 @@ export async function postEmail (fastify, opts) {
         tags: ['user'],
         body: {
           type: 'object',
+          additionalProperties: false,
           properties: {
-            email: userEditableUserProps.email,
+            email: userEditableUserProps.properties.email,
           },
           required: ['email'],
         },
-      },
-      respose: {
-        202: {
-          type: 'object',
-          properties: {
-            status: {
-              type: 'string',
+        response: {
+          202: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              status: {
+                type: 'string', enum: ['ok']
+              },
+              oldEmail: { type: 'string', format: 'email' },
+              newEmail: { type: 'string', format: 'email' },
+              message: { type: 'string' },
             },
-            oldEmail: { type: 'string', format: 'email' },
-            newEmail: { type: 'string', format: 'email' },
-            message: { type: 'string ' },
           },
         },
       },
@@ -114,8 +116,6 @@ export async function postEmail (fastify, opts) {
           subject: verifyEmailSubject,
           text: notifyOldEmailBody({
             username: updatedUser.username,
-            host: fastify.config.HOST,
-            transport: fastify.config.TRANSPORT,
             oldEmail: updatedUser.email,
             newEmail: updatedUser.pending_email_update,
           }),
@@ -144,6 +144,16 @@ export async function postEmail (fastify, opts) {
 
 export const verifyEmailSubject = 'Email update request notificaiton'
 
+/**
+ * @param {object} params
+ * @param  {'http' | 'https'} params.transport
+ * @param  {string} params.oldEmail
+ * @param  {string} params.newEmail
+ * @param  {string} params.username
+ * @param  {string} params.host
+ * @param  {string} params.token
+ * @return {string}
+ */
 export function verifyEmailUpdateBody ({ transport, oldEmail, newEmail, username, host, token }) {
   return `Hi ${username},
 
@@ -156,7 +166,14 @@ If you did not request this change, please immediately change your password and 
 Thank you!`
 }
 
-function notifyOldEmailBody ({ username, transport, host, oldEmail, newEmail }) {
+/**
+ * @param {object} params
+ * @param  {string} params.oldEmail
+ * @param  {string} params.newEmail
+ * @param  {string} params.username
+ * @return {string}
+ */
+function notifyOldEmailBody ({ username, oldEmail, newEmail }) {
   return `Hi ${username},
 
 If you requested to change your Breadcrum.net account email address from ${oldEmail} to ${newEmail}, please check your inbox for ${newEmail} for a confirmation link to finish the email update process.

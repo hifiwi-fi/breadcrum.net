@@ -1,17 +1,16 @@
 import SQL from '@nearform/sql'
 
-import { commonArchiveProps } from '../archive-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaArchiveUpdate } from '../schemas/schema-archive-update.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
  */
-export async function putArchive (fastify, _opts) {
+export async function putArchiveRoute (fastify, _opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,
@@ -29,17 +28,11 @@ export async function putArchive (fastify, _opts) {
         },
         required: ['archive_id'],
       },
-      body: {
-        type: 'object',
-        properties: {
-          ...commonArchiveProps,
-        },
-        minProperties: 1,
-        additionalProperties: false,
-      },
+      body: /** @type { SchemaArchiveUpdate } */ (fastify.getSchema('schema:breadcrum:archive:update')),
     },
   },
-  async function putArchiveHandler (request, reply) {
+  async function putArchiveHandler (request, _reply) {
+    // TODO: limit editing to a much smaller set. Finish implementing
     return fastify.pg.transact(async client => {
       const ownerId = request.user.id
       const { archive_id: archiveId } = request.params
@@ -62,7 +55,7 @@ export async function putArchive (fastify, _opts) {
         await client.query(query)
       }
 
-      fastify.metrics.archiveEditCounter.inc()
+      fastify.prom.archiveEditCounter.inc()
 
       return {
         status: 'ok',

@@ -5,7 +5,7 @@ import SQL from '@nearform/sql'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -37,7 +37,7 @@ export async function deleteEpisode (fastify, _opts) {
     await fastify.pg.query(query)
 
     reply.status(202)
-    fastify.metrics.episodeDeleteCounter.inc()
+    fastify.prom.episodeDeleteCounter.inc()
 
     return {
       status: 'ok',

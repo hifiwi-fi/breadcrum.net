@@ -1,5 +1,10 @@
 import SQL from '@nearform/sql'
 
+/**
+ * @param  {object} params
+ * @param  {string} params.feedId
+ * @param  {string} params.ownerId
+ */
 export function getFeedQuery ({
   feedId,
   ownerId,

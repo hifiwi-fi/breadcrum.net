@@ -20,7 +20,7 @@ import { episodePropsQuery } from '../../episodes/episode-query-get.js'
  * @param {boolean} params.starred - Flag to filter episodes marked as starred.
  * @param {number} [params.perPage] - The maximum number of episodes to return. If not provided, all matching episodes are returned.
  * @param {number} [params.lastRank] - The rank of the last episode in the previous query result, used for pagination.
- * @param {number} [params.lastId] - The ID of the last episode in the previous query result, used for pagination.
+ * @param {string} [params.lastId] - The ID of the last episode in the previous query result, used for pagination.
  * @param {boolean} [params.reverse=false] - Whether to reverse the order of the results.
  * @returns {import('@nearform/sql').SqlStatement} The constructed SQL query statement ready to be executed.
  */

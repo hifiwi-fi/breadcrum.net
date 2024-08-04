@@ -1,17 +1,15 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password-hash.js'
-import { userEditableUserProps } from '../user-props.js'
+import { userEditableUserProps } from '../schemas/user-base.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function postPassword (fastify, _opts) {
+export async function postPasswordRoute (fastify, _opts) {
   fastify.post(
     '/',
     {
@@ -25,8 +23,9 @@ export async function postPassword (fastify, _opts) {
         tags: ['user'],
         body: {
           type: 'object',
+          additionalProperties: false,
           properties: {
-            password: userEditableUserProps.password,
+            password: userEditableUserProps.properties.password,
             token: {
               type: 'string',
               minLength: 64,
@@ -39,13 +38,14 @@ export async function postPassword (fastify, _opts) {
           },
           required: ['password', 'token'],
         },
-      },
-      respose: {
-        202: {
-          type: 'object',
-          properties: {
-            status: {
-              type: 'string',
+        response: {
+          202: {
+            type: 'object',
+            properties: {
+              status: {
+                type: 'string',
+                enum: ['ok']
+              },
             },
           },
         },
@@ -117,7 +117,15 @@ export async function postPassword (fastify, _opts) {
   )
 }
 
-function passwordUpdatedBody ({ username, host, transport, email }) {
+/**
+ * @param  {object} params
+ * @param  {string} params.username
+ * @param  {string} params.host
+ * @param  {'http' | 'https'} params.transport
+ * @param  {string} params.email
+ * @return {string}
+ */
+function passwordUpdatedBody ({ username }) {
   return `Hi ${username},
 
 Your password on Breadcrum.net has been updated.

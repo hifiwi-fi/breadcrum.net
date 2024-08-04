@@ -5,7 +5,7 @@ import { defaultFrontendFlags } from '../../../plugins/flags/frontend-flags.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -26,7 +26,7 @@ export async function getFlags (fastify, _opts) {
       },
     },
     // Get flags
-    async function getFlagsHandler (request, reply) {
+    async function getFlagsHandler (_request, _reply) {
       const frontendFlags = await fastify.getFlags({ frontend: true, backend: false })
       return frontendFlags
     }

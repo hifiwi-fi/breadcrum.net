@@ -1,7 +1,13 @@
 import { getSearchArchivesQuery } from './get-search-archives-query.js'
-import { fullArchivePropsWithBookmark } from '../../archives/mixed-archive-props.js'
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
 
-export async function getSearchArchives (fastify, opts) {
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getSearchArchives (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -60,13 +66,17 @@ export async function getSearchArchives (fastify, opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullArchivePropsWithBookmark,
-                    rank: {
-                      type: 'number',
+                  allOf: [
+                    { $ref: 'schema:breadcrum:archive:read' },
+                    {
+                      type: 'object',
+                      properties: {
+                        rank: {
+                          type: 'number',
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
               pagination: {

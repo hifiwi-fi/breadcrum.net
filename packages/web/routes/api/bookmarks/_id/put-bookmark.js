@@ -1,13 +1,34 @@
 import SQL from '@nearform/sql'
 import { createEpisode } from '../../episodes/episode-query-create.js'
-import { commnonBookmarkProps } from '../bookmark-props.js'
-import { createEpisodeProp } from '../../episodes/episode-props.js'
-import { createArchiveProp } from '../../archives/archive-props.js'
 import { createArchive } from '../../archives/archive-query-create.js'
-import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
-import { getBookmarksQuery } from '../get-bookmarks-query.js'
+import { getBookmark } from '../get-bookmarks-query.js'
 
-export async function putBookmark (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaBookmarkCreate } from '../schemas/schema-bookmark-create.js'
+ * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
+ * @import { SchemaEpisodeRead } from '../../episodes/schemas/schema-episode-read.js'
+ * @import { SchemaArchiveRead } from '../../archives/schemas/schema-archive-read.js'
+ */
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<
+ *     {references: [
+ *       SchemaBookmarkCreate,
+ *       SchemaBookmarkRead,
+ *       SchemaEpisodeRead,
+ *       SchemaArchiveRead
+*     ],
+*    deserialize: [{
+*       pattern: {
+*         type: "string"
+*         format: "date-time"
+*       }
+*       output: Date
+*     }]}
+ * >}
+ */
+export async function putBookmark (fastify, _opts) {
   fastify.put('/', {
     preHandler: fastify.auth([
       fastify.verifyJWT,
@@ -26,26 +47,18 @@ export async function putBookmark (fastify, opts) {
       },
       body: {
         type: 'object',
-        properties: {
-          ...commnonBookmarkProps,
-          ...createEpisodeProp,
-          ...createArchiveProp,
-        },
+        $ref: 'schema:breadcrum:bookmark:update',
         minProperties: 1,
-        additionalProperties: false,
       },
       response: {
         200: {
           type: 'object',
           description: 'Existing bookmarks are returned unmodified',
           properties: {
-            status: { enum: ['updated'] },
+            status: { type: 'string', enum: ['updated'] },
             site_url: { type: 'string' },
             data: {
-              type: 'object',
-              properties: {
-                ...fullBookmarkPropsWithEpisodes,
-              },
+              $ref: 'schema:breadcrum:bookmark:read',
             },
           },
         },
@@ -65,6 +78,7 @@ export async function putBookmark (fastify, opts) {
               AND owner_id =${userId};
             `
       const bookmarkResults = await client.query(bookmarkQuery)
+      /** @type {{ url: string } | undefined} */
       const existingBookmark = bookmarkResults.rows[0]
       if (!existingBookmark) {
         return reply.notFound(`bookmark ${bookmarkId} not found for user ${userId}`)
@@ -121,7 +135,7 @@ export async function putBookmark (fastify, opts) {
           `
 
           await client.query(applyTags)
-          fastify.metrics.tagAppliedCounter.inc(tagsResults.rows.length)
+          fastify.prom.tagAppliedCounter.inc(tagsResults.rows.length)
 
           const removeOldTags = SQL`
           DELETE FROM bookmarks_tags
@@ -130,7 +144,7 @@ export async function putBookmark (fastify, opts) {
         `
 
           const removeResults = await client.query(removeOldTags)
-          fastify.metrics.tagRemovedCounter.inc(removeResults.rows.length)
+          fastify.prom.tagRemovedCounter.inc(removeResults.rows.length)
         } else {
           const removeAllTags = SQL`
           DELETE FROM bookmarks_tags
@@ -142,18 +156,17 @@ export async function putBookmark (fastify, opts) {
       }
 
       await client.query('commit')
-      fastify.metrics.bookmarkEditCounter.inc()
+      fastify.prom.bookmarkEditCounter.inc()
 
       // Look up the newly created bookmark instead of trying to re-assemble it here.
-      const updatedBookmarkQuery = getBookmarksQuery({
+      const createdBookmark = await getBookmark({
+        fastify,
+        pg: fastify.pg,
         ownerId: userId,
         bookmarkId,
         sensitive: true,
         perPage: 1,
       })
-
-      const createdResults = await fastify.pg.query(updatedBookmarkQuery)
-      const createdBookmark = createdResults.rows.pop()
 
       if (bookmark?.createEpisode) {
         const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
@@ -166,7 +179,7 @@ export async function putBookmark (fastify, opts) {
         })
 
         await client.query('commit')
-        fastify.metrics.episodeCounter.inc()
+        fastify.prom.episodeCounter.inc()
 
         await fastify.queues.resolveEpisodeQ.add(
           'resolve-episode',
@@ -191,7 +204,7 @@ export async function putBookmark (fastify, opts) {
         })
 
         await client.query('commit')
-        fastify.metrics.archiveCounter.inc()
+        fastify.prom.archiveCounter.inc()
 
         await fastify.queues.resolveDocumentQ.add(
           'resolve-document',

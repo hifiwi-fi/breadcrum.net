@@ -5,11 +5,10 @@ import SQL from '@nearform/sql'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function deleteArchive (fastify, _opts) {
+export async function deleteArchiveRoute (fastify, _opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
@@ -20,6 +19,25 @@ export async function deleteArchive (fastify, _opts) {
           archive_id: { type: 'string', format: 'uuid' },
         },
         required: ['archive_id'],
+      },
+      response: {
+        202: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            status: { type: 'string', enum: ['ok'] },
+          },
+          required: ['status'],
+        },
+        404: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            status: { type: 'string', enum: ['error'] },
+            message: { type: 'string' },
+          },
+          required: ['status', 'message'],
+        },
       },
     },
   },
@@ -33,14 +51,20 @@ export async function deleteArchive (fastify, _opts) {
         and owner_id = ${ownerId}
     `
 
-    // TODO: check results
-    await fastify.pg.query(query)
+    const result = await fastify.pg.query(query)
+
+    if (result.rowCount === 0) {
+      return reply.status(404).send(/** @type {const} */({
+        status: 'error',
+        message: 'Archive not found or you do not have permission to delete it',
+      }))
+    }
 
     reply.status(202)
-    fastify.metrics.episodeDeleteCounter.inc()
+    fastify.prom.episodeDeleteCounter.inc()
 
-    return {
+    return /** @type {const} */({
       status: 'ok',
-    }
+    })
   })
 }

@@ -12,7 +12,7 @@ export async function deleteFeed (fastify, opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         tags: ['feeds'],
-        parms: {
+        params: {
           type: 'object',
           properties: {
             feed: {

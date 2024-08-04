@@ -1,16 +1,34 @@
-import { getBookmarksQuery } from '../get-bookmarks-query.js'
-import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
+import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import {
+ *  SchemaBookmarkWithArchivesAndEpisodes,
+ * } from '../schemas/schema-bookmark-with-archives-and-episodes.js'
+ * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
+ * @import { SchemaEpisodeRead } from '../../episodes/schemas/schema-episode-read.js'
+ * @import { SchemaArchiveRead } from '../../archives/schemas/schema-archive-read.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *    references: [
+ *     SchemaBookmarkWithArchivesAndEpisodes,
+ *     SchemaBookmarkRead,
+ *     SchemaEpisodeRead,
+ *     SchemaArchiveRead
+ *   ],
+ *   deserialize: [{
+ *       pattern: {
+ *         type: "string"
+ *         format: "date-time"
+ *       }
+ *       output: Date
+ *     }]
+ * }>}
  */
-export async function getBookmark (fastify, opts) {
+export async function getBookmarkRoute (fastify, _opts) {
   fastify.get(
     '/', {
       preHandler: fastify.auth([fastify.verifyJWT]),
@@ -34,10 +52,7 @@ export async function getBookmark (fastify, opts) {
         },
         response: {
           200: {
-            type: 'object',
-            properties: {
-              ...fullBookmarkPropsWithEpisodes,
-            },
+            $ref: 'schema:breadcrum:bookmark:read',
           },
         },
       },
@@ -47,18 +62,18 @@ export async function getBookmark (fastify, opts) {
       const { id: bookmarkId } = request.params
       const { sensitive } = request.query
 
-      const query = getBookmarksQuery({
+      const bookmark = getBookmark({
+        fastify,
         ownerId,
         bookmarkId,
         perPage: 1,
         sensitive,
       })
 
-      const results = await fastify.pg.query(query)
-      const bookmark = results.rows[0]
       if (!bookmark) {
         return reply.notFound('bookmark id not found')
       }
+
       return bookmark
     })
 }

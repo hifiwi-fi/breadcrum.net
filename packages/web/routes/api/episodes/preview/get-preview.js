@@ -6,7 +6,7 @@ import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */

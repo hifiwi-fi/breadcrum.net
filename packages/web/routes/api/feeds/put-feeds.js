@@ -1,13 +1,13 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { fullFeedProps, commonFeedProps } from './feed-props.js'
+import { feedProps, feedReadProps } from './schemas/feed-base.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -26,7 +26,7 @@ export async function putFeeds (fastify, _opts) {
         body: {
           type: 'object',
           properties: {
-            ...commonFeedProps,
+            ...feedProps.properties,
           },
           required: ['title', 'explicit', 'description'],
         },
@@ -39,7 +39,8 @@ export async function putFeeds (fastify, _opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullFeedProps,
+                    ...feedReadProps.properties,
+                    ...feedProps.properties,
                   },
                 },
               },
@@ -48,7 +49,7 @@ export async function putFeeds (fastify, _opts) {
         },
       },
     },
-    async function createFeedHandler (request, reply) {
+    async function createFeedHandler (request, _reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
 

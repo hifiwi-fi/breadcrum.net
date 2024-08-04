@@ -1,4 +1,4 @@
-import { fullSerializedUserProps, userEditableUserProps } from '../../user/user-props.js'
+import { fullSerializedUserProps, userEditableUserProps } from '../../user/schemas/user-base.js'
 
 const adminUserProps = {
   internal_note: {
@@ -8,18 +8,18 @@ const adminUserProps = {
 }
 
 export const fullSerializedAdminUserProps = {
-  ...fullSerializedUserProps,
+  ...fullSerializedUserProps.properties,
   ...adminUserProps,
 }
 
 export const adminEditableUserProps = {
-  username: userEditableUserProps.username,
-  email: userEditableUserProps.email,
-  newsletter_subscription: userEditableUserProps.newsletter_subscription,
-  email_confirmed: fullSerializedUserProps.email_confirmed,
-  pending_email_update: fullSerializedUserProps.pending_email_update,
-  disabled_email: fullSerializedUserProps.disabled_email,
-  disabled: fullSerializedUserProps.disabled,
-  disabled_reason: fullSerializedUserProps.disabled_reason,
+  username: userEditableUserProps.properties.username,
+  email: userEditableUserProps.properties.email,
+  newsletter_subscription: userEditableUserProps.properties.newsletter_subscription,
+  email_confirmed: fullSerializedUserProps.properties.email_confirmed,
+  pending_email_update: fullSerializedUserProps.properties.pending_email_update,
+  disabled_email: fullSerializedUserProps.properties.disabled_email,
+  disabled: fullSerializedUserProps.properties.disabled,
+  disabled_reason: fullSerializedUserProps.properties.disabled_reason,
   internal_note: adminUserProps.internal_note,
 }

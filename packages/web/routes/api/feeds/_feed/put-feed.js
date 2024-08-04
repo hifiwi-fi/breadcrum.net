@@ -1,8 +1,17 @@
 /* eslint-disable camelcase */
 import SQL from '@nearform/sql'
-import { commonFeedProps, fullFeedProps } from '../feed-props.js'
+import { feedProps, feedReadProps } from '../schemas/feed-base.js'
 
-export async function putFeed (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function putFeed (fastify, _opts) {
   const podcastFeedEditCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_podcast_feed_edit_total',
     help: 'The number of times podcast feeds are edited',
@@ -19,7 +28,7 @@ export async function putFeed (fastify, opts) {
       }),
       schema: {
         tags: ['feeds'],
-        parms: {
+        params: {
           type: 'object',
           properties: {
             feed: {
@@ -32,7 +41,7 @@ export async function putFeed (fastify, opts) {
         body: {
           type: 'object',
           properties: {
-            ...commonFeedProps,
+            ...feedProps.properties,
           },
           minProperties: 1,
           additionalProperties: false,
@@ -46,7 +55,8 @@ export async function putFeed (fastify, opts) {
                 items: {
                   type: 'object',
                   properties: {
-                    ...fullFeedProps,
+                    ...feedProps.properties,
+                    ...feedReadProps.properties
                   },
                 },
               },
@@ -55,7 +65,7 @@ export async function putFeed (fastify, opts) {
         },
       },
     },
-    async function putFeedHandler (request, reply) {
+    async function putFeedHandler (request, _reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
         const { feed: feedId } = request.params

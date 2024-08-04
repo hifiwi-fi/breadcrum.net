@@ -1,4 +1,5 @@
 import 'fastify'
+import { PoolClient } from 'pg'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -12,7 +13,7 @@ declare module 'fastify' {
      * @returns The retrieved flag set.
      */
     getFlags(options: {
-      pgClient?: FastifyInstance['pg'];
+      pgClient?: PoolClient | FastifyInstance['pg'];
       frontend?: boolean;
       backend?: boolean;
     }): Promise<Record<string, any>>;

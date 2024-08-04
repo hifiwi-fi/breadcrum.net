@@ -1,6 +1,14 @@
 import SQL from '@nearform/sql'
 
-export async function deleteBookmark (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ */
+export async function deleteBookmark (fastify, _opts) {
   fastify.delete('/', {
     preHandler: fastify.auth([fastify.verifyJWT]),
     schema: {
@@ -12,6 +20,17 @@ export async function deleteBookmark (fastify, opts) {
         },
         required: ['id'],
       },
+      response: {
+        202: {
+          type: 'object',
+          properties: {
+            status: {
+              type: 'string',
+              enum: ['ok']
+            }
+          }
+        }
+      }
     },
   },
   async function deleteBookmarkHandler (request, reply) {
@@ -28,9 +47,9 @@ export async function deleteBookmark (fastify, opts) {
     await fastify.pg.query(query)
 
     reply.status(202)
-    fastify.metrics.bookmarkDeleteCounter.inc()
-    return {
+    fastify.prom.bookmarkDeleteCounter.inc()
+    return /** @type {const} */ ({
       status: 'ok',
-    }
+    })
   })
 }

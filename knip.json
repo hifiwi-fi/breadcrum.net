@@ -9,7 +9,7 @@
         "app.js",
         "client/**/*.js",
         "plugins/**/*.js",
-        "routes/**/{index,autohooks}.js",
+        "routes/**/{routes,autohooks}.js",
         "scripts/**/*.js",
         "test/**/*.js"
       ],

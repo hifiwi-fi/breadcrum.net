@@ -1,19 +1,20 @@
-import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
 import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
-import { getEpisodesQuery } from './episode-query-get.js'
+import { getEpisodes } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaEpisodeRead } from './schemas/schema-episode-read.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
- */
-export async function getEpisodes (fastify, _opts) {
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   references: [ SchemaEpisodeRead ],
+ *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+*  }>}
+*/
+export async function getEpisodesRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -71,21 +72,19 @@ export async function getEpisodes (fastify, _opts) {
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
             properties: {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                  },
+                  $ref: 'schema:breadcrum:episode:read',
                 },
               },
               pagination: {
                 type: 'object',
                 properties: {
-                  before: { type: 'string', format: 'date-time' },
-                  after: { type: 'string', format: 'date-time' },
+                  before: { type: ['string', 'null'], format: 'date-time' },
+                  after: { type: ['string', 'null'], format: 'date-time' },
                   top: { type: 'boolean' },
                   bottom: { type: 'boolean' },
                 },
@@ -112,7 +111,9 @@ export async function getEpisodes (fastify, _opts) {
           ? await getOrCreateDefaultFeed({ client, userId })
           : null
 
-        const episodeQuery = getEpisodesQuery({
+        const episodes = await getEpisodes({
+          fastify,
+          pg: client,
           ownerId: userId,
           before,
           after,
@@ -124,31 +125,29 @@ export async function getEpisodes (fastify, _opts) {
           includeFeed: request.query.include_feed,
         })
 
-        const results = await fastify.pg.query(episodeQuery)
-
         const top = Boolean(
           (!before && !after) ||
-          (after && results.rows.length <= perPage)
+          (after && episodes.length <= perPage)
         )
         const bottom = Boolean(
-          (before && results.rows.length <= perPage) ||
-          (!before && !after && results.rows.length <= perPage)
+          (before && episodes.length <= perPage) ||
+          (!before && !after && episodes.length <= perPage)
         )
 
-        if (results.rows.length > perPage) {
+        if (episodes.length > perPage) {
           if (after) {
-            results.rows.shift()
+            episodes.shift()
           } else {
-            results.rows.pop()
+            episodes.pop()
           }
         }
 
-        const nextPage = bottom ? null : results.rows.at(-1)?.created_at
-        const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+        const nextPage = bottom ? null : episodes.at(-1)?.created_at ?? null
+        const prevPage = top ? null : addMillisecond(episodes[0]?.created_at)
 
         return {
           data: request.query.include_feed
-            ? results.rows.map(episode => {
+            ? episodes.map(episode => {
               episode.podcast_feed = getFeedWithDefaults({
                 feed: episode.podcast_feed,
                 transport: fastify.config.TRANSPORT,
@@ -156,7 +155,7 @@ export async function getEpisodes (fastify, _opts) {
               })
               return episode
             })
-            : results.rows,
+            : episodes,
           pagination: {
             before: nextPage,
             after: prevPage,

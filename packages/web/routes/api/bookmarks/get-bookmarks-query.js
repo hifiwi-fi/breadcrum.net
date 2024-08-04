@@ -1,8 +1,62 @@
-// @ts-nocheck
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ * @import { TypeBookmarkRead } from './schemas/schema-bookmark-read.js'
+ */
+
 import SQL from '@nearform/sql'
 
 /**
- * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ * @typedef {GetBookmarksQueryParams & {
+ *   fastify: FastifyInstance,
+ *   pg?: PoolClient | FastifyInstance['pg']
+ * }} GetBookmarksParams
+ */
+
+/**
+ * Retrieves a single bookmark based on the provided query parameters.
+ *
+ * @function getBookmark
+ * @param {GetBookmarksParams} getBookmarksParams - Parameters to shape the query.
+ * @returns {Promise<TypeBookmarkRead| undefined >} A bookmark object or null if not found.
+ */
+export async function getBookmark (getBookmarksParams) {
+  /** @type {TypeBookmarkRead | undefined } */
+  const bookmark = (await getBookmarks(getBookmarksParams))?.[0]
+  return bookmark
+}
+
+/**
+ * Retrieves bookmarks based on the provided query parameters.
+ *
+ * @function getBookmarks
+ * @param {GetBookmarksParams} getBookmarksParams - Parameters to shape the query.
+ * @returns {Promise<TypeBookmarkRead[]>} An array of bookmark objects.
+ */
+export async function getBookmarks (getBookmarksParams) {
+  const { fastify, pg, ...getBookmarksQueryParams } = getBookmarksParams
+  const client = pg ?? fastify.pg
+  const query = getBookmarksQuery(getBookmarksQueryParams)
+
+  const results = await client.query(query)
+  /** @type {TypeBookmarkRead[]} */
+  const bookmarks = results.rows
+  return bookmarks
+}
+
+/**
+ * @typedef {object} GetBookmarksQueryParams
+ * @property {string} ownerId - ID of the owner (required).
+ * @property {string} [tag] - Tag associated with the bookmarks.
+ * @property {string} [bookmarkId] - Specific ID of the bookmark.
+ * @property {string} [before] - Date string to get bookmarks before this date.
+ * @property {string} [after] - Date string to get bookmarks after this date.
+ * @property {string} [url] - URL of the bookmark.
+ * @property {boolean} [sensitive=false] - If true, includes sensitive bookmarks.
+ * @property {boolean} [starred] - If true, includes only starred bookmarks.
+ * @property {boolean} [toread] - If true, includes only 'to read' bookmarks.
+ * @property {number} [perPage] - Limits the number of returned rows.
+ * @property {boolean} [fullArchives=false] - If true, includes full archive content in the result.
  */
 
 /**
@@ -10,19 +64,8 @@ import SQL from '@nearform/sql'
  *
  * @function getBookmarksQuery
  * @exports
- * @param {Object} params - Parameters to shape the query.
- * @param {string} [params.tag] - Tag associated with the bookmarks.
- * @param {string} params.ownerId - ID of the owner.
- * @param {string} [params.bookmarkId] - Specific ID of the bookmark.
- * @param {string} [params.before] - Date string to get bookmarks before this date.
- * @param {string} [params.after] - Date string to get bookmarks after this date.
- * @param {string} [params.url] - URL of the bookmark.
- * @param {boolean} [params.sensitive=false] - If true, includes sensitive bookmarks.
- * @param {boolean} [params.starred] - If true, includes only starred bookmarks.
- * @param {boolean} [params.toread] - If true, includes only 'to read' bookmarks.
- * @param {number} [params.perPage] - Limits the number of returned rows.
- * @param {boolean} [params.fullArchives=false] - If true, includes full archive content in the result.
- * @returns {SqlStatement} SQL template literal representing the bookmarks query.
+ * @param {GetBookmarksQueryParams} params - Parameters to shape the query.
+ * @returns {SQL.SqlStatement} SQL template literal representing the bookmarks query.
  * @throws {Error} Throws an error if ownerId is not provided.
  */
 export const getBookmarksQuery = ({
@@ -98,11 +141,17 @@ export const getBookmarksQuery = ({
         order by b.created_at desc, b.title desc, b.url desc
       `
 
-  console.log(boomkmarksQuery)
-
   return boomkmarksQuery
 }
 
+/**
+ * Generates an SQL query to retrieve an array of tags associated with bookmarks.
+ *
+ * @function bookmarkTagsArray
+ * @param {Object} params - Parameters to shape the query.
+ * @param {string} params.ownerId - ID of the owner (required).
+ * @returns {SQL.SqlStatement} SQL template literal representing the query for bookmark tags.
+ */
 export function bookmarkTagsArray ({
   ownerId,
 }) {
@@ -119,6 +168,14 @@ export function bookmarkTagsArray ({
   `
 }
 
+/**
+ * Generates an SQL query to retrieve an array of episodes associated with bookmarks.
+ *
+ * @function bookmarkEpisodesArray
+ * @param {Object} params - Parameters to shape the query.
+ * @param {string} params.ownerId - ID of the owner (required).
+ * @returns {SQL.SqlStatement} SQL template literal representing the query for bookmark episodes.
+ */
 export function bookmarkEpisodesArray ({
   ownerId,
 }) {
@@ -158,6 +215,15 @@ export function bookmarkEpisodesArray ({
   `
 }
 
+/**
+ * Generates an SQL query to retrieve an array of archives associated with bookmarks.
+ *
+ * @function bookmarkArchivesArray
+ * @param {Object} params - Parameters to shape the query.
+ * @param {boolean} [params.fullArchives=false] - If true, includes full archive content in the result.
+ * @param {string} params.ownerId - ID of the owner (required).
+ * @returns {SQL.SqlStatement} SQL template literal representing the query for bookmark archives.
+ */
 export function bookmarkArchivesArray ({
   fullArchives,
   ownerId,

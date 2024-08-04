@@ -1,14 +1,8 @@
-import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
-/**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
- */
+/** @type {FastifyPluginAsyncJsonSchemaToTs} */
 export async function putEpisodes (fastify, _opts) {
   fastify.put(
     '/',
@@ -59,10 +53,7 @@ export async function putEpisodes (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                  },
+                  $ref: 'schema:breadcrum:episode:read',
                 },
               },
             },
@@ -70,7 +61,7 @@ export async function putEpisodes (fastify, _opts) {
         },
       },
     },
-    async function putEpisodesHandler (request, reply) {
+    async function putEpisodesHandler (_request, reply) {
       return reply.notImplemented()
     }
   )

@@ -1,6 +1,17 @@
+/**
+ * @import { FastifyInstance, FastifyReply } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-tokens.js'
 
+/**
+ * @param  {object} params
+ * @param  {string} params.userId
+ * @param  {PoolClient | FastifyInstance['pg']} params.client
+ * @param  {FastifyReply} params.reply  [description]
+ * @param  {FastifyInstance} params.fastify
+ */
 export async function resendAccountEmailVerificationHandler ({
   userId, client, reply, fastify,
 }) {
@@ -41,7 +52,6 @@ export async function resendAccountEmailVerificationHandler ({
       transport: fastify.config.TRANSPORT,
       host: fastify.config.HOST,
       token: updatedUser.email_verify_token,
-      email: updatedUser.email,
     }),
   })
 
@@ -57,7 +67,15 @@ export async function resendAccountEmailVerificationHandler ({
   await emailSendJob
 }
 
-export function verifyEmailBody ({ email, username, transport, host, token }) {
+/**
+ * @param  {object} params Params for the email body
+ * @param  {string} params.username
+ * @param  { 'http' | 'https' } params.transport``
+ * @param  {string} params.host
+ * @param  {string} params.token
+ * @returns { string } The body of the email
+ */
+export function verifyEmailBody ({ username, transport, host, token }) {
   return `Hi ${username},
 
 Thanks for signing up for a Breadcrum.net account. Please verify your email address by clicking the link below.

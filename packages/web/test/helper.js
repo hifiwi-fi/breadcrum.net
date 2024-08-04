@@ -1,3 +1,8 @@
+/**
+ * @import { Test } from '@tapjs/test'
+ * @import { FastifyInstance } from 'fastify'
+ */
+
 // This file contains code that we reuse
 // between our tests.
 
@@ -16,6 +21,10 @@ function config () {
 }
 
 // automatically build and tear down our instance
+/**
+ * @param  {Test} t
+ * @returns {Promise<FastifyInstance>}
+ */
 async function build (t) {
   // you can set all the options supported by the fastify CLI command
   const argv = [AppPath]
@@ -23,6 +32,10 @@ async function build (t) {
   // fastify-plugin ensures that all decorators
   // are exposed for testing purposes, this is
   // different from the production setup
+
+  /**
+   * @type {FastifyInstance}
+   */
   const app = await helper.build(argv, config())
 
   // tear down our app after we are done

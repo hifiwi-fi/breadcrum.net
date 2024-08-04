@@ -6,5 +6,16 @@
   "include": [],
   "exclude": [
     "node_modules"
+  ],
+  "references": [
+    {
+      "path": "packages/web"
+    },
+    {
+      "path": "packages/worker"
+    },
+    {
+      "path": "packages/resources"
+    }
   ]
 }

@@ -1,16 +1,17 @@
-import { getArchivesQuery } from '../archive-query-get.js'
-import { fullArchivePropsWithBookmark } from '../mixed-archive-props.js'
+import { getArchive } from '../archive-query-get.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaArchiveRead } from '../schemas/schema-archive-read.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   references: [ SchemaArchiveRead ],
+ *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
  */
-export async function getArchive (fastify, _opts) {
+export async function getArchiveRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -35,10 +36,7 @@ export async function getArchive (fastify, _opts) {
         },
         response: {
           200: {
-            type: 'object',
-            properties: {
-              ...fullArchivePropsWithBookmark,
-            },
+            $ref: 'schema:breadcrum:archive:read',
           },
         },
       },
@@ -48,16 +46,14 @@ export async function getArchive (fastify, _opts) {
       const { archive_id: archiveId } = request.params
       const { sensitive } = request.query
 
-      const archiveQuery = getArchivesQuery({
+      const archive = await getArchive({
+        fastify,
         ownerId,
         archiveId,
         sensitive,
         perPage: 1,
         fullArchives: true,
       })
-
-      const results = await fastify.pg.query(archiveQuery)
-      const archive = results.rows[0]
 
       if (!archive) {
         return reply.notFound('archive_id not found')

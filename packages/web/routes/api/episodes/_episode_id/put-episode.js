@@ -1,15 +1,12 @@
 import SQL from '@nearform/sql'
 
-import { commonEpisodeProps } from '../episode-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaEpisodeUpdate } from '../schemas/schema-episode-update.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
 export async function putEpisode (fastify, _opts) {
   fastify.put('/', {
@@ -29,17 +26,10 @@ export async function putEpisode (fastify, _opts) {
         },
         required: ['episode_id'],
       },
-      body: {
-        type: 'object',
-        properties: {
-          ...commonEpisodeProps,
-        },
-        minProperties: 1,
-        additionalProperties: false,
-      },
+      body: /** @type {SchemaEpisodeUpdate} */ (fastify.getSchema('schema:breadcrum:episode:update')),
     },
   },
-  async function putEpisodeHandler (request, reply) {
+  async function putEpisodeHandler (request, _reply) {
     return fastify.pg.transact(async client => {
       const ownerId = request.user.id
       const { episode_id: episodeId } = request.params
@@ -65,7 +55,7 @@ export async function putEpisode (fastify, _opts) {
         await client.query(query)
       }
 
-      fastify.metrics.episodeEditCounter.inc()
+      fastify.prom.episodeEditCounter.inc()
 
       return {
         status: 'ok',

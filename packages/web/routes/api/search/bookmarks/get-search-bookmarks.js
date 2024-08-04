@@ -1,7 +1,14 @@
-import { fullBookmarkPropsWithEpisodes } from '../../bookmarks/mixed-bookmark-props.js'
 import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 
-export async function getSearchBookmarks (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getSearchBookmarks (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -60,13 +67,17 @@ export async function getSearchBookmarks (fastify, opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullBookmarkPropsWithEpisodes,
-                    rank: {
-                      type: 'number',
+                  allOf: [
+                    { $ref: 'schema:breadcrum:bookmark:read' },
+                    {
+                      type: 'object',
+                      properties: {
+                        rank: {
+                          type: 'number',
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
               pagination: {

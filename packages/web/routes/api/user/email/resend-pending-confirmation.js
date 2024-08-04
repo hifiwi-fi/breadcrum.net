@@ -1,7 +1,18 @@
+/**
+ * @import { FastifyInstance, FastifyReply } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-tokens.js'
 import { verifyEmailSubject, verifyEmailUpdateBody } from './post-email.js'
 
+/**
+ * @param  {object} params
+ * @param  {string} params.userId
+ * @param  {PoolClient | FastifyInstance['pg']} params.client
+ * @param  {FastifyReply} params.reply  [description]
+ * @param  {FastifyInstance} params.fastify
+ */
 export async function resendPendingEmailVerificationHandler ({
   userId, client, reply, fastify,
 }) {

@@ -1,7 +1,7 @@
 {
   "name": "breadcrum.net",
   "description": "Breadcrum internet newspaper clippigns",
-  "version": "2024.10.6",
+  "version": "2024.10.17",
   "type": "module",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
@@ -13,11 +13,10 @@
   "devDependencies": {
     "@voxpelli/tsconfig": "^15.0.0",
     "auto-changelog": "^2.0.0",
+    "custompatch": "^1.0.28",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
-    "neostandard": "^0.11.0",
     "npm-run-all2": "^6.0.0",
-    "patch-package": "^8.0.0",
     "typescript": "~5.6.2"
   },
   "funding": {
@@ -33,9 +32,9 @@
     "url": "https://github.com/hifiwi-fi/breadcrum.net.git"
   },
   "scripts": {
-    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules",
+    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm package-lock.json",
     "prepublishOnly": "git push --follow-tags && gh-release -y",
-    "postinstall": "patch-package",
+    "postinstall": "custompatch",
     "release": "git push --follow-tags && gh-release -y",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",

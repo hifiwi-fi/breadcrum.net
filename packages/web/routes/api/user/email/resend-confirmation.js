@@ -8,9 +8,8 @@ import { resendPendingEmailVerificationHandler } from './resend-pending-confirma
 /**
  * Request a email verification email
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function resendEmailVerification (fastify, opts) {
+export async function resendEmailVerificationRoute (fastify, _opts) {
   fastify.post(
     '::resend',
     {
@@ -25,19 +24,21 @@ export async function resendEmailVerification (fastify, opts) {
         tags: ['user'],
         body: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             update: {
               type: 'boolean',
             },
           },
         },
-      },
-      respose: {
-        202: {
-          type: 'object',
-          properties: {
-            status: {
-              type: 'string',
+        response: {
+          202: {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              status: {
+                type: 'string', enum: ['ok']
+              },
             },
           },
         },

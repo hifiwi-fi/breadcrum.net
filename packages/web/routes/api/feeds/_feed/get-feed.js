@@ -1,3 +1,4 @@
+// @ts-ignore
 import jsonfeedToRSS from 'jsonfeed-to-rss'
 import cleanDeep from 'clean-deep'
 import { getFeedQuery } from './feed-query.js'
@@ -8,7 +9,16 @@ import { getBookmarksUrl } from '../../bookmarks/bookmarks-urls.js'
 import { getBookmarkUrl } from '../../bookmarks/_id/bookmark-urls.js'
 import { getEpisodeUrl } from './episode/_episode/episode-urls.js'
 
-export async function getFeed (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function getFeed (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -20,7 +30,7 @@ export async function getFeed (fastify, opts) {
       }),
       schema: {
         tags: ['feeds'],
-        parms: {
+        params: {
           type: 'object',
           properties: {
             feed: {
@@ -42,7 +52,14 @@ export async function getFeed (fastify, opts) {
     },
     async function getFeedHandler (request, reply) {
       // const { userId, token: userProvidedToken } = request.feedTokenUser
+
+      /** @type {{
+        userId: string
+        token: string,
+      }} Added in autohook */
+      // @ts-ignore
       const feedTokenUser = request.feedTokenUser
+
       const userId = feedTokenUser?.userId ?? request?.user?.id
       if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
@@ -82,9 +99,9 @@ export async function getFeed (fastify, opts) {
 
       const jsonfeed = {
         version: 'https://jsonfeed.org/version/1',
-        title: getFeedTitle({ title: pf.title, ownerName: pf.owner_name }),
+        title: getFeedTitle({ title: pf.title }),
         home_page_url: getFeedHtmlUrl({ transport, host, feedId }),
-        description: getFeedDescription({ description: pf.description, ownerName: pf.owner_name, defaultFeed: pf.default_feed }),
+        description: getFeedDescription({ description: pf.description, defaultFeed: pf.default_feed }),
         icon: getFeedImageUrl({ transport, host, imageUrl: pf.image_url }),
         favicon: getFeedImageUrl({ transport, host, imageUrl: pf.image_url }),
         feed_url: getFeedUrl({ transport, host, userId, token, feedId: pf.id }),
@@ -109,6 +126,7 @@ export async function getFeed (fastify, opts) {
               content_text: ep.text_content ?? ep.bookmark.note,
               date_published: ep.created_at,
               image: ep.thumbnail,
+              // @ts-ignore
               attachments: cleanDeep([{
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: ep.id }),
                 mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
@@ -123,6 +141,7 @@ export async function getFeed (fastify, opts) {
               title: 'Breadcum.net placeholder episode',
               content_text: 'This episode will disapear when you create your first breadcrum episode. Its added so that you can subscribe to your podcast feed URL before you add any episodes.',
               date_published: new Date('2022-09-24T19:30:24.654Z'),
+              // @ts-ignore
               attachments: cleanDeep([{
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: 'placeholder' }),
                 mime_type: 'video/mp4',
@@ -164,4 +183,5 @@ export async function getFeed (fastify, opts) {
   )
 }
 
+// @ts-ignore
 const getRss = (jsonfeed) => jsonfeedToRSS(jsonfeed, { itunes: true })

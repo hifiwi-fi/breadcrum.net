@@ -1,6 +1,8 @@
 // This file contains code that we reuse
 // between our tests.
 
+/** @import { Test } from 'tap' */
+
 import helper from 'fastify-cli/helper.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -15,7 +17,10 @@ function config () {
   return {}
 }
 
-// automatically build and tear down our instance
+/**
+ * Automatically build and tear down our instance
+ * @param {Test} t - Tap test instance
+ */
 async function build (t) {
   // you can set all the opti ons supported by the fastify CLI command
   const argv = [AppPath]

@@ -1,16 +1,15 @@
-import { getEpisodesQuery } from '../episode-query-get.js'
-import { fullEpisodePropsWithBookmarkAndFeed } from '../mixed-episode-props.js'
+import { getEpisode } from '../episode-query-get.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
-export async function getEpisode (fastify, _opts) {
+export async function getEpisodeRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -35,10 +34,7 @@ export async function getEpisode (fastify, _opts) {
         },
         response: {
           200: {
-            type: 'object',
-            properties: {
-              ...fullEpisodePropsWithBookmarkAndFeed,
-            },
+            $ref: 'schema:breadcrum:episode:read',
           },
         },
       },
@@ -48,7 +44,8 @@ export async function getEpisode (fastify, _opts) {
       const { episode_id: episodeId } = request.params
       const { sensitive } = request.query
 
-      const episodeQuery = getEpisodesQuery({
+      const episode = await getEpisode({
+        fastify,
         ownerId,
         episodeId,
         sensitive,
@@ -56,16 +53,15 @@ export async function getEpisode (fastify, _opts) {
         includeFeed: true,
       })
 
-      const results = await fastify.pg.query(episodeQuery)
-      const episode = results.rows[0]
-
       if (!episode) {
         return reply.notFound('episide_id not found')
       }
 
-      return {
-        ...episode,
-      }
+      console.log({
+        episode
+      })
+
+      return episode
     }
   )
 }

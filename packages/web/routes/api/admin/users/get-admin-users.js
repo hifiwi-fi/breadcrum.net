@@ -1,9 +1,19 @@
 import { fullSerializedAdminUserProps } from './admin-user-props.js'
-import { userEditableUserProps } from '../../user/user-props.js'
+import { userEditableUserProps } from '../../user/schemas/user-base.js'
 import { getAdminUsersQuery } from './get-admin-users-query.js'
 import { addMillisecond } from '../../bookmarks/addMillisecond.js'
 
-export async function getAdminUsers (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
+ */
+export async function getAdminUsers (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -32,7 +42,7 @@ export async function getAdminUsers (fastify, opts) {
               maximum: 200,
               default: 20,
             },
-            username: userEditableUserProps.username,
+            username: userEditableUserProps.properties.username,
           },
           dependencies: {
             before: { allOf: [{ not: { required: ['after'] } }] },
@@ -65,7 +75,7 @@ export async function getAdminUsers (fastify, opts) {
       },
     },
     // GET users with administrative fields
-    async function getAdminUsersHandler (request, reply) {
+    async function getAdminUsersHandler (request, _reply) {
       return fastify.pg.transact(async client => {
         const {
           before,

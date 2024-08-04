@@ -1,7 +1,16 @@
-import { fullSerializedUserProps } from './user-props.js'
-import { getUserQuery } from './user-query.js'
+import { getUser } from './user-query.js'
 
-export async function getUser (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaUserRead } from './schemas/schema-user-read.js'
+ */
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
+ */
+export async function getUserRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -9,22 +18,18 @@ export async function getUser (fastify, opts) {
       schema: {
         tags: ['user'],
         response: {
-          200: fullSerializedUserProps,
+          200: /** @type {SchemaUserRead} */(fastify.getSchema('schema:breadcrum:user:read')),
         },
       },
     },
-    async function (request, reply) {
+    async function getUserHanlder (request, reply) {
       const userId = request.user.id
 
-      const query = getUserQuery({ userId })
-
-      const results = await fastify.pg.query(query)
-      const user = results.rows.pop()
-
-      fastify.log.info({ user })
+      const user = await getUser({ fastify, userId })
 
       if (user) {
         // TODO refresh token
+        reply.status(200)
         return user
       } else {
         return reply.notFound('User not found')

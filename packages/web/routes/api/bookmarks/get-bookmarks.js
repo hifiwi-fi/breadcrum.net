@@ -1,23 +1,26 @@
-import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
-import { getBookmarksQuery } from './get-bookmarks-query.js'
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
+ * @import { GetBookmarksQueryParams } from './get-bookmarks-query.js'
+ */
+
+import { getBookmarks } from './get-bookmarks-query.js'
 import { addMillisecond } from './addMillisecond.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
- */
-
-/**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
- */
-export async function getBookmarks (fastify) {
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   references: [ SchemaBookmarkRead ],
+ *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+*  }>}
+*/
+export async function getBookmarksHandler (fastify) {
   fastify.get(
     '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         tags: ['bookmarks'],
+
         querystring: {
           type: 'object',
           properties: {
@@ -60,24 +63,23 @@ export async function getBookmarks (fastify) {
             after: { allOf: [{ not: { required: ['before', 'url'] } }] },
           },
         },
+
         response: {
           200: {
             type: 'object',
+            unevaluatedProperties: false,
             properties: {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullBookmarkPropsWithEpisodes,
-                  },
-                },
+                  $ref: 'schema:breadcrum:bookmark:read',
+                }
               },
               pagination: {
                 type: 'object',
                 properties: {
-                  before: { type: 'string', format: 'date-time' },
-                  after: { type: 'string', format: 'date-time' },
+                  before: { type: ['string', 'null'], format: 'date-time' },
+                  after: { type: ['string', 'null'], format: 'date-time' },
                   top: { type: 'boolean' },
                   bottom: { type: 'boolean' },
                 },
@@ -85,11 +87,11 @@ export async function getBookmarks (fastify) {
             },
           },
         },
-
       },
+
     },
     // Get Bookmarks
-    async function getBookmarksHandler (request, _reply) {
+    async function getBookmarksHandler (request, reply) {
       const userId = request.user.id
       const {
         before,
@@ -102,42 +104,44 @@ export async function getBookmarks (fastify) {
         toread,
       } = request.query
 
-      const bookmarkQuery = getBookmarksQuery({
-        tag,
+      /** @type {GetBookmarksQueryParams} */
+      const bookmarkParams = {
         ownerId: userId,
-        before,
-        after,
-        url,
         sensitive,
         starred,
         toread,
         perPage: perPage + 1,
-      })
+      }
 
-      const results = await fastify.pg.query(bookmarkQuery)
+      if (tag) bookmarkParams.tag = tag
+      if (before) bookmarkParams.before = before
+      if (after) bookmarkParams.after = after
+      if (url) bookmarkParams.url = url
+
+      const rows = await getBookmarks({ fastify, ...bookmarkParams })
 
       const top = Boolean(
         (!before && !after) ||
-        (after && results.rows.length <= perPage)
+        (after && rows.length <= perPage)
       )
       const bottom = Boolean(
-        (before && results.rows.length <= perPage) ||
-        (!before && !after && results.rows.length <= perPage)
+        (before && rows.length <= perPage) ||
+        (!before && !after && rows.length <= perPage)
       )
 
-      if (results.rows.length > perPage) {
+      if (rows.length > perPage) {
         if (after) {
-          results.rows.shift()
+          rows.shift()
         } else {
-          results.rows.pop()
+          rows.pop()
         }
       }
 
-      const nextPage = bottom ? null : results.rows.at(-1)?.created_at
-      const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+      const nextPage = bottom ? null : rows.at(-1)?.created_at ?? null
+      const prevPage = top ? null : addMillisecond(rows[0]?.created_at)
 
       const response = {
-        data: results.rows,
+        data: rows,
         pagination: {
           before: nextPage,
           after: prevPage,
@@ -145,6 +149,8 @@ export async function getBookmarks (fastify) {
           bottom,
         },
       }
+
+      reply.status(200)
 
       return response
     }

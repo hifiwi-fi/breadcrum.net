@@ -7,9 +7,8 @@ import SQL from '@nearform/sql'
 /**
  * Delete any pending email updates
  * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
  */
-export async function deleteEmail (fastify, _opts) {
+export async function deleteEmailRoute (fastify, _opts) {
   fastify.delete(
     '/',
     {

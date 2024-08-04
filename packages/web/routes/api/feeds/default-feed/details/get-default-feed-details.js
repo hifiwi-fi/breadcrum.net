@@ -1,4 +1,4 @@
-import { fullFeedProps } from '../../feed-props.js'
+import { feedProps, feedReadProps } from '../../schemas/feed-base.js'
 import { getOrCreateDefaultFeed } from '../default-feed-query.js'
 import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
 
@@ -7,7 +7,7 @@ import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -30,7 +30,8 @@ export async function getDefaultFeedDetails (fastify, _opts) {
               data: {
                 type: 'object',
                 properties: {
-                  ...fullFeedProps,
+                  ...feedProps.properties,
+                  ...feedReadProps.properties
                 },
               },
             },

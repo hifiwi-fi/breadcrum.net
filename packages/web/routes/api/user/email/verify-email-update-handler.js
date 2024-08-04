@@ -1,5 +1,23 @@
+/**
+ * @import { FastifyInstance, FastifyReply } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ */
 import SQL from '@nearform/sql'
 
+/**
+ * @param  {object} params
+ * @param  {string} params.userId
+ * @param  {PoolClient | FastifyInstance['pg']} params.client
+ * @param  {FastifyReply} params.reply  [description]
+ * @param  {string} params.token
+ * @param  {Date} params.now
+ * @returns {Promise<{
+ *  status: 'ok'
+ *  email: string
+ *  updated: true
+ *  confirmed: boolean
+ * }>}
+ */
 export async function verifyEmailUpdateHandler ({
   userId, client, reply, token, now,
 }) {

@@ -1,11 +1,9 @@
-import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -29,10 +27,7 @@ export async function putArchives (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullArchivePropsWithBookmark,
-                  },
+                  $ref: 'schema:breadcrum:archive:read',
                 },
               },
             },

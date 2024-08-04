@@ -1,32 +1,73 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ * @import { TypeArchiveRead } from './schemas/schema-archive-read.js'
+ */
+
 import SQL from '@nearform/sql'
 
 /**
- * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ * @typedef {ArchiveQueryParams & {
+ *   fastify: FastifyInstance,
+ *   pg?: PoolClient | FastifyInstance['pg']
+ * }} GetArchivesParams
+ */
+
+/**
+ * Retrieves multiple archives based on the provided query parameters.
+ *
+ * @function getArchives
+ * @param {GetArchivesParams} getArchivesParams - Parameters to shape the query.
+ * @returns {Promise<TypeArchiveRead[]>} An array of archive objects.
+ */
+export async function getArchives (getArchivesParams) {
+  const { fastify, pg, ...getArchivesQueryParams } = getArchivesParams
+  const client = pg ?? fastify.pg
+  const query = getArchivesQuery(getArchivesQueryParams)
+
+  const results = await client.query(query)
+  return results.rows
+}
+
+/**
+ * Retrieves a single archive based on the provided query parameters.
+ *
+ * @function getArchive
+ * @param {GetArchivesParams} getArchivesParams - Parameters to shape the query.
+ * @returns {Promise<TypeArchiveRead | undefined>} An archive object or undefined if not found.
+ */
+export async function getArchive (getArchivesParams) {
+  const archives = await getArchives(getArchivesParams)
+  return archives?.[0]
+}
+
+/**
+ * @typedef {Object} ArchiveQueryParams
+ * @property {boolean | undefined} [fullArchives] - Whether to include full HTML content of the archive.
+ * @property {string|number} ownerId - The owner ID to filter the archives and bookmarks.
+ * @property {boolean | undefined} [sensitive] - Whether to include sensitive bookmarks.
+ * @property {boolean | undefined} [toread] - Whether to include bookmarks marked "to read."
+ * @property {boolean | undefined} [starred] - Whether to include starred bookmarks.
+ * @property {boolean | undefined} [ready] - Whether the archive is ready.
+ * @property {string | undefined } [archiveId] - Specific archive ID to fetch.
+ * @property {string | undefined } [bookmarkId] - Specific bookmark ID associated with an archive to fetch.
+ * @property {string | undefined } [before] - Timestamp to fetch archives created before this time.
+ * @property {string | undefined} [after] - Timestamp to fetch archives created after this time.
+ * @property {boolean} [withRank] - Whether to include ranking based on text search.
+ * @property {string} [query] - Text search query for ranking.
+ * @property {boolean} [includeRank] - Include rank column.
+ * @property {string|number} [perPage] - Number of items per page.
  */
 
 /**
  * Generates an SQL query for fetching archive properties based on various filters.
  *
  * @export
- * @param {Object} options - The options object containing filter and query properties.
- * @param {boolean} [options.fullArchives] - Whether to include full HTML content of the archive.
- * @param {string|number} options.ownerId - The owner ID to filter the archives and bookmarks.
- * @param {boolean} [options.sensitive] - Whether to include sensitive bookmarks.
- * @param {boolean} [options.toread] - Whether to include bookmarks marked "to read."
- * @param {boolean} [options.starred] - Whether to include starred bookmarks.
- * @param {boolean} [options.ready] - Whether the archive is ready.
- * @param {string|number} [options.archiveId] - Specific archive ID to fetch.
- * @param {string|number} [options.bookmarkId] - Specific bookmark ID associated with an archive to fetch.
- * @param {string|number} [options.before] - Timestamp to fetch archives created before this time.
- * @param {string|number} [options.after] - Timestamp to fetch archives created after this time.
- * @param {boolean} [options.withRank] - Whether to include ranking based on text search.
- * @param {string} [options.query] - Text search query for ranking.
- * @param {boolean} [options.includeRank] - Include rank column
- *
- * @returns {SqlStatement} The generated SQL query.
+ * @param {ArchiveQueryParams} params - The options object containing filter and query properties.
+ * @returns {SQL.SqlStatement} The generated SQL query.
  */
 export function archivePropsQuery ({
-  fullArchives,
+  fullArchives = false,
   ownerId,
   sensitive,
   toread,
@@ -90,23 +131,8 @@ export function archivePropsQuery ({
  * Generates an SQL query for fetching archive properties based on various filters.
  *
  * @export
- * @param {Object} options - The options object containing filter and query properties.
- * @param {boolean} [options.fullArchives] - Whether to include full HTML content of the archive.
- * @param {string|number} options.ownerId - The owner ID to filter the archives and bookmarks.
- * @param {boolean} [options.sensitive] - Whether to include sensitive bookmarks.
- * @param {boolean} [options.toread] - Whether to include bookmarks marked "to read."
- * @param {boolean} [options.starred] - Whether to include starred bookmarks.
- * @param {boolean} [options.ready] - Whether the archive is ready.
- * @param {string|number} [options.archiveId] - Specific archive ID to fetch.
- * @param {string|number} [options.bookmarkId] - Specific bookmark ID associated with an archive to fetch.
- * @param {string|number} [options.before] - Timestamp to fetch archives created before this time.
- * @param {string|number} [options.after] - Timestamp to fetch archives created after this time.
- * @param {string|number} [options.perPage] - Number of items per apge
- * @param {boolean} [options.withRank] - Whether to include ranking based on text search.
- * @param {string} [options.query] - Text search query for ranking.
- * @param {boolean} [options.includeRank] - Include rank column
- *
- * @returns {SqlStatement} The generated SQL query.
+ * @param {ArchiveQueryParams} params - The options object containing filter and query properties.
+ * @returns {SQL.SqlStatement} The generated SQL query.
  */
 export function getArchivesQuery ({
   ownerId,

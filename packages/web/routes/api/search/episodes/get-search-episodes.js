@@ -1,12 +1,10 @@
 import { getSearchEpisodesQuery } from './get-search-episodes-query.js'
-import { fullEpisodePropsWithBookmarkAndFeed } from '../../episodes/mixed-episode-props.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
@@ -19,13 +17,15 @@ export async function getSearchEpisodes (fastify, _opts) {
         tags: ['search', 'episodes'],
         querystring: {
           type: 'object',
+          additionalProperties: false,
+          required: ['query'],
           properties: {
             query: {
               type: 'string',
               description: 'The search query',
             },
             rank: {
-              type: 'string',
+              type: 'number',
               description: 'The rank use for paginating',
             },
             id: {
@@ -65,21 +65,27 @@ export async function getSearchEpisodes (fastify, _opts) {
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
             properties: {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                    rank: {
-                      type: 'number',
+                  allOf: [
+                    { $ref: 'schema:breadcrum:episode:read' },
+                    {
+                      type: 'object',
+                      properties: {
+                        rank: {
+                          type: 'number',
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
               pagination: {
                 type: 'object',
+                additionalProperties: false,
                 properties: {
                   top: {
                     type: 'boolean',
@@ -88,6 +94,7 @@ export async function getSearchEpisodes (fastify, _opts) {
                     type: 'boolean',
                   },
                   next: {
+                    additionalProperties: false,
                     type: 'object',
                     properties: {
                       rank: {
@@ -106,6 +113,7 @@ export async function getSearchEpisodes (fastify, _opts) {
                     },
                   },
                   prev: {
+                    additionalProperties: false,
                     type: 'object',
                     properties: {
                       rank: {
@@ -130,7 +138,6 @@ export async function getSearchEpisodes (fastify, _opts) {
         },
       },
     },
-    // Get Bookmarks
     async function getSearchEpisodesHandler (request, _reply) {
       const userId = request.user.id
       const {
@@ -169,10 +176,25 @@ export async function getSearchEpisodes (fastify, _opts) {
         results.rows.shift()
       }
 
-      const pagination = {
-        top,
-        bottom,
-      }
+      const pagination = /** @type {{
+        top: boolean
+        bottom: boolean
+        prev?: {
+          rank: number
+          id: string
+          reverse: boolean
+          query: string
+        }
+        next?: {
+          rank: number
+          id: string
+          reverse: boolean
+          query: string
+        }
+      }} */ ({
+          top,
+          bottom,
+        })
 
       if (!top) {
         const firstResult = results.rows.at(0)

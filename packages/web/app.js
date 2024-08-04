@@ -14,27 +14,46 @@ const hid = hyperid()
  * @type {FastifyPluginAsync<AppOptions>}
  */
 export default async function App (fastify, opts) {
-  const testPattern = /.*(test|spec).js/
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
-  fastify.register(AutoLoad, {
-    dir: join(__dirname, 'plugins'),
-    dirNameRoutePrefix: false,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
-  })
+  const testPattern = /.*(test|spec)(\.js|\.cjs|\.mjs)$/i
+  const skipPattern = /.*.no-load(\.js|\.cjs|\.mjs)$/i
+  const ignorePattern = new RegExp(`${testPattern.source}|${skipPattern.source}`)
 
-  // This loads all plugins defined in routes
-  // define your routes in one of these
+  // Load any files in the routes folder ending with .schema.js
+  // Use these files to register schemas in the fastify schema store before
+  // any routes try to reference them.
+  // Use fp to ensure load order correctness.
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
-    routeParams: true,
+    matchFilter: /^.*[a-zA-Z0-9_-]+\.schema(\.js|\.cjs|\.mjs)$/i,
+    indexPattern: /(?!.*)/, // Disable index files for schema.
+    dirNameRoutePrefix: false,
+    autoHooks: false,
+    options: { ...opts },
+  })
+
+  // This loads all global plugins defined in the plugins folder
+  // Plugins should use fp and be named and define their
+  // plugin dependencies.
+  fastify.register(AutoLoad, {
+    dir: join(__dirname, 'plugins'),
+    ignorePattern,
+    dirNameRoutePrefix: false,
+    options: { ...opts },
+  })
+
+  // This loads all of your routes in the routes folder and their
+  // associated autoHooks (route scoped plugins).
+  // Routes do not need to be wrapped in fp, but autoHooks do.
+  fastify.register(AutoLoad, {
+    dir: join(__dirname, 'routes'),
+    indexPattern: /^.*routes(?:\.ts|\.js|\.cjs|\.mjs)$/,
+    ignorePattern: /^.*(\.js|\.cjs|\.mjs)$/,
+    autoHooksPattern: /.*hooks(\.js|\.cjs|\.mjs)$/i,
     autoHooks: true,
     cascadeHooks: true,
     overwriteHooks: true,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
+    routeParams: true,
+    options: { ...opts },
   })
 }
 

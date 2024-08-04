@@ -100,17 +100,17 @@ export const page = Component(() => {
     beforeParams.delete('after')
   }
 
-  let afterParms
+  let afterParams
   if (after) {
-    afterParms = new URLSearchParams(query)
-    afterParms.set('after', after.valueOf())
-    afterParms.delete('before')
+    afterParams = new URLSearchParams(query)
+    afterParams.set('after', after.valueOf())
+    afterParams.delete('before')
   }
 
   return html`
     <div>
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
+      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
     ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
@@ -122,7 +122,7 @@ export const page = Component(() => {
 
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
+    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>
 `
 })

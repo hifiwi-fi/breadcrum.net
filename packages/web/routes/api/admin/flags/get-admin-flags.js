@@ -6,7 +6,7 @@ import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
+ *
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */

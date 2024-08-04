@@ -1,15 +1,55 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ * @import { TypeEpisodeRead } from './schemas/schema-episode-read.js'
+ */
+
 import SQL from '@nearform/sql'
 
 /**
- * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
+ * @typedef {EpisodeQueryOptions & {
+ *   fastify: FastifyInstance,
+ *   pg?: PoolClient | FastifyInstance['pg']
+ * }} GetEpisodesParams
  */
+
+/**
+ * Retrieves a single episode based on the provided query parameters.
+ *
+ * @function getEpisode
+ * @param {GetEpisodesParams} getEpisodesParams - Parameters to shape the query.
+ * @returns {Promise<TypeEpisodeRead| undefined>} An episode object or null if not found.
+ */
+export async function getEpisode (getEpisodesParams) {
+  /** @type {TypeEpisodeRead | undefined } */
+  const episode = (await getEpisodes(getEpisodesParams))?.[0]
+  return episode
+}
+
+/**
+ * Retrieves episodes based on the provided query parameters.
+ *
+ * @function getEpisodes
+ * @param {GetEpisodesParams} getEpisodesParams - Parameters to shape the query.
+ * @returns {Promise<TypeEpisodeRead[]>} An array of episode objects.
+ */
+export async function getEpisodes (getEpisodesParams) {
+  const { fastify, pg, ...getEpisodesQueryParams } = getEpisodesParams
+  const client = pg ?? fastify.pg
+  const query = getEpisodesQuery(getEpisodesQueryParams)
+
+  const results = await client.query(query)
+  /** @type {TypeEpisodeRead[]} */
+  const episodes = results.rows
+  return episodes
+}
 
 /**
  * @typedef {Object} EpisodeQueryOptions
  * @property {string} ownerId - ID of the episode owner.
  * @property {string | null | undefined} [episodeId] - Specific ID of the episode to query.
- * @property {Date | null | undefined} [before] - Timestamp to fetch episodes created before.
- * @property {Date | null | undefined} [after] - Timestamp to fetch episodes created after.
+ * @property {string | Date | null | undefined} [before] - Timestamp to fetch episodes created before.
+ * @property {string | Date | null | undefined} [after] - Timestamp to fetch episodes created after.
  * @property {boolean | null | undefined} [sensitive] - Whether to include sensitive episodes.
  * @property {boolean | null | undefined} [ready] - Whether to filter episodes by readiness.
  * @property {number | null | undefined} [perPage] - Number of episodes to return per page (not used in current implementation).
@@ -25,7 +65,7 @@ import SQL from '@nearform/sql'
  * additional related information like podcast feed and bookmark details.
  *
  * @param {EpisodeQueryOptions} options - Query options.
- * @returns {SqlStatement} Generated SQL query.
+ * @returns {SQL.SqlStatement} Generated SQL query.
  */
 export function episodePropsQuery ({
   ownerId,
@@ -119,7 +159,7 @@ export function episodePropsQuery ({
  * additional related information like podcast feed and bookmark details.
  *
  * @param {EpisodeQueryOptions} options - Query options.
- * @returns {SqlStatement} Generated SQL query.
+ * @returns {SQL.SqlStatement} Generated SQL query.
  */
 export function getEpisodesQuery ({
   ownerId,

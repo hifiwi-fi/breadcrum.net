@@ -1,17 +1,18 @@
-import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
-import { getArchivesQuery } from './archive-query-get.js'
+import { getArchives } from './archive-query-get.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { SchemaArchiveRead } from './schemas/schema-archive-read.js'
  */
 
 /**
- * admin/flags route returns frontend and backend flags and requires admin to see
- * @type {FastifyPluginAsyncJsonSchemaToTs}
- * @returns {Promise<void>}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   references: [ SchemaArchiveRead ],
+ *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }>}
  */
-export async function getArchives (fastify, _opts) {
+export async function getArchivesRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -67,21 +68,20 @@ export async function getArchives (fastify, _opts) {
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
+            required: ['data', 'pagination'],
             properties: {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullArchivePropsWithBookmark,
-                  },
+                  $ref: 'schema:breadcrum:archive:read',
                 },
               },
               pagination: {
                 type: 'object',
                 properties: {
-                  before: { type: 'string', format: 'date-time' },
-                  after: { type: 'string', format: 'date-time' },
+                  before: { type: ['string', 'null'], format: 'date-time' },
+                  after: { type: ['string', 'null'], format: 'date-time' },
                   top: { type: 'boolean' },
                   bottom: { type: 'boolean' },
                 },
@@ -106,7 +106,9 @@ export async function getArchives (fastify, _opts) {
           bookmark_id: bookmarkId,
         } = request.query
 
-        const archivesQuery = getArchivesQuery({
+        const archives = await getArchives({
+          fastify,
+          pg: client,
           ownerId: userId,
           bookmarkId,
           before,
@@ -119,30 +121,28 @@ export async function getArchives (fastify, _opts) {
           fullArchives: request.query.full_archives,
         })
 
-        const results = await client.query(archivesQuery)
-
         const top = Boolean(
           (!before && !after) ||
-          (after && results.rows.length <= perPage)
+          (after && archives.length <= perPage)
         )
         const bottom = Boolean(
-          (before && results.rows.length <= perPage) ||
-          (!before && !after && results.rows.length <= perPage)
+          (before && archives.length <= perPage) ||
+          (!before && !after && archives.length <= perPage)
         )
 
-        if (results.rows.length > perPage) {
+        if (archives.length > perPage) {
           if (after) {
-            results.rows.shift()
+            archives.shift()
           } else {
-            results.rows.pop()
+            archives.pop()
           }
         }
 
-        const nextPage = bottom ? null : results.rows.at(-1)?.created_at
-        const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+        const nextPage = bottom ? null : archives.at(-1)?.created_at ?? null
+        const prevPage = top ? null : addMillisecond(archives[0]?.created_at)
 
         const response = {
-          data: results.rows,
+          data: archives,
           pagination: {
             before: nextPage,
             after: prevPage,

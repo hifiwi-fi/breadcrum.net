@@ -110,11 +110,11 @@ export const page = Component(() => {
     beforeParams.delete('after')
   }
 
-  let afterParms
+  let afterParams
   if (after) {
-    afterParms = new URLSearchParams(query)
-    afterParms.set('after', after.valueOf())
-    afterParms.delete('before')
+    afterParams = new URLSearchParams(query)
+    afterParams.set('after', after.valueOf())
+    afterParams.delete('before')
   }
 
   const tageFilterRemovedParams = new URLSearchParams(query)
@@ -128,7 +128,7 @@ export const page = Component(() => {
     })}
     <div>
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
+      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
     <div>
@@ -143,7 +143,7 @@ export const page = Component(() => {
 
   <div>
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParms}>later</span>` : null}
+    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>
 `
 })

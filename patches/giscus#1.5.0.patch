@@ -1,0 +1,14 @@
+Index: /giscus/dist/giscus.mjs
+===================================================================
+--- /giscus/dist/giscus.mjs
++++ /giscus/dist/giscus.mjs
+@@ -169,8 +169,9 @@
+   }
+   render() {
+     return d`
+       <iframe
++        credentialless
+         title="Comments"
+         scrolling="no"
+         class="loading"
+         ${f(this._iframeRef)}
