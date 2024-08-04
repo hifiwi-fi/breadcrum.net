@@ -1,4 +1,3 @@
-import { fullArchivePropsWithBookmark } from './mixed-archive-props.js'
 import { getArchivesQuery } from './archive-query-get.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
@@ -71,10 +70,7 @@ export async function getArchives (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullArchivePropsWithBookmark,
-                  },
+                  $ref: 'schema:breadcrum:archive-with-bookmark:read',
                 },
               },
               pagination: {

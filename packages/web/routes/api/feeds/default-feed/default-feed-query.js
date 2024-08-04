@@ -13,8 +13,8 @@ import SQL from '@nearform/sql'
  *
  * @param {Object} params - The function parameters.
  * @param {import('@fastify/postgres').PostgresDb} params.client - The database client for executing queries, an instance of a pg connection from `fastify.pg` or `node-pg`.
- * @param {number} params.userId - The ID of the user for whom to retrieve or create the default podcast feed.
- * @returns {Promise<number>} The ID of the default podcast feed for the given user.
+ * @param {string} params.userId - The ID of the user for whom to retrieve or create the default podcast feed.
+ * @returns {Promise<string>} The ID of the default podcast feed for the given user.
  * @throws {Error} Throws an error if the database transaction fails.
  */
 export async function getOrCreateDefaultFeed ({

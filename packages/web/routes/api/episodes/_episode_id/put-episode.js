@@ -1,7 +1,5 @@
 import SQL from '@nearform/sql'
 
-import { commonEpisodeProps } from '../episode-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
@@ -31,9 +29,7 @@ export async function putEpisode (fastify, _opts) {
       },
       body: {
         type: 'object',
-        properties: {
-          ...commonEpisodeProps,
-        },
+        $ref: 'schema:breadcrum:episode:base',
         minProperties: 1,
         additionalProperties: false,
       },

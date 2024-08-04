@@ -1,10 +1,6 @@
 import SQL from '@nearform/sql'
 import { createEpisode } from '../../episodes/episode-query-create.js'
-import { commnonBookmarkProps } from '../bookmark-props.js'
-import { createEpisodeProp } from '../../episodes/episode-props.js'
-import { createArchiveProp } from '../../archives/archive-props.js'
 import { createArchive } from '../../archives/archive-query-create.js'
-import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 import { getBookmarksQuery } from '../get-bookmarks-query.js'
 
 export async function putBookmark (fastify, opts) {
@@ -26,13 +22,9 @@ export async function putBookmark (fastify, opts) {
       },
       body: {
         type: 'object',
-        properties: {
-          ...commnonBookmarkProps,
-          ...createEpisodeProp,
-          ...createArchiveProp,
-        },
+        $ref: 'schema:breadcrum:bookmark:create',
         minProperties: 1,
-        additionalProperties: false,
+        // additionalProperties: false,
       },
       response: {
         200: {
@@ -42,10 +34,7 @@ export async function putBookmark (fastify, opts) {
             status: { enum: ['updated'] },
             site_url: { type: 'string' },
             data: {
-              type: 'object',
-              properties: {
-                ...fullBookmarkPropsWithEpisodes,
-              },
+              $ref: 'schema:breadcrum:bookmark-with-archives-and-episode',
             },
           },
         },

@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "^1.0.10",
-    "@bret/type-provider-json-schema-to-ts": "^4.0.1",
+    "@bret/type-provider-json-schema-to-ts": "^4.0.2",
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.15",
@@ -70,12 +70,13 @@
     "json-schema-to-ts": "^3.1.0",
     "local-storage-proxy": "^4.0.3",
     "mine.css": "^10.0.0",
+    "neostandard": "^0.11.1",
     "npm-run-all2": "^6.0.0",
     "p-map": "^7.0.0",
     "tap": "^21.0.0",
-    "neostandard": "^0.11.1",
     "top-bun": "^10.0.0",
     "typescript": "~5.6.2",
+    "type-fest": "^4.26.1",
     "uland-isomorphic": "^2.0.0",
     "xmlbuilder": "^15.1.1"
   },

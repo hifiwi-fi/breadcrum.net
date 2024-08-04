@@ -1,7 +1,5 @@
 import SQL from '@nearform/sql'
 
-import { commonArchiveProps } from '../archive-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
@@ -31,11 +29,9 @@ export async function putArchive (fastify, _opts) {
       },
       body: {
         type: 'object',
-        properties: {
-          ...commonArchiveProps,
-        },
+        $ref: 'schema:breadcrum:archive:base',
         minProperties: 1,
-        additionalProperties: false,
+        // additionalProperties: false,
       },
     },
   },

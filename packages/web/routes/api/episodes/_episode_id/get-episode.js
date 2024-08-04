@@ -1,5 +1,4 @@
 import { getEpisodesQuery } from '../episode-query-get.js'
-import { fullEpisodePropsWithBookmarkAndFeed } from '../mixed-episode-props.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
@@ -35,10 +34,7 @@ export async function getEpisode (fastify, _opts) {
         },
         response: {
           200: {
-            type: 'object',
-            properties: {
-              ...fullEpisodePropsWithBookmarkAndFeed,
-            },
+            $ref: 'schema:breadcrum:episode-with-bookmark-and-feed',
           },
         },
       },

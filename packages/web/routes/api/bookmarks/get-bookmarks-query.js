@@ -98,8 +98,6 @@ export const getBookmarksQuery = ({
         order by b.created_at desc, b.title desc, b.url desc
       `
 
-  console.log(boomkmarksQuery)
-
   return boomkmarksQuery
 }
 

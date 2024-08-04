@@ -1,4 +1,3 @@
-import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
 import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
 import { getEpisodesQuery } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
@@ -75,10 +74,7 @@ export async function getEpisodes (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                  },
+                  $ref: 'schema:breadcrum:episode-with-bookmark-and-feed',
                 },
               },
               pagination: {

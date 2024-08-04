@@ -1,5 +1,3 @@
-import { fullEpisodePropsWithBookmarkAndFeed } from './mixed-episode-props.js'
-
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
@@ -59,10 +57,7 @@ export async function putEpisodes (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                  },
+                  $ref: 'schema:breadcrum:episode-with-bookmark-and-feed',
                 },
               },
             },

@@ -1,5 +1,4 @@
 import { getSearchEpisodesQuery } from './get-search-episodes-query.js'
-import { fullEpisodePropsWithBookmarkAndFeed } from '../../episodes/mixed-episode-props.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
@@ -69,13 +68,17 @@ export async function getSearchEpisodes (fastify, _opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullEpisodePropsWithBookmarkAndFeed,
-                    rank: {
-                      type: 'number',
+                  allOf: [
+                    { $ref: 'schema:breadcrum:episode-with-bookmark-and-feed' },
+                    {
+                      type: 'object',
+                      properties: {
+                        rank: {
+                          type: 'number',
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
               pagination: {

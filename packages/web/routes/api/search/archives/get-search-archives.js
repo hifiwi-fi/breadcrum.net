@@ -1,5 +1,4 @@
 import { getSearchArchivesQuery } from './get-search-archives-query.js'
-import { fullArchivePropsWithBookmark } from '../../archives/mixed-archive-props.js'
 
 export async function getSearchArchives (fastify, opts) {
   fastify.get(
@@ -60,13 +59,17 @@ export async function getSearchArchives (fastify, opts) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullArchivePropsWithBookmark,
-                    rank: {
-                      type: 'number',
+                  allOf: [
+                    { $ref: 'schema:breadcrum:archive-with-bookmark:read' },
+                    {
+                      type: 'object',
+                      properties: {
+                        rank: {
+                          type: 'number',
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
               pagination: {

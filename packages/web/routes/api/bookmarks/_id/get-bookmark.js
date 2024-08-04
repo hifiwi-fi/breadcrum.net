@@ -1,5 +1,4 @@
 import { getBookmarksQuery } from '../get-bookmarks-query.js'
-import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
@@ -34,10 +33,7 @@ export async function getBookmark (fastify, opts) {
         },
         response: {
           200: {
-            type: 'object',
-            properties: {
-              ...fullBookmarkPropsWithEpisodes,
-            },
+            $ref: 'schema:breadcrum:bookmark-with-archives-and-episode',
           },
         },
       },
