@@ -4,13 +4,9 @@ import SQL from '@nearform/sql'
 import { oneLineTrim } from 'common-tags'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 
-import { commnonBookmarkProps } from './bookmark-props.js'
-import { createEpisodeProp } from '../episodes/episode-props.js'
 import { createEpisode } from '../episodes/episode-query-create.js'
 import { createArchive } from '../archives/archive-query-create.js'
-import { createArchiveProp } from '../archives/archive-props.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
-import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { normalizeURL } from './normalizeURL.js'
 
 /**
@@ -38,11 +34,11 @@ export async function putBookmarks (fastify, _opts) {
         tags: ['bookmarks'],
         body: /** @type {const} @satisfies {JSONSchema} */ ({
           type: 'object',
-          properties: {
-            ...commnonBookmarkProps,
-            ...createEpisodeProp,
-            ...createArchiveProp,
-          },
+          allOf: [
+            { $ref: 'schema:breadcrum:bookmark:base' },
+            { $ref: 'schema:breadcrum:episode:create' },
+            { $ref: 'schema:breadcrum:archive:create' },
+          ],
           additionalProperties: false,
           required: ['url'],
         }),
@@ -86,10 +82,7 @@ export async function putBookmarks (fastify, _opts) {
               status: { enum: ['created'] },
               site_url: { type: 'string' },
               data: {
-                type: 'object',
-                properties: {
-                  ...fullBookmarkPropsWithEpisodes,
-                },
+                $ref: 'schema:breadcrum:bookmark-with-archives-and-episode',
               },
             },
           },
@@ -100,10 +93,7 @@ export async function putBookmarks (fastify, _opts) {
               status: { enum: ['nochange'] },
               site_url: { type: 'string' },
               data: {
-                type: 'object',
-                properties: {
-                  ...fullBookmarkPropsWithEpisodes,
-                },
+                $ref: 'schema:breadcrum:bookmark-with-archives-and-episode',
               },
             },
           },

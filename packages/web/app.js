@@ -14,27 +14,44 @@ const hid = hyperid()
  * @type {FastifyPluginAsync<AppOptions>}
  */
 export default async function App (fastify, opts) {
-  const testPattern = /.*(test|spec).js/
+  const testPattern = /.*(test|spec)(\.js|\.cjs|\.mjs)$/i
+  const skipPattern = /.*.no-load(\.js|\.cjs|\.mjs)$/i
+  const ignorePattern = new RegExp(`${testPattern.source}|${skipPattern.source}`)
+
+  // Load any files in the routes folder ending with .schema.js
+  // Use these files to register schemas in the fastify schema store.
+  // Use fp to ensure load order correctness.
+  fastify.register(AutoLoad, {
+    dir: join(__dirname, 'routes'),
+    matchFilter: /^.*[a-zA-Z0-9_-]+\.schema(\.js|\.cjs|\.mjs)$/i,
+    indexPattern: /(?!.*)/,
+    dirNameRoutePrefix: false,
+    autoHooks: false,
+    options: { ...opts },
+  })
+
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
+    ignorePattern,
     dirNameRoutePrefix: false,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
+    options: { ...opts },
   })
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
-    routeParams: true,
+    indexPattern: /^.*routes(?:\.ts|\.js|\.cjs|\.mjs)$/,
+    ignorePattern: /^.*(\.js|\.cjs|\.mjs)$/,
+    autoHooksPattern: /.*hooks(\.js|\.cjs|\.mjs)$/i,
     autoHooks: true,
     cascadeHooks: true,
     overwriteHooks: true,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
+    routeParams: true,
+    options: { ...opts },
   })
 }
 

@@ -1,4 +1,3 @@
-import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { addMillisecond } from './addMillisecond.js'
 
@@ -67,10 +66,7 @@ export async function getBookmarks (fastify) {
               data: {
                 type: 'array',
                 items: {
-                  type: 'object',
-                  properties: {
-                    ...fullBookmarkPropsWithEpisodes,
-                  },
+                  $ref: 'schema:breadcrum:bookmark-with-archives-and-episode',
                 },
               },
               pagination: {
