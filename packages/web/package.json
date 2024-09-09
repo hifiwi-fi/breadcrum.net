@@ -59,7 +59,7 @@
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.15",
-    "@voxpelli/tsconfig": "^13.0.0",
+    "@voxpelli/tsconfig": "^14.0.0",
     "classnames": "^2.3.1",
     "fastify-tsconfig": "^2.0.0",
     "fetch-undici": "^4.0.0",

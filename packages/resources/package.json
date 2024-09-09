@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "@voxpelli/tsconfig": "^13.0.0",
+    "@voxpelli/tsconfig": "^14.0.0",
     "npm-run-all2": "^6.0.0",
     "neostandard": "^0.11.0",
     "tap": "^21.0.0",

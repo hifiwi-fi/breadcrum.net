@@ -11,7 +11,7 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@voxpelli/tsconfig": "^13.0.0",
+    "@voxpelli/tsconfig": "^14.0.0",
     "auto-changelog": "^2.0.0",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
