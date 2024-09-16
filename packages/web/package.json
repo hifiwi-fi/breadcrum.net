@@ -26,7 +26,7 @@
     "@fastify/sensible": "^5.0.0",
     "@fastify/static": "^7.0.0",
     "@fastify/swagger": "^8.3.1",
-    "@fastify/swagger-ui": "^4.0.0",
+    "@fastify/swagger-ui": "^5.0.1",
     "@nearform/sql": "^1.5.0",
     "abstract-cache-redis": "^2.0.0",
     "bullmq": "^5.1.12",
