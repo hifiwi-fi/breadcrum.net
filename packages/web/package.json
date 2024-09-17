@@ -74,7 +74,7 @@
     "p-map": "^7.0.0",
     "tap": "^21.0.0",
     "neostandard": "^0.11.1",
-    "top-bun": "^8.0.0",
+    "top-bun": "^9.0.1",
     "typescript": "~5.5.0-beta",
     "uland-isomorphic": "^2.0.0",
     "xmlbuilder": "^15.1.1"
