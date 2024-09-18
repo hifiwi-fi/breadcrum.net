@@ -10,7 +10,7 @@
     "@bull-board/fastify": "^5.17.1",
     "@fastify/accepts": "^4.0.0",
     "@fastify/auth": "^4.6.1",
-    "@fastify/autoload": "^5.8.2",
+    "@fastify/autoload": "^6.0.0",
     "@fastify/basic-auth": "^5.0.0",
     "@fastify/circuit-breaker": "^3.0.0",
     "@fastify/compress": "^7.0.0",
