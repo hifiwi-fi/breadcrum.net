@@ -60,11 +60,13 @@
       "routes",
       "plugins"
     ],
-    "typecheck": false,
     "allow-incomplete-coverage": true,
     "coverage-report": [
       "text",
       "lcovonly"
+    ],
+    "plugin": [
+      "!@tapjs/typescript"
     ]
   }
 }
