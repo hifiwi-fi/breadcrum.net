@@ -13,7 +13,7 @@ on:
         default: true
 
 env:
-  node_version: 21
+  node_version: 22
   redis-version: 7
   FORCE_COLOR: 1
   NPM_CONFIG_COLOR: always
