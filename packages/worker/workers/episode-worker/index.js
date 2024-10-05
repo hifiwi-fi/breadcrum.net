@@ -77,7 +77,7 @@ export function makeEpisodeWorker ({ fastify }) {
           videoData.push(SQL`title = ${metadata.title.trim().substring(0, 255)}`)
         }
         if ('ext' in metadata) videoData.push(SQL`ext = ${metadata.ext}`)
-        if ('_type' in metadata) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
+        if ('ext' in metadata) videoData.push(SQL`src_type = ${resolveType(metadata)}`)
         if ('description' in metadata) {
           videoData.push(SQL`text_content = ${metadata.description}`)
         }
