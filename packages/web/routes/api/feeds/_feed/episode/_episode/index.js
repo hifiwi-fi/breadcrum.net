@@ -87,7 +87,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
 
       if (cachedUrl) {
         reply.header('fly-cache-status', 'HIT')
-        return reply.redirect(302, cachedUrl)
+        return reply.redirect(cachedUrl, 302)
       } else {
         reply.header('fly-cache-status', 'MISS')
       }
@@ -100,7 +100,7 @@ export default async function podcastFeedsRoutes (fastify, opts) {
       if (!metadata.url) throw new Error('metadata is missing url')
 
       await fastify.urlCache.set(cacheKey, metadata.url)
-      reply.redirect(302, metadata.url)
+      reply.redirect(metadata.url, 302)
     }
   )
 }

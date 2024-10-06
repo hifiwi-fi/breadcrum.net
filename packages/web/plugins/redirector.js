@@ -6,7 +6,7 @@ export default fp(async function (fastify, _) {
       fastify.config.ENV === 'production' &&
       (request.headers?.host?.startsWith('www.') || request.headers?.host?.endsWith('.fly.dev'))
     ) {
-      return reply.redirect(301, `${fastify.config.TRANSPORT}://${fastify.config.HOST}${request.url}`)
+      return reply.redirect(`${fastify.config.TRANSPORT}://${fastify.config.HOST}${request.url}`, 301)
     }
   })
 }, {

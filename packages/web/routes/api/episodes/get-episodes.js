@@ -5,7 +5,7 @@ import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**

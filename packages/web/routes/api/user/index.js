@@ -2,7 +2,7 @@ import { getUser } from './get-user.js'
 import { putUser } from './put-user.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**

@@ -3,7 +3,7 @@ import { getOrCreateDefaultFeed } from '../default-feed-query.js'
 import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**

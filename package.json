@@ -11,14 +11,14 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@voxpelli/tsconfig": "^13.0.0",
+    "@voxpelli/tsconfig": "^15.0.0",
     "auto-changelog": "^2.0.0",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
     "neostandard": "^0.11.0",
     "npm-run-all2": "^6.0.0",
     "patch-package": "^8.0.0",
-    "typescript": "~5.5.0-beta"
+    "typescript": "~5.6.2"
   },
   "funding": {
     "type": "individual",

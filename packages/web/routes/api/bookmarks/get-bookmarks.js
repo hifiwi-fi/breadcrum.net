@@ -3,7 +3,7 @@ import { getBookmarksQuery } from './get-bookmarks-query.js'
 import { addMillisecond } from './addMillisecond.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**

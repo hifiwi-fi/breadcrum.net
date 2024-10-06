@@ -1,7 +1,7 @@
 // import SQL from '@nearform/sql'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**

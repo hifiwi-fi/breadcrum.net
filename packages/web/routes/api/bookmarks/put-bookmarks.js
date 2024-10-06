@@ -14,7 +14,7 @@ import { fullBookmarkPropsWithEpisodes } from './mixed-bookmark-props.js'
 import { normalizeURL } from './normalizeURL.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  * @import {JSONSchema} from 'json-schema-to-ts'
  */
 
@@ -47,36 +47,39 @@ export async function putBookmarks (fastify, _opts) {
           required: ['url'],
         }),
         querystring: {
-          update: {
-            type: 'boolean',
-            default: false,
-            description: oneLineTrim`
+          type: 'object',
+          properties: {
+            update: {
+              type: 'boolean',
+              default: false,
+              description: oneLineTrim`
               If set to true, bookmarks that already exist at URL are redirected
               to to the specific bookmark endpoint which will process the
               request as a bookmark update. Otherwise, this creates or returns
               the existing bookmark.
             `,
-          },
-          meta: {
-            type: 'boolean',
-            default: false,
-            description: 'Extract page metadata on the server.',
-          },
-          episode: {
-            type: 'boolean',
-            default: true,
-            description: 'Determines if an episode is optimistically created',
-          },
-          archive: {
-            type: 'boolean',
-            default: true,
-            description: 'Determines if an archive is optimistically created',
-          },
-          normalize: {
-            type: 'boolean',
-            default: true,
-            description: 'Normalize URLs when looking them up or creating them.',
-          },
+            },
+            meta: {
+              type: 'boolean',
+              default: false,
+              description: 'Extract page metadata on the server.',
+            },
+            episode: {
+              type: 'boolean',
+              default: true,
+              description: 'Determines if an episode is optimistically created',
+            },
+            archive: {
+              type: 'boolean',
+              default: true,
+              description: 'Determines if an archive is optimistically created',
+            },
+            normalize: {
+              type: 'boolean',
+              default: true,
+              description: 'Normalize URLs when looking them up or creating them.',
+            },
+          }
         },
         response: {
           201: {
@@ -152,7 +155,7 @@ export async function putBookmarks (fastify, _opts) {
 
         if (existingResults.rows.length > 0) {
           if (update) {
-            reply.redirect(308, `/api/bookmarks/${maybeResult.id}`)
+            reply.redirect(`/api/bookmarks/${maybeResult.id}`, 308)
             return
           } else {
             reply.status(200)
