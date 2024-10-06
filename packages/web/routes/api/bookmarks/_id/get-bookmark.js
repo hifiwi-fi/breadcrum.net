@@ -2,7 +2,7 @@ import { getBookmarksQuery } from '../get-bookmarks-query.js'
 import { fullBookmarkPropsWithEpisodes } from '../mixed-bookmark-props.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
@@ -17,10 +17,13 @@ export async function getBookmark (fastify, opts) {
       schema: {
         tags: ['bookmarks'],
         querystring: {
-          sensitive: {
-            type: 'boolean',
-            default: false,
-          },
+          type: 'object',
+          properties: {
+            sensitive: {
+              type: 'boolean',
+              default: false,
+            },
+          }
         },
         params: {
           type: 'object',

@@ -2,7 +2,7 @@ import { getEpisodesQuery } from '../episode-query-get.js'
 import { fullEpisodePropsWithBookmarkAndFeed } from '../mixed-episode-props.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
@@ -18,10 +18,13 @@ export async function getEpisode (fastify, _opts) {
       schema: {
         tags: ['episodes'],
         querystring: {
-          sensitive: {
-            type: 'boolean',
-            default: false,
-          },
+          type: 'object',
+          properties: {
+            sensitive: {
+              type: 'boolean',
+              default: false,
+            },
+          }
         },
         params: {
           type: 'object',

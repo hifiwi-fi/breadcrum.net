@@ -2,7 +2,7 @@ import { defaultFrontendFlags } from '../../../../plugins/flags/frontend-flags.j
 import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
  */
 
 /**
