@@ -27,7 +27,7 @@ export async function deleteBookmark (fastify, opts) {
     // TODO: check results
     await fastify.pg.query(query)
 
-    reply.status = 202
+    reply.status(202)
     fastify.metrics.bookmarkDeleteCounter.inc()
     return {
       status: 'ok',

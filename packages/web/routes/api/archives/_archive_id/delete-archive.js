@@ -36,7 +36,7 @@ export async function deleteArchive (fastify, _opts) {
     // TODO: check results
     await fastify.pg.query(query)
 
-    reply.status = 202
+    reply.status(202)
     fastify.metrics.episodeDeleteCounter.inc()
 
     return {

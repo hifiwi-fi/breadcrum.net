@@ -37,7 +37,7 @@ export async function deleteTag (fastify, _opts) {
 
       await fastify.pg.query(query)
 
-      reply.status = 202
+      reply.status(202)
       return {
         status: 'ok',
       }
