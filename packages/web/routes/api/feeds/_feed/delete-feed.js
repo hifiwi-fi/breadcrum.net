@@ -69,7 +69,7 @@ export async function deleteFeed (fastify, opts) {
         // TODO: check results
         await fastify.pg.query(query)
 
-        reply.status = 202
+        reply.status(202)
         podcastFeedDeleteCounter.inc()
         return {
           status: 'ok',
