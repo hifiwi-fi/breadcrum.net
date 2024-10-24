@@ -71,7 +71,7 @@
     "local-storage-proxy": "^4.0.3",
     "mine.css": "^10.0.0",
     "neostandard": "^0.11.1",
-    "npm-run-all2": "^6.0.0",
+    "npm-run-all2": "^7.0.1",
     "p-map": "^7.0.0",
     "tap": "^21.0.0",
     "top-bun": "^10.0.0",
