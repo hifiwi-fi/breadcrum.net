@@ -5,10 +5,6 @@ import { request as undiciRequest } from 'undici'
 // TODO: Derive a client from open api types in yt-dlp-api
 
 /**
- * @typedef {'video' | 'audio' } MediumTypes
- */
-
-/**
  * @typedef {Object} YTDLPMetadata
  * @property {string} url - The URL of the resource (required, format: uri).
  * @property {number|null} [filesize_approx] - Approximate file size (nullable).
@@ -23,6 +19,10 @@ import { request as undiciRequest } from 'undici'
  * @property {string|null} [thumbnail] - Thumbnail URL (nullable, format: uri).
  * @property {string|null} [live_status] - Live status of the resource (nullable).
  * @property {number|null} [release_timestamp] - Release timestamp (nullable).
+ */
+
+/**
+ * @typedef {'video' | 'audio' } MediumTypes
  */
 
 /**
