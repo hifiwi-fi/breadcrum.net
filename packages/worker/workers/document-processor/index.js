@@ -1,10 +1,33 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { Processor} from 'bullmq'
+ */
+
 import SQL from '@nearform/sql'
 import { JSDOM } from 'jsdom'
 import { fetchHTML } from './fetch-html.js'
 import { resolveBookmark } from './resolve-bookmark.js'
 import { resolveArchive } from './resolve-archive.js'
 
+/**
+ * @param  {object} params
+ * @param  {FastifyInstance} params.fastify
+ */
 export function makeDocumentWorker ({ fastify }) {
+  /** @type {Processor<
+   * {
+    * url: string
+    * userId: string
+    * resolveMeta: boolean
+    * archive: boolean
+    * title: string
+    * tags: string[]
+    * summary: string
+    * bookmarkId: string
+    * archiveId: string
+    * archiveURL: string
+   * }
+   * >} */
   return async function documentWorker (job) {
     const {
       url,
@@ -61,10 +84,11 @@ export function makeDocumentWorker ({ fastify }) {
     } catch (err) {
       log.error(`Error resolving document: Bookmark ${bookmarkId} Archive ${archiveId}`)
       log.error(err)
+      const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
       if (archiveId && userId) {
         const errorQuery = SQL`
           update archives
-          set error = ${err.stack}, done = true
+          set error = ${handledError.stack}, done = true
           where id = ${archiveId}
           and owner_id =${userId};`
         await pg.query(errorQuery)

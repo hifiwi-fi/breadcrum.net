@@ -1,6 +1,8 @@
 {
   "extends": "@voxpelli/tsconfig/node20.json",
-  "compilerOptions": {},
+  "compilerOptions": {
+    "skipLibCheck": true
+  },
   "include": [
     "routes/**/*",
     "plugins/**/*",

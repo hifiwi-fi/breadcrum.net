@@ -3,6 +3,7 @@ import SQL from '@nearform/sql'
 /**
  * @import { FastifyInstance } from 'fastify'
  * @import { PoolClient } from 'pg'
+ * @import { PostgresDb } from '@fastify/postgres'
  */
 
 /**
@@ -12,7 +13,7 @@ import SQL from '@nearform/sql'
  * @exports
  * @param {Object} params - Parameters to shape the query.
  * @param {FastifyInstance} params.fastify - Fastify instance, used for logging and other utilities.
- * @param {PoolClient?} [params.pg] - PostgreSQL connection or transaction client for executing the query.
+ * @param {PoolClient | PostgresDb?} [params.pg] - PostgreSQL connection or transaction client for executing the query.
  * @param {string} params.userId - UserID of the owner
  * @param {string} params.bookmarkId - The Bookmark ID to add tags to
  * @param {Array<string>} params.tags- List of tags to associate with the bookmark.

@@ -1,6 +1,11 @@
 import fp from 'fastify-plugin'
 // @ts-ignore
 import abstractCacheRedis from 'abstract-cache-redis'
+import { getYTDLPMetaKey, ytdlpTtl } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+
+/**
+ * @import { YTDLPMetaKeyParams } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ */
 
 /**
  * @typedef {Object} FileKeyParams
@@ -9,13 +14,6 @@ import abstractCacheRedis from 'abstract-cache-redis'
  * @property {string} sourceUrl - The source URL of the file.
  * @property {string} type - The type of the file.
  * @property {string} medium - The medium of the file.
- */
-
-/**
- * @typedef {Object} YTDLPMetaKeyParams
- * @property {string} url - The URL of the YTDLP source.
- * @property {string} medium - The medium of the YTDLP source.
- * @property {number} attempt - Cache busting attempt key.
  */
 
 /**
@@ -54,7 +52,7 @@ export default fp(async function (fastify, _) {
 
   const urlCacheTtl = 1000 * 60 * 20 // 20 mins
 
-  fastify.decorate(cache, cache)
+  fastify.decorate('cache', cache)
 
   fastify.decorate('urlCache', {
     /**
@@ -77,27 +75,6 @@ export default fp(async function (fastify, _) {
       return cache.set(key, value, urlCacheTtl)
     },
   })
-
-  /**
-   * Generates a YTDLP meta key based on the provided parameters.
-   *
-   * @param {YTDLPMetaKeyParams} params - The parameters for generating the YTDLP meta key.
-   * @returns {string} The generated YTDLP meta key.
-   */
-  function getYTDLPMetaKey ({
-    url,
-    medium,
-    attempt = 0,
-  }) {
-    return [
-      'meta',
-      url,
-      medium,
-      attempt,
-    ].join(':')
-  }
-
-  const ytdlpTtl = 1000 * 60 * 20 // 20 mins
 
   fastify.decorate('ytdlpCache', {
   /**

@@ -1,5 +1,10 @@
+// @ts-expect-error
 import { extractMeta } from '@breadcrum/extract-meta'
 
+/**
+ * @param  {object} params
+ * @param  {Document} params.document
+ */
 export async function getSiteMetadata ({
   document,
 }) {

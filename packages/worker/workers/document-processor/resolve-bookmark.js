@@ -1,7 +1,23 @@
+/**
+ * @import {FastifyInstance} from 'fastify'
+ */
+
 import SQL from '@nearform/sql'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 import { getSiteMetadata } from './get-site-metadata.js'
 
+/**
+ * @param  {object} params
+ * @param  {FastifyInstance} params.fastify
+ * @param  {FastifyInstance['log']} params.log
+ * @param  {string} params.userId
+ * @param  {string} params.bookmarkId
+ * @param  {string} params.title
+ * @param  {string[]} params.tags
+ * @param  {string} params.summary
+ * @param  {string} params.url
+ * @param  {Document} params.initialDocument
+ */
 export async function resolveBookmark ({
   fastify,
   log,
@@ -56,9 +72,10 @@ export async function resolveBookmark ({
   } catch (err) {
     log.error(`Error resolving bookmark ${bookmarkId}`)
     log.error(err)
+    const handledError = err instanceof Error ? err : new Error('Unknown error type', { cause: err })
     const errorQuery = SQL`
         update bookmarks
-        set error = ${err.stack}, done = true
+        set error = ${handledError.stack}, done = true
         where id = ${bookmarkId}
         and owner_id =${bookmarkId};`
     log.error({ errorQuery })

@@ -2,6 +2,10 @@ import { JSDOM } from 'jsdom'
 import { Readability } from '@mozilla/readability'
 import createDOMPurify from 'dompurify'
 
+/**
+ * @param  {object} params
+ * @param  {Document} params.document
+ */
 export async function extractArchive ({
   document,
 }) {

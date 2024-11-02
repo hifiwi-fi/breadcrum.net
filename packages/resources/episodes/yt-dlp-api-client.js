@@ -5,20 +5,48 @@ import { request as undiciRequest } from 'undici'
 // TODO: Derive a client from open api types in yt-dlp-api
 
 /**
+ * @typedef {Object} YTDLPMetaKeyParams
+ * @property {string} url - The URL of the YTDLP source.
+ * @property {string} medium - The medium of the YTDLP source.
+ * @property {number} attempt - Cache busting attempt key.
+ */
+
+/**
+   * Generates a YTDLP meta key based on the provided parameters.
+   *
+   * @param {YTDLPMetaKeyParams} params - The parameters for generating the YTDLP meta key.
+   * @returns {string} The generated YTDLP meta key.
+   */
+export function getYTDLPMetaKey ({
+  url,
+  medium,
+  attempt = 0,
+}) {
+  return [
+    'meta',
+    url,
+    medium,
+    attempt,
+  ].join(':')
+}
+
+export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
+
+/**
  * @typedef {Object} YTDLPMetadata
  * @property {string} url - The URL of the resource (required, format: uri).
- * @property {number|null} [filesize_approx] - Approximate file size (nullable).
- * @property {number|null} [duration] - Duration of the resource (nullable).
- * @property {string|null} [channel] - Channel name (nullable).
- * @property {string|null} [title] - Title of the resource (nullable).
- * @property {string|null} [ext] - File extension (nullable).
- * @property {string|null} [_type] - Resource type (nullable).
- * @property {string|null} [description] - Description of the resource (nullable).
- * @property {string|null} [uploader_url] - URL of the uploader (nullable, format: uri).
- * @property {string|null} [channel_url] - URL of the channel (nullable, format: uri).
- * @property {string|null} [thumbnail] - Thumbnail URL (nullable, format: uri).
- * @property {string|null} [live_status] - Live status of the resource (nullable).
- * @property {number|null} [release_timestamp] - Release timestamp (nullable).
+ * @property {number} [filesize_approx] - Approximate file size (nullable).
+ * @property {number} [duration] - Duration of the resource (nullable).
+ * @property {string} [channel] - Channel name (nullable).
+ * @property {string} [title] - Title of the resource (nullable).
+ * @property {string} [ext] - File extension (nullable).
+ * @property {string} [_type] - Resource type (nullable).
+ * @property {string} [description] - Description of the resource (nullable).
+ * @property {string} [uploader_url] - URL of the uploader (nullable, format: uri).
+ * @property {string} [channel_url] - URL of the channel (nullable, format: uri).
+ * @property {string} [thumbnail] - Thumbnail URL (nullable, format: uri).
+ * @property {string} [live_status] - Live status of the resource (nullable).
+ * @property {number} [release_timestamp] - Release timestamp (nullable).
  */
 
 /**

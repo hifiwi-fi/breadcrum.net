@@ -1,6 +1,15 @@
 import fp from 'fastify-plugin'
 
 /**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { PoolClient } from 'pg'
+ */
+
+/**
+ * @typedef {PoolClient | FastifyInstance['pg']} PgClientAlias
+ */
+
+/**
  * This plugins adds a postgres connection
  *
  * @see https://github.com/fastify/fastify-postgres

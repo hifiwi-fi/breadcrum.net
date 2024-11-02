@@ -1,8 +1,17 @@
-export default async function rootRoute (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function rootRoute (fastify, _opts) {
   fastify.get(
     '/',
     {},
-    async function (request, reply) {
+    async function (_request, _reply) {
       return {
         hello: 'world',
         name: 'bc-worker',

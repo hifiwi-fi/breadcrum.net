@@ -7,9 +7,13 @@ import { makeDocumentWorker } from '../workers/document-processor/index.js'
 /**
  * This plugins adds bullMQ queues
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _opts) {
+  const redis = fastify.redis['bullmq']
+
+  if (!redis) throw new Error('Missing a redis connection object')
+
   const defautOpts = {
-    connection: fastify.redis.bullmq,
+    connection: redis,
     autorun: false,
   }
 
@@ -56,7 +60,7 @@ export default fp(async function (fastify, opts) {
     await new Promise(resolve => setTimeout(resolve, 1000))
   })
 
-  fastify.addHook('onClose', async (instance) => {
+  fastify.addHook('onClose', async (_instance) => {
     await Promise.all(
       Object.values(workers)
         .map(worker => worker.close()

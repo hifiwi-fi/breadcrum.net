@@ -5,7 +5,7 @@ import fp from 'fastify-plugin'
  *
  * @see https://github.com/smartiniOnGitHub/fastify-healthcheck
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _opts) {
   fastify.register(import('fastify-healthcheck'))
 }, {
   name: 'health',

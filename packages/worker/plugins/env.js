@@ -2,7 +2,12 @@ import fp from 'fastify-plugin'
 import { readFile } from 'fs/promises'
 import { join, resolve } from 'path'
 
-export const schema = {
+/**
+ * @import { FromSchema, JSONSchema } from "json-schema-to-ts"
+ * @typedef { FromSchema<typeof schema> } SchemaType
+ */
+
+export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   required: [],
   properties: {
@@ -40,14 +45,14 @@ export const schema = {
       default: 'http://user:pass@127.0.0.1:5000',
     },
   },
-}
+})
 
 /**
  * This plugins adds config
  *
  * @see https://github.com/fastify/fastify-env
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _opts) {
   fastify.register(import('@fastify/env'), {
     schema,
     dotenv: {

@@ -1,3 +1,7 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ */
+
 import { request as undiciRequest } from 'undici'
 import { pipeline } from 'node:stream/promises'
 import gunzip from 'gunzip-maybe'
@@ -5,11 +9,21 @@ import concat from 'concat-stream'
 // Sorry newspapers, no cheating
 const GOOGLE_BOT_UA = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Googlebot/2.1; +http://www.google.com/bot.html) Chrome/W.X.Y.Z Safari/537.36'
 
+/**
+ * @type {{
+ *   [url: string]: string
+ * }}
+ */
 const uaHacks = {
   'twitter.com': GOOGLE_BOT_UA,
   'mobile.twitter.com': GOOGLE_BOT_UA,
 }
 
+/**
+ * @param  {object} params
+ * @param  {string} params.url
+ * @param  {FastifyInstance} params.fastify
+ */
 export async function fetchHTML ({ url, fastify }) {
   const requestURL = new URL(url)
   const ua = uaHacks[requestURL.hostname] ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
@@ -20,6 +34,7 @@ export async function fetchHTML ({ url, fastify }) {
       'user-agent': ua,
     },
     maxRedirections: 3,
+    // @ts-ignore
     autoSelectFamily: true,
     headersTimeout: 15000,
     bodyTimeout: 15000,
@@ -34,6 +49,9 @@ export async function fetchHTML ({ url, fastify }) {
   if (response.headers['content-encoding'] === 'gzip') {
     await pipeline(response.body, gunzip(), concat(gotData))
 
+    /**
+     * @param  {Buffer} htmlData
+     */
     function gotData (htmlData) {
       html = htmlData.toString('utf8')
     }

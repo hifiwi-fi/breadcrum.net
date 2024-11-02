@@ -1,20 +1,30 @@
+/**
+ * @import { Processor} from 'bullmq'
+ * @import { FastifyInstance } from 'fastify'
+ * @import { MediumTypes } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ */
 import SQL from '@nearform/sql'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
 import { DelayedError } from 'bullmq'
 
 /**
- * @import { Processor} from 'bullmq'
- */
-
-/**
- * @param  {Object} options.fastify
+ * @param {object} params
+ * @param  { FastifyInstance } params.fastify
  * @return {Processor}
  */
 export function makeEpisodeWorker ({ fastify }) {
   const logger = fastify.log
 
-  /** @type {Processor} */
+  /** @type {Processor<
+   * {
+   *   userId: string
+   *   bookmarkTitle: string
+   *   episodeId: string
+   *   url: string
+   *   medium: MediumTypes
+   * }
+   * >} */
   async function episodeWorker (job, token) {
     const log = logger.child({
       jobId: job.id,
@@ -105,11 +115,13 @@ export function makeEpisodeWorker ({ fastify }) {
           // TODO make this not janky
           throw err
         }
+        /** @type {Error} */
+        const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
         log.error(`Error extracting video for episode ${episodeId}`)
-        log.error(err)
+        log.error(handledError)
         const errorQuery = SQL`
         update episodes
-        set error = ${err.stack}, done = true
+        set error = ${handledError.stack}, done = true
         where id = ${episodeId}
         and owner_id =${userId};`
         await pg.query(errorQuery)

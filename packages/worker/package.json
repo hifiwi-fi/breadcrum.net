@@ -15,6 +15,7 @@
     "test": "run-s test:*",
     "test:eslint": "eslint .",
     "test:tap": "tap",
+    "test:tsc":"tsc",
     "watch": "run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web public' -l info -P -p 3001 --options --address localhost app.js",
     "print-routes": "fastify print-routes app.js",
@@ -47,10 +48,14 @@
   },
   "devDependencies": {
     "@bret/type-provider-json-schema-to-ts": "^4.0.2",
+    "@types/concat-stream": "^2.0.3",
+    "@types/dompurify": "^3.0.5",
+    "@types/gunzip-maybe": "^1.4.2",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^22.0.0",
     "@voxpelli/tsconfig": "^15.0.0",
-    "npm-run-all2": "^7.0.1",
     "neostandard": "^0.11.0",
+    "npm-run-all2": "^7.0.1",
     "tap": "^21.0.0",
     "typescript": "~5.6.2"
   },

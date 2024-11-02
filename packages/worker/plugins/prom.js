@@ -6,7 +6,8 @@ import Fastify from 'fastify'
  *
  * @see https://gitlab.com/m03geek/fastify-metrics
  */
-export default fp(async function (fastify, opts) {
+export default fp(async function (fastify, _opts) {
+  // @ts-ignore
   await fastify.register((await import('fastify-metrics')).default, {
     defaultMetrics: { enabled: true },
     endpoint: null,
@@ -24,7 +25,7 @@ export default fp(async function (fastify, opts) {
     logLevel: 'info',
     schema: {
       // hide route from swagger plugins
-      hide: true,
+      // hide: true,
     },
     handler: async (_, reply) => {
       reply.type('text/plain').send(await fastify.metrics.client.register.metrics())
@@ -50,7 +51,7 @@ export default fp(async function (fastify, opts) {
     })
   }
 
-  fastify.addHook('onClose', async (instance) => {
+  fastify.addHook('onClose', async (_instance) => {
     await promServer.close()
   })
 },
