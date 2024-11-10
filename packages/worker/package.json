@@ -15,7 +15,7 @@
     "test": "run-s test:*",
     "test:eslint": "eslint .",
     "test:tap": "tap",
-    "test:tsc":"tsc",
+    "test:tsc": "tsc",
     "watch": "run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web public' -l info -P -p 3001 --options --address localhost app.js",
     "print-routes": "fastify print-routes app.js",

@@ -12,11 +12,11 @@ import { request as undiciRequest } from 'undici'
  */
 
 /**
-   * Generates a YTDLP meta key based on the provided parameters.
-   *
-   * @param {YTDLPMetaKeyParams} params - The parameters for generating the YTDLP meta key.
-   * @returns {string} The generated YTDLP meta key.
-   */
+ * Generates a YTDLP meta key based on the provided parameters.
+ *
+ * @param {YTDLPMetaKeyParams} params - The parameters for generating the YTDLP meta key.
+ * @returns {string} The generated YTDLP meta key.
+ */
 export function getYTDLPMetaKey ({
   url,
   medium,
@@ -57,9 +57,9 @@ export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
  * [getYTDLPMetadata description]
  * @param  {object} params
  * @param  {string} params.url           the url of the video
- * @param  {MediumTypes} params.medium        the desuired filetype
+ * @param  {MediumTypes} params.medium        the desired filetype
  * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
- * @param  {Number} params.attempt      Cache busting attemp number
+ * @param  {Number} params.attempt      Cache busting attempt number
  * @param  {{
       get(key: object): Promise<any>;
       set(key: object, value: any, ttl?: number): Promise<void>;

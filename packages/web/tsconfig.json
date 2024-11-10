@@ -1,13 +1,13 @@
 {
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "incremental": true,
   },
   "include": [
-    "routes/**/*",
-    "plugins/**/*",
-    "workers/**/*",
-    "test/**/*"
+    "**/*"
   ],
   "exclude": [
     "node_modules",

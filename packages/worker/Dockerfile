@@ -31,6 +31,7 @@ COPY --link package*.json ./
 COPY --link packages/web/package.json packages/web/package.json
 COPY --link packages/worker/package.json packages/worker/package.json
 COPY --link packages/resources/package.json packages/resources/package.json
+COPY --link patches/* patches/
 
 RUN npm i --include=dev
 

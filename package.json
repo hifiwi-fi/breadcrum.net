@@ -16,6 +16,7 @@
     "custompatch": "^1.0.28",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
+    "neostandard": "^0.11.0",
     "npm-run-all2": "^7.0.1",
     "typescript": "~5.6.2"
   },
@@ -42,6 +43,7 @@
     "test": "npm run test --workspaces --if-present",
     "test-web": "npm run test --workspace=@breadcrum/web",
     "test-worker": "npm run test --workspace=@breadcrum/worker",
+    "neostandard": "eslint .",
     "watch": "FORCE_COLOR=1 run-p -n -l watch:*",
     "watch:web": "npm run watch --workspace=@breadcrum/web",
     "watch:worker": "npm run watch --workspace=@breadcrum/worker",

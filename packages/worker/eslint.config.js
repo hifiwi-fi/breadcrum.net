@@ -1,5 +1,5 @@
-import neostandard from 'neostandard'
+import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 
 export default neostandard({
-  ignores: [],
+  ignores: resolveIgnoresFromGitignore(),
 })

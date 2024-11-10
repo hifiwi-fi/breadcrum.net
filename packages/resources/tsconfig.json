@@ -2,13 +2,15 @@
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
     "noEmit": true,
+    "skipLibCheck": true,
     "composite": true,
-    "skipLibCheck": true
+    "incremental": true,
   },
   "include": [
     "**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".tap"
   ]
 }

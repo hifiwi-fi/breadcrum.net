@@ -1,12 +1,11 @@
 {
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "incremental": true
   },
-  "include": [],
-  "exclude": [
-    "node_modules"
-  ],
   "references": [
     {
       "path": "packages/web"
@@ -17,5 +16,7 @@
     {
       "path": "packages/resources"
     }
-  ]
+  ],
+  "include": ["**/*"],
+  "exclude": ["node_modules", "packages"]
 }

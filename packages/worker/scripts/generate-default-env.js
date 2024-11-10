@@ -7,7 +7,7 @@ const __dirname = import.meta.dirname
 // This script sets up a default .env dotenv file for use in development
 // Do not run this in production or when deploying.
 
-if (process.env.ENV !== 'production') {
+if (process.env['ENV'] !== 'production') {
   const dotenv = []
 
   for (const [name, opts] of Object.entries(schema.properties)) {

@@ -1,15 +1,16 @@
 {
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
-    "skipLibCheck": true
+    "noEmit": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "incremental": true,
   },
   "include": [
-    "routes/**/*",
-    "plugins/**/*",
-    "web/**/*",
-    "app.js"
+    "**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".tap"
   ]
 }
