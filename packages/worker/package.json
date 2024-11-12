@@ -22,6 +22,7 @@
     "print-plugins": "fastify print-plugins app.js"
   },
   "dependencies": {
+    "@bret/is-youtube-url": "^1.0.3",
     "@breadcrum/extract-meta": "^1.0.5",
     "@breadcrum/resources": "file:../resources",
     "@fastify/autoload": "^6.0.1",

@@ -9,8 +9,8 @@ import { fetchHTML } from '../document-processor/fetch-html.js'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { getSiteMetadata } from '../document-processor/get-site-metadata.js'
 import { extractArchive } from '../document-processor/extract-archive.js'
-import { normalizeURL } from './normalize-url.js'
-import { isYouTubeUrl } from './is-yt-url.js'
+import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
 
 /**
  * @param  {object} params
