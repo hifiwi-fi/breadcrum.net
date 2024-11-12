@@ -1,32 +1,26 @@
 import SQL from '@nearform/sql'
-import { createEpisode } from '../../episodes/episode-query-create.js'
-import { createArchive } from '../../archives/archive-query-create.js'
+import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
+import { resolveEpisodeJobName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
+import { resolveArchiveJobName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
- * @import { SchemaBookmarkCreate } from '../schemas/schema-bookmark-create.js'
+ * @import { SchemaBookmarkUpdate } from '../schemas/schema-bookmark-update.js'
  * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
- * @import { SchemaEpisodeRead } from '../../episodes/schemas/schema-episode-read.js'
- * @import { SchemaArchiveRead } from '../../archives/schemas/schema-archive-read.js'
  */
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  * ValidatorSchemaOptions: {
  * references: [
- *       SchemaBookmarkCreate,
- *       SchemaBookmarkRead,
- *       SchemaEpisodeRead,
- *       SchemaArchiveRead
+ *       SchemaBookmarkUpdate
  *  ]
  }
  * SerializerSchemaOptions: {
  *    references: [
- *       SchemaBookmarkCreate,
- *       SchemaBookmarkRead,
- *       SchemaEpisodeRead,
- *       SchemaArchiveRead
+ *       SchemaBookmarkRead
  *     ],
  *    deserialize: [{
  *       pattern: {
@@ -94,6 +88,7 @@ export async function putBookmark (fastify, _opts) {
         return reply.notFound(`bookmark ${bookmarkId} not found for user ${userId}`)
       }
 
+      /** @type {SQL.SqlStatement[]} */
       const updates = []
 
       if (bookmark.url != null) updates.push(SQL`url = ${bookmark.url}`)
@@ -169,7 +164,7 @@ export async function putBookmark (fastify, _opts) {
       fastify.prom.bookmarkEditCounter.inc()
 
       // Look up the newly created bookmark instead of trying to re-assemble it here.
-      const createdBookmark = await getBookmark({
+      const updatedBookmark = await getBookmark({
         fastify,
         pg: fastify.pg,
         ownerId: userId,
@@ -178,6 +173,8 @@ export async function putBookmark (fastify, _opts) {
         perPage: 1,
       })
 
+      if (!updatedBookmark) throw new Error('Something wen\'t wrong retreiving the newly updated bookmark')
+
       if (bookmark?.createEpisode) {
         const { id: episodeId, medium: episodeMedium, url: episodeURL } = await createEpisode({
           client,
@@ -185,17 +182,17 @@ export async function putBookmark (fastify, _opts) {
           bookmarkId,
           type: bookmark.createEpisode.type,
           medium: bookmark.createEpisode.medium,
-          url: request?.body?.createEpisode.url ?? bookmark.url ?? existingBookmark.url,
+          url: bookmark.createEpisode.url ?? updatedBookmark.url,
         })
 
         await client.query('commit')
         fastify.prom.episodeCounter.inc()
 
         await fastify.queues.resolveEpisodeQ.add(
-          'resolve-episode',
+          resolveEpisodeJobName,
           {
             userId,
-            bookmarkTitle: createdBookmark.title,
+            bookmarkTitle: updatedBookmark.title,
             episodeId,
             url: episodeURL,
             medium: episodeMedium,
@@ -203,38 +200,39 @@ export async function putBookmark (fastify, _opts) {
         )
       }
 
-      if (request?.body?.createArchive) {
+      if (bookmark.createArchive) {
+        const archiveUrl = (bookmark.createArchive === true)
+          ? updatedBookmark.url
+          : bookmark.createArchive?.url ?? updatedBookmark.url
         const { id: archiveId, url: archiveURL } = await createArchive({
           client,
           userId,
-          bookmarkId: createdBookmark.id,
-          bookmarkTitle: createdBookmark.title,
-          url: request?.body?.createArchive?.url ?? bookmark.url ?? createdBookmark.url,
+          bookmarkId: updatedBookmark.id,
+          bookmarkTitle: updatedBookmark.title ?? updatedBookmark.url,
+          url: archiveUrl,
           extractionMethod: 'server',
         })
 
         await client.query('commit')
         fastify.prom.archiveCounter.inc()
 
-        await fastify.queues.resolveDocumentQ.add(
-          'resolve-document',
+        await fastify.queues.resolveArchiveQ.add(
+          resolveArchiveJobName,
           {
             url: archiveURL,
             userId,
-            archive: true,
-            archiveId,
-            archiveURL,
+            archiveId
           }
         )
       }
 
       reply.status(200)
 
-      return {
+      return /** @type { const } */({
         status: 'updated',
-        site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${createdBookmark.id}`,
-        data: createdBookmark,
-      }
+        site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${updatedBookmark.id}`,
+        data: updatedBookmark,
+      })
     })
   })
 }

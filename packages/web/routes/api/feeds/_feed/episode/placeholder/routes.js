@@ -1,4 +1,13 @@
-export default async function podcastFeedsRoutes (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export default async function podcastFeedsRoutes (fastify, _opts) {
   fastify.get(
     '/',
     {

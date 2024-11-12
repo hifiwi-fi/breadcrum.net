@@ -2,9 +2,7 @@
   "extends": "@voxpelli/tsconfig/node20.json",
   "compilerOptions": {
     "noEmit": true,
-    "skipLibCheck": true,
-    "composite": true,
-    "incremental": true,
+    "skipLibCheck": true
   },
   "include": [
     "**/*"

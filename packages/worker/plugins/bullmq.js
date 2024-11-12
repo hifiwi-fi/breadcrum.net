@@ -1,8 +1,19 @@
+/**
+ * @import { ResolveEpisodeW, ResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+ * @import { ResolveArchiveW } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+ * @import { ResolveBookmarkW } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+ */
 import fp from 'fastify-plugin'
-import { Worker } from 'bullmq'
+import { Worker, Queue } from 'bullmq'
 
-import { makeEpisodeWorker } from '../workers/episode-worker/index.js'
-import { makeDocumentWorker } from '../workers/document-processor/index.js'
+import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { defaultJobOptions } from '@breadcrum/resources/bullmq/default-job-options.js'
+
+import { makeEpisodeP } from '../workers/episodes/index.js'
+import { makeArchiveP } from '../workers/archives/index.js'
+import { makeBookmarkP } from '../workers/bookmarks/index.js'
 
 /**
  * This plugins adds bullMQ queues
@@ -12,27 +23,52 @@ export default fp(async function (fastify, _opts) {
 
   if (!redis) throw new Error('Missing a redis connection object')
 
-  const defautOpts = {
+  /** @type {ResolveEpisodeQ} */
+  const resolveEpisodeQ = new Queue(
+    resolveEpisodeQName,
+    {
+      connection: redis,
+      defaultJobOptions,
+    }
+  )
+
+  const queues = {
+    resolveEpisodeQ,
+  }
+
+  fastify.decorate('queues', queues)
+
+  const defaultWorkerOpts = {
     connection: redis,
     autorun: false,
   }
 
   // Running both workers in a single process
-  const createEpisodeWorker = new Worker(
-    'resolveEpisode',
-    makeEpisodeWorker({ fastify }),
-    defautOpts
+  /** @type {ResolveEpisodeW} */
+  const resolveEpisodeW = new Worker(
+    resolveEpisodeQName,
+    makeEpisodeP({ fastify }),
+    defaultWorkerOpts
   )
 
-  const resolveDocumentWorker = new Worker(
-    'resolveDocument',
-    makeDocumentWorker({ fastify }),
-    defautOpts
+  /** @type {ResolveArchiveW} */
+  const resolveArchiveW = new Worker(
+    resolveArchiveQName,
+    makeArchiveP({ fastify }),
+    defaultWorkerOpts
+  )
+
+  /** @type {ResolveBookmarkW} */
+  const resolveBookmarkW = new Worker(
+    resolveBookmarkQName,
+    makeBookmarkP({ fastify }),
+    defaultWorkerOpts
   )
 
   const workers = {
-    createEpisodeWorker,
-    resolveDocumentWorker,
+    resolveEpisodeW,
+    resolveArchiveW,
+    resolveBookmarkW
   }
 
   fastify.decorate('workers', workers)

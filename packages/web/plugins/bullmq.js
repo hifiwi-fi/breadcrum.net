@@ -1,35 +1,53 @@
+/**
+ * @import { ResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+ * @import { ResolveArchiveQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+ * @import { ResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+ */
 import fp from 'fastify-plugin'
 import { Queue } from 'bullmq'
+
+import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { defaultJobOptions } from '@breadcrum/resources/bullmq/default-job-options.js'
 
 /**
  * This plugins adds bullMQ queues
  */
 export default fp(async function (fastify, _) {
-  const defaultJobOptions = {
-    removeOnComplete: {
-      age: 3600, // keep up to 1 hour
-      count: 1000, // keep up to 1000 jobs
-    },
-    removeOnFail: {
-      age: 24 * 3600, // keep up to 24 hours
-    },
-  }
-
   const queueRedis = fastify.redis['bullmq']
   if (queueRedis !== undefined) {
-    const resolveEpisodeQ = new Queue('resolveEpisode', {
-      connection: queueRedis,
-      defaultJobOptions,
-    })
+    /** @type {ResolveEpisodeQ} */
+    const resolveEpisodeQ = new Queue(
+      resolveEpisodeQName,
+      {
+        connection: queueRedis,
+        defaultJobOptions,
+      }
+    )
 
-    const resolveDocumentQ = new Queue('resolveDocument', {
-      connection: queueRedis,
-      defaultJobOptions,
-    })
+    /** @type {ResolveArchiveQ} */
+    const resolveArchiveQ = new Queue(
+      resolveArchiveQName,
+      {
+        connection: queueRedis,
+        defaultJobOptions,
+      }
+    )
+
+    /** @type {ResolveBookmarkQ} */
+    const resolveBookmarkQ = new Queue(
+      resolveBookmarkQName,
+      {
+        connection: queueRedis,
+        defaultJobOptions,
+      }
+    )
 
     const queues = {
       resolveEpisodeQ,
-      resolveDocumentQ,
+      resolveArchiveQ,
+      resolveBookmarkQ
     }
 
     fastify.decorate('queues', queues)
@@ -39,4 +57,5 @@ export default fp(async function (fastify, _) {
 },
 {
   dependencies: ['env', 'redis'],
+  name: 'bullmq',
 })

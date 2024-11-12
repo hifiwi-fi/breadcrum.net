@@ -1,13 +1,13 @@
 /**
- * @import { FastifyInstance, FastifyReply } from 'fastify'
- * @import { PoolClient } from 'pg'
+ * @import { FastifyReply } from 'fastify'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 import SQL from '@nearform/sql'
 
 /**
  * @param  {object} params
  * @param  {string} params.userId
- * @param  {PoolClient | FastifyInstance['pg']} params.client
+ * @param  {PgClient} params.client
  * @param  {FastifyReply} params.reply  [description]
  * @param  {string} params.token
  * @param  {Date} params.now

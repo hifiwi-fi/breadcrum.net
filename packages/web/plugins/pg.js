@@ -1,12 +1,11 @@
 import fp from 'fastify-plugin'
 
 /**
- * @import { FastifyInstance } from 'fastify'
- * @import { PoolClient } from 'pg'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
 /**
- * @typedef {PoolClient | FastifyInstance['pg']} PgClientAlias
+ * @typedef {PgClient} PgClientAlias
  */
 
 /**
