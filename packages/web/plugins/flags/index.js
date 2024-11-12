@@ -4,7 +4,7 @@ import { defaultFrontendFlags } from './frontend-flags.js'
 import { defaultBackendFlags } from './backend-flags.js'
 
 /**
- * @import { FastifyInstance } from 'fastify'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
 /**
@@ -16,7 +16,7 @@ export default fp(async function (fastify, _) {
      * Retrieves the feature flags.
      *
      * @param {Object} options - The options for retrieving flags.
-     * @param {FastifyInstance['pg']} [options.pgClient] - The PostgreSQL client instance.
+     * @param {PgClient} [options.pgClient] - The PostgreSQL client instance.
      * @param {boolean} [options.frontend=true] - Whether to retrieve frontend flags.
      * @param {boolean} [options.backend=true] - Whether to retrieve backend flags.
      * @returns {Promise<Object>} The retrieved flag set.

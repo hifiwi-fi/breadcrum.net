@@ -1,6 +1,7 @@
 import SQL from '@nearform/sql'
-import { createEpisode } from '../../episodes/episode-query-create.js'
-import { createArchive } from '../../archives/archive-query-create.js'
+import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
+
+import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
 import { getBookmark } from '../get-bookmarks-query.js'
 
 /**

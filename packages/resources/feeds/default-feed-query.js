@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
+
 /**
- * @import { FastifyInstance } from 'fastify'
- * @import { PoolClient } from 'pg'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
 import SQL from '@nearform/sql'
@@ -17,7 +17,7 @@ import SQL from '@nearform/sql'
  * within a database transaction to ensure data consistency.
  *
  * @param {Object} params - The function parameters.
- * @param {PoolClient | FastifyInstance['pg']} params.client - The database client for executing queries, an instance of a pg connection from `fastify.pg` or `node-pg`.
+ * @param {PgClient} params.client - The database client for executing queries, an instance of a pg connection from `fastify.pg` or `node-pg`.
  * @param {string} params.userId - The ID of the user for whom to retrieve or create the default podcast feed.
  * @returns {Promise<string>} The ID of the default podcast feed for the given user.
  * @throws {Error} Throws an error if the database transaction fails.
