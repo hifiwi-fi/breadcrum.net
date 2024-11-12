@@ -27,9 +27,15 @@ export default fp(async function (fastify, _) {
       defaultJobOptions,
     })
 
+    const initializeBookmarkQ = new Queue('initializeBookmark', {
+      connection: queueRedis,
+      defaultJobOptions,
+    })
+
     const queues = {
       resolveEpisodeQ,
       resolveDocumentQ,
+      initializeBookmarkQ
     }
 
     fastify.decorate('queues', queues)

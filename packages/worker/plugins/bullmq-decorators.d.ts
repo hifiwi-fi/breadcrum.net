@@ -6,6 +6,7 @@ declare module 'fastify' {
     workers: {
       createEpisodeWorker: Worker
       resolveDocumentWorker: Worker
+      initializeBookmarkWorker: Worker
     }
   }
 }

@@ -30,9 +30,16 @@ export default fp(async function (fastify, _opts) {
     defautOpts
   )
 
+  const initializeBookmarkWorker = new Worker(
+    'initializeBookmark',
+    makeDocumentWorker({ fastify }),
+    defautOpts
+  )
+
   const workers = {
     createEpisodeWorker,
     resolveDocumentWorker,
+    initializeBookmarkWorker
   }
 
   fastify.decorate('workers', workers)

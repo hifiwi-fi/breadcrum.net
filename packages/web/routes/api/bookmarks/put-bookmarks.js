@@ -5,10 +5,7 @@
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
 import { oneLineTrim } from 'common-tags'
-import { createEpisode } from '../episodes/episode-query-create.js'
-import { createArchive } from '../archives/archive-query-create.js'
 import { getBookmark } from './get-bookmarks-query.js'
-import { normalizeURL } from './normalizeURL.js'
 import { createBookmark } from './put-bookmark-query.js'
 
 /**
@@ -93,7 +90,6 @@ export async function putBookmarks (fastify, _opts) {
     },
     async function createBookmarkHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        console.log('RUNNNING')
         const userId = request.user.id
         const {
           note,
@@ -114,11 +110,6 @@ export async function putBookmarks (fastify, _opts) {
           normalize,
         } = request.query
 
-        if (normalize) { // This will be the one possibly slow step
-          const { normalizedURL } = await normalizeURL(urlObj)
-          url = normalizedURL
-        }
-
         const maybeResult = await getBookmark({
           fastify,
           pg: client,
@@ -130,11 +121,9 @@ export async function putBookmarks (fastify, _opts) {
 
         if (maybeResult) {
           if (update) {
-            console.log({ update })
             reply.redirect(`/api/bookmarks/${maybeResult.id}`, 308)
             return
           } else {
-            console.log({ update })
             reply.status(200)
             return {
               status: 'nochange',
@@ -162,72 +151,28 @@ export async function putBookmarks (fastify, _opts) {
           tags
         })
 
-        let episodeId, episodeMedium, episodeURL
-        if (episode) {
-          // TODO: ensure handling of createEpisode url is correct
-          const episodeEntity = await createEpisode({
-            client,
-            userId,
-            bookmarkId: bookmark.id,
-            type: request?.body?.createEpisode?.type ?? 'redirect',
-            medium: request?.body?.createEpisode?.medium ?? 'video',
-            url: request?.body?.createEpisode?.url ?? url,
-          })
-          episodeId = episodeEntity.id
-          episodeMedium = episodeEntity.medium
-          episodeURL = episodeEntity.url
-
-          await fastify.queues.resolveEpisodeQ.add(
-            'resolve-episode',
+        if (meta || episode || archive || normalize) {
+          await fastify.queues.initializeBookmarkQ.add(
+            'initialize-bookmark',
             {
               userId,
-              bookmarkTitle: bookmark.title,
-              episodeId,
-              url: episodeURL,
-              medium: episodeMedium,
+              bookmarkId: bookmark.id,
+              resolveBookmark: meta,
+              resolveEpisode: episode,
+              resolveArchive: archive,
+              normalizeURL: normalize,
+              userProvidedMeta: {
+                title,
+                tags,
+                summary,
+              }
             }
           )
-        }
-
-        let archiveId, archiveURL
-        if (archive) {
-          // TODO: ensure handling of createArchive url is correct
-          const archiveEntity = await createArchive({
-            client,
-            userId,
-            bookmarkId: bookmark.id,
-            bookmarkTitle: title ?? null,
-            url: request?.body?.createArchive?.url ?? url,
-            extractionMethod: 'server',
-          })
-
-          archiveId = archiveEntity.id
-          archiveURL = archiveEntity.url
         }
 
         // Commit bookmark, tags, archive and episode in their incomplete state
         await client.query('commit')
-        fastify.prom.episodeCounter.inc()
-        fastify.prom.archiveCounter.inc()
         fastify.prom.bookmarkCreatedCounter.inc()
-
-        if (archive || meta) {
-          await fastify.queues.resolveDocumentQ.add(
-            'resolve-document',
-            {
-              url,
-              userId,
-              resolveMeta: meta,
-              archive,
-              title,
-              tags,
-              summary,
-              bookmarkId: bookmark.id,
-              archiveId,
-              archiveURL,
-            }
-          )
-        }
 
         // Look up the newly created bookmark instead of trying to re-assemble it here.
         const createdBookmark = await getBookmark({
