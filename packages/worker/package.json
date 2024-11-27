@@ -44,7 +44,7 @@
     "gunzip-maybe": "^1.4.2",
     "hyperid": "^3.1.1",
     "jsdom": "^25.0.1",
-    "undici": "^6.16.0",
+    "undici": "^7.0.0",
     "user-agents": "^1.1.355"
   },
   "devDependencies": {
@@ -59,7 +59,7 @@
     "neostandard": "^0.11.0",
     "npm-run-all2": "^7.0.1",
     "tap": "^21.0.0",
-    "typescript": "~5.6.2"
+    "typescript": "~5.7.2"
   },
   "tap": {
     "serial": [
