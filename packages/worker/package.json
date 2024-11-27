@@ -44,8 +44,7 @@
     "hyperid": "^3.1.1",
     "jsdom": "^25.0.1",
     "undici": "^6.16.0",
-    "user-agents": "^1.1.355",
-    "webassert": "^3.0.2"
+    "user-agents": "^1.1.355"
   },
   "devDependencies": {
     "@bret/type-provider-json-schema-to-ts": "^4.0.2",

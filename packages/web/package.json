@@ -28,7 +28,6 @@
     "@fastify/swagger": "^9.1.0",
     "@fastify/swagger-ui": "^5.0.1",
     "@nearform/sql": "^1.5.0",
-    "ajv": "^8.17.1",
     "abstract-cache-redis": "^2.0.0",
     "bullmq": "^5.1.12",
     "clean-deep": "^3.4.0",
@@ -48,8 +47,7 @@
     "pg": "^8.6.0",
     "postgrator-cli": "^9.0.0",
     "resolve-email": "3.0.4",
-    "undici": "^6.0.1",
-    "webassert": "^3.0.2"
+    "undici": "^6.0.1"
   },
   "optionalDependencies": {
     "sodium-native": "^4.0.0"

@@ -16,6 +16,7 @@
     "custompatch": "^1.0.28",
     "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
+    "knip": "^5.37.1",
     "neostandard": "^0.11.0",
     "npm-run-all2": "^7.0.1"
   },
@@ -32,7 +33,7 @@
     "url": "https://github.com/hifiwi-fi/breadcrum.net.git"
   },
   "scripts": {
-    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm package-lock.json",
+    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm -f package-lock.json",
     "prepublishOnly": "git push --follow-tags && gh-release -y",
     "postinstall": "custompatch",
     "release": "git push --follow-tags && gh-release -y",
