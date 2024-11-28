@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@nearform/sql": "^1.10.5",
-    "undici": "^6.16.0"
+    "undici": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
