@@ -25,7 +25,6 @@ export async function putTagsQuery ({
   bookmarkId,
   tags,
 }) {
-  // @ts-ignore
   pg = pg ?? fastify.pg
 
   if (!pg) throw new Error('A postgres client is required')

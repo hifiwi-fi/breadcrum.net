@@ -19,5 +19,9 @@ const uaHacks = {
  * @param {URL} url
  */
 export function getUA (url) {
-  return uaHacks[url.hostname] ?? ua().toString()
+  return (
+    uaHacks[url.hostname] ??
+    // @ts-expect-error ua is not listed as callable for some reason
+    ua().toString()
+  )
 }

@@ -9,8 +9,9 @@ import { fetchHTML } from '../document-processor/fetch-html.js'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { getSiteMetadata } from '../document-processor/get-site-metadata.js'
 import { extractArchive } from '../document-processor/extract-archive.js'
-import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
+import { normalizeURL as normalize } from '@breadcrum/resources/bookmarks/normalize-url.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
+import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 
 /**
  * @param  {object} params
@@ -19,11 +20,12 @@ import { isYouTubeUrl } from '@bret/is-youtube-url'
 export function makeBookmarkInitializerWorker ({ fastify }) {
   /** @type {Processor<
    * {
-    * url: string
     * userId: string
     * bookmarkId: string
+    * url: string
     * resolveBookmark: boolean
     * resolveArchive: boolean
+    * normalizeURL: boolean
     * resolveEpisode: boolean
     * userProvidedMeta: {
     *   title: string
@@ -34,88 +36,104 @@ export function makeBookmarkInitializerWorker ({ fastify }) {
    * >} */
   return async function documentWorker (job) {
     const {
-      url,
       userId,
       bookmarkId,
+      url,
       resolveBookmark,
       resolveArchive,
       resolveEpisode,
+      normalizeURL,
       userProvidedMeta,
     } = job.data
     const log = fastify.log.child({ jobId: job.id })
     const pg = fastify.pg
 
-    const urlObj = await normalizeURL(url)
+    const originalUrl = new URL(url)
 
-    if (isYouTubeUrl(urlObj)) {
-      const metadata = await getYTDLPMetadata({
-        url,
-        medium: 'video',
-        ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
-        attempt: job.attemptsMade,
-        cache: fastify.ytdlpCache,
+    /** workingUrl is the URL to fetch subsequent data with. It is probably normalized but might not be. */
+    let workingUrl = originalUrl
+
+    if (normalizeURL) {
+      const normalizedUrl = await normalize(url)
+      workingUrl = normalizedUrl
+
+      const updates = [
+        SQL`url = ${normalizedUrl.toString()}`,
+        SQL`original_url = ${originalUrl.toString()}`
+      ]
+
+      const normalizeUrlQuery = SQL`
+        update bookmarks
+        set ${SQL.glue(updates, ' , ')}
+        where id = ${bookmarkId}
+        and owner_id = ${userId};
+      `
+
+      const normalizeUrlQueryResult = await pg.query(normalizeUrlQuery)
+      log.debug({ normalizeUrlQueryResult }, 'Normalized URL')
+    }
+
+    const html = await fetchHTML({ url: workingUrl })
+    const initialDocument = (new JSDOM(html, { url: workingUrl.toString() })).window.document
+    log.debug({ url, html }, 'Fetched HTML')
+
+    const mediaMetadata = await getYTDLPMetadata({
+      url,
+      medium: 'video',
+      ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
+      attempt: job.attemptsMade,
+      cache: fastify.ytdlpCache,
+    })
+
+    if (resolveBookmark) {
+      /** The simplified metadata extraction that also runs in the bookmarkelt. */
+      const pageMetadata = await getSiteMetadata({
+        document: initialDocument,
       })
 
-      const episodeEntity = await createEpisode({
-        client,
-        userId,
-        bookmarkId: bookmark.id,
-        type: request?.body?.createEpisode?.type ?? 'redirect',
-        medium: request?.body?.createEpisode?.medium ?? 'video',
-        url: request?.body?.createEpisode?.url ?? url,
-      })
+      const bookmarkUpdates = []
 
-      // Create episode here
+      bookmarkUpdates.push(SQL`done = true`)
 
-      if (metadata.live_status === 'is_upcoming' && metadata.release_timestamp) {
-        const releaseTimestamp = metadata.release_timestamp * 1000 // Convert seconds to milliseconds
-        const threeMinutesInMilliseconds = 3 * 60 * 1000 // 3 minutes in milliseconds
-
-        const delayedTimestamp = releaseTimestamp + threeMinutesInMilliseconds
-
-        const releaseDate = new Date(releaseTimestamp)
-        const delayedDate = new Date(delayedTimestamp)
-        const isoTimestamp = delayedDate.toISOString()
-
-        log.info(`Episode ${episodeId} for ${url} is scheduled at ${releaseDate.toLocaleString()} and will be processed at ${isoTimestamp}.`)
-        // Schedule an episode job here
-        // job.moveToDelayed(delayedTimestamp, token)
-
-        // throw new DelayedError()
-        //
-        await fastify.queues.resolveEpisodeQ.add(
-          'resolve-episode',
-          {
-            userId,
-            bookmarkTitle: bookmark.title,
-            episodeId,
-            url: episodeURL,
-            medium: episodeMedium,
-          }
-        )
+      if (pageMetadata?.title && userProvidedMeta.title === originalUrl.toString()) {
+        bookmarkUpdates.push(SQL`title = ${pageMetadata.title}`)
       }
 
-      if (!metadata?.url) {
-        throw new Error('No video URL was found in discovery step')
+      if (pageMetadata?.summary && !userProvidedMeta.summary) {
+        bookmarkUpdates.push(SQL`summary = ${pageMetadata?.summary}`)
       }
-    } else {
-      // Handle Default bookmark initialization
-      // Fetch the URL and check the content type
-      // Try to create an archive
-      // Try to fetch an episode
-      // Try to extract meta on the page
-      // Merge user provided meta with extracted meta
-      // Create episode and archive where we have data
-      // finalize the bookmark
-      //
-      const archiveEntity = await createArchive({
-        client,
-        userId,
-        bookmarkId: bookmark.id,
-        bookmarkTitle: title ?? null,
-        url: request?.body?.createArchive?.url ?? url,
-        extractionMethod: 'server',
-      })
+
+      log.debug({ bookmarkUpdates }, 'Bookmark updates')
+
+      if (bookmarkUpdates.length > 0) {
+        const bookmarkResolveQuery = SQL`
+            update bookmarks
+            set ${SQL.glue(bookmarkUpdates, ' , ')}
+            where id = ${bookmarkId}
+            and owner_id =${userId};
+          `
+        log.debug({ bookmarkResolveQuery }, 'Bookmark resolve query')
+
+        const bookmarkResolveResult = await pg.query(bookmarkResolveQuery)
+        log.debug({ bookmarkResolveResult }, 'Bookmark resolved')
+      }
+
+      if (pageMetadata?.tags?.length > 0 && !(userProvidedMeta?.tags?.length > 0)) {
+        await putTagsQuery({
+          fastify,
+          pg,
+          userId,
+          bookmarkId,
+          tags: pageMetadata.tags,
+        })
+      }
+      log.info(`Bookmark ${bookmarkId} for ${url} is ready.`)
+    }
+
+    if (resolveArchive) {
+      const article = await extractArchive({ document: initialDocument })
+
+      const archiveData = []
     }
   }
 }
