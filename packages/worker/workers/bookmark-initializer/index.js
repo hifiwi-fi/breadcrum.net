@@ -73,10 +73,6 @@ export function makeBookmarkInitializerWorker ({ fastify }) {
       log.debug({ normalizeUrlQueryResult }, 'Normalized URL')
     }
 
-    const html = await fetchHTML({ url: workingUrl })
-    const initialDocument = (new JSDOM(html, { url: workingUrl.toString() })).window.document
-    log.debug({ url, html }, 'Fetched HTML')
-
     const mediaMetadata = await getYTDLPMetadata({
       url,
       medium: 'video',
@@ -84,6 +80,17 @@ export function makeBookmarkInitializerWorker ({ fastify }) {
       attempt: job.attemptsMade,
       cache: fastify.ytdlpCache,
     })
+
+    const html = await fetchHTML({ url: workingUrl })
+
+    const initialDocument = (new JSDOM(html, { url: workingUrl.toString() })).window.document
+    log.debug({ url, html }, 'Fetched HTML')
+
+    // Order by likelyhood of working.
+
+    if (resolveEpisode) {
+
+    }
 
     if (resolveBookmark) {
       /** The simplified metadata extraction that also runs in the bookmarkelt. */

@@ -15,7 +15,7 @@ export const page = Component(() => {
       ${badge(html`<a href="/register">Early Access</a>`)}
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
-          <img src="/static/bread.png">
+          <img src="/static/bread-santa-small.png">
         </div>
         <h1 class="bc-marking-hero-title">
           Breadcrum
