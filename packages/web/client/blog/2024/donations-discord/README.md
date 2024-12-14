@@ -2,7 +2,7 @@
 layout: article
 title: "💸 Donations & Discord"
 serif: false
-publishDate: "2024-12-14T22:39:53.124Z"
+publishDate: "2024-12-14T23:24:37.016Z"
 authorName: "Bret Comnes"
 authorUrl: "https://bret.io"
 authorImgUrl: "/static/bret-ava.png"
@@ -26,6 +26,7 @@ With some regret, Breadcrum now offers a Discord server. As a longtime fan of co
 
 If you rely on the service and are interested in discussing ideas, design, or other development topics, feel free to join the Discord.
 At the time of writing, it’s literally just me in the server, so please adjust your expectations as the room grows.
+Feel free to @ mention me on anything!
 
 ## Donations
 

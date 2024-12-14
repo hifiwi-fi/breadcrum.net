@@ -56,6 +56,6 @@
     "knip": "knip --dependencies",
     "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg",
     "new-blogpost": "node scripts/create-blogpost.js --title",
-    "publish-draft": "node scripts/publish-draft.js"
+    "publish-draft": "node scripts/publish-blogpost.js"
   }
 }
