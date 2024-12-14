@@ -27,6 +27,7 @@ export default async () => {
     // image: '/static/preview.png',
     siteTwitter: '@breadcrum_',
     mastodonUrl: 'https://fosstodon.org/@breadcrum',
+    discordUrl: 'https://discord.gg/pYJdTvNdZN',
     version,
     authorName: 'Breadcrum',
     authorUrl: baseUrl,

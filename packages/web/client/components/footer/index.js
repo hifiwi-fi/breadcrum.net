@@ -2,10 +2,16 @@ import { Component, html } from 'uland-isomorphic'
 
 /**
  * Footer component. STATIC. NOT CURRENTLTY CLIENT RENDERED
+ * @type {{
+  *   version: string,
+  *   mastodonUrl: string,
+  *   discordUrl: string
+ }}
  */
 export const footer = Component(({
   version,
   mastodonUrl,
+  discordUrl
 }) => {
   return html`
   <footer class="bc-footer">
@@ -34,9 +40,18 @@ export const footer = Component(({
         v${version}
       </a>
     </div>
-    <a class="flex-center preserve-icon" href="/feed.xml"><img height="16" width="16" src="/static/atom.svg"></a>
-    <a class="flex-center preserve-icon" href="/feed.json"><img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg"></a>
-    <a class="flex-center preserve-icon" href="${mastodonUrl}" rel="me"><img height="16" width="16" src="/static/mastodon.svg"></a>
+    <a class="flex-center preserve-icon" href="${discordUrl}" aria-label="Join us on Discord" title="Join us on Discord">
+      <img height="16" width="16" src="/static/discord.svg" alt="Discord icon">
+    </a>
+    <a class="flex-center preserve-icon" href="/feed.xml" aria-label="Subscribe to the RSS feed" title="Subscribe to the RSS feed">
+      <img height="16" width="16" src="/static/atom.svg" alt="Atom feed icon">
+    </a>
+    <a class="flex-center preserve-icon" href="/feed.json" aria-label="Subscribe to the JSON feed" title="Subscribe to the JSON feed">
+      <img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg" alt="JSON feed icon">
+    </a>
+    <a class="flex-center preserve-icon" href="${mastodonUrl}" rel="me" aria-label="Follow us on Mastodon" title="Follow us on Mastodon">
+      <img height="16" width="16" src="/static/mastodon.svg" alt="Mastodon icon">
+    </a>
   </footer>
   `
 })
