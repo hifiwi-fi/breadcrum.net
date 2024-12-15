@@ -6,7 +6,7 @@ publishDate: "2024-12-14T23:24:37.016Z"
 authorName: "Bret Comnes"
 authorUrl: "https://bret.io"
 authorImgUrl: "/static/bret-ava.png"
-description: "Breadcrum added a Discord server and is accepting donations"
+description: "Breadcrum adds a Discord server and is accepting donations"
 image: "./img/discord.png"
 ---
 
