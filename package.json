@@ -1,7 +1,7 @@
 {
   "name": "breadcrum.net",
   "description": "Breadcrum internet newspaper clippigns",
-  "version": "2024.12.1",
+  "version": "2024.12.14",
   "type": "module",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
@@ -55,6 +55,8 @@
     "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
     "deploy:worker": "flyctl deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
     "knip": "knip --dependencies",
-    "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg"
+    "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg",
+    "new-blogpost": "node scripts/create-blogpost.js --title",
+    "publish-draft": "node scripts/publish-blogpost.js"
   }
 }

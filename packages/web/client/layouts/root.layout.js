@@ -1,3 +1,5 @@
+/** @import { LayoutFunction } from 'top-bun' */
+
 import { html, render } from 'uland-isomorphic'
 import { header } from '../components/header/index.js'
 import { footer } from '../components/footer/index.js'
@@ -8,11 +10,6 @@ THIS LAYOUT IS STATIC.
 If you need to render components inside, you need attatch them in the global client.
 
 */
-
-/**
- * @template T
- * @typedef {import('top-bun').LayoutFunction<T>} LayoutFunction
- */
 
 /**
  * @typedef {{
@@ -31,6 +28,7 @@ export default function defaultRootLayout ({
     siteName,
     baseUrl,
     mastodonUrl,
+    discordUrl,
     version,
     noindex,
     siteDescription,
@@ -113,7 +111,7 @@ export default function defaultRootLayout ({
         <main class="bc-main">
           ${typeof children === 'string' ? html([children]) : children /* Support both uhtml and string children. Optional. */}
         </main>
-        ${footer({ version, mastodonUrl })}
+        ${footer({ version, mastodonUrl, discordUrl })}
       </div>
     </body>
     </html>
