@@ -12,6 +12,7 @@ import { extractArchive } from '../document-processor/extract-archive.js'
 import { normalizeURL as normalize } from '@breadcrum/resources/bookmarks/normalize-url.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
+import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
 
 /**
  * @param  {object} params
@@ -89,7 +90,25 @@ export function makeBookmarkInitializerWorker ({ fastify }) {
     // Order by likelyhood of working.
 
     if (resolveEpisode) {
+      const isUpcoming = mediaMetadata.live_status === 'is_upcoming' && mediaMetadata.release_timestamp
+      const mediaUrlFound = mediaMetadata?.url
 
+      if (isUpcoming || mediaUrlFound) {
+        const episodeEntity = await createEpisode({
+          client,
+          userId,
+          bookmarkId: bookmark.id,
+          type: request?.body?.createEpisode?.type ?? 'redirect',
+          medium: request?.body?.createEpisode?.medium ?? 'video',
+          url: request?.body?.createEpisode?.url ?? url,
+        })
+      }
+
+      if (mediaMetadata.live_status === 'is_upcoming' && mediaMetadata.release_timestamp) {
+
+      } else if (mediaMetadata?.url) {
+
+      } // else no media found, skipping
     }
 
     if (resolveBookmark) {

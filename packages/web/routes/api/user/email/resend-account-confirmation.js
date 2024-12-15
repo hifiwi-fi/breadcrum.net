@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance, FastifyReply } from 'fastify'
- * @import { PoolClient } from 'pg'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-tokens.js'
@@ -8,7 +8,7 @@ import { EMAIL_CONFIRM_TOKEN, EMAIL_CONFIRM_TOKEN_EXP } from './email-confirm-to
 /**
  * @param  {object} params
  * @param  {string} params.userId
- * @param  {PoolClient | FastifyInstance['pg']} params.client
+ * @param  {PgClient} params.client
  * @param  {FastifyReply} params.reply  [description]
  * @param  {FastifyInstance} params.fastify
  */
