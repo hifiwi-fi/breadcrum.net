@@ -11,7 +11,8 @@ image: "./img/discord.png"
 ---
 
 Breadcrum now has two new community resources: Discord and Donations.
-These new resources offer a modern and convenient way to connect and discuss ideas and issues related to the project.
+These new resources offer a modern and convenient way to connect and discuss ideas and issues related to the project, and
+a way to support the ongoing work and costs of the project prior to shipping paid subscriptions.
 
 ## Discord
 
@@ -25,7 +26,7 @@ With some regret, Breadcrum now offers a Discord server. As a longtime fan of co
 </figure>
 
 If you rely on the service and are interested in discussing ideas, design, or other development topics, feel free to join the Discord.
-At the time of writing, it’s literally just me in the server, so please adjust your expectations as the room grows.
+At the time of writing, it's literally just me in the server, so please adjust your expectations as the room grows.
 Feel free to @ mention me on anything!
 
 ## Donations
@@ -37,4 +38,4 @@ We now have a donations page:
 
 - 💸 [Donate to Breadcrum](/docs/donate)
 
-You’ll find details on ways to support the project on that page!
+You'll find details on ways to support the project on that page!
