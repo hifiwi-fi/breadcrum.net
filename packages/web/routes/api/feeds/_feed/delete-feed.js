@@ -1,6 +1,15 @@
 import SQL from '@nearform/sql'
 
-export async function deleteFeed (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ */
+
+/**
+ *
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @returns {Promise<void>}
+ */
+export async function deleteFeed (fastify, _opts) {
   const podcastFeedDeleteCounter = new fastify.metrics.client.Counter({
     name: 'breadcrum_podcast_feed_delete_total',
     help: 'The number of times podcast feeds are deleted',

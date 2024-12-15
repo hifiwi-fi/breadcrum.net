@@ -1,7 +1,7 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { PoolClient } from 'pg'
  * @import { TypeBookmarkRead } from './schemas/schema-bookmark-read.js'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
 import SQL from '@nearform/sql'
@@ -9,7 +9,7 @@ import SQL from '@nearform/sql'
 /**
  * @typedef {GetBookmarksQueryParams & {
  *   fastify: FastifyInstance,
- *   pg?: PoolClient | FastifyInstance['pg']
+ *   pg?: PgClient
  * }} GetBookmarksParams
  */
 

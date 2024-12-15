@@ -3,7 +3,7 @@
  */
 
 import SQL from '@nearform/sql'
-import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
+import { getOrCreateDefaultFeed } from '../feeds/default-feed-query.js'
 
 /**
  * Creates an episode entry in the database.

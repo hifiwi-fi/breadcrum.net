@@ -6,6 +6,7 @@ declare module 'fastify' {
     queues: {
       resolveEpisodeQ: Queue
       resolveDocumentQ: Queue
+      initializeBookmarkQ: Queue
     }
   }
 }
