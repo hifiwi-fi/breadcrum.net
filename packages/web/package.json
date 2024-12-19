@@ -47,7 +47,7 @@
     "nodemailer": "^6.8.0",
     "pg": "^8.6.0",
     "postgrator-cli": "^9.0.0",
-    "resolve-email": "3.0.8",
+    "resolve-email": "3.0.9",
     "undici": "^7.0.0",
     "webassert": "^3.0.2"
   },
