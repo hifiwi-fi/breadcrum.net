@@ -8,8 +8,10 @@ import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *  SerializerSchemaOptions: {
  *   references: [ SchemaArchiveRead ],
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *  }
  * }>}
  */
 export async function getArchivesRoute (fastify, _opts) {

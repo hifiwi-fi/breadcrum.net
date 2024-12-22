@@ -7,7 +7,9 @@ import SQL from '@nearform/sql'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
- *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   }
  * }>}
  */
 export async function putArchiveRoute (fastify, _opts) {

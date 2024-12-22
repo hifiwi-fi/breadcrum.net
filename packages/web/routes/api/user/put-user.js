@@ -9,7 +9,9 @@ import { getPasswordHashQuery } from './password/password-hash.js'
 /**
  *
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *    SerializerSchemaOptions: {
  *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ * }
  * }>}
  */
 export async function putUserRoute (fastify, _opts) {

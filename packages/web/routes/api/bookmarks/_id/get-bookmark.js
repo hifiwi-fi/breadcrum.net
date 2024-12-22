@@ -13,6 +13,7 @@ import { getBookmark } from '../get-bookmarks-query.js'
 /**
  *
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ * SerializerSchemaOptions: {
  *    references: [
  *     SchemaBookmarkWithArchivesAndEpisodes,
  *     SchemaBookmarkRead,
@@ -26,6 +27,7 @@ import { getBookmark } from '../get-bookmarks-query.js'
  *       }
  *       output: Date
  *     }]
+ *  }
  * }>}
  */
 export async function getBookmarkRoute (fastify, _opts) {

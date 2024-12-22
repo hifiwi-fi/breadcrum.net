@@ -7,8 +7,10 @@ import { getArchive } from '../archive-query-get.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *  SerializerSchemaOptions: {
  *   references: [ SchemaArchiveRead ],
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *  }
  * }>}
  */
 export async function getArchiveRoute (fastify, _opts) {

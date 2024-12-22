@@ -13,8 +13,10 @@ import { createBookmark } from './put-bookmark-query.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
- *   references: [ SchemaBookmarkRead ],
- *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   SerializerSchemaOptions: {
+ *     references: [ SchemaBookmarkRead ],
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   }
  * }>}
  */
 export async function putBookmarks (fastify, _opts) {

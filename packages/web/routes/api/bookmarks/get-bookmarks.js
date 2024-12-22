@@ -9,9 +9,11 @@ import { addMillisecond } from './addMillisecond.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
- *   references: [ SchemaBookmarkRead ],
- *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
-*  }>}
+ *    SerializerSchemaOptions: {
+ *      references: [ SchemaBookmarkRead ],
+ *      deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *    }
+ *  }>}
 */
 export async function getBookmarksHandler (fastify) {
   fastify.get(

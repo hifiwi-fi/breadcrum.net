@@ -7,7 +7,9 @@ import { getUser } from './user-query.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *  SerializerSchemaOptions: {
  *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *  }
  * }>}
  */
 export async function getUserRoute (fastify, _opts) {

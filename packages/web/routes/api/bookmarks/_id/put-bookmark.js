@@ -12,21 +12,31 @@ import { getBookmark } from '../get-bookmarks-query.js'
  */
 
 /**
- * @type {FastifyPluginAsyncJsonSchemaToTs<
- *     {references: [
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ * ValidatorSchemaOptions: {
+ * references: [
  *       SchemaBookmarkCreate,
  *       SchemaBookmarkRead,
  *       SchemaEpisodeRead,
  *       SchemaArchiveRead
-*     ],
-*    deserialize: [{
-*       pattern: {
-*         type: "string"
-*         format: "date-time"
-*       }
-*       output: Date
-*     }]}
- * >}
+ *  ]
+ }
+ * SerializerSchemaOptions: {
+ *    references: [
+ *       SchemaBookmarkCreate,
+ *       SchemaBookmarkRead,
+ *       SchemaEpisodeRead,
+ *       SchemaArchiveRead
+ *     ],
+ *    deserialize: [{
+ *       pattern: {
+ *         type: "string"
+ *         format: "date-time"
+ *       }
+ *       output: Date
+ *     }]
+ }
+* }>}
  */
 export async function putBookmark (fastify, _opts) {
   fastify.put('/', {

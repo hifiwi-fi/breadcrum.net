@@ -10,7 +10,9 @@ import { addMillisecond } from '../../bookmarks/addMillisecond.js'
 /**
  *
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
- *       deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *    }
  * }>}
  */
 export async function getAdminUsers (fastify, _opts) {
