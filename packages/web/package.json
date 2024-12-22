@@ -47,7 +47,7 @@
     "nodemailer": "^6.8.0",
     "pg": "^8.6.0",
     "postgrator-cli": "^9.0.0",
-    "resolve-email": "3.0.8",
+    "resolve-email": "3.0.9",
     "undici": "^7.0.0"
   },
   "optionalDependencies": {
@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "^1.0.10",
-    "@bret/type-provider-json-schema-to-ts": "^4.0.2",
+    "@bret/type-provider-json-schema-to-ts": "^5.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.15",
