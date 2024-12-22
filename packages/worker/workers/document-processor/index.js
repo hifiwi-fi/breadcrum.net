@@ -45,7 +45,7 @@ export function makeDocumentWorker ({ fastify }) {
     const pg = fastify.pg
 
     try {
-      const html = await fetchHTML({ url, fastify })
+      const html = await fetchHTML({ url })
       const initialDocument = (new JSDOM(html, { url })).window.document
 
       const work = []
