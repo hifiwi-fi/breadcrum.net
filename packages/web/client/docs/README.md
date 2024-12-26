@@ -11,7 +11,7 @@ Learn about more about Breadcrum:
 - 📜 [Blog](/blog/)
 - ℹ️ [About](/about/)
 - 🙊 [Social Media](./social/)
-- 🚦 [Status](https://status.breadcrum.net/)
+- 🚦 [Status](https://breadcrum.betteruptime.com)
 - ⌨️ [API](/openapi)
 - 💸 [Donate](./donate)
 
