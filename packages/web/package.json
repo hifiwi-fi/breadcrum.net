@@ -30,7 +30,7 @@
     "@nearform/sql": "^1.5.0",
     "ajv": "^8.17.1",
     "abstract-cache-redis": "^2.0.0",
-    "bullmq": "^5.1.12",
+    "bullmq": "^5.34.6",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
     "dotenv": "^16.0.1",
@@ -55,7 +55,7 @@
     "sodium-native": "^4.0.0"
   },
   "devDependencies": {
-    "@breadcrum/bookmarklet": "^1.0.11",
+    "@breadcrum/bookmarklet": "1.0.11",
     "@bret/type-provider-json-schema-to-ts": "^5.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
@@ -67,7 +67,7 @@
     "fetch-undici": "^5.0.0",
     "format-duration": "^3.0.0",
     "fragmentions": "^1.1.4",
-    "giscus": "^1.5.0",
+    "giscus": "^1.6.0",
     "highlight.js": "^11.5.0",
     "json-schema-to-ts": "^3.1.0",
     "local-storage-proxy": "^4.0.3",

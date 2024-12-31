@@ -32,7 +32,7 @@
     "@mozilla/readability": "^0.5.0",
     "@nearform/sql": "^1.10.5",
     "abstract-cache-redis": "^2.0.0",
-    "bullmq": "^5.1.12",
+    "bullmq": "^5.34.6",
     "concat-stream": "^2.0.0",
     "dompurify": "^3.1.2",
     "fastify": "^5.0.0",
