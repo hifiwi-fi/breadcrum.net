@@ -1,4 +1,3 @@
-// @ts-expect-error
 import { extractMeta } from '@breadcrum/extract-meta'
 
 /**
