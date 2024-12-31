@@ -22,7 +22,7 @@
     "print-plugins": "fastify print-plugins app.js"
   },
   "dependencies": {
-    "@breadcrum/extract-meta": "^1.0.5",
+    "@breadcrum/extract-meta": "^2.0.0",
     "@breadcrum/resources": "file:../resources",
     "@fastify/autoload": "^6.0.1",
     "@fastify/env": "^5.0.1",
