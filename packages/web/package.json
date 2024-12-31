@@ -55,7 +55,7 @@
     "sodium-native": "^4.0.0"
   },
   "devDependencies": {
-    "@breadcrum/bookmarklet": "^1.0.10",
+    "@breadcrum/bookmarklet": "^1.0.11",
     "@bret/type-provider-json-schema-to-ts": "^5.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
@@ -97,7 +97,7 @@
     "test": "run-s test:*",
     "test:eslint": "eslint . --ignore-pattern 'public/*'",
     "test:tap": "tap",
-    "test-skip:tsc":"tsc",
+    "test-skip:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address localhost app.js",
     "watch:tob-bun": "npm run build:top-bun -- --watch-only --drafts",

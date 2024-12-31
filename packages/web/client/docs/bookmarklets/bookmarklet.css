@@ -8,3 +8,13 @@
 	padding: 5px;
 	text-decoration: none !important;
 }
+
+.bc-bookmarklet-copy-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bc-bookmarklet-copy-line .bc-bookmarklet-copy-select {
+  flex-grow: 1;
+}

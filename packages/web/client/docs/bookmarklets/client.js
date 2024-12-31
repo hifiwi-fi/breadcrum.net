@@ -1,7 +1,42 @@
 /* eslint-env browser */
-import { Component, html, render } from 'uland-isomorphic'
+import { Component, html, render, useCallback, useRef } from 'uland-isomorphic'
 import { bookmarklet } from '../bookmarklets/bookmarklet.js'
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
+
+const bookmarkletCopyLine = Component(() => {
+  const copyButton = useRef()
+
+  const handleSelect = useCallback(async ev => {
+    ev.target.select()
+  })
+
+  const handleCopy = useCallback(async (ev) => {
+    try {
+      await navigator.clipboard.writeText(bookmarklet)
+      copyButton.current.innerText = 'Copied'
+      console.log('copied bookmarklet to clipboard')
+    } catch (e) {
+      console.error(e)
+      copyButton.current.innerText = 'Error'
+    }
+  }, [copyButton.current])
+
+  return html`
+  <div>
+    <div class="bc-bookmarklet-copy-line">
+      <input
+        class="bc-bookmarklet-copy-select"
+        type="text"
+        readonly
+        onclick=${handleSelect}
+        value="${bookmarklet}"
+      >
+      <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
+    </div>
+    <span class="bc-help-text">Or create a Bookmark and set the URL to the above script.</span>
+  </div>
+  `
+})
 
 export const page = Component(() => {
   return html`
@@ -9,14 +44,32 @@ export const page = Component(() => {
 
   <p>
     Drag this bookmarklet to your bookmark bar or menu.
-    When you visit a page you want to bookmark, click the the bookmarklet in your bookmark bar or menu and it will open a new bookmark window. Existing URLs will open an edit window.
+    When you visit a page you want to bookmark, click the the bookmarklet in
+    your bookmark bar or menu and it will open a new bookmark window. Existing
+    URLs will open an edit window.
   </p>
 
-  <p><a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a> <a class="bc-help-text" href="${`https://github.com/hifiwi-fi/bc-bookmarklet/releases/tag/v${version}`}">Version ${version}</a></p>
+  <div>
+  <p>
+    <a class="bc-bookmarklet" href="${bookmarklet}">🥖 bookmark</a>
+    <a class="bc-help-text" href="${`https://github.com/hifiwi-fi/bc-bookmarklet/releases/tag/v${version}`}">Version ${version}</a>
+    <br/>
+    <span class="bc-help-text">Drag me to your bookmarks!</span>
+  <div>
+
+  <p>
+    Alternatively, manually create a new bookmark in your Browser bookmark manager
+    and copy/paste the following script into the bookmark URL field.
+  </p>
+
+  ${bookmarkletCopyLine()}
 
   <h2>Apple Shortcut</h2>
 
-  <p>This apple shortcut will let you save safari web pages to breadcrum from the share sheet. Eventually this will be provided by a native app.</p>
+  <p>
+    This apple shortcut will let you save safari web pages to breadcrum from
+    the share sheet. Eventually this will be provided by a native app.
+  </p>
 
   <ul>
     <li>
@@ -32,16 +85,16 @@ export const page = Component(() => {
   </h2>
 
   <p>
-    The bookmarklet simply opens the <a href="/bookmarks/add">Bookmark Add</a> page with a few query params populated by client side metadata extraction.
-    This page supports client provided metadata, or an option to request server side extracted metadata.
+    The bookmarklet simply opens the <a href="/bookmarks/add">Bookmark Add</a>
+    page with a few query params populated by client side metadata extraction.
+    This page supports client provided metadata, or an option to request server
+    side extracted metadata.
     Here are the relavant query params you can use on this page:
   </p>
 
   <p>Example:</p>
 
-  <pre>
-${process.env.TRANSPORT}://${process.env.HOST}/bookmarks/add/?url=https://example.com&title=Example Title
-  </pre>
+  <pre>${process.env.TRANSPORT}://${process.env.HOST}/bookmarks/add/?url=https://example.com&title=Example Title</pre>
 
   <ul>
     <li>
