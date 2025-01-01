@@ -55,7 +55,7 @@
     "sodium-native": "^4.0.0"
   },
   "devDependencies": {
-    "@breadcrum/bookmarklet": "1.0.11",
+    "@breadcrum/bookmarklet": "1.0.12",
     "@bret/type-provider-json-schema-to-ts": "^5.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/node": "^22.0.0",
