@@ -3,6 +3,10 @@ import { Readability } from '@mozilla/readability'
 import createDOMPurify from 'dompurify'
 
 /**
+ * @typedef {ReturnType<Readability['parse']>} ReadabilityParseResult
+ */
+
+/**
  * @param  {object} params
  * @param  {Document} params.document
  */

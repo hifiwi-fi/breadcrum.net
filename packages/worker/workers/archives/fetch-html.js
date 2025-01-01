@@ -1,7 +1,3 @@
-/**
- * @import { FastifyInstance } from 'fastify'
- */
-
 import { request as undiciRequest } from 'undici'
 import { pipeline } from 'node:stream/promises'
 import gunzip from 'gunzip-maybe'
@@ -20,12 +16,12 @@ const uaHacks = {
 }
 
 /**
+ * Fetch HTML documents from an HTML. Supports max 3 redirects and gzip. Probably needs more work.
  * @param  {object} params
- * @param  {string} params.url
- * @param  {FastifyInstance} params.fastify
+ * @param  {URL} params.url
  */
-export async function fetchHTML ({ url, fastify }) {
-  const requestURL = new URL(url)
+export async function fetchHTML ({ url }) {
+  const requestURL = url
   const ua = uaHacks[requestURL.hostname] ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
 
   const response = await undiciRequest(requestURL, {
@@ -60,6 +56,5 @@ export async function fetchHTML ({ url, fastify }) {
     html = await response.body.text()
   }
 
-  fastify.log.debug({ url, html })
   return html
 }
