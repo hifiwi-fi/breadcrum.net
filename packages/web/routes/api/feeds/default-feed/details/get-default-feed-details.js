@@ -1,5 +1,5 @@
 import { feedProps, feedReadProps } from '../../schemas/feed-base.js'
-import { getOrCreateDefaultFeed } from '../default-feed-query.js'
+import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
 
 /**

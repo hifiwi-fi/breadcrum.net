@@ -1,4 +1,4 @@
-import { getOrCreateDefaultFeed } from './default-feed/default-feed-query.js'
+import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { feedProps, feedReadProps } from './schemas/feed-base.js'
 import { getFeedsQuery } from './feeds-query.js'
 import { getFeedWithDefaults } from './feed-defaults.js'

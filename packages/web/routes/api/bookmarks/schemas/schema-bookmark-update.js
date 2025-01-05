@@ -17,14 +17,13 @@ export const schemaBookmarkUpdate = /** @type {const} @satisfies {JSONSchema} */
       anyOf: [
         {
           type: 'object',
+          additionalProperties: false,
+          required: ['url', 'medium', 'type'],
           properties: {
             type: { enum: ['redirect'] },
             medium: { enum: ['video', 'audio'] },
             url: { type: 'string', format: 'uri' },
           },
-          required: [
-            'type', 'medium', 'url'
-          ],
         },
         {
           type: 'null',
@@ -35,11 +34,12 @@ export const schemaBookmarkUpdate = /** @type {const} @satisfies {JSONSchema} */
       anyOf: [
         {
           type: 'object',
+          additionalProperties: false,
           properties: {
             url: { type: 'string', format: 'uri' },
           },
           required: [
-            'uri',
+            'url',
           ],
         },
         {

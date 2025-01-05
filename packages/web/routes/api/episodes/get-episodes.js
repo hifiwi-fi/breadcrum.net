@@ -1,4 +1,4 @@
-import { getOrCreateDefaultFeed } from '../feeds/default-feed/default-feed-query.js'
+import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { getEpisodes } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'

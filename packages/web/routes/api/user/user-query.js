@@ -1,7 +1,7 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { PoolClient } from 'pg'
  * @import { TypeUserRead } from './schemas/schema-user-read.js'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
 import SQL from '@nearform/sql'
@@ -10,7 +10,7 @@ import SQL from '@nearform/sql'
  * getUser returns the user object for a given userId
  * @typedef {GetUserQueryParams & {
  *   fastify: FastifyInstance,
- *   pg?: PoolClient | FastifyInstance['pg']
+ *   pg?: PgClient
  * }} GetUserParams
  */
 

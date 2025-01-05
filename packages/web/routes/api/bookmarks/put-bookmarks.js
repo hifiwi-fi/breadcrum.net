@@ -5,11 +5,10 @@
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
 import { oneLineTrim } from 'common-tags'
-import { createEpisode } from '../episodes/episode-query-create.js'
-import { createArchive } from '../archives/archive-query-create.js'
 import { getBookmark } from './get-bookmarks-query.js'
-import { normalizeURL } from './normalizeURL.js'
 import { createBookmark } from './put-bookmark-query.js'
+import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
+import { resolveBookmarkJobName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
@@ -95,8 +94,8 @@ export async function putBookmarks (fastify, _opts) {
     },
     async function createBookmarkHandler (request, reply) {
       return fastify.pg.transact(async client => {
-        console.log('RUNNNING')
         const userId = request.user.id
+
         const {
           note,
           toread,
@@ -105,8 +104,9 @@ export async function putBookmarks (fastify, _opts) {
           archive_urls = [],
           summary,
         } = request.body
-        let { url, title } = request.body
-        const urlObj = new URL(url)
+
+        const submittedUrl = new URL(request.body.url)
+        const submittedTitle = request.body.title
 
         const {
           update,
@@ -116,27 +116,24 @@ export async function putBookmarks (fastify, _opts) {
           normalize,
         } = request.query
 
-        if (normalize) { // This will be the one possibly slow step
-          const { normalizedURL } = await normalizeURL(urlObj)
-          url = normalizedURL
-        }
+        // This will be the one possibly slow step
+        // This needs to happen on create for de-dupe behavior
+        const workingUrl = normalize ? await normalizeURL(submittedUrl) : submittedUrl
 
         const maybeResult = await getBookmark({
           fastify,
           pg: client,
           ownerId: userId,
-          url,
+          url: workingUrl.toString(),
           sensitive: true,
           perPage: 1,
         })
 
         if (maybeResult) {
           if (update) {
-            console.log({ update })
             reply.redirect(`/api/bookmarks/${maybeResult.id}`, 308)
             return
           } else {
-            console.log({ update })
             reply.status(200)
             return {
               status: 'nochange',
@@ -147,86 +144,45 @@ export async function putBookmarks (fastify, _opts) {
         }
 
         // Title will fallback to just being the URL on create
-        title = title ?? url
+        const workingTitle = submittedTitle ?? workingUrl.toString()
 
         const bookmark = await createBookmark({
           fastify,
           pg: client,
-          url,
-          title,
+          url: workingUrl.toString(),
+          title: workingTitle,
           note,
           toread,
           sensitive,
           archiveUrls: archive_urls,
           summary,
           userId,
+          originalUrl: workingUrl.href === submittedUrl.href ? null : submittedUrl.toString(),
           meta,
           tags
         })
 
-        let episodeId, episodeMedium, episodeURL
-        if (episode) {
-          // TODO: ensure handling of createEpisode url is correct
-          const episodeEntity = await createEpisode({
-            client,
-            userId,
-            bookmarkId: bookmark.id,
-            type: request?.body?.createEpisode?.type ?? 'redirect',
-            medium: request?.body?.createEpisode?.medium ?? 'video',
-            url: request?.body?.createEpisode?.url ?? url,
-          })
-          episodeId = episodeEntity.id
-          episodeMedium = episodeEntity.medium
-          episodeURL = episodeEntity.url
-
-          await fastify.queues.resolveEpisodeQ.add(
-            'resolve-episode',
-            {
-              userId,
-              bookmarkTitle: bookmark.title,
-              episodeId,
-              url: episodeURL,
-              medium: episodeMedium,
-            }
-          )
-        }
-
-        let archiveId, archiveURL
-        if (archive) {
-          // TODO: ensure handling of createArchive url is correct
-          const archiveEntity = await createArchive({
-            client,
-            userId,
-            bookmarkId: bookmark.id,
-            bookmarkTitle: title ?? null,
-            url: request?.body?.createArchive?.url ?? url,
-            extractionMethod: 'server',
-          })
-
-          archiveId = archiveEntity.id
-          archiveURL = archiveEntity.url
-        }
-
-        // Commit bookmark, tags, archive and episode in their incomplete state
+        // Commit bookmark create for background job lookup
         await client.query('commit')
-        fastify.prom.episodeCounter.inc()
-        fastify.prom.archiveCounter.inc()
         fastify.prom.bookmarkCreatedCounter.inc()
 
-        if (archive || meta) {
-          await fastify.queues.resolveDocumentQ.add(
-            'resolve-document',
+        if (meta || episode || archive) {
+          await fastify.queues.resolveBookmarkQ.add(
+            resolveBookmarkJobName,
             {
-              url,
               userId,
-              resolveMeta: meta,
-              archive,
-              title,
-              tags,
-              summary,
+              url: workingUrl.toString(),
               bookmarkId: bookmark.id,
-              archiveId,
-              archiveURL,
+              resolveBookmark: meta,
+              resolveEpisode: episode,
+              resolveArchive: archive,
+              userProvidedMeta: {
+                // If submittedTitle is null, this is treated as a signal
+                // to resolve it when resolveBookmark is true.
+                title: submittedTitle,
+                tags,
+                summary,
+              }
             }
           )
         }
@@ -235,7 +191,7 @@ export async function putBookmarks (fastify, _opts) {
         const createdBookmark = await getBookmark({
           fastify,
           ownerId: userId,
-          url,
+          bookmarkId: bookmark.id,
           sensitive: true,
           perPage: 1,
         })

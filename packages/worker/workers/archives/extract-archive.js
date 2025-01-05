@@ -3,8 +3,13 @@ import { Readability } from '@mozilla/readability'
 import createDOMPurify from 'dompurify'
 
 /**
+ * @typedef {ReturnType<Readability['parse']>} ReadabilityParseResult
+ */
+
+/**
  * @param  {object} params
  * @param  {Document} params.document
+ * @returns {Promise<ReadabilityParseResult>}
  */
 export async function extractArchive ({
   document,
@@ -17,5 +22,8 @@ export async function extractArchive ({
   const dpWindow = new JSDOM('').window
   const DOMPurify = createDOMPurify(dpWindow)
   article.content = DOMPurify.sanitize(article.content)
+
+  if (!article.title) throw new Error('Article extracted without a title')
+  if (!article.content) throw new Error('Article extracted without content')
   return article
 }

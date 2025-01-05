@@ -22,6 +22,7 @@
     "print-plugins": "fastify print-plugins app.js"
   },
   "dependencies": {
+    "@bret/is-youtube-url": "^1.0.3",
     "@breadcrum/extract-meta": "^2.0.0",
     "@breadcrum/resources": "file:../resources",
     "@fastify/autoload": "^6.0.1",
@@ -44,7 +45,7 @@
     "hyperid": "^3.1.1",
     "jsdom": "^25.0.1",
     "undici": "^7.0.0",
-    "webassert": "^3.0.2"
+    "user-agents": "^1.1.355"
   },
   "devDependencies": {
     "@bret/type-provider-json-schema-to-ts": "^5.0.1",
@@ -53,11 +54,12 @@
     "@types/gunzip-maybe": "^1.4.2",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.0.0",
+    "@types/user-agents": "^1.0.4",
     "@voxpelli/tsconfig": "^15.0.0",
     "neostandard": "^0.12.0",
     "npm-run-all2": "^7.0.1",
     "tap": "^21.0.0",
-    "typescript": "~5.6.2"
+    "typescript": "~5.7.2"
   },
   "tap": {
     "serial": [

@@ -28,6 +28,7 @@ import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
  * @param {Array<string>} [params.archiveUrls=[]] - List of archived URLs, defaults to an empty array.
  * @param {string} [params.summary] - Optional summary of the bookmark.
  * @param {string} params.userId - UUID of the user creating the bookmark (must be provided).
+ * @param {string?} [params.originalUrl] - The originally submitted URL prior to normalization, if it differs
  * @param {boolean} [params.meta=false] - Metadata flag for the bookmark, defaults to false.
  * @param {Array<string>} [params.tags] - List of tags to associate with the bookmark.
  * @throws {Error} Throws an error if userId is not provided.
@@ -44,6 +45,7 @@ export async function createBookmark ({
   archiveUrls,
   summary,
   userId,
+  originalUrl,
   meta,
   tags
 }) {
@@ -57,6 +59,7 @@ export async function createBookmark ({
       archive_urls,
       summary,
       owner_id,
+      original_url,
       done
     )
     select
@@ -68,6 +71,7 @@ export async function createBookmark ({
       ${archiveUrls.length > 0 ? archiveUrls : SQL`'{}'`} as archive_urls,
       ${summary ?? null} as summary,
       ${userId} as owner_id,
+      ${originalUrl ?? null} as original_url,
       ${meta === false} as done
     returning
       id,
