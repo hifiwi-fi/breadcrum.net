@@ -26,18 +26,22 @@ export const page = Component(() => {
   }, [user, loading])
 
   useEffect(() => {
+    // PWAs send urls as the summary (text) and not the url, in most cases :(
+    const pwaTextAsUrl = Boolean(!query.get('url') && query.get('summary') && URL.canParse(query.get))
+
     const setFallbackBookmark = () => {
       setBookmark({
-        url: query.get('url'),
+        url: pwaTextAsUrl ? query.get('summary') : query.get('url'),
         title: query.get('title'),
         note: query.get('note'),
+        summary: pwaTextAsUrl ? undefined : query.get('summary'),
         tags: query.getAll('tags').filter(t => Boolean(t)),
       })
     }
 
     const init = async () => {
       setNewlyCreated(false)
-      const queryUrl = query.get('url')
+      const queryUrl = pwaTextAsUrl ? query.get('summary') : query.get('url')
       const ver = query.get('ver')
       setBookmarkletVersion(ver)
       if (ver !== version || query.get('description')) setBookmarkletUpdateAvailable(true)
@@ -59,7 +63,7 @@ export const page = Component(() => {
       const params = new URLSearchParams()
 
       const serverMeta = query.get('meta')
-      if (serverMeta) params.set('meta', 'true')
+      if (serverMeta === 'false') params.set('meta', 'false')
 
       const response = await fetch(`${state.apiUrl}/bookmarks?${params.toString()}`, {
         method: 'put',

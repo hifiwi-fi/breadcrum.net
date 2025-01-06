@@ -63,16 +63,16 @@ export function makeBookmarkP ({ fastify }) {
           cache: fastify.ytdlpCache,
         })
       } catch (err) {
+        log.warn(err, 'getYTDLPMetadata threw during bookmark resolve')
         log.warn(
           {
-            error: err,
             bookmarkId,
             resolveBookmark,
             resolveArchive,
             resolveEpisode,
             userProvidedMeta
           },
-          'getYTDLPMetadata threw during bookmark resolve'
+          'getYTDLPMetadata threw during bookmark resolve (stats)'
         )
       }
     }
@@ -85,6 +85,7 @@ export function makeBookmarkP ({ fastify }) {
         const html = await fetchHTML({ url: workingUrl })
         document = (new JSDOM(html, { url })).window.document
       } catch (err) {
+        log.warn(err, 'Resolving html document failed during bookmark resolve')
         log.warn(
           {
             error: err,
@@ -94,7 +95,7 @@ export function makeBookmarkP ({ fastify }) {
             resolveEpisode,
             userProvidedMeta
           },
-          'Resolving html document failed during bookmark resolve'
+          'Resolving html document failed during bookmark resolve (stats)'
         )
       }
     }
@@ -109,16 +110,16 @@ export function makeBookmarkP ({ fastify }) {
           media
         })
       } catch (err) {
+        log.warn(err, 'Failed to ExtractMeta during bookmark resolve')
         log.warn(
           {
-            error: err,
             bookmarkId,
             resolveBookmark,
             resolveArchive,
             resolveEpisode,
             userProvidedMeta
           },
-          'Failed to ExtractMeta during bookmark resolve'
+          'Failed to ExtractMeta during bookmark resolve (stats)'
         )
       }
     }
@@ -129,6 +130,7 @@ export function makeBookmarkP ({ fastify }) {
       try {
         article = await extractArchive({ document })
       } catch (err) {
+        log.warn(err, 'Failed to run Readability during bookmark resolve')
         log.warn(
           {
             error: err,
@@ -138,7 +140,7 @@ export function makeBookmarkP ({ fastify }) {
             resolveEpisode,
             userProvidedMeta
           },
-          'Failed to run Readability during bookmark resolve'
+          'Failed to run Readability during bookmark resolve (stats)'
         )
       }
     }
@@ -207,7 +209,8 @@ export function makeBookmarkP ({ fastify }) {
           ? err
           : new Error('Unknown episode create error', { cause: err })
 
-        log.error({ episodeEntity, error: err }, 'Error creating episode on bookmark create')
+        log.error(err, 'Error creating episode on bookmark create')
+        log.error({ episodeEntity, error: err }, 'Error creating episode on bookmark create (stats)')
         if (episodeEntity && episodeEntity.id) {
           await finalizeEpisodeError({
             pg,

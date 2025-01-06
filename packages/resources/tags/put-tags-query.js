@@ -53,5 +53,8 @@ export async function putTagsQuery ({
   await pg.query(applyTags)
 
   // @ts-expect-error TODO: Fix this ignore
-  fastify?.prom?.tagAppliedCounter?.inc?.(tagsResults.rows.length)
+  if (fastify?.prom?.tagAppliedCounter?.inc) {
+    // @ts-expect-error TODO: Fix this ignore
+    fastify?.prom?.tagAppliedCounter?.inc?.(tagsResults.rows.length)
+  }
 }

@@ -23,7 +23,7 @@ export const browser = {
 export default async () => {
   return {
     siteName: 'Breadcrum',
-    siteDescription: 'Breadcrum.net: bookmarking with podcasting and archiving super powers.',
+    siteDescription: 'Personal private bookmarking with video, audio, and text archiving and podcasting tools.',
     // image: '/static/preview.png',
     siteTwitter: '@breadcrum_',
     mastodonUrl: 'https://fosstodon.org/@breadcrum',

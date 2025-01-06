@@ -46,8 +46,8 @@ export async function putBookmarks (fastify, _opts) {
             },
             meta: {
               type: 'boolean',
-              default: false,
-              description: 'Extract page metadata on the server.',
+              default: true,
+              description: 'Extract page metadata on the server. User provided fields take precedence.',
             },
             episode: {
               type: 'boolean',
@@ -135,11 +135,11 @@ export async function putBookmarks (fastify, _opts) {
             return
           } else {
             reply.status(200)
-            return {
+            return /** @type {const} */ ({
               status: 'nochange',
               site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
               data: maybeResult,
-            }
+            })
           }
         }
 
@@ -196,12 +196,15 @@ export async function putBookmarks (fastify, _opts) {
           perPage: 1,
         })
 
-        reply.status(201)
-        return {
-          status: 'ok',
+        if (!createdBookmark) {
+          throw new Error('Bookmark was not created')
+        }
+
+        await reply.status(201).send(/** @type {const} */ ({
+          status: 'created',
           site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`,
           data: createdBookmark,
-        }
+        }))
       })
     }
   )

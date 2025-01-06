@@ -101,8 +101,15 @@ export async function getYTDLPMetadata ({
   })
 
   if (response.statusCode !== 200) {
-    const text = await response.body.text()
-    throw new Error(`yt-dlp error${response.statusCode}: ` + text)
+    /**
+      * @type {{
+      *  code: number,
+      *  name: string,
+      *  description: string
+      * }}
+      */
+    const body = /** @type {any} */ (await response.body.json())
+    throw new Error(`yt-dlp-api error: ${body.description}`)
   }
 
   const metadata = /** @type {YTDLPMetadata} */ (await response.body.json())

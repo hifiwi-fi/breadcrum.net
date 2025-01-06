@@ -94,6 +94,7 @@ export default function defaultRootLayout ({
       <meta property="og:url" content="${resolvedURL}">
       <meta property="og:description" content="${description ?? siteDescription}">
 
+      <link rel="manifest" href="/manifest.json">
 
       ${scripts
         ? scripts.map(script => html`<script type='module' src="${script}"></script>`)
