@@ -36,7 +36,11 @@ layout: article
 title: "${title}"
 serif: false
 publishDate: "${new Date().toISOString()}"
-handlebars: false
+authorName: "Bret Comnes"
+authorUrl: "https://bret.io"
+authorImgUrl: "/static/bret-ava.png"
+description: "Breadcrum adds a Discord server and is accepting donations"
+image: "./img/FIX-ME.png"
 ---
 
 Content goes here.

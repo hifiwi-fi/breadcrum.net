@@ -36,7 +36,6 @@ const blockedHostnames = [
 function isBlockedIP (ip) {
   const parsedIP = ipaddr.parse(ip)
   for (const range of blockedIPRanges) {
-    // @ts-expect-error this works
     if (parsedIP.match(ipaddr.parseCIDR(range))) {
       return true
     }
