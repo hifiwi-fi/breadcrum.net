@@ -33,7 +33,7 @@ export default async () => {
     version,
     authorName: 'Breadcrum',
     authorUrl: baseUrl,
-    authorImgUrl: `${baseUrl}/static/breadcrum-fill-red-santa.png`,
+    authorImgUrl: `${baseUrl}/static/breadcrum-fill-red.png`,
     authorImgAlt: 'Picture of author',
     transport,
     host,

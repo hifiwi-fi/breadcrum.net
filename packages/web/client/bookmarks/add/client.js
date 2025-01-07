@@ -27,36 +27,37 @@ export const page = Component(() => {
 
   useEffect(() => {
     // PWAs send urls as the summary (text) and not the url, in most cases :(
-    const pwaTextAsUrl = Boolean(!query.get('url') && query.get('summary') && URL.canParse(query.get))
+    const pwaTextAsUrl = Boolean(!query.get('url') && query.get('summary') && URL.canParse(query.get('summary')))
+
+    const workingUrl = pwaTextAsUrl ? query.get('summary') : query.get('url')
+    const workingSummary = pwaTextAsUrl ? undefined : query.get('summary')
 
     const setFallbackBookmark = () => {
       setBookmark({
-        url: pwaTextAsUrl ? query.get('summary') : query.get('url'),
+        url: workingUrl,
         title: query.get('title'),
         note: query.get('note'),
-        summary: pwaTextAsUrl ? undefined : query.get('summary'),
+        summary: workingSummary,
         tags: query.getAll('tags').filter(t => Boolean(t)),
       })
     }
 
     const init = async () => {
       setNewlyCreated(false)
-      const queryUrl = pwaTextAsUrl ? query.get('summary') : query.get('url')
       const ver = query.get('ver')
       setBookmarkletVersion(ver)
       if (ver !== version || query.get('description')) setBookmarkletUpdateAvailable(true)
 
-      if (!queryUrl) {
+      if (!workingUrl) {
         setFallbackBookmark()
         return
       }
 
-      const payload = { url: queryUrl }
+      const payload = { url: workingUrl }
       if (query.get('title')) payload.title = query.get('title')
       if (query.get('note')) payload.note = query.get('note')
 
-      const summary = query.get('summary') || query.get('description')
-      if (summary) payload.summary = summary
+      if (workingSummary) payload.summary = workingSummary
       const queryTags = query.getAll('tags').filter(t => Boolean(t))
       if (queryTags.length > 0) payload.tags = queryTags
 

@@ -6,8 +6,8 @@ publishDate: "2025-01-07T04:22:18.544Z"
 authorName: "Bret Comnes"
 authorUrl: "https://bret.io"
 authorImgUrl: "/static/bret-ava.png"
-description: "Breadcrum adds a Discord server and is accepting donations"
-image: "./img/FIX-ME.png"
+description: "A look at what happened with Breadcrum in 2024."
+image: "./img/bc-4-contribs.jpg"
 ---
 
 Breadcrum is entering 2025, its 4th year (3rd year in operation)!
@@ -16,7 +16,7 @@ Let's take a quick look at how things went last year, what got done, and chat ab
 ## By the Numbers
 
 <figure>
-  <a href="https://github.com/hifiwi-fi/breadcrum.net/graphs/contributors"><img src="./img/bc-4-contribs.jpg" alt="Breadcrum 2024 contributing graph"></a>
+  <a href="https://github.com/hifiwi-fi/breadcrum.net/graphs/contributors"><img src="./img/bc-4-contribs.jpg" alt="Breadcrum 2024 contribution graph"></a>
   <figcaption>Looks like 2024 was another slow and steady year 🐢.</figcaption>
 </figure>
 
