@@ -138,3 +138,9 @@ Let's make 2025 the year Breadcrum becomes an essential tool in your web media w
 
 Join the conversation in our [Discord]({{ vars.discordUrl }}) or drop me a message on [Twitter]({{ vars.siteTwitterUrl }}), [Mastodon]({{ vars.mastodonUrl }}), or [BlueSky]({{ vars.bskyUrl }})!
 Here's to making the media firehose a little more manageable.
+
+## Syndication
+
+- [Mastodon](https://fosstodon.org/@breadcrum/113822413536530534)
+- [X](https://x.com/breadcrum_/status/1878868571918569806)
+- [Bsky](https://bsky.app/profile/breadcrum.net/post/3lfnduaerfk2j)
