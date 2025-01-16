@@ -84,16 +84,16 @@ If you're a migrating huffduff-video user, I'm especially eager to hear about yo
 ## What Goals?!
 
 It's been an especially hectic year for me personally.
-Family life and career have been my primary focus this year, so I'm mildly sad to say most of the goals I set out for 2024 were not met.
+Family life and career have been my primary focus, so I'm mildly sad to say most of the goals I set out for Breadcrum in 2024 were not met.
 
 A lot did get done though:
 
 - 🌎 Breadcrum the service is still online!
 - 🪙 It is still inexpensive to operate.
 - 🐂 Dramatically improved back-end architecture that scales very efficiently.
-- 📆 Scheduled episodes.
+- 📆 Scheduled episodes (currently broken, shipping a fix soon).
 - 🦋 BlueSky Video Support.
-- 🐦 X Video Support started working agin.
+- 🐦 X Video Support started working again.
 - 📀 Pluggable media extraction backend (YouTube not broken yet).
 - 👨‍💼 Refactoring to use TypeScript (This wasted so much time, but should help things later).
 - 💬 Discord Chat.
