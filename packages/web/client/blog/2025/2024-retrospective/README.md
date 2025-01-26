@@ -91,7 +91,7 @@ A lot did get done though:
 - 🌎 Breadcrum the service is still online!
 - 🪙 It is still inexpensive to operate.
 - 🐂 Dramatically improved back-end architecture that scales very efficiently.
-- 📆 Scheduled episodes (currently broken, shipping a fix soon).
+- 📆 Scheduled episodes (~~currently broken~~ fixed again).
 - 🦋 BlueSky Video Support.
 - 🐦 X Video Support started working again.
 - 📀 Pluggable media extraction backend (YouTube not broken yet).
@@ -138,3 +138,9 @@ Let's make 2025 the year Breadcrum becomes an essential tool in your web media w
 
 Join the conversation in our [Discord]({{ vars.discordUrl }}) or drop me a message on [Twitter]({{ vars.siteTwitterUrl }}), [Mastodon]({{ vars.mastodonUrl }}), or [BlueSky]({{ vars.bskyUrl }})!
 Here's to making the media firehose a little more manageable.
+
+## Syndication
+
+- [Mastodon](https://fosstodon.org/@breadcrum/113822413536530534)
+- [X](https://x.com/breadcrum_/status/1878868571918569806)
+- [Bsky](https://bsky.app/profile/breadcrum.net/post/3lfnduaerfk2j)
