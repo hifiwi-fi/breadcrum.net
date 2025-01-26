@@ -1,8 +1,7 @@
 ---
 title: '🙊 Social Media'
+layout: 'docs'
 ---
-
-# 🙊 Social Media
 
 Connect with Breadcum on social media, feeds, irc and email:
 

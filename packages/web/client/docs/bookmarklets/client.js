@@ -40,8 +40,6 @@ const bookmarkletCopyLine = Component(() => {
 
 export const page = Component(() => {
   return html`
-    <h1>📑 Bookmarklets</h1>
-
   <p>
     Drag this bookmarklet to your bookmark bar or menu.
     When you visit a page you want to bookmark, click the the bookmarklet in
@@ -126,5 +124,5 @@ export const page = Component(() => {
 })
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  render(document.querySelector('.bc-docs-main'), page)
 }

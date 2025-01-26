@@ -1,3 +1,4 @@
 export default {
-  title: '🔰 Docs > Tutorial',
+  title: '🔰 Tutorial',
+  layout: 'docs'
 }

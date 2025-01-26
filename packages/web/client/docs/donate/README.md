@@ -1,8 +1,7 @@
 ---
 title: '💸 Donate to Breadcrum'
+layout: 'docs'
 ---
-
-# 💸 Donate to Breadcrum
 
 If you'd like to support Breadcrum's ongoing development, either before or in addition to a paid subscription (coming soon), you can donate using the following payment providers:
 

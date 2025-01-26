@@ -1,3 +1,4 @@
 export default {
-  title: '📑️ Docs > Bookmarklets',
+  title: 'Bookmarklets',
+  layout: 'docs'
 }

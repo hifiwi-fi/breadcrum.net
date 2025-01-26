@@ -1,8 +1,7 @@
 ---
 title: '📑️ Docs > 🦜 Warrant Canary'
+layout: 'docs'
 ---
-
-# 🦜 Warrant Canary
 
 As of 2023-01-02 no warrants have ever been served to [Breadcrum.net](https://Breadcrum.net), its owners or its employees. No searches or seizures of any kind have ever been performed on [Breadcrum.net](https://Breadcrum.net) assets. [Breadcrum.net](https://Breadcrum.net) has no direct or indirect knowledge of any backdoors, or potential backdoors in our servers or network and [Breadcrum.net](https://Breadcrum.net) has not received any requests to implement a backdoor. [Breadcrum.net](https://Breadcrum.net) has never disclosed any user communications to any third party. All git commits to Breadcrum's source code are signed with the following GPG key.
 

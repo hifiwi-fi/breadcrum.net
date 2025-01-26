@@ -1,8 +1,7 @@
 ---
 title: '📚 Docs'
+layout: 'docs'
 ---
-
-# Docs
 
 Learn about more about Breadcrum:
 
