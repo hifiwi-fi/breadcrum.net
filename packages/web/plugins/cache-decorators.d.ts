@@ -1,6 +1,5 @@
-import type { FastifyInstance } from 'fastify';
-import type { FileKeyParams } from './cache.js';
-import type { YTDLPMetaKeyParams } from '@breadcrum/resources/episodes/yt-dlp-api-client.js';
+import type { FileKeyParams } from './cache.js'
+import type { YTDLPMetaKeyParams } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 
 declare module 'fastify' {
   interface FastifyInstance {

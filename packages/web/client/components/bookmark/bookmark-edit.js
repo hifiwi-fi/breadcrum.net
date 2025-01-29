@@ -41,6 +41,24 @@ export const bookmarkEdit = Component(({
   }, [b?.archive_urls])
 
   useEffect(() => {
+    /** * @param {KeyboardEvent} ev */
+    const handleKeyDown = (ev) => {
+      if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
+        ev.preventDefault()
+        if (formRef.current) {
+          // Dispatch a native submit event to trigger the form submission
+          formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [formRef])
+
+  useEffect(() => {
     const controller = new AbortController()
     const getPreview = async () => {
       setEpisodePreviewLoading(true)

@@ -1,15 +1,15 @@
-import "@fastify/jwt";
-import "fastify";
-import { JwtUser, JwtUserWithTokenId } from "./jwt.js";
+import '@fastify/jwt'
+import 'fastify'
+import { JwtUser, JwtUserWithTokenId } from './jwt.js'
 
-declare module "@fastify/jwt" {
+declare module '@fastify/jwt' {
   interface FastifyJWT {
     payload: JwtUserWithTokenId; // payload type is used for signing and verifying
     user: JwtUserWithTokenId; // user type is return type of `request.user` object
   }
 }
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyReply {
     /**
      * Creates a JWT token for the given user.

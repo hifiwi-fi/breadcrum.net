@@ -1,6 +1,3 @@
-import type { FastifyRequest } from 'fastify';
-import type { Worker } from 'bullmq'
-
 import type {
   ResolveBookmarkW,
 } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'

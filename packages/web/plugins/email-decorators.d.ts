@@ -1,5 +1,5 @@
 import 'fastify'
-import type { SentMessageInfo } from 'nodemailer';
+import type { SentMessageInfo } from 'nodemailer'
 
 declare module 'fastify' {
   interface FastifyInstance {

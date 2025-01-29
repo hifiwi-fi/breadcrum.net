@@ -1,5 +1,5 @@
 import 'fastify'
-import {MediumTypes, YTDLPMetadata} from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { MediumTypes, YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 
 declare module 'fastify' {
   interface FastifyInstance {

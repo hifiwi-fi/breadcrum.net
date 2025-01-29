@@ -1,6 +1,4 @@
-import 'fastify'
-import { PoolClient } from 'pg'
-import { PgClientAlias } from '../pg.js';
+import { PgClientAlias } from '../pg.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
