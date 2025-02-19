@@ -35,6 +35,8 @@ export default fp(async function (fastify, _) {
         WHERE jti = ${decodedToken['jti']}
       `
       const results = await fastify.pg.query(query)
+      // Only trust JWT tokens if they are still in the DB.
+      // TODO: Expire them automatically if they haven't been seen for over N days
       return results.rowCount === 1
     },
   })

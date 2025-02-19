@@ -5,6 +5,8 @@
 @import '../components/header';
 @import '../components/footer';
 
+@view-transition { navigation: auto; }
+
 :root {
   --bc-episodes-color: hsla(87, 74%, 44%, 0.9);
   --bc-archives-color: hsla(360, 100%, 61.5%, 0.9);
