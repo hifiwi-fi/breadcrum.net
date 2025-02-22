@@ -44,7 +44,7 @@ export async function finalizeEpisode ({
   if ('description' in media) {
     videoData.push(SQL`text_content = ${media.description}`)
   }
-  if ('uploader_url' in media || 'channel_url' in media) {
+  if (media.uploader_url || media.channel_url) {
     videoData.push(SQL`author_url = ${media.uploader_url || media.channel_url}`)
   }
   if ('thumbnail' in media) {
