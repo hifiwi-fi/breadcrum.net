@@ -10,6 +10,7 @@ export default fp(async function (fastify, _) {
     origin: ['http://localhost:3000', 'https://breadcrum.net'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
   })
 }, {
   name: 'cors',
