@@ -21,9 +21,9 @@ export async function extractArchive ({
 
   const dpWindow = new JSDOM('').window
   const DOMPurify = createDOMPurify(dpWindow)
+  if (!article.content) throw new Error('Article extracted without content')
   article.content = DOMPurify.sanitize(article.content)
 
   if (!article.title) throw new Error('Article extracted without a title')
-  if (!article.content) throw new Error('Article extracted without content')
   return article
 }
