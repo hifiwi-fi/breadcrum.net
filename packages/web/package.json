@@ -77,7 +77,7 @@
     "tap": "^21.0.0",
     "top-bun": "^10.0.0",
     "type-fest": "^4.26.1",
-    "typescript": "~5.7.2",
+    "typescript": "~5.8.2",
     "uland-isomorphic": "^2.0.0",
     "xmlbuilder": "^15.1.1"
   },
@@ -114,8 +114,6 @@
       "text",
       "lcovonly"
     ],
-    "plugin": [
-      "!@tapjs/typescript"
-    ]
+    "typecheck": false
   }
 }
