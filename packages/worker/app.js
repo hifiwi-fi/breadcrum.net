@@ -14,27 +14,33 @@ const hid = hyperid()
  * @type {FastifyPluginAsync<AppOptions>}
  */
 export default async function App (fastify, opts) {
-  const testPattern = /.*(test|spec).js/
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
+  const testPattern = /.*(test|spec)(\.js|\.cjs|\.mjs)$/i
+  const skipPattern = /.*.no-load(\.js|\.cjs|\.mjs)$/i
+  const ignorePattern = new RegExp(`${testPattern.source}|${skipPattern.source}`)
+
+  // This loads all global plugins defined in the plugins folder
+  // Plugins should use fp and be named and define their
+  // plugin dependencies.
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
+    ignorePattern,
     dirNameRoutePrefix: false,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
+    options: { ...opts },
   })
 
-  // This loads all plugins defined in routes
-  // define your routes in one of these
+  // This loads all of your routes in the routes folder and their
+  // associated autoHooks (route scoped plugins).
+  // Routes do not need to be wrapped in fp, but autoHooks do.
   fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
-    routeParams: true,
+    indexPattern: /^.*routes(?:\.ts|\.js|\.cjs|\.mjs)$/,
+    ignorePattern: /^.*(\.js|\.cjs|\.mjs)$/,
+    autoHooksPattern: /.*hooks(\.js|\.cjs|\.mjs)$/i,
     autoHooks: true,
     cascadeHooks: true,
     overwriteHooks: true,
-    ignorePattern: testPattern,
-    options: Object.assign({}, opts),
+    routeParams: true,
+    options: { ...opts },
   })
 }
 

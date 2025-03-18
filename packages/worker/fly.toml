@@ -24,6 +24,7 @@ swap_size_mb = 1024
   FASTIFY_ADDRESS = "0.0.0.0"
   FASTIFY_LOG_LEVEL = "info"
   FASTIFY_OPTIONS = "true"
+  FASTIFY_IMPORT = "otel.js"
   NODE_ENV = "production"
   NODE_OPTIONS = "--max-old-space-size=256"
   PORT = "8080"

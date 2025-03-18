@@ -61,5 +61,8 @@
     "new-blogpost": "node scripts/create-blogpost.js --title",
     "publish-draft": "node scripts/publish-blogpost.js",
     "watch-tb": "npm run -w @breadcrum/web top-bun-watch"
+  },
+  "dependencies": {
+    "@opentelemetry/semantic-conventions": "^1.30.0"
   }
 }
