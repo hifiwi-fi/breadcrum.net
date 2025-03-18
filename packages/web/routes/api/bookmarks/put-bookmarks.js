@@ -163,7 +163,7 @@ export async function putBookmarks (fastify, _opts) {
 
         // Commit bookmark create for background job lookup
         await client.query('commit')
-        fastify.prom.bookmarkCreatedCounter.inc()
+        fastify.otel.bookmarkCreatedCounter.add(1)
 
         if (meta || episode || archive) {
           await fastify.pgboss.queues.resolveBookmarkQ.send({

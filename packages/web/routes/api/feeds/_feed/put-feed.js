@@ -12,11 +12,6 @@ import { feedProps, feedReadProps } from '../schemas/feed-base.js'
  * @returns {Promise<void>}
  */
 export async function putFeed (fastify, _opts) {
-  const podcastFeedEditCounter = new fastify.metrics.client.Counter({
-    name: 'breadcrum_podcast_feed_edit_total',
-    help: 'The number of times podcast feeds are edited',
-  })
-
   fastify.put(
     '/',
     {
@@ -93,7 +88,7 @@ export async function putFeed (fastify, _opts) {
 
           await client.query(query)
 
-          podcastFeedEditCounter.inc()
+          fastify.otel.podcastFeedEditCounter.add(1)
         }
 
         return {

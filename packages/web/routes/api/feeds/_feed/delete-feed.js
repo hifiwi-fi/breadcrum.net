@@ -10,11 +10,6 @@ import SQL from '@nearform/sql'
  * @returns {Promise<void>}
  */
 export async function deleteFeed (fastify, _opts) {
-  const podcastFeedDeleteCounter = new fastify.metrics.client.Counter({
-    name: 'breadcrum_podcast_feed_delete_total',
-    help: 'The number of times podcast feeds are deleted',
-  })
-
   fastify.delete(
     '/',
     {
@@ -79,7 +74,7 @@ export async function deleteFeed (fastify, _opts) {
         await fastify.pg.query(query)
 
         reply.status(202)
-        podcastFeedDeleteCounter.inc()
+        fastify.otel.podcastFeedDeleteCounter.add(1)
         return {
           status: 'ok',
         }

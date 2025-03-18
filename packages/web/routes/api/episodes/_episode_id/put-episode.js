@@ -55,7 +55,7 @@ export async function putEpisode (fastify, _opts) {
         await client.query(query)
       }
 
-      fastify.prom.episodeEditCounter.inc()
+      fastify.otel.episodeEditCounter.add(1)
 
       return {
         status: 'ok',

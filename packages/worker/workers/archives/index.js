@@ -33,11 +33,20 @@ export function makeArchivePgBossP ({ fastify }) {
       const log = logger.child({ jobId: job.id })
       const pg = fastify.pg
 
+      const jobStartTime = performance.now()
+
       try {
+        const fetchStartTime = performance.now()
         const html = await fetchHTML({ url: new URL(url) })
+        const fetchDuration = (performance.now() - fetchStartTime) / 1000
+        fastify.otel.archiveFetchSeconds.record(fetchDuration)
+
         const initialDocument = (new JSDOM(html, { url })).window.document
 
+        const extractionStartTime = performance.now()
         const article = await extractArchive({ document: initialDocument })
+        const extractionDuration = (performance.now() - extractionStartTime) / 1000
+        fastify.otel.archiveExtractionSeconds.record(extractionDuration)
 
         const results = await finalizeArchive({
           pg,
@@ -46,9 +55,17 @@ export function makeArchivePgBossP ({ fastify }) {
           article,
         })
 
+        const totalDuration = (performance.now() - jobStartTime) / 1000
+        fastify.otel.archiveProcessingSeconds.record(totalDuration)
+        fastify.otel.archiveJobProcessedCounter.add(1)
+
         log.info({ results }, 'document processed')
       } catch (err) {
         const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
+
+        const totalDuration = (performance.now() - jobStartTime) / 1000
+        fastify.otel.archiveProcessingSeconds.record(totalDuration)
+        fastify.otel.archiveJobFailedCounter.add(1)
 
         log.error({ error: handledError, archiveId }, 'Error resolving Archive')
 
