@@ -5,7 +5,7 @@
 ## Do not pass secrets here.
 ARG ENV=production
 ARG NODE_ENV=production
-ARG NODE_VERSION
+ARG NODE_VERSION=23
 
 FROM node:${NODE_VERSION}-alpine AS base
 
@@ -59,4 +59,4 @@ USER nodeuser
 # Open the mapped port
 EXPOSE 8080
 
-CMD [ "./node_modules/.bin/fastify", "start", "app.js" ]    
+CMD [ "./node_modules/.bin/fastify", "start", "app.js" ]

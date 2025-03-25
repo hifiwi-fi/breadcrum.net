@@ -10,6 +10,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "engines": {
+    "node": ">=23.0.0"
+  },
   "devDependencies": {
     "@voxpelli/tsconfig": "^15.0.0",
     "auto-changelog": "^2.0.0",

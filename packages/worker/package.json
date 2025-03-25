@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=23.0.0"
   },
   "scripts": {
     "generate-default-env": "node scripts/generate-default-env.js",

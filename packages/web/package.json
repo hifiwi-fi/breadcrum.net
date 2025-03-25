@@ -82,7 +82,7 @@
     "xmlbuilder": "^15.1.1"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=23.0.0"
   },
   "scripts": {
     "build": "run-s clean && run-p build:*",
