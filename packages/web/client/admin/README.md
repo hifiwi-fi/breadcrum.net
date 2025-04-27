@@ -6,6 +6,7 @@ noindex: true
 
 - [Users](./users/)
 - [Flags](./flags/)
+- [Redis Cache](./redis-cache/)
 - [Stats](./stats/)
 - [Deps](./deps/)
 - [Bull Board](./bull/)
