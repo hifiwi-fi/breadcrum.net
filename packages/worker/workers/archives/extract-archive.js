@@ -20,6 +20,7 @@ export async function extractArchive ({
   if (!article) return null
 
   const dpWindow = new JSDOM('').window
+  // @ts-expect-error
   const DOMPurify = createDOMPurify(dpWindow)
   if (!article.content) throw new Error('Article extracted without content')
   article.content = DOMPurify.sanitize(article.content)
