@@ -21,7 +21,7 @@
     "gh-release": "^7.0.0",
     "knip": "^5.37.1",
     "neostandard": "^0.12.0",
-    "npm-run-all2": "^7.0.1"
+    "npm-run-all2": "^8.0.1"
   },
   "funding": {
     "type": "individual",
