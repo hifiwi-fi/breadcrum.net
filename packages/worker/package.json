@@ -57,7 +57,7 @@
     "@types/user-agents": "^1.0.4",
     "@voxpelli/tsconfig": "^15.0.0",
     "neostandard": "^0.12.0",
-    "npm-run-all2": "^7.0.1",
+    "npm-run-all2": "^8.0.1",
     "tap": "^21.0.0",
     "typescript": "~5.8.2"
   },
