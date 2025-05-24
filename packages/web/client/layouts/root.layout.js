@@ -7,7 +7,7 @@ import { footer } from '../components/footer/index.js'
 /*
 
 THIS LAYOUT IS STATIC.
-If you need to render components inside, you need attatch them in the global client.
+If you need to render components inside, you need attach them in the global client.
 
 */
 
@@ -102,6 +102,7 @@ export default function defaultRootLayout ({
       ${styles
         ? styles.map(style => html`<link rel="stylesheet" href="${style}">`)
         : null}
+      <script src="https://analytics.ahrefs.com/analytics.js" data-key="waSPM1/2UEwSi65p1tYn8A" async></script>
       ${head || null}
     </head>
     <body class="bc-body">
