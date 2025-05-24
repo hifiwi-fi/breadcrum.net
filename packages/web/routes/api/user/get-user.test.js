@@ -2,7 +2,7 @@ import { test, suite } from 'node:test'
 import assert from 'node:assert'
 import { build } from '../../../test/helper.js'
 
-await suite('User API Tests', async () => {
+await suite('User API Tests', { concurrency: false }, async () => {
   await test('default root route', async (t) => {
     const app = await build(t)
     const res = await app.inject({
