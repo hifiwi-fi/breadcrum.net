@@ -111,25 +111,41 @@ export default fp(async function (fastify, _) {
 
   const start = async () => {
     try {
+      // Use port 0 in test environments to get a random available port
+      const isTestEnv = process.env['NODE_TEST_CONTEXT'] === '1' || process.argv.includes('--test')
       await promServer.listen({
-        port: 9091,
+        port: isTestEnv ? 0 : 9091,
         host: '0.0.0.0',
       })
     } catch (err) {
       promServer.log.error(err)
       promServer.log.info('prometheus server stopped')
-      process.exit(1)
+      // Don't exit the process during tests, just log the error
+      if (!(process.env['NODE_TEST_CONTEXT'] === '1' || process.argv.includes('--test'))) {
+        process.exit(1)
+      }
     }
   }
 
-  if (fastify.config.METRICS) {
+  // Skip starting prom server during tests if env variable is set
+  const isTestEnv = process.env['NODE_TEST_CONTEXT'] === '1' || process.argv.includes('--test')
+  if (fastify.config.METRICS && (!isTestEnv || process.env['ENABLE_PROM_IN_TESTS'] === '1')) {
     fastify.addHook('onReady', async () => {
+      console.log('prom server starting')
       await start()
+      const address = promServer.server.address()
+      const port = address && typeof address === 'object' ? address.port : 9091
+      console.log(`prom server started on port ${port}`)
     })
   }
 
   fastify.addHook('onClose', async (_) => {
-    await promServer.close()
+    try {
+      await promServer.close()
+    } catch (err) {
+      // Ignore errors during close
+      console.log('prom server close error:', err)
+    }
   })
 },
 {

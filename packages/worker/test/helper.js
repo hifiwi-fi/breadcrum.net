@@ -1,7 +1,9 @@
 // This file contains code that we reuse
 // between our tests.
 
-/** @import { Test } from 'tap' */
+/**
+ * @import { TestContext } from 'node:test'
+*/
 
 import helper from 'fastify-cli/helper.js'
 import path from 'path'
@@ -19,10 +21,10 @@ function config () {
 
 /**
  * Automatically build and tear down our instance
- * @param {Test} t - Tap test instance
+ * @param {TestContext} t - Test context instance
  */
 async function build (t) {
-  // you can set all the opti ons supported by the fastify CLI command
+  // you can set all the options supported by the fastify CLI command
   const argv = [AppPath]
 
   // fastify-plugin ensures that all decorators
@@ -31,7 +33,9 @@ async function build (t) {
   const app = await helper.build(argv, config())
 
   // tear down our app after we are done
-  t.teardown(app.close.bind(app))
+  t.after(async () => {
+    await app.close()
+  })
 
   return app
 }

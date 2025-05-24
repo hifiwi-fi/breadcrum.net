@@ -1,5 +1,6 @@
-import { test } from 'tap'
+import { test } from 'node:test'
+import { ok } from 'node:assert'
 
-test('testing is set up', async (t) => {
-  t.ok(true, 'Yes testing is set up')
+test('testing is set up', () => {
+  ok(true, 'Yes testing is set up')
 })

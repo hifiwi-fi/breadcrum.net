@@ -1,4 +1,5 @@
-import { test } from 'tap'
+import test from 'node:test'
+import assert from 'node:assert'
 import { build } from '../test/helper.js'
 
 test('healthcheck baseline test', async (t) => {
@@ -6,5 +7,5 @@ test('healthcheck baseline test', async (t) => {
   const res = await app.inject({
     url: '/health',
   })
-  t.equal(res.payload, '{"statusCode":200,"status":"ok"}')
+  assert.strictEqual(res.payload, '{"statusCode":200,"status":"ok"}')
 })
