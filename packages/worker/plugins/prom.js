@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import Fastify from 'fastify'
 
 /**
- * This plugins adds promethius metrics
+ * This plugins adds prometheus metrics
  *
  * @see https://gitlab.com/m03geek/fastify-metrics
  */
@@ -40,7 +40,7 @@ export default fp(async function (fastify, _opts) {
       })
     } catch (err) {
       promServer.log.error(err)
-      promServer.log.info('promethius server stopped')
+      promServer.log.info('prometheus server stopped')
       process.exit(1)
     }
   }

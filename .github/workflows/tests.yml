@@ -37,7 +37,7 @@ jobs:
       with:
         parallel: true
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        files: "packages/web/.tap/report/lcov.info packages/worker/.tap/report/lcov.info"
+        files: "packages/web/coverage/lcov.info packages/worker/coverage/lcov.info"
 
   coverage:
     needs: test

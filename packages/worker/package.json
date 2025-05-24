@@ -13,7 +13,7 @@
     "start": "run-s watch",
     "test": "run-s test:*",
     "test:eslint": "eslint .",
-    "test:tap": "tap",
+    "test:node": "c8 node --test --test-reporter spec",
     "test:tsc": "tsc",
     "watch": "run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web public' -l info -P -p 3001 --options --address localhost app.js",
@@ -56,22 +56,15 @@
     "@types/node": "^22.0.0",
     "@types/user-agents": "^1.0.4",
     "@voxpelli/tsconfig": "^15.0.0",
+    "c8": "^10.0.0",
     "neostandard": "^0.12.0",
     "npm-run-all2": "^8.0.1",
-    "tap": "^21.0.0",
     "typescript": "~5.8.2"
   },
-  "tap": {
-    "serial": [
-      "test",
-      "routes",
-      "plugins"
-    ],
-    "allow-incomplete-coverage": true,
-    "coverage-report": [
-      "text",
-      "lcovonly"
-    ],
-    "typecheck": false
+  "c8": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
   }
 }

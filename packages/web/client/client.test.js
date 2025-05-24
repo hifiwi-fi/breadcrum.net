@@ -1,11 +1,12 @@
-import t from 'tap'
+import { test } from 'node:test'
+import assert from 'node:assert'
 import { page } from './client.js'
 import { render } from 'uland-isomorphic'
 
-t.test('Testing is set up and working', async t => {
+test('Testing is set up and working', async (t) => {
   let rendered
-  t.doesNotThrow(() => {
+  assert.doesNotThrow(() => {
     rendered = render(String, page)
-  }, 'page renders without error')
-  t.equal(typeof rendered, 'string', 'page renders to string')
+  })
+  assert.strictEqual(typeof rendered, 'string')
 })
