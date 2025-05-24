@@ -27,6 +27,7 @@ export default fp(async function (fastify, _) {
           'https://platform.twitter.com', // Allow all scripts from platform.twitter.com
           'https://fosstodon.org/embed.js',
           'https://embed.bsky.app/static/embed.js',
+          'https://analytics.ahrefs.com',
         ],
       },
     },
