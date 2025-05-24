@@ -16,6 +16,10 @@ export default fp(async function (fastify, _) {
         'upgrade-insecure-requests': fastify.config.ENV !== 'production' ? null : [],
         'media-src': '*',
         'img-src': ['*', 'data:'],
+        'connect-src': [
+          "'self'",
+          'https://analytics.ahrefs.com',
+        ],
         'frame-src': [
           'https://giscus.app',
           'https://platform.twitter.com',
