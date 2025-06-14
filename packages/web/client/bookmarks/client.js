@@ -7,6 +7,7 @@ import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { bookmarkList } from '../components/bookmark/bookmark-list.js'
 import { search } from '../components/search/index.js'
+import { createPageNavHandler } from '../components/view-transition/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -93,13 +94,13 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
 
-  const onPageNav = useCallback((ev) => {
-    ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
-  }, [window, pushState])
+  const onPageNav = useCallback(
+    createPageNavHandler(pushState, window),
+    [window, pushState]
+  )
 
-  const handleSearch = useCallback((query) => {
+  const handleSearch = useCallback(async (query) => {
+    // For search, we're doing a full page navigation, so the CSS view transition will handle it
     window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
   }, [window])
 
@@ -126,22 +127,24 @@ export const page = Component(() => {
       placeholder: 'Search Bookmarks...',
       onSearch: handleSearch,
     })}
-    <div>
+    <div class="bc-pagination-top">
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
       ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
-    <div>
+    <div class="bc-page-controls">
       <span>🔖 <a href="./add">add +</a></span>
       ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onclick=${onPageNav} href=${`./?${tageFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
     </div>
-    ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
-    ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
-    ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
-      : null}
+    <div class="bc-bookmark-list">
+      ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
+      ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
+      ${Array.isArray(bookmarks)
+        ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
+        : null}
+    </div>
 
-  <div>
+  <div class="bc-pagination-bottom">
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>

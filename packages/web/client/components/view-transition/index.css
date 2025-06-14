@@ -1,0 +1,81 @@
+/* View transition names for common elements */
+.bc-main {
+  view-transition-name: main-content;
+}
+
+/* View transition names for list containers */
+.bc-bookmark-list,
+.bc-archive-list,
+.bc-episode-list,
+.bc-user-list,
+.bc-search-results {
+  view-transition-name: content-list;
+}
+
+/* View transition names for pagination */
+.bc-pagination-top {
+  view-transition-name: pagination-top;
+}
+
+.bc-pagination-bottom {
+  view-transition-name: pagination-bottom;
+}
+
+/* View transition names for controls */
+.bc-page-controls {
+  view-transition-name: page-controls;
+}
+
+/* Custom view transition animations */
+::view-transition-old(content-list) {
+  animation: slide-out 250ms ease-in-out;
+}
+
+::view-transition-new(content-list) {
+  animation: slide-in 250ms ease-in-out;
+}
+
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade transition for pagination and controls */
+::view-transition-old(pagination-top),
+::view-transition-old(pagination-bottom),
+::view-transition-old(page-controls) {
+  animation: fade-out 200ms ease-out;
+}
+
+::view-transition-new(pagination-top),
+::view-transition-new(pagination-bottom),
+::view-transition-new(page-controls) {
+  animation: fade-in 200ms ease-out;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
