@@ -7,6 +7,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { search } from '../../components/search/index.js'
 import { bookmarkList } from '../../components/bookmark/bookmark-list.js'
+import { createPageNavHandler } from '../../components/view-transition/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -104,11 +105,10 @@ export const page = Component(() => {
   const title = pageParams.get('query') ? ['🔖', pageParams.get('query'), '|', 'Bookmarks Search'] : []
   useTitle(...title)
 
-  const onPageNav = useCallback((ev) => {
-    ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
-  }, [window, pushState])
+  const onPageNav = useCallback(
+    createPageNavHandler(pushState, window),
+    [window, pushState]
+  )
 
   const handleSearch = useCallback((query) => {
     window.location.replace(`./?query=${encodeURIComponent(query)}`)
@@ -138,27 +138,25 @@ export const page = Component(() => {
       value: pageParams.get('query'),
       onSearch: handleSearch,
     })}
-
-    <div>
-      ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
-      🔎
-      🔖 <a href="${`../bookmarks?query=${pageParams.get('query')}`}">bookmarks</a>
-      🗄️ <a href="${`../archives?query=${pageParams.get('query')}`}">archives</a>
-      📼 <a href="${`../episodes?query=${pageParams.get('query')}`}">episodes</a>
-    </div>
-
-    ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
-    ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
-
-    ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
-      : null}
-
-    <div>
-      ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
-    </div>
+      <div class="bc-pagination-top">
+        ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+        ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+        🔎
+        🔖 <a href="${`../bookmarks?query=${pageParams.get('query')}`}">bookmarks</a>
+        🗄️ <a href="${`../archives?query=${pageParams.get('query')}`}">archives</a>
+        📼 <a href="${`../episodes?query=${pageParams.get('query')}`}">episodes</a>
+      </div>
+      <div class="bc-search-results">
+        ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
+        ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
+        ${Array.isArray(bookmarks)
+          ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload, onDelete: reload })}`)
+          : null}
+      </div>
+      <div class="bc-pagination-bottom">
+        ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+        ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      </div>
 `
 })
 

@@ -6,6 +6,7 @@ import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { archiveList } from '../components/archive/archive-list.js'
 import { search } from '../components/search/index.js'
+import { createPageNavHandler } from '../components/view-transition/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -96,11 +97,10 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archiveReload])
 
-  const onPageNav = useCallback((ev) => {
-    ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
-  }, [window, pushState])
+  const onPageNav = useCallback(
+    createPageNavHandler(pushState, window),
+    [window, pushState]
+  )
 
   const handleSearch = useCallback((query) => {
     window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
@@ -125,19 +125,21 @@ export const page = Component(() => {
     placeholder: 'Search Archives...',
     onSearch: handleSearch,
   })}
-  <div>
+  <div class="bc-pagination-top">
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
-  ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
-  ${archivesError ? html`<div>${archivesError.message}</div>` : null}
-  ${Array.isArray(archives)
-      ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
-      : null}
-  <div>
+  </div>
+  <div class="bc-archive-list">
+    ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
+    ${archivesError ? html`<div>${archivesError.message}</div>` : null}
+    ${Array.isArray(archives)
+        ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
+        : null}
+  </div>
+  <div class="bc-pagination-bottom">
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
+  </div>
 `
 })
 

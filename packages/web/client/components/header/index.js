@@ -7,6 +7,7 @@ import { toread } from '../toread/index.js'
 import { star } from '../star/index.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { loginButtons } from './login-buttons.js'
+import { navigateWithTransition } from '../view-transition/index.js'
 
 export const header = Component(() => {
   const { user } = useUser()
@@ -26,12 +27,15 @@ export const header = Component(() => {
     state.starred = !state.starred
   })
 
-  const onPageNav = (ev) => {
+  const onPageNav = async (ev) => {
     const url = new URL(window.location)
     const newUrl = new URL(ev.currentTarget.href)
+
     if (url.pathname === newUrl.pathname) {
       ev.preventDefault()
-      pushState(ev.currentTarget.href)
+      await navigateWithTransition(async () => {
+        pushState(ev.currentTarget.href)
+      })
     }
   }
 

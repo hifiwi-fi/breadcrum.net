@@ -7,6 +7,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { search } from '../../components/search/index.js'
 import { archiveList } from '../../components/archive/archive-list.js'
+import { createPageNavHandler } from '../../components/view-transition/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -104,11 +105,10 @@ export const page = Component(() => {
   const title = pageParams.get('query') ? ['🗄️', pageParams.get('query'), '|', 'Archives Search'] : []
   useTitle(...title)
 
-  const onPageNav = useCallback((ev) => {
-    ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
-  }, [window, pushState])
+  const onPageNav = useCallback(
+    createPageNavHandler(pushState, window),
+    [window, pushState]
+  )
 
   const handleSearch = useCallback((query) => {
     window.location.replace(`./?query=${encodeURIComponent(query)}`)
@@ -139,7 +139,7 @@ export const page = Component(() => {
       onSearch: handleSearch,
     })}
 
-    <div>
+    <div class="bc-pagination-top">
       ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
       ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
       🔎
@@ -148,14 +148,16 @@ export const page = Component(() => {
       📼 <a href="${`../episodes?query=${pageParams.get('query')}`}">episodes</a>
     </div>
 
-    ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
-    ${archivesError ? html`<div>${archivesError.message}</div>` : null}
+    <div class="bc-search-results">
+      ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
+      ${archivesError ? html`<div>${archivesError.message}</div>` : null}
 
-    ${Array.isArray(archives)
-      ? archives.map(a => html.for(a, a.id)`${archiveList({ archive: a, reload, onDelete: reload })}`)
-      : null}
+      ${Array.isArray(archives)
+        ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload, onDelete: reload, clickForPreview: true })}`)
+        : null}
+    </div>
 
-    <div>
+    <div class="bc-pagination-bottom">
       ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
       ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
     </div>

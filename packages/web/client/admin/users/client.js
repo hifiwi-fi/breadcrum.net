@@ -6,6 +6,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { userTable } from '../../components/user-table/user-table.js'
+import { createPageNavHandler } from '../../components/view-transition/index.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -87,11 +88,10 @@ export const page = Component(() => {
     }
   }, [query, state.apiUrl, dataReload])
 
-  const onPageNav = (ev) => {
-    ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
-  }
+  const onPageNav = useCallback(
+    createPageNavHandler(pushState, window),
+    [window, pushState]
+  )
 
   let beforeParams
   if (before) {
@@ -108,19 +108,21 @@ export const page = Component(() => {
   }
 
   return html`
-    <div>
+    <div class="bc-pagination-top">
       ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
       ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
-    ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
-    ${usersError ? html`<div>${usersError.message}</div>` : null}
-    ${Array.isArray(users)
-      ? html`${userTable({ users, reload, onDelete: reload })}`
-      : null
-    }
+    <div class="bc-user-list">
+      ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
+      ${usersError ? html`<div>${usersError.message}</div>` : null}
+      ${Array.isArray(users)
+        ? userTable({ users, reload })
+        : null
+      }
+    </div>
 
-  <div>
+  <div class="bc-pagination-bottom">
     ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
     ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>

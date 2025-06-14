@@ -1,4 +1,5 @@
 @import '../../components/user-table/user-table.css';
+@import '../../components/view-transition/index.css';
 
 .bc-main {
   max-width: unset;

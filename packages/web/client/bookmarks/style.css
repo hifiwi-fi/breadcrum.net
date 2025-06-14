@@ -1,5 +1,6 @@
 @import '../components/bookmark/bookmark-list.css';
 @import '../components/search/index.css';
+@import '../components/view-transition/index.css';
 
 .bc-tag-filter-remove {
   color: var(--bc-tags-color);
