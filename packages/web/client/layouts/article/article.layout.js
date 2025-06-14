@@ -1,9 +1,9 @@
 import { html } from 'uland-isomorphic'
 import { sep } from 'node:path'
-import { breadcrumb } from '../components/breadcrumb/index.js'
-import { articleHeader } from '../components/article-header/index.js'
+import { breadcrumb } from '../../components/breadcrumb/index.js'
+import { articleHeader } from '../../components/article-header/index.js'
 
-import defaultRootLayout from './root.layout.js'
+import defaultRootLayout from '../root/root.layout.js'
 
 export default function articleLayout (args) {
   const { children, ...rest } = args

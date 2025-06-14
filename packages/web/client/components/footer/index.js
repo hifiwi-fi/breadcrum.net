@@ -28,6 +28,9 @@ export const footer = Component(({
       <a href="https://breadcrum.betteruptime.com">status</a>
     </div>
     <div>
+      <a href="/legal/">legal</a>
+    </div>
+    <div>
       © <a href="https://hifiwi.fi">HifiWi.fi</a>
     </div>
     <div>
