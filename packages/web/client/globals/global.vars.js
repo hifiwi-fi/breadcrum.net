@@ -27,6 +27,8 @@ export default async () => {
     // image: '/static/preview.png',
     siteTwitter: '@breadcrum_',
     siteTwitterUrl: 'http://x.com/breadcrum_',
+    supportEmail: 'support@breadcrum.net',
+    jurisdiction: 'California, USA',
     mastodonUrl: 'https://fosstodon.org/@breadcrum',
     bskyUrl: 'https://bsky.app/profile/breadcrum.net',
     discordUrl: 'https://discord.gg/pYJdTvNdZN',
@@ -38,5 +40,10 @@ export default async () => {
     transport,
     host,
     baseUrl,
+    providers: {
+      hostingProvider: 'Fly.io',
+      storageProvider: 'Backblaze B2',
+      emailProvider: 'AWS SES',
+    }
   }
 }

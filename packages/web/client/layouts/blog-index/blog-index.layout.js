@@ -1,6 +1,6 @@
 import { html } from 'uland-isomorphic'
 import { sep } from 'node:path'
-import { breadcrumb } from '../components/breadcrumb/index.js'
+import { breadcrumb } from '../../components/breadcrumb/index.js'
 
 /**
  * @template T
@@ -8,7 +8,7 @@ import { breadcrumb } from '../components/breadcrumb/index.js'
  */
 
 /**
- * @typedef {import('./root.layout.js').RootLayoutVars} RootLayoutVars
+ * @typedef {import('../root/root.layout.js').RootLayoutVars} RootLayoutVars
  */
 
 /**
@@ -19,7 +19,7 @@ import { breadcrumb } from '../components/breadcrumb/index.js'
  * }} BlogIndexVars
  */
 
-import defaultRootLayout from './root.layout.js'
+import defaultRootLayout from '../root/root.layout.js'
 
 /** @type {LayoutFunction<BlogIndexVars>} */
 export default function blogIndexLayout (args) {

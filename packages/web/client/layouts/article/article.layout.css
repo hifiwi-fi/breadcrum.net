@@ -1,0 +1,8 @@
+@import '../../components/breadcrumb/index.css';
+@import '../../components/article-header/index.css';
+
+.bc-article {
+  & .blog-footer {
+    color: var(--accent-foreground);
+  }
+}
