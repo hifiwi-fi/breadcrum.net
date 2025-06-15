@@ -27,7 +27,7 @@ By using the service, you confirm that you meet this requirement.
 
 ## 3. Account and Access
 
-You must create an account using a valid email address and authenticate using email/password, passkeys, or TOTP.
+You must create an account using a valid email address and authenticate using email/password, passkeys, or an API key.
 You are responsible for keeping your login credentials secure.
 You are also responsible for all activity under your account.
 
@@ -49,7 +49,7 @@ We collect and store the following information:
 User data is stored securely and kept private by default.
 For more information, please review our Privacy Policy.
 
-We may use limited analytics (such as Ahrefs and search engine webmaster tools) to improve performance and discoverability.
+We may use limited analytics to improve performance and discoverability.
 
 ---
 
@@ -60,8 +60,9 @@ You retain ownership of your uploaded or generated content.
 By using Breadcrum, you grant us a limited license to store and process your content solely to provide the service.
 
 You may not upload or archive:
-- Illegal content (e.g. child sexual abuse material, malware)
-- Content that infringes third-party copyrights
+- Illegal content (e.g. CSAM, malware)
+- Content use that infringes third-party copyrights
+- Any other content, regulated or unregulated, which causes harm or unreasonable burden to the operation of the service.
 
 ---
 
@@ -121,3 +122,5 @@ These Terms are governed by the laws of {{ vars.jurisdiction }}, without regard 
 
 If you have questions, concerns, or need to report abuse, contact us at:
 **{{ vars.supportEmail }}**
+
+*[CSAM]: child sexual abuse material

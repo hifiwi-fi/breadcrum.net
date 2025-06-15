@@ -19,8 +19,8 @@ Our services run in dedicated containers with automatic updates and region-aware
 
 ## 2. Data Storage and Encryption
 
-- Content and media are stored on [{{ vars.storageProvider }}](https://www.backblaze.com/b2/), a durable and encrypted storage provider.
-- Email delivery is handled through [{{ vars.emailProvider }}](https://aws.amazon.com/ses/).
+- Content and media are stored on [{{ vars.providers.storageProvider }}](https://www.backblaze.com/b2/), a durable and encrypted storage provider.
+- Email delivery is handled through [{{ vars.providers.emailProvider }}](https://aws.amazon.com/ses/).
 - Passwords are hashed with a strong, modern hashing algorithm (e.g. bcrypt or Argon2).
 - All communications with Breadcrum are encrypted via HTTPS using TLS 1.2 or higher.
 
@@ -54,7 +54,7 @@ Our services run in dedicated containers with automatic updates and region-aware
 
 If you believe you've discovered a security vulnerability in Breadcrum, we encourage responsible disclosure.
 Please report it privately to:
-**{{ vars.securityEmail }}**
+**{{ vars.supportEmail }}**
 
 We will respond within 5 business days and keep you informed throughout the remediation process.
 We appreciate and acknowledge all security researchers who act in good faith.
@@ -65,4 +65,4 @@ We appreciate and acknowledge all security researchers who act in good faith.
 
 This page may be updated to reflect evolving best practices.
 For questions, contact us at:
-**{{ vars.securityEmail }}**
+**{{ vars.supportEmail }}**

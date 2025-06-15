@@ -1,13 +1,7 @@
 ---
 title: Legal Information
 layout: docs
-publishDate: "2025-01-07T04:22:18.544Z"
-updatedDate: "2025-01-07T04:22:18.544Z"
 ---
-
-Welcome to the {{ vars.siteName }} legal information. This section contains all the important policies and agreements that govern your use of the service.
-
-## Available Documents
 
 ## [Terms of Service](./terms/)
 
