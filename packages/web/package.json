@@ -80,6 +80,7 @@
     "type-fest": "^4.26.1",
     "typescript": "~5.8.2",
     "uland-isomorphic": "^2.0.0",
+    "why-is-node-running": "^3.2.2",
     "xmlbuilder": "^15.1.1"
   },
   "engines": {
@@ -95,7 +96,7 @@
     "start": "run-s watch",
     "test": "run-s test:*",
     "test:eslint": "eslint . --ignore-pattern 'public/*'",
-    "test:node": "c8 node --test --test-reporter spec",
+    "test:node": "c8 node --test --test-reporter spec --test-force-exit",
     "test-skip:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
