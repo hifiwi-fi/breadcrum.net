@@ -1,6 +1,7 @@
 /**
  * @import { Queue, Worker, Processor } from 'bullmq'
  * @import { MediumTypes } from './yt-dlp-api-client.js'
+ * @import PgBoss from 'pg-boss'
  */
 
 /**
@@ -40,4 +41,19 @@ export const resolveEpisodeJobName = 'resolve-episode'
  *          null,
  *          typeof resolveEpisodeJobName
  * >} ResolveEpisodeP
+ */
+
+/**
+ * pg-boss queue wrapper for resolve episode jobs
+ *
+ * @typedef {{
+ *   name: string
+ *   send: (request: { data: ResolveEpisodeData, options?: PgBoss.SendOptions }) => Promise<string | null>
+ * }} ResolveEpisodePgBossQ
+ */
+
+/**
+ * pg-boss worker for resolve episode jobs
+ *
+ * @typedef {string} ResolveEpisodePgBossW
  */
