@@ -43,8 +43,13 @@ export default fp(async function (fastify, _opts) {
     fastify.log.info('pg-boss stopped')
   })
 
+  fastify.log.info({ isInstalled: await boss.isInstalled() })
+
+  fastify.log.info('pg-boss starting..,')
   await boss.start()
   fastify.log.info('pg-boss started')
+
+  fastify.log.info({ isInstalled: await boss.isInstalled() })
 
   // Create pg-boss workers with native processors
   /** @type {ResolveEpisodePgBossW} */

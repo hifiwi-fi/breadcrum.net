@@ -55,6 +55,7 @@ async function build (t) {
     await new Promise(resolve => setTimeout(resolve, 100))
   })
 
+  await app.ready()
   return app
 }
 

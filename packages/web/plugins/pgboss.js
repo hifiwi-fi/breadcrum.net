@@ -44,6 +44,8 @@ export default fp(async function (fastify, _) {
   await boss.start()
   fastify.log.info('pg-boss started')
 
+  fastify.log.info({ isInstalled: await boss.isInstalled() })
+
   // Create queues similar to BullMQ structure
   await boss.createQueue(resolveEpisodeQName)
   await boss.createQueue(resolveArchiveQName)
