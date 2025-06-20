@@ -40,6 +40,7 @@ export default fp(async function (fastify, _) {
     fastify.log.info('pg-boss stopped')
   })
 
+  fastify.log.info('pg-boss starting')
   await boss.start()
   fastify.log.info('pg-boss started')
 
