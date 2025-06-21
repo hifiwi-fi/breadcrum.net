@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@nearform/sql": "^1.10.5",
-    "bullmq": "^5.1.12",
     "ipaddr": "^0.1.0",
     "pony-cause": "^2.1.11",
     "undici": "^7.0.0"

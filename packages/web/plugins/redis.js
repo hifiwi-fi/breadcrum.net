@@ -13,14 +13,6 @@ export default fp(async function (fastify, _) {
     maxRetriesPerRequest: 1,
     namespace: 'cache',
   })
-
-  fastify.register(import('@fastify/redis'), {
-    url: fastify.config.REDIS_QUEUE_URL,
-    family: 6,
-    connectTimeout: 500,
-    maxRetriesPerRequest: null,
-    namespace: 'bullmq',
-  })
 },
 {
   name: 'redis',

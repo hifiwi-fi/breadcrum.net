@@ -1,5 +1,4 @@
 /**
- * @import { Queue, Worker, Processor } from 'bullmq'
  * @import PgBoss from 'pg-boss'
  */
 
@@ -29,30 +28,6 @@
 
 export const resolveBookmarkQName = 'resolveBookmark'
 export const resolveBookmarkJobName = 'resolve-bookmark'
-
-/**
- * @typedef {Queue<
- *          ResolveBookmarkData,
- *          null,
- *          typeof resolveBookmarkJobName
- * >} ResolveBookmarkQ
- */
-
-/**
- * @typedef {Worker<
- *          ResolveBookmarkData,
- *          null,
- *          typeof resolveBookmarkJobName
- * >} ResolveBookmarkW
- */
-
-/**
- * @typedef {Processor<
- *          ResolveBookmarkData,
- *          null,
- *          typeof resolveBookmarkJobName
- * >} ResolveBookmarkP
- */
 
 /**
  * pg-boss queue wrapper for resolve bookmark jobs

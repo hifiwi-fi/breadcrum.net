@@ -9,6 +9,7 @@ import PgBoss from 'pg-boss'
 import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
 import { makeArchivePgBossP } from '../workers/archives/index.js'
@@ -19,11 +20,8 @@ import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
  */
 export default fp(async function (fastify, _opts) {
   const boss = new PgBoss({
+    ...defaultBossOptions,
     db: { executeSql: fastify.pg.query },
-    // Match BullMQ cleanup policies
-    archiveCompletedAfterSeconds: 3600,
-    archiveFailedAfterSeconds: 24 * 3600,
-    deleteAfterHours: 48
   })
 
   // Set up event listeners for pg-boss

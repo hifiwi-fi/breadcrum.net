@@ -9,6 +9,7 @@ import PgBoss from 'pg-boss'
 import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
 /**
  * This plugin adds pg-boss queues
@@ -16,11 +17,8 @@ import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-boo
 export default fp(async function (fastify, _) {
   const pg = fastify.pg
   const boss = new PgBoss({
+    ...defaultBossOptions,
     db: { executeSql: pg.query },
-    // Match BullMQ cleanup policies
-    archiveCompletedAfterSeconds: 3600,
-    archiveFailedAfterSeconds: 24 * 3600,
-    deleteAfterHours: 48
   })
 
   // Set up event listeners for pg-boss
@@ -46,12 +44,10 @@ export default fp(async function (fastify, _) {
 
   fastify.log.info({ isInstalled: await boss.isInstalled() })
 
-  // Create queues similar to BullMQ structure
   await boss.createQueue(resolveEpisodeQName)
   await boss.createQueue(resolveArchiveQName)
   await boss.createQueue(resolveBookmarkQName)
 
-  // Create queue wrappers that match BullMQ interface
   /** @type {ResolveEpisodePgBossQ} */
   const resolveEpisodeQ = {
     name: resolveEpisodeQName,

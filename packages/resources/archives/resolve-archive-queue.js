@@ -1,5 +1,4 @@
 /**
- * @import { Queue, Worker, Processor } from 'bullmq'
  * @import PgBoss from 'pg-boss'
  */
 
@@ -15,30 +14,6 @@
 
 export const resolveArchiveQName = 'resolveArchive'
 export const resolveArchiveJobName = 'resolve-archive'
-
-/**
- * @typedef {Queue<
- *          ResolveArchiveData,
- *          null,
- *          typeof resolveArchiveJobName
- * >} ResolveArchiveQ
- */
-
-/**
- * @typedef {Worker<
- *          ResolveArchiveData,
- *          null,
- *          typeof resolveArchiveJobName
- * >} ResolveArchiveW
- */
-
-/**
- * @typedef {Processor<
- *          ResolveArchiveData,
- *          null,
- *          typeof resolveArchiveJobName
- * >} ResolveArchiveP
- */
 
 /**
  * pg-boss queue wrapper for resolve archive jobs
