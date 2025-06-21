@@ -8,7 +8,6 @@ import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
-import { resolveBookmarkJobName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
@@ -167,9 +166,8 @@ export async function putBookmarks (fastify, _opts) {
         fastify.prom.bookmarkCreatedCounter.inc()
 
         if (meta || episode || archive) {
-          await fastify.queues.resolveBookmarkQ.add(
-            resolveBookmarkJobName,
-            {
+          await fastify.pgboss.queues.resolveBookmarkQ.send({
+            data: {
               userId,
               url: workingUrl.toString(),
               bookmarkId: bookmark.id,
@@ -184,7 +182,7 @@ export async function putBookmarks (fastify, _opts) {
                 summary,
               }
             }
-          )
+          })
         }
 
         // Look up the newly created bookmark instead of trying to re-assemble it here.

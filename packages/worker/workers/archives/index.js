@@ -1,6 +1,7 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { ResolveArchiveP } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+ * @import PgBoss from 'pg-boss'
+ * @import { ResolveArchiveData } from '@breadcrum/resources/archives/resolve-archive-queue.js'
  */
 
 import SQL from '@nearform/sql'
@@ -13,50 +14,55 @@ import { extractArchive } from './extract-archive.js'
 // Archive row, and set it to ready when completed.
 
 /**
+ * pg-boss compatible archive processor
  * @param {object} params
  * @param  { FastifyInstance } params.fastify
- * @return {ResolveArchiveP}
- */export function makeArchiveP ({ fastify }) {
-  /** @type { ResolveArchiveP } */
-  async function archiveP (job) {
-    const {
-      url,
-      userId,
-      archiveId,
-    } = job.data
-    const log = fastify.log.child({ jobId: job.id })
-    const pg = fastify.pg
+ * @return {PgBoss.WorkHandler<ResolveArchiveData>} pg-boss handler
+ */
+export function makeArchivePgBossP ({ fastify }) {
+  const logger = fastify.log
 
-    try {
-      const html = await fetchHTML({ url: new URL(url) })
-      const initialDocument = (new JSDOM(html, { url })).window.document
-
-      const article = await extractArchive({ document: initialDocument })
-
-      const results = await finalizeArchive({
-        pg,
+  /** @type {PgBoss.WorkHandler<ResolveArchiveData>} */
+  return async function archivePgBossP (jobs) {
+    for (const job of jobs) {
+      const {
+        url,
         userId,
         archiveId,
-        article,
-      })
+      } = job.data
+      const log = logger.child({ jobId: job.id })
+      const pg = fastify.pg
 
-      log.info({ results }, 'document processed')
-    } catch (err) {
-      const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
+      try {
+        const html = await fetchHTML({ url: new URL(url) })
+        const initialDocument = (new JSDOM(html, { url })).window.document
 
-      log.error({ error: handledError, archiveId }, 'Error resolving Archive')
+        const article = await extractArchive({ document: initialDocument })
 
-      if (archiveId && userId) {
-        const errorQuery = SQL`
-          update archives
-          set error = ${handledError.stack}, done = true
-          where id = ${archiveId}
-          and owner_id =${userId};`
-        await pg.query(errorQuery)
+        const results = await finalizeArchive({
+          pg,
+          userId,
+          archiveId,
+          article,
+        })
+
+        log.info({ results }, 'document processed')
+      } catch (err) {
+        const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
+
+        log.error({ error: handledError, archiveId }, 'Error resolving Archive')
+
+        if (archiveId && userId) {
+          const errorQuery = SQL`
+            update archives
+            set error = ${handledError.stack}, done = true
+            where id = ${archiveId}
+            and owner_id =${userId};`
+          await pg.query(errorQuery)
+        }
+        // Accept the failure - don't throw to avoid pg-boss retries
+        // The error has already been logged and stored in the database
       }
     }
-    return null
   }
-
-  return archiveP
 }

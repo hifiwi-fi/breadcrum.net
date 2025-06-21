@@ -37,6 +37,7 @@ async function build (t) {
     await app.close()
   })
 
+  await app.ready()
   return app
 }
 

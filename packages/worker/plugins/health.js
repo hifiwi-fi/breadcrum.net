@@ -8,5 +8,6 @@ import fp from 'fastify-plugin'
 export default fp(async function (fastify, _opts) {
   fastify.register(import('fastify-healthcheck'))
 }, {
+  dependencies: ['env', 'pg'],
   name: 'health',
 })

@@ -36,10 +36,6 @@ export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: 'redis://localhost:6379/1',
     },
-    REDIS_QUEUE_URL: {
-      type: 'string',
-      default: 'redis://localhost:6379/2',
-    },
     YT_DLP_API_URL: {
       type: 'string',
       default: 'http://user:pass@127.0.0.1:5000',
