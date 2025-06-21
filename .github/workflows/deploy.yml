@@ -16,6 +16,7 @@ env:
   redis-version: 7
   FORCE_COLOR: 1
   NPM_CONFIG_COLOR: always
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
 
 concurrency:
   group: flyctl-deploy
@@ -24,6 +25,21 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: breadcrum
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js
@@ -43,6 +59,13 @@ jobs:
         name: package-lock.json
         path: package-lock.json
     - run: npm run generate-default-env --workspaces --if-present
+    - run: npm run migrate --workspaces --if-present
+      env:
+        PGDATABASE: breadcrum
+        PGHOST: localhost
+        PGPASSWORD: postgres
+        PGPORT: 5432
+        PGUSER: postgres
     - run: npm test
     - name: Deploy web
       run: npm run deploy:web
