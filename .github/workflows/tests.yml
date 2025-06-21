@@ -4,6 +4,7 @@ on: [pull_request, push]
 
 env:
   FORCE_COLOR: 1
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
 
 jobs:
   test:
@@ -13,6 +14,20 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         redis-version: [7]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: breadcrum
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v4
@@ -31,6 +46,13 @@ jobs:
         name: package-lock.json
         path: package-lock.json
     - run: npm run generate-default-env --workspaces --if-present
+    - run: npm run migrate --workspaces --if-present
+      env:
+        PGDATABASE: breadcrum
+        PGHOST: localhost
+        PGPASSWORD: postgres
+        PGPORT: 5432
+        PGUSER: postgres
     - run: npm test
     - name: Coveralls
       uses: coverallsapp/github-action@v2

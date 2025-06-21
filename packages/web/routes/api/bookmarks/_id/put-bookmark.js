@@ -1,8 +1,6 @@
 import SQL from '@nearform/sql'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
-import { resolveEpisodeJobName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
-import { resolveArchiveJobName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
@@ -188,16 +186,15 @@ export async function putBookmark (fastify, _opts) {
         await client.query('commit')
         fastify.prom.episodeCounter.inc()
 
-        await fastify.queues.resolveEpisodeQ.add(
-          resolveEpisodeJobName,
-          {
+        await fastify.pgboss.queues.resolveEpisodeQ.send({
+          data: {
             userId,
             bookmarkTitle: updatedBookmark.title,
             episodeId,
             url: episodeURL,
             medium: episodeMedium,
           }
-        )
+        })
       }
 
       if (bookmark.createArchive) {
@@ -216,14 +213,13 @@ export async function putBookmark (fastify, _opts) {
         await client.query('commit')
         fastify.prom.archiveCounter.inc()
 
-        await fastify.queues.resolveArchiveQ.add(
-          resolveArchiveJobName,
-          {
+        await fastify.pgboss.queues.resolveArchiveQ.send({
+          data: {
             url: archiveURL,
             userId,
             archiveId
           }
-        )
+        })
       }
 
       reply.status(200)
