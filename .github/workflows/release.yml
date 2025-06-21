@@ -16,7 +16,6 @@ on:
         default: true
 
 env:
-  redis-version: 7
   FORCE_COLOR: 1
   NPM_CONFIG_COLOR: always
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
@@ -31,7 +30,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: breadcrum
@@ -42,6 +41,15 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     steps:
     - uses: actions/checkout@v4
       with:
@@ -51,10 +59,7 @@ jobs:
       with:
         node-version-file: package.json
         registry-url: 'https://registry.npmjs.org'
-    - name: Start Redis
-      uses: supercharge/redis-github-action@1.8.0
-      with:
-        redis-version: ${{ env.redis-version }}
+
     - uses: superfly/flyctl-actions/setup-flyctl@master
     - run: npm i
     - name: Archive lockfile
