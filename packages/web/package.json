@@ -46,7 +46,7 @@
     "pg-boss": "^10.3.2",
     "pony-cause": "^2.1.11",
     "postgrator-cli": "^9.0.0",
-    "resolve-email": "^3.0.18",
+    "resolve-email": "^4.0.1",
     "undici": "^7.0.0"
   },
   "optionalDependencies": {
