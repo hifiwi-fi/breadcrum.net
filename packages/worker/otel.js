@@ -1,9 +1,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions'
 import { FastifyOtelInstrumentation } from '@fastify/otel'
-import { resourceFromAttributes } from '@opentelemetry/resources'
 import { RuntimeNodeInstrumentation } from '@opentelemetry/instrumentation-runtime-node'
 import { HostMetrics } from '@opentelemetry/host-metrics'
 import { metrics } from '@opentelemetry/api'
@@ -16,27 +14,28 @@ const traceExporter = new OTLPTraceExporter({
 })
 */
 
+const ignoredRoutes = {
+  '/health': true,
+}
+
 export const sdk = new NodeSDK({
-  resource: resourceFromAttributes({
-    [ATTR_SERVICE_NAME]: 'breadcrum-worker',
-    // [ATTR_SERVICE_VERSION]: '0.1.0',
-  }),
+  // Resource attributes are automatically set by OTEL_SERVICE_NAME, OTEL_SERVICE_VERSION, and OTEL_RESOURCE_ATTRIBUTES env vars
   metricReader: new PrometheusExporter({ port: 9092 }),
   // traceExporter,
   instrumentations: [
     new HttpInstrumentation(),
-    new RuntimeNodeInstrumentation({
-      monitoringPrecision: 5000,
+    new RuntimeNodeInstrumentation({ monitoringPrecision: 5000, }),
+    new FastifyOtelInstrumentation({
+      registerOnInitialization: true,
+      ignorePaths: (routeOptions) => {
+        // Ignore static file wildcard routes and health endpoints
+        return routeOptions.url in ignoredRoutes
+      },
     }),
   ],
 })
 
 sdk.start()
-
-export const fastifyOtelInstrumentation = new FastifyOtelInstrumentation({
-  registerOnInitialization: true,
-})
-// fastifyOtelInstrumentation.setTracerProvider(trace.getTracerProvider())
 // Must come after sdk.start() for getMeterProvider to return something
 new HostMetrics({ meterProvider: metrics.getMeterProvider() }).start()
 

@@ -29,7 +29,11 @@
   "liveNow": false,
   "panels": [
     {
-      "datasource": {},
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "prometheus_on_fly"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -112,9 +116,9 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(http_request_duration_seconds_count[5m]))",
+          "expr": "sum without(host, instance, region)(rate(http_server_duration_count[5m]))",
           "interval": "",
-          "legendFormat": "{{route}} {{method}} {{status_code}}",
+          "legendFormat": "{{http_route}} {{http_method}} {{http_status_code}}",
           "range": true,
           "refId": "A"
         }
@@ -1078,6 +1082,6 @@
   "timezone": "",
   "title": "App stats",
   "uid": "MOwxGunVk",
-  "version": 11,
+  "version": 13,
   "weekStart": ""
 }

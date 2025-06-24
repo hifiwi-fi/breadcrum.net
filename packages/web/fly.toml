@@ -37,6 +37,9 @@ swap_size_mb = 1024
   PQUEUE_CONCURRENCY = "2"
   TRANSPORT = "https"
   METRICS = "1"
+  OTEL_SERVICE_NAME = "breadcrum-web"
+  OTEL_SERVICE_VERSION = "1.0.0"
+  OTEL_RESOURCE_ATTRIBUTES = "deployment.environment=production"
 
 [[services]]
   protocol = "tcp"
@@ -72,5 +75,5 @@ swap_size_mb = 1024
     protocol = "http"
 
 [metrics]
-  port = 9891
+  port = 9091
   path = "/metrics"
