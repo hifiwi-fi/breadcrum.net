@@ -1,0 +1,82 @@
+[
+  {
+    "label": "Debug Web Server (Port 3000)",
+    "adapter": "JavaScript",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "npm",
+    "args": [
+      "run",
+      "-w",
+      "@breadcrum/web",
+      "watch:server"
+    ],
+    "cwd": "${ZED_WORKTREE_ROOT}",
+    "console": "integratedTerminal",
+    "env": {
+      "NODE_ENV": "development",
+      "FORCE_COLOR": "1"
+    },
+    "skipFiles": [
+      "<node_internals>/**"
+    ],
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**"
+    ]
+  },
+  {
+    "label": "Debug Worker Server (Port 3001)",
+    "adapter": "JavaScript",
+    "type": "pwa-node",
+    "request": "launch",
+    "program": "npm",
+    "args": [
+      "run",
+      "-w",
+      "@breadcrum/worker",
+      "watch:server"
+    ],
+    "cwd": "${ZED_WORKTREE_ROOT}",
+    "console": "integratedTerminal",
+    "env": {
+      "NODE_ENV": "development",
+      "FORCE_COLOR": "1"
+    },
+    "skipFiles": [
+      "<node_internals>/**"
+    ],
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**"
+    ]
+  },
+  {
+    "label": "Attach to Web Server Debug (Port 9320)",
+    "adapter": "JavaScript",
+    "type": "pwa-node",
+    "request": "attach",
+    "port": 9320,
+    "skipFiles": [
+      "<node_internals>/**"
+    ],
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**"
+    ]
+  },
+  {
+    "label": "Attach to Worker Server Debug (Port 9321)",
+    "adapter": "JavaScript",
+    "type": "pwa-node",
+    "request": "attach",
+    "port": 9321,
+    "skipFiles": [
+      "<node_internals>/**"
+    ],
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**"
+    ]
+  }
+]

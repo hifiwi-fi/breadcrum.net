@@ -5,8 +5,10 @@ import { metrics } from '@opentelemetry/api'
  * This plugin adds OpenTelemetry metrics under the 'otel' decorator.
  */
 export default fp(async function (fastify, _) {
-  // Create meter for custom metrics
-  const meter = metrics.getMeter('breadcrum-worker', '1.0.0')
+  // Create meter for custom metrics using centralized config
+  const serviceName = fastify.config.OTEL_SERVICE_NAME
+  const serviceVersion = fastify.config.OTEL_SERVICE_VERSION
+  const meter = metrics.getMeter(serviceName, serviceVersion)
 
   fastify.decorate('otel', {
     meter,
