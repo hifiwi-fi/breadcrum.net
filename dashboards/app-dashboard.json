@@ -112,7 +112,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(http_request_summary_seconds_count[5m]))",
+          "expr": "sum without(host, instance, region)(rate(http_request_duration_seconds_count[5m]))",
           "interval": "",
           "legendFormat": "{{route}} {{method}} {{status_code}}",
           "range": true,
@@ -266,7 +266,7 @@
             "uid": "htWHdm37z"
           },
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(breadcrum_tag_removed_total[5m])",
+          "expr": "sum without(host, instance, region)(rate(breadcrum_tag_removed_total[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Tags removed",
@@ -561,7 +561,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(breadcrum_pqueue_size[5m]))",
+          "expr": "sum without(host, instance, region)(breadcrium_pqueue_size)",
           "interval": "",
           "legendFormat": "Size",
           "range": true,
@@ -574,7 +574,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(breadcrum_pqueue_pending[5m]))",
+          "expr": "sum without(host, instance, region)(breadcrium_pqueue_pending)",
           "hide": false,
           "interval": "",
           "legendFormat": "Pending",
@@ -587,7 +587,7 @@
             "uid": "htWHdm37z"
           },
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(breadcrum_pqueue_total[5m]))",
+          "expr": "sum without(host, instance, region)(rate(breadcrium_pqueue_total[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Queue Rate",
@@ -599,7 +599,7 @@
             "uid": "htWHdm37z"
           },
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(breadcrum_pqueue_error_total[5m]))",
+          "expr": "sum without(host, instance, region)(rate(breadcrium_pqueue_error_total[5m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "Error Rate",
@@ -693,7 +693,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum without(host, instance, region)(rate(http_request_summary_seconds_sum[1m]))",
+          "expr": "sum without(host, instance, region)(rate(http_request_duration_seconds_sum[1m]))",
           "interval": "",
           "legendFormat": "{{route}} {{method}} {{status_code}}",
           "range": true,
@@ -701,6 +701,160 @@
         }
       ],
       "title": "Slow http",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {},
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "editorMode": "code",
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_archive_job_processed_total[5m]))",
+          "interval": "",
+          "legendFormat": "Archive Jobs Processed",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_archive_job_failed_total[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Archive Jobs Failed",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_episode_job_processed_total[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Episode Jobs Processed",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_episode_job_failed_total[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Episode Jobs Failed",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_bookmark_job_processed_total[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Bookmark Jobs Processed",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "htWHdm37z"
+          },
+          "exemplar": true,
+          "expr": "sum without(host, instance, region)(rate(breadcrum_episode_upcoming_total[5m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Upcoming Episodes Detected",
+          "refId": "F"
+        }
+      ],
+      "title": "Worker Job Stats",
       "type": "timeseries"
     }
   ],
@@ -718,6 +872,6 @@
   "timezone": "",
   "title": "App stats",
   "uid": "MOwxGunVk",
-  "version": 9,
+  "version": 10,
   "weekStart": ""
 }
