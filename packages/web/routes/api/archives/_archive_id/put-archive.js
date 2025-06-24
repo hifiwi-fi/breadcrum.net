@@ -57,7 +57,7 @@ export async function putArchiveRoute (fastify, _opts) {
         await client.query(query)
       }
 
-      fastify.prom.archiveEditCounter.inc()
+      fastify.otel.archiveEditCounter.add(1)
 
       return {
         status: 'ok',

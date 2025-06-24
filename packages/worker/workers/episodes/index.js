@@ -33,6 +33,8 @@ export function makeEpisodePgBossP ({ fastify }) {
 
       const pg = fastify.pg
 
+      const jobStartTime = performance.now()
+
       try {
         const media = await getYTDLPMetadata({
           url,
@@ -45,6 +47,7 @@ export function makeEpisodePgBossP ({ fastify }) {
         const upcomingData = upcomingCheck({ media })
 
         if (upcomingData.isUpcoming) {
+          fastify.otel.episodeUpcomingCounter.add(1)
           const releaseTimestampDate = new Date(upcomingData.releaseTimestampMs)
 
           log.info(`Episode ${episodeId} for ${url} is scheduled at ${releaseTimestampDate.toLocaleString()}. Rescheduling job.`)
@@ -74,10 +77,19 @@ export function makeEpisodePgBossP ({ fastify }) {
           url
         })
 
+        const totalDuration = (performance.now() - jobStartTime) / 1000
+        fastify.otel.episodeProcessingSeconds.record(totalDuration)
+        fastify.otel.episodeJobProcessedCounter.add(1)
+
         log.info(`Episode ${episodeId} for ${url} is ready.`)
       } catch (err) {
         /** @type {Error} */
         const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
+
+        const totalDuration = (performance.now() - jobStartTime) / 1000
+        fastify.otel.episodeProcessingSeconds.record(totalDuration)
+        fastify.otel.episodeJobFailedCounter.add(1)
+
         log.error(`Error extracting video for episode ${episodeId}`)
         log.error(handledError)
         await finalizeEpisodeError({

@@ -41,16 +41,6 @@ export default fp(async function (fastify, _) {
     },
   })
 
-  const jwtVerifyCounter = new fastify.metrics.client.Counter({
-    name: 'breadcrum_jwt_verify_total',
-    help: 'The number of times a jwt token attempts verification',
-  })
-
-  const jwtVerifyFailCounter = new fastify.metrics.client.Counter({
-    name: 'breadcrum_jwt_verify_fail_total',
-    help: 'The number of times a jwt token attempts verification',
-  })
-
   fastify.decorate('verifyJWT',
     /**
      * verifyJWT used in fastify-auth to verify jwt tokens
@@ -58,21 +48,16 @@ export default fp(async function (fastify, _) {
      * @return {Promise<void>}         [description]
      */
     async function (request) {
-      jwtVerifyCounter.inc()
+      fastify.otel.jwtVerifyCounter.add(1)
       try {
         await request.jwtVerify()
       } catch (err) {
         // reply.deleteJWTCookie()
-        jwtVerifyFailCounter.inc()
+        fastify.otel.jwtVerifyFailCounter.add(1)
         throw err
       }
     }
   )
-
-  const jwtCreatedCounter = new fastify.metrics.client.Counter({
-    name: 'breadcrum_jwt_created_total',
-    help: 'The number of times a jwt token is created',
-  })
 
   fastify.decorateReply('createJWTToken',
     /**
@@ -106,7 +91,7 @@ export default fp(async function (fastify, _) {
       }
       const token = await this.jwtSign(tokenBody)
 
-      jwtCreatedCounter.inc()
+      fastify.otel.jwtCreatedCounter.add(1)
 
       return token
     })
@@ -146,5 +131,5 @@ export default fp(async function (fastify, _) {
     })
 }, {
   name: 'jwt',
-  dependencies: ['env', 'cookie', 'pg', 'prom'],
+  dependencies: ['env', 'cookie', 'pg', 'otel-metrics'],
 })

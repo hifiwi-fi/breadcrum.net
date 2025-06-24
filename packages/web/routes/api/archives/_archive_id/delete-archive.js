@@ -61,7 +61,7 @@ export async function deleteArchiveRoute (fastify, _opts) {
     }
 
     reply.status(202)
-    fastify.prom.episodeDeleteCounter.inc()
+    fastify.otel.episodeDeleteCounter.add(1)
 
     return /** @type {const} */({
       status: 'ok',

@@ -12,7 +12,7 @@ export default fp(async function (fastify, _opts) {
       medium,
       attempt = 0,
     }) {
-      const endTimer = fastify.prom.ytdlpSeconds.startTimer()
+      const startTime = performance.now()
       try {
         return await getYTDLPMetadata({
           url,
@@ -22,10 +22,11 @@ export default fp(async function (fastify, _opts) {
           cache: fastify.ytdlpCache,
         })
       } finally {
-        endTimer()
+        const duration = (performance.now() - startTime) / 1000 // Convert to seconds
+        fastify.otel.ytdlpSeconds.record(duration)
       }
     })
 }, {
   name: 'yt-dlp',
-  dependencies: ['env', 'prom', 'cache'],
+  dependencies: ['env', 'otel-metrics', 'cache'],
 })

@@ -37,7 +37,7 @@ export async function deleteEpisode (fastify, _opts) {
     await fastify.pg.query(query)
 
     reply.status(202)
-    fastify.prom.episodeDeleteCounter.inc()
+    fastify.otel.episodeDeleteCounter.add(1)
 
     return {
       status: 'ok',

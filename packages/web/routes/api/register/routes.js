@@ -141,7 +141,7 @@ export default async function registerRoutes (fastify, _opts) {
         const token = await reply.createJWTToken({ id: user.id, username: user.username })
         reply.setJWTCookie(token)
 
-        fastify.prom.userCreatedCounter.inc()
+        fastify.otel.userCreatedCounter.add(1)
 
         const emailSendJob = fastify.sendEmail({
           toEmail: email,

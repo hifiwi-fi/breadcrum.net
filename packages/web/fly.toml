@@ -29,12 +29,14 @@ swap_size_mb = 1024
   FASTIFY_ADDRESS = "0.0.0.0"
   FASTIFY_LOG_LEVEL = "info"
   FASTIFY_OPTIONS = "true"
+  FASTIFY_IMPORT = "otel.js"
   HOST = "breadcrum.net"
   NODE_ENV = "production"
   NODE_OPTIONS = "--max-old-space-size=256"
   PORT = "8080"
   PQUEUE_CONCURRENCY = "2"
   TRANSPORT = "https"
+  METRICS = "1"
 
 [[services]]
   protocol = "tcp"
@@ -70,5 +72,5 @@ swap_size_mb = 1024
     protocol = "http"
 
 [metrics]
-  port = 9091
+  port = 9891
   path = "/metrics"

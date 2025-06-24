@@ -47,6 +47,8 @@ export function makeBookmarkPgBossP ({ fastify }) {
       const log = logger.child({ jobId: job.id })
       const pg = fastify.pg
 
+      const jobStartTime = performance.now()
+
       // Get full job metadata to access retry count
       const jobWithMetadata = await fastify.pgboss.boss.getJobById(job.name, job.id)
       const retryCount = jobWithMetadata?.retryCount || 0
@@ -87,10 +89,19 @@ export function makeBookmarkPgBossP ({ fastify }) {
       let document
       if (resolveBookmark || resolveArchive /* TODO: && !youtube */) {
         // TODO: Handle xhtml, pdfs etc.
+        const fetchStartTime = performance.now()
         try {
           const html = await fetchHTML({ url: workingUrl })
+          const fetchDuration = (performance.now() - fetchStartTime) / 1000
+          fastify.otel.httpFetchSeconds.record(fetchDuration)
+          fastify.otel.httpFetchSuccessCounter.add(1)
+
           document = (new JSDOM(html, { url })).window.document
         } catch (err) {
+          const fetchDuration = (performance.now() - fetchStartTime) / 1000
+          fastify.otel.httpFetchSeconds.record(fetchDuration)
+          fastify.otel.httpFetchFailedCounter.add(1)
+
           log.warn(err, 'Resolving html document failed during bookmark resolve')
           log.warn(
             {
@@ -109,13 +120,21 @@ export function makeBookmarkPgBossP ({ fastify }) {
       /** @type {ExtractMetaMeta | undefined} */
       let pageMetadata
       if (resolveBookmark && document) {
+        const metadataStartTime = performance.now()
         try {
           pageMetadata = await getSiteMetadata({
             url: workingUrl,
             document,
             media
           })
+          const metadataDuration = (performance.now() - metadataStartTime) / 1000
+          fastify.otel.siteMetadataSeconds.record(metadataDuration)
+          fastify.otel.siteMetadataSuccessCounter.add(1)
         } catch (err) {
+          const metadataDuration = (performance.now() - metadataStartTime) / 1000
+          fastify.otel.siteMetadataSeconds.record(metadataDuration)
+          fastify.otel.siteMetadataFailedCounter.add(1)
+
           log.warn(err, 'Failed to ExtractMeta during bookmark resolve')
           log.warn(
             {
@@ -168,6 +187,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
             })
 
             if (upcomingData.isUpcoming) {
+              fastify.otel.episodeUpcomingCounter.add(1)
               const releaseTimestampDate = new Date(upcomingData.releaseTimestampMs)
 
               // Use typed queue wrapper
@@ -283,6 +303,11 @@ export function makeBookmarkPgBossP ({ fastify }) {
           article,
         })
       }
+
+      // Record successful bookmark job completion
+      const totalDuration = (performance.now() - jobStartTime) / 1000
+      fastify.otel.bookmarkProcessingSeconds.record(totalDuration)
+      fastify.otel.bookmarkJobProcessedCounter.add(1)
     }
   }
 }

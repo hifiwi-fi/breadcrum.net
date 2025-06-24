@@ -138,7 +138,7 @@ export async function putBookmark (fastify, _opts) {
           `
 
           await client.query(applyTags)
-          fastify.prom.tagAppliedCounter.inc(tagsResults.rows.length)
+          fastify.otel.tagAppliedCounter.add(tagsResults.rows.length)
 
           const removeOldTags = SQL`
           DELETE FROM bookmarks_tags
@@ -147,7 +147,7 @@ export async function putBookmark (fastify, _opts) {
         `
 
           const removeResults = await client.query(removeOldTags)
-          fastify.prom.tagRemovedCounter.inc(removeResults.rows.length)
+          fastify.otel.tagRemovedCounter.add(removeResults.rows.length)
         } else {
           const removeAllTags = SQL`
           DELETE FROM bookmarks_tags
@@ -159,7 +159,7 @@ export async function putBookmark (fastify, _opts) {
       }
 
       await client.query('commit')
-      fastify.prom.bookmarkEditCounter.inc()
+      fastify.otel.bookmarkEditCounter.add(1)
 
       // Look up the newly created bookmark instead of trying to re-assemble it here.
       const updatedBookmark = await getBookmark({
@@ -184,7 +184,7 @@ export async function putBookmark (fastify, _opts) {
         })
 
         await client.query('commit')
-        fastify.prom.episodeCounter.inc()
+        fastify.otel.episodeCounter.add(1)
 
         await fastify.pgboss.queues.resolveEpisodeQ.send({
           data: {
@@ -211,7 +211,7 @@ export async function putBookmark (fastify, _opts) {
         })
 
         await client.query('commit')
-        fastify.prom.archiveCounter.inc()
+        fastify.otel.archiveCounter.add(1)
 
         await fastify.pgboss.queues.resolveArchiveQ.send({
           data: {
