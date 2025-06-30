@@ -35,7 +35,7 @@
     "ajv": "^8.17.1",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
-    "dotenv": "^16.0.1",
+    "dotenv": "^17.0.0",
     "fast-json-body": "^1.1.0",
     "fastify": "^5.0.0",
     "fastify-cli": "^7.0.1",
