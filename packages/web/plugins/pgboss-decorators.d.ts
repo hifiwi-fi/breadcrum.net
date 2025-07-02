@@ -8,11 +8,13 @@ import type {
 import type {
   ResolveBookmarkPgBossQ
 } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import type { ConstructorOptions } from 'pg-boss'
 
 declare module 'fastify' {
   interface FastifyInstance {
     pgboss: {
       boss: PgBoss
+      config: ConstructorOptions
       queues: {
         resolveEpisodeQ: ResolveEpisodePgBossQ
         resolveArchiveQ: ResolveArchivePgBossQ

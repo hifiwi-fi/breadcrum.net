@@ -16,10 +16,11 @@ import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-opti
  */
 export default fp(async function (fastify, _) {
   const pg = fastify.pg
-  const boss = new PgBoss({
+  const bossConfig = {
     ...defaultBossOptions,
     db: { executeSql: pg.query },
-  })
+  }
+  const boss = new PgBoss(bossConfig)
 
   // Set up event listeners for pg-boss
   boss.on('error', (error) => {
@@ -80,6 +81,7 @@ export default fp(async function (fastify, _) {
 
   const pgboss = {
     boss,
+    config: defaultBossOptions,
     queues: {
       resolveEpisodeQ,
       resolveArchiveQ,

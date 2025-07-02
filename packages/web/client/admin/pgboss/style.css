@@ -1,0 +1,161 @@
+.bc-main {
+  max-width: unset;
+}
+
+.bc-pgboss-dashboard {
+  padding: 1rem;
+}
+
+.bc-pgboss-dashboard h1 {
+  margin-bottom: 2rem;
+}
+
+.bc-pgboss-dashboard h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.5em;
+}
+
+.bc-pgboss-loading,
+.bc-pgboss-error {
+  padding: 2rem;
+  text-align: center;
+}
+
+.bc-pgboss-error pre {
+  text-align: left;
+  max-width: 600px;
+  margin: 1rem auto;
+}
+
+/* Summary section */
+.bc-pgboss-summary {
+  background: var(--accent-background);
+  padding: 1.5rem;
+  border-radius: 5px;
+  margin-bottom: 2rem;
+}
+
+.bc-pgboss-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.bc-pgboss-stats .stat {
+  text-align: center;
+  padding: 1rem;
+  background: var(--background);
+  border-radius: 5px;
+  border: 1px solid var(--accent-midground);
+}
+
+.bc-pgboss-stats .label {
+  display: block;
+  font-size: 0.85em;
+  color: var(--accent-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.bc-pgboss-stats .value {
+  display: block;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.bc-pgboss-stats .value.healthy {
+  color: #28a745;
+}
+
+.bc-pgboss-stats .value.unhealthy {
+  color: #dc3545;
+}
+
+/* Queues section */
+.bc-pgboss-queue {
+  background: var(--accent-background);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
+
+.bc-pgboss-queue h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.queue-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9em;
+  color: var(--accent-foreground);
+}
+
+/* Recent failures */
+.bc-pgboss-recent-failures ul {
+  list-style: none;
+  padding: 0;
+}
+
+.bc-pgboss-recent-failures li {
+  padding: 1rem;
+  background: var(--accent-background);
+  margin-bottom: 0.5rem;
+  border-radius: 5px;
+  border-left: 4px solid #dc3545;
+}
+
+.bc-pgboss-recent-failures pre {
+  margin-top: 0.5rem;
+  font-size: 0.85em;
+}
+
+/* Jobs table */
+.bc-pgboss-jobs table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bc-pgboss-jobs th,
+.bc-pgboss-jobs td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--accent-midground);
+}
+
+.bc-pgboss-jobs th {
+  font-weight: bold;
+  color: var(--accent-foreground);
+}
+
+.bc-pgboss-jobs code {
+  font-size: 0.85em;
+}
+
+.bc-pgboss-jobs details summary {
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  background: var(--accent-midground);
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.bc-pgboss-jobs details pre {
+  margin-top: 0.5rem;
+  font-size: 0.85em;
+}
+
+/* State colors */
+.state-created { color: #6c757d; }
+.state-retry { color: #fd7e14; }
+.state-active { color: #007bff; }
+.state-completed { color: #28a745; }
+.state-cancelled { color: #6c757d; }
+.state-failed { color: #dc3545; }
+
+/* Maintenance section */
+.bc-pgboss-maintenance {
+  background: var(--accent-background);
+  padding: 1.5rem;
+  border-radius: 5px;
+  margin-top: 2rem;
+}
