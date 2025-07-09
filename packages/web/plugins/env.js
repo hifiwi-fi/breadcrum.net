@@ -97,6 +97,14 @@ export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: 'deployment.environment=development',
     },
+    EMAIL_VALIDATION: {
+      type: 'boolean',
+      default: true,
+    },
+    RATE_LIMITING: {
+      type: 'boolean',
+      default: true,
+    },
   },
 })
 

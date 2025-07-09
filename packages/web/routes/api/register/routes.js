@@ -95,17 +95,20 @@ export default async function registerRoutes (fastify, _opts) {
           return reply.conflict('Email is already taken.')
         }
 
-        const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
+        // Only validate email if EMAIL_VALIDATION is enabled
+        if (fastify.config.EMAIL_VALIDATION) {
+          const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
 
-        request.log[emailError ? 'error' : 'info']({
-          email,
-          emailResolves,
-          mxRecords,
-          emailError,
-        })
+          request.log[emailError ? 'error' : 'info']({
+            email,
+            emailResolves,
+            mxRecords,
+            emailError,
+          })
 
-        if (!emailResolves) {
-          return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
+          if (!emailResolves) {
+            return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
+          }
         }
 
         const query = SQL`

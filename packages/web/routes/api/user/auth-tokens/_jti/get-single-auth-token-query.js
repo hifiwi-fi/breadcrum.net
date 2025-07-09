@@ -57,7 +57,7 @@ export const getSingleAuthTokenQuery = ({
       jti,
       created_at,
       last_seen,
-      (EXTRACT(EPOCH FROM last_seen) * 1000000)::text AS last_seen_micros,
+      (EXTRACT(EPOCH FROM last_seen) * 1000000)::bigint::text AS last_seen_micros,
       user_agent,
       ip,
       ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}

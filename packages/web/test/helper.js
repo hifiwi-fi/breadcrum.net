@@ -16,13 +16,7 @@ const AppPath = path.join(__dirname, '../app.js')
 // needed for testing the application
 function config () {
   return {
-    // Disable metrics server in tests to prevent port conflicts
-    METRICS: 0,
-    // Set test environment flag
-    NODE_TEST_CONTEXT: 1,
-    // Add required JWT and cookie secrets for tests
-    JWT_SECRET: 'test-jwt-secret-for-unit-tests',
-    COOKIE_SECRET: 'test-cookie-secret-for-unit-tests'
+    skipOverride: true // Register our application with fastify-plugin
   }
 }
 
@@ -33,8 +27,14 @@ function config () {
  * @returns {Promise<FastifyInstance>}
  */
 async function build (t) {
-  // Set environment variable for tests
+  // Set environment variables for tests
   process.env['NODE_TEST_CONTEXT'] = '1'
+  process.env['METRICS'] = '0'
+  process.env['JWT_SECRET'] = 'test-jwt-secret-for-unit-tests'
+  process.env['COOKIE_SECRET'] = 'test-cookie-secret-for-unit-tests'
+  process.env['DATABASE_URL'] = process.env.DATABASE_URL || 'postgres://postgres@localhost/breadcrum'
+  process.env['EMAIL_VALIDATION'] = 'false'
+  process.env['RATE_LIMITING'] = 'false'
 
   // you can set all the options supported by the fastify CLI command
   const argv = [AppPath]
