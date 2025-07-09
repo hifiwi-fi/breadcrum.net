@@ -3,7 +3,7 @@ import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-
 import { feedDetailsHandler } from '../../_feed/details/feed-details-handler.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

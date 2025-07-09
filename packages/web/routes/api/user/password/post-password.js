@@ -3,7 +3,7 @@ import { getPasswordHashQuery } from './password-hash.js'
 import { userEditableUserProps } from '../schemas/user-base.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

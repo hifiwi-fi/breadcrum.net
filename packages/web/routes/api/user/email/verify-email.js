@@ -2,7 +2,7 @@ import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
 import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

@@ -1,5 +1,5 @@
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  * @import { GetBookmarksQueryParams } from './get-bookmarks-query.js'
  */

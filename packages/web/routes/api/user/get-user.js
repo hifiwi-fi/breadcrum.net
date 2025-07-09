@@ -1,7 +1,7 @@
 import { getUser } from './user-query.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaUserRead } from './schemas/schema-user-read.js'
  */
 
@@ -24,7 +24,7 @@ export async function getUserRoute (fastify, _opts) {
         },
       },
     },
-    async function getUserHanlder (request, reply) {
+    async function getUserHandler (request, reply) {
       const userId = request.user.id
 
       const user = await getUser({ fastify, userId })

@@ -10,7 +10,7 @@ import { getBookmarkUrl } from '../../bookmarks/_id/bookmark-urls.js'
 import { getEpisodeUrl } from './episode/_episode/episode-urls.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

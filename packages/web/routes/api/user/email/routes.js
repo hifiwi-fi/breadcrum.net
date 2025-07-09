@@ -4,7 +4,7 @@ import { verifyEmailRoute } from './verify-email.js'
 import { deleteEmailRoute } from './delete-email.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

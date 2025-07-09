@@ -4,7 +4,7 @@ import { createArchive } from '@breadcrum/resources/archives/archive-query-creat
 import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkUpdate } from '../schemas/schema-bookmark-update.js'
  * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
  */

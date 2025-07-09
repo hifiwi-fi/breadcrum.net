@@ -2,7 +2,7 @@ import { postPasswordRoute } from './post-password.js'
 import { resetPasswordRoute } from './reset-password.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**
