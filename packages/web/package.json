@@ -29,7 +29,7 @@
     "@nearform/sql": "^1.5.0",
     "@opentelemetry/host-metrics": "^0.36.0",
     "@opentelemetry/instrumentation-http": "^0.202.0",
-    "@opentelemetry/instrumentation-runtime-node": "^0.16.0",
+    "@opentelemetry/instrumentation-runtime-node": "^0.17.0",
     "@opentelemetry/sdk-node": "^0.202.0",
     "abstract-cache-redis": "^2.0.0",
     "ajv": "^8.17.1",
