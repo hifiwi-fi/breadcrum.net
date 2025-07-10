@@ -8,15 +8,22 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
   - package-ecosystem: "npm"
     directory: "/" # Covers all workspaces
     schedule:
       interval: "daily"
+    groups:
+      opentelemetry:
+        patterns:
+          - "@opentelemetry/*"
+
   # Worker
   - package-ecosystem: "docker"
     directory: "/packages/worker"
     schedule:
       interval: "daily"
+
   # Server
   - package-ecosystem: "docker"
     directory: "/packages/web"
