@@ -35,7 +35,7 @@
     "@opentelemetry/host-metrics": "^0.36.0",
     "@opentelemetry/instrumentation-http": "^0.202.0",
     "@opentelemetry/instrumentation-runtime-node": "^0.16.0",
-    "@opentelemetry/sdk-node": "^0.202.0",
+    "@opentelemetry/sdk-node": "^0.203.0",
     "abstract-cache-redis": "^2.0.0",
     "concat-stream": "^2.0.0",
     "dompurify": "^3.1.2",
