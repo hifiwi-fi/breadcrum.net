@@ -100,7 +100,7 @@
     "test:node": "c8 node --test --test-reporter spec --test-force-exit --test-concurrency 1",
     "test-skip:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
-    "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js --import otel.js",
+    "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:tob-bun": "npm run build:top-bun -- --watch-only --drafts",
     "top-bun-watch": "npm run build:top-bun -- --watch --drafts",
     "print-routes": "fastify print-routes app.js",
