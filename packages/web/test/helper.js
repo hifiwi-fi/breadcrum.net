@@ -4,49 +4,58 @@
 /**
  * @import { TestContext } from 'node:test'
  * @import { FastifyInstance } from 'fastify'
+ * @import { DotEnvSchemaType } from '../config/env-schema.js'
+ * @import { AppOptions } from '../config/server-options.js'
 */
 
 import helper from 'fastify-cli/helper.js'
 import path from 'path'
 
-const __dirname = import.meta.dirname
-const AppPath = path.join(__dirname, '../app.js')
+const appPath = path.join(import.meta.dirname, '../app.js')
+
+const testingEnv = /** @type {const} @satisfies {Partial<DotEnvSchemaType>} */ ({
+  EMAIL_SENDING: false,
+  EMAIL_VALIDATION: false,
+  RATE_LIMITING: false
+})
 
 // Fill in this config with all the configurations
 // needed for testing the application
-function config () {
+/**
+ *
+ * @param {Partial<DotEnvSchemaType>} env
+ * @returns {Partial<AppOptions>}
+ */
+function config (env) {
   return {
-    skipOverride: true // Register our application with fastify-plugin
+    envData: env,
+    skipOverride: true, // Register our application with fastify-plugin
   }
 }
 
-// automatically build and tear down our instance
 /**
  * Automatically build and tear down our instance
  * @param {TestContext} t - Test context instance
+ * @param {Partial<DotEnvSchemaType>} env
+ * @param {object} serverOptions
  * @returns {Promise<FastifyInstance>}
  */
-async function build (t) {
-  // Set environment variables for tests
-  process.env['NODE_TEST_CONTEXT'] = '1'
-  process.env['METRICS'] = '0'
-  process.env['JWT_SECRET'] = 'test-jwt-secret-for-unit-tests'
-  process.env['COOKIE_SECRET'] = 'test-cookie-secret-for-unit-tests'
-  process.env['DATABASE_URL'] = process.env.DATABASE_URL || 'postgres://postgres@localhost/breadcrum'
-  process.env['EMAIL_VALIDATION'] = 'false'
-  process.env['RATE_LIMITING'] = 'false'
-
+async function build (t, env, serverOptions) {
   // you can set all the options supported by the fastify CLI command
-  const argv = [AppPath]
+  const argv = ['--options', appPath]
 
   // fastify-plugin ensures that all decorators
   // are exposed for testing purposes, this is
   // different from the production setup
 
   /**
+   * fastify-plugin ensures that all decorators
+   * are exposed for testing purposes, this is
+   * different from the production setup
+   *
    * @type {FastifyInstance}
    */
-  const app = await helper.build(argv, config())
+  const app = await helper.build(argv, config({ ...testingEnv, ...env }), serverOptions)
 
   // tear down our app after we are done
   t.after(async () => {

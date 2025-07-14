@@ -4,7 +4,7 @@ import SQL from '@nearform/sql'
 
 /**
  * @import { Transporter } from 'nodemailer'
- * @import SMTPTransport from 'nodemailer/lib/smtp-transport'
+ * @import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
  */
 
 /**
@@ -22,7 +22,8 @@ export default fp(async function (fastify, _) {
     fastify.config.SMTP_PORT &&
     fastify.config.SMTP_SECURE &&
     fastify.config.SMTP_USER &&
-    fastify.config.SMTP_PASS
+    fastify.config.SMTP_PASS &&
+    fastify.config.EMAIL_SENDING === true
   ) {
     /** @type {SMTPTransport.Options} */
     const opts = {
@@ -63,11 +64,13 @@ export default fp(async function (fastify, _) {
      * @param {string} options.text    The text boy of the email
      * @param {string} options.toEmail The email address to sent to
      * @param {string} options.subject The email subject
+     * @param {boolean} options.includeUnsubscribe Whether to include an unsubscribe link
      */
     async function sendEmail ({
       toEmail,
       subject,
       text,
+      includeUnsubscribe
     }) {
       if (transport) {
       // If A transport is configured
@@ -83,7 +86,7 @@ export default fp(async function (fastify, _) {
               from: `"Breadcrum.net 🥖" <${fastify.config.APP_EMAIL}>`,
               to: toEmail,
               subject,
-              text: addUnsubscribeLine({ text, toEmail }),
+              text: includeUnsubscribe ? addUnsubscribeLine({ text, toEmail }) : text,
               headers: {
                 'List-Unsubscribe': `<${fastify.config.TRANSPORT}://${fastify.config.HOST}/api/user/email/unsubscribe?email=${toEmail}>`,
                 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
