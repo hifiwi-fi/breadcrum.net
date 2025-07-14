@@ -36,8 +36,8 @@ function config (env) {
 /**
  * Automatically build and tear down our instance
  * @param {TestContext} t - Test context instance
- * @param {Partial<DotEnvSchemaType>} env
- * @param {object} serverOptions
+ * @param {Partial<DotEnvSchemaType>} [env]
+ * @param {object} [serverOptions]
  * @returns {Promise<FastifyInstance>}
  */
 async function build (t, env, serverOptions) {
