@@ -64,7 +64,7 @@ export default fp(async function (fastify, _) {
      * @param {string} options.text    The text boy of the email
      * @param {string} options.toEmail The email address to sent to
      * @param {string} options.subject The email subject
-     * @param {boolean} options.includeUnsubscribe Whether to include an unsubscribe link
+     * @param {boolean} [options.includeUnsubscribe] Whether to include an unsubscribe link
      */
     async function sendEmail ({
       toEmail,

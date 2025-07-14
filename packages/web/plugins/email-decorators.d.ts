@@ -7,7 +7,7 @@ declare module 'fastify' {
       toEmail: string;
       subject: string;
       text: string;
-      includeUnsubscribe: boolean;
+      includeUnsubscribe?: boolean;
     }) => Promise<SentMessageInfo | undefined>;
   }
 }
