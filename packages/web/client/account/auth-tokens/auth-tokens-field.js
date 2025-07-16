@@ -31,9 +31,12 @@ export const authTokensField = Component(({ user }) => {
 
       const params = new URLSearchParams(query)
 
+      const beforeParam = params.get('before')
+      const afterParam = params.get('after')
+
       // Add cursor params if they exist
-      if (params.get('before')) params.set('before', before)
-      if (params.get('after')) params.set('after', after)
+      if (beforeParam) params.set('before', beforeParam)
+      if (afterParam) params.set('after', afterParam)
 
       const response = await fetch(`${state.apiUrl}/user/auth-tokens?${params.toString()}`, {
         method: 'get',
@@ -58,7 +61,7 @@ export const authTokensField = Component(({ user }) => {
         .catch(err => { console.error(err); setTokensError(err) })
         .finally(() => { setTokensLoading(false) })
     }
-  }, [user, state.apiUrl, reload])
+  }, [state.apiUrl, dataReload, query])
 
   const onPageNav = (ev) => {
     ev.preventDefault()
@@ -84,6 +87,10 @@ export const authTokensField = Component(({ user }) => {
     <dt>Active Sessions</dt>
     <dd>
       <div class="bc-auth-tokens-section">
+        <div class="bc-auth-tokens-info">
+          <p><small>These are all the devices and browsers where you're currently logged in. You can revoke access to any session except your current one.</small></p>
+        </div>
+
         ${tokensLoading && !Array.isArray(tokens) ? html`<div>Loading sessions...</div>` : null}
         ${tokensError ? html`<div class="bc-error">${tokensError.message}</div>` : null}
 
@@ -93,15 +100,15 @@ export const authTokensField = Component(({ user }) => {
               ${tokens.length > 0
                 ? html`
                   <div class="bc-pagination-controls">
-                    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-                    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+                    ${before ? html`<a onclick=${onPageNav} href=${`./?${beforeParams}`}>earlier</a>` : null}
+                    ${after ? html`<a onclick=${onPageNav} href=${`./?${afterParams}`}>later</a>` : null}
                   </div>
 
                   ${authTokensTable({ tokens, reload, onDelete: reload })}
 
                   <div class="bc-pagination-controls">
-                    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-                    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+                    ${before ? html`<a onclick=${onPageNav} href=${`./?${beforeParams}`}>earlier</a>` : null}
+                    ${after ? html`<a onclick=${onPageNav} href=${`./?${afterParams}`}>later</a>` : null}
                   </div>
                 `
                 : html`<p>No active sessions found.</p>`
@@ -110,10 +117,6 @@ export const authTokensField = Component(({ user }) => {
           `
           : null
         }
-
-        <div class="bc-auth-tokens-info">
-          <p><small>These are all the devices and browsers where you're currently logged in. You can revoke access to any session except your current one.</small></p>
-        </div>
       </div>
     </dd>
   `

@@ -132,11 +132,13 @@ export function assertTokenShape (assert, token, options = {}) {
   assert.ok(token.created_at, 'Token should have created_at')
   assert.ok(token.last_seen, 'Token should have last_seen')
   assert.ok(token.last_seen_micros, 'Token should have last_seen_micros')
+  assert.ok(token.updated_at, 'Token should have updated_at')
   assert.strictEqual(typeof token.is_current, 'boolean', 'Token should have is_current boolean')
 
   // user_agent and ip can be null
   assert.ok('user_agent' in token, 'Token should have user_agent field')
   assert.ok('ip' in token, 'Token should have ip field')
+  assert.ok('note' in token, 'Token should have note field')
 
   if (options.checkCurrent !== undefined) {
     assert.strictEqual(token.is_current, options.checkCurrent, `Token is_current should be ${options.checkCurrent}`)

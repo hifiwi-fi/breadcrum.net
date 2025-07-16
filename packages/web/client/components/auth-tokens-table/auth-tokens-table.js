@@ -7,12 +7,12 @@ export const authTokensTable = Component(({ tokens, reload, onDelete }) => {
     <table class="bc-auth-tokens-table">
       <thead>
         <tr>
-          <th>Actions</th>
-          <th>Status</th>
+          <th>Note</th>
           <th>Last Used</th>
           <th>Created</th>
           <th>User Agent</th>
           <th>IP Address</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>

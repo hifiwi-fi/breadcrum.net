@@ -94,8 +94,10 @@ export const getAuthTokensQuery = ({
         created_at,
         last_seen,
         (EXTRACT(EPOCH FROM last_seen) * 1000000)::bigint::text AS last_seen_micros,
+        updated_at,
         user_agent,
         ip,
+        note,
         ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}
       FROM auth_tokens
       WHERE owner_id = ${userId}
@@ -113,8 +115,10 @@ export const getAuthTokensQuery = ({
       created_at,
       last_seen,
       last_seen_micros,
+      updated_at,
       user_agent,
       ip,
+      note,
       is_current
     FROM tokens_page
     ORDER BY last_seen ${sortAsc ? SQL`ASC` : SQL`DESC`}, jti ${sortAsc ? SQL`ASC` : SQL`DESC`}

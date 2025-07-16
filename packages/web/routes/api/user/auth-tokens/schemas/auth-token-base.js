@@ -21,6 +21,11 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
       format: 'date-time',
       description: 'When the token was last used',
     },
+    updated_at: {
+      type: 'string',
+      format: 'date-time',
+      description: 'When the token was last updated',
+    },
     user_agent: {
       type: ['string', 'null'],
       description: 'The last user agent used with this token',
@@ -28,6 +33,10 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
     ip: {
       type: ['string', 'null'],
       description: 'The last IP address used with this token',
+    },
+    note: {
+      type: ['string', 'null'],
+      description: 'User-defined note to identify/describe the session',
     },
   }
 })
