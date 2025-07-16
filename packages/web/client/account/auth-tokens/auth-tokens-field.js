@@ -2,12 +2,14 @@
 import { Component, html, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useWindow } from '../../hooks/useWindow.js'
 import { authTokensTable } from '../../components/auth-tokens-table/auth-tokens-table.js'
+import { useQuery } from '../../hooks/useQuery.js'
+import { useWindow } from '../../hooks/useWindow.js'
 
-export const authTokensField = Component(({ user, reload }) => {
+export const authTokensField = Component(({ user }) => {
   const state = useLSP()
   const window = useWindow()
+  const { query, pushState } = useQuery()
 
   const [tokens, setTokens] = useState()
   const [tokensLoading, setTokensLoading] = useState(false)
@@ -16,19 +18,22 @@ export const authTokensField = Component(({ user, reload }) => {
   const [before, setBefore] = useState()
   const [after, setAfter] = useState()
 
+  const [dataReload, setDataReload] = useState(0)
+  const reload = useCallback(() => {
+    setDataReload(dataReload + 1)
+  }, [dataReload, setDataReload])
+
   // Load tokens
   useEffect(() => {
     async function getTokens () {
       setTokensLoading(true)
       setTokensError(null)
 
-      const params = new URLSearchParams()
-      params.set('per_page', '10')
-      params.set('sort', 'desc')
+      const params = new URLSearchParams(query)
 
       // Add cursor params if they exist
-      if (before) params.set('before', before)
-      if (after) params.set('after', after)
+      if (params.get('before')) params.set('before', before)
+      if (params.get('after')) params.set('after', after)
 
       const response = await fetch(`${state.apiUrl}/user/auth-tokens?${params.toString()}`, {
         method: 'get',
@@ -53,25 +58,27 @@ export const authTokensField = Component(({ user, reload }) => {
         .catch(err => { console.error(err); setTokensError(err) })
         .finally(() => { setTokensLoading(false) })
     }
-  }, [user, state.apiUrl, reload, before, after])
+  }, [user, state.apiUrl, reload])
 
-  const onPageNav = useCallback((cursor, direction) => {
-    if (direction === 'before') {
-      setBefore(cursor)
-      setAfter(null)
-    } else {
-      setAfter(cursor)
-      setBefore(null)
-    }
-    reload()
-  }, [reload])
+  const onPageNav = (ev) => {
+    ev.preventDefault()
+    pushState(ev.currentTarget.href)
+    window.scrollTo({ top: 0 })
+  }
 
-  const handleDelete = useCallback(() => {
-    // Reset to first page after deletion
-    setBefore(null)
-    setAfter(null)
-    reload()
-  }, [reload])
+  let beforeParams
+  if (before) {
+    beforeParams = new URLSearchParams(query)
+    beforeParams.set('before', before)
+    beforeParams.delete('after')
+  }
+
+  let afterParams
+  if (after) {
+    afterParams = new URLSearchParams(query)
+    afterParams.set('after', after)
+    afterParams.delete('before')
+  }
 
   return html`
     <dt>Active Sessions</dt>
@@ -86,15 +93,15 @@ export const authTokensField = Component(({ user, reload }) => {
               ${tokens.length > 0
                 ? html`
                   <div class="bc-pagination-controls">
-                    ${after ? html`<button onclick=${() => onPageNav(after, 'after')}>← Previous</button>` : null}
-                    ${before ? html`<button onclick=${() => onPageNav(before, 'before')}>Next →</button>` : null}
+                    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+                    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
                   </div>
 
-                  ${authTokensTable({ tokens, reload, onDelete: handleDelete })}
+                  ${authTokensTable({ tokens, reload, onDelete: reload })}
 
                   <div class="bc-pagination-controls">
-                    ${after ? html`<button onclick=${() => onPageNav(after, 'after')}>← Previous</button>` : null}
-                    ${before ? html`<button onclick=${() => onPageNav(before, 'before')}>Next →</button>` : null}
+                    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+                    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
                   </div>
                 `
                 : html`<p>No active sessions found.</p>`

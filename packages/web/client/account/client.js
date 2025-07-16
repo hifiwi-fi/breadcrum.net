@@ -47,7 +47,6 @@ export const page = Component(() => {
         ${passwordField()}
         ${emailField({ user, reload })}
         ${newsletterField({ user, reload })}
-        ${authTokensField({ user, reload })}
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
@@ -61,6 +60,7 @@ export const page = Component(() => {
           `
           : null
         }
+        ${authTokensField({ user })}
      </dl>
     </div>
 `

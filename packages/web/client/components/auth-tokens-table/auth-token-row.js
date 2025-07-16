@@ -7,65 +7,29 @@ import { useWindow } from '../../hooks/useWindow.js'
 export const authTokenRow = Component(({ token, reload, onDelete }) => {
   const state = useLSP()
   const window = useWindow()
-  const [deleting, setDeleting] = useState(false)
-  const [deleteError, setDeleteError] = useState(null)
+  const [deleted, setDeleted] = useState(false)
 
-  const handleDelete = useCallback(async () => {
-    if (!window.confirm('Are you sure you want to delete this session?')) {
-      return
+  const handleDelete = useCallback(async (ev) => {
+    const response = await fetch(`${state.apiUrl}/user/auth-tokens/${token.jti}`, {
+      method: 'DELETE',
+      headers: {
+        'accept-encoding': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     }
 
-    setDeleting(true)
-    setDeleteError(null)
+    setDeleted(true)
 
-    try {
-      const response = await fetch(`${state.apiUrl}/user/auth-tokens/${token.jti}`, {
-        method: 'DELETE',
-        headers: {
-          'accept-encoding': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-      }
-
-      if (onDelete) {
-        onDelete()
-      } else if (reload) {
-        reload()
-      }
-    } catch (err) {
-      console.error(err)
-      setDeleteError(err)
-    } finally {
-      setDeleting(false)
-    }
-  }, [token.jti, reload, onDelete, state.apiUrl])
-
-  // Format dates
-  const formatDate = (dateString) => {
-    const date = new Date(dateString)
-    return date.toLocaleString()
-  }
-
-  // Format relative time
-  const formatRelativeTime = (dateString) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now - date
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
-
-    if (diffMins < 1) return 'just now'
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-    if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
-    return formatDate(dateString)
-  }
+    onDelete()
+  }, [token.jti, reload, state.apiUrl, setDeleted])
 
   return html`
+  ${deleted
+  ? html`<!-- Deleted -->`
+  : html`
     <tr class=${token.is_current ? 'bc-current-session' : ''}>
       <td>
         ${token.is_current
@@ -108,4 +72,37 @@ export const authTokenRow = Component(({ token, reload, onDelete }) => {
       </td>
     </tr>
   `
+  }`
 })
+
+/**
+ * Format dates
+ *
+ * @param {string} dateString
+ * @returns string
+ */
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleString()
+}
+
+/**
+ * Format relative time
+ *
+ * @param {string} dateString
+ * @returns string
+ */
+const formatRelativeTime = (dateString) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return 'just now'
+  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  return formatDate(dateString)
+}
