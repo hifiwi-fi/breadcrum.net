@@ -34,14 +34,7 @@ export async function getAuthToken (fastify, _opts) {
         },
         response: {
           200: schemaAuthTokenRead,
-          404: {
-            type: 'object',
-            properties: {
-              statusCode: { type: 'number' },
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
+          404: { $ref: 'HttpError' },
         },
       },
     },
@@ -60,7 +53,7 @@ export async function getAuthToken (fastify, _opts) {
         return reply.notFound('Auth token not found')
       }
 
-      return token
+      return reply.code(200).send(token)
     }
   )
 }

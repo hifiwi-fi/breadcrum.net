@@ -16,7 +16,7 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
       schema: {
         tags: ['auth-tokens'],
         summary: 'Bulk delete auth tokens',
-        description: 'Delete all auth tokens that have not been used since a specified date. Cannot delete the current session.',
+        description: 'Delete all auth tokens that have not been used since a specified date. Cannot delete the current session or protected tokens.',
         body: {
           type: 'object',
           additionalProperties: false,
@@ -40,14 +40,7 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
         response: {
           200: schemaBulkDeleteResponse,
           202: schemaBulkDeleteResponse,
-          400: {
-            type: 'object',
-            properties: {
-              statusCode: { type: 'number' },
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
+          400: { $ref: 'HttpError' },
         },
       },
     },
@@ -74,54 +67,53 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
         return reply.badRequest('Attempting to delete recently used tokens. Use allow_recent_deletes=true to confirm.')
       }
 
-      // First, get the tokens that will be deleted (excluding current session)
+      // First, get the tokens that will be deleted (excluding current session and protected tokens)
       const selectQuery = SQL`
         SELECT jti, last_seen
         FROM auth_tokens
         WHERE owner_id = ${userId}
           AND last_seen < ${cutoffDate}
           AND jti != ${currentJti}
+          AND protect = FALSE
         ORDER BY last_seen ASC
       `
 
       const tokensToDelete = await fastify.pg.query(selectQuery)
 
       if (tokensToDelete.rowCount === 0) {
-        if (dryRun) {
-          reply.code(202)
-        }
-        return {
+        const response = {
           deleted_count: 0,
           deleted_tokens: [],
           dry_run: dryRun
         }
+        return reply.code(dryRun ? 202 : 200).send(response)
       }
 
       // If dry run, return what would be deleted without actually deleting
       if (dryRun) {
-        reply.code(202)
-        return {
-          deleted_count: tokensToDelete.rowCount,
+        return reply.code(202).send({
+          deleted_count: tokensToDelete.rowCount ?? 0,
           deleted_tokens: tokensToDelete.rows,
           dry_run: true
-        }
+        })
       }
 
-      // Delete the tokens
+      // Delete the tokens (excluding protected ones)
       const deleteQuery = SQL`
         DELETE FROM auth_tokens
         WHERE owner_id = ${userId}
           AND last_seen < ${cutoffDate}
           AND jti != ${currentJti}
+          AND protect = FALSE
       `
 
       const deleteResult = await fastify.pg.query(deleteQuery)
 
-      return {
+      return reply.code(200).send({
         deleted_count: deleteResult.rowCount,
         deleted_tokens: tokensToDelete.rows,
         dry_run: false
-      }
+      })
     }
   )
 }

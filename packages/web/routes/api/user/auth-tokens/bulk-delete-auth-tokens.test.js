@@ -372,6 +372,87 @@ await suite('bulk delete auth tokens', async () => {
   await test('bulk delete auth tokens - protection cases', async (t) => {
     const app = await build(t)
 
+    await t.test('never deletes protected tokens', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      // Create old tokens
+      const tokens = await createTokensWithDates(app, user.userId, [
+        { daysAgo: 30 },
+        { daysAgo: 60 },
+        { daysAgo: 90 }
+      ])
+
+      // Protect the middle token
+      await app.pg.query(
+        'UPDATE auth_tokens SET protect = true WHERE jti = $1',
+        [tokens[1].jti]
+      )
+
+      // Try to delete all old tokens
+      const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      const deleteRes = await app.inject({
+        method: 'DELETE',
+        url: '/api/user/auth-tokens/bulk',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          last_seen_before: cutoffDate.toISOString()
+        }
+      })
+
+      assert.strictEqual(deleteRes.statusCode, 200, 'Should return 200 OK')
+      /** @type {TypeBulkDeleteResponse} */
+      const deleteBody = JSON.parse(deleteRes.payload)
+      assert.strictEqual(deleteBody.deleted_count, 2, 'Should delete only unprotected tokens')
+
+      // Verify protected token still exists
+      const checkQuery = await app.pg.query(
+        'SELECT jti FROM auth_tokens WHERE jti = $1',
+        [tokens[1].jti]
+      )
+      assert.strictEqual(checkQuery.rowCount, 1, 'Protected token should still exist')
+    })
+
+    await t.test('dry run excludes protected tokens from count', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      // Create old tokens
+      const tokens = await createTokensWithDates(app, user.userId, [
+        { daysAgo: 30 },
+        { daysAgo: 60 }
+      ])
+
+      // Protect one token
+      await app.pg.query(
+        'UPDATE auth_tokens SET protect = true WHERE jti = $1',
+        [tokens[0].jti]
+      )
+
+      // Dry run to delete all old tokens
+      const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      const dryRunRes = await app.inject({
+        method: 'DELETE',
+        url: '/api/user/auth-tokens/bulk',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          last_seen_before: cutoffDate.toISOString(),
+          dry_run: true
+        }
+      })
+
+      assert.strictEqual(dryRunRes.statusCode, 202, 'Should return 202 for dry run')
+      /** @type {TypeBulkDeleteResponse & { dry_run?: boolean }} */
+      const dryRunBody = JSON.parse(dryRunRes.payload)
+      assert.strictEqual(dryRunBody.deleted_count, 1, 'Should only count unprotected token')
+      assert.strictEqual(dryRunBody.deleted_tokens.length, 1, 'Should only return unprotected token')
+      assert.strictEqual(dryRunBody.deleted_tokens[0].jti, tokens[1].jti, 'Should return the unprotected token')
+    })
+
     await t.test('never deletes current session token', async (t) => {
       const user = await createTestUser(app, t)
       if (!user) return // Registration disabled

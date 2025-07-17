@@ -38,6 +38,10 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
       type: ['string', 'null'],
       description: 'User-defined note to identify/describe the session',
     },
+    protect: {
+      type: 'boolean',
+      description: 'When true, prevents the token from being bulk deleted',
+    },
   }
 })
 

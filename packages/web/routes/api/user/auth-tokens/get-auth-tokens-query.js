@@ -98,6 +98,7 @@ export const getAuthTokensQuery = ({
         user_agent,
         ip,
         note,
+        protect,
         ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}
       FROM auth_tokens
       WHERE owner_id = ${userId}
@@ -119,6 +120,7 @@ export const getAuthTokensQuery = ({
       user_agent,
       ip,
       note,
+      protect,
       is_current
     FROM tokens_page
     ORDER BY last_seen ${sortAsc ? SQL`ASC` : SQL`DESC`}, jti ${sortAsc ? SQL`ASC` : SQL`DESC`}

@@ -89,6 +89,7 @@ export async function listAuthTokens (fastify, _opts) {
             },
             required: ['data', 'pagination'],
           },
+          400: { $ref: 'HttpError' },
         },
       },
     },
@@ -145,7 +146,7 @@ export async function listAuthTokens (fastify, _opts) {
           prevPage = firstToken ? `${firstToken.last_seen_micros}:${firstToken.jti}` : null
         }
 
-        return {
+        return reply.code(200).send({
           data: tokens,
           pagination: {
             before: nextPage,
@@ -153,7 +154,7 @@ export async function listAuthTokens (fastify, _opts) {
             top,
             bottom,
           },
-        }
+        })
       })
     }
   )

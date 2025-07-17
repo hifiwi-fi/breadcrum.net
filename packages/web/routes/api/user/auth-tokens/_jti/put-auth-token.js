@@ -21,7 +21,7 @@ export async function putAuthToken (fastify, _opts) {
       schema: {
         tags: ['auth-tokens'],
         summary: 'Update an auth token',
-        description: 'Update the note field of a specific auth token (session) for the authenticated user',
+        description: 'Update the note field and/or protect status of a specific auth token (session) for the authenticated user',
         params: {
           type: 'object',
           properties: {
@@ -41,27 +41,24 @@ export async function putAuthToken (fastify, _opts) {
               maxLength: 255,
               description: 'A note to identify the session (e.g., "Work laptop", "Home PC")',
             },
+            protect: {
+              type: 'boolean',
+              description: 'When true, prevents the token from being bulk deleted',
+            },
           },
-          required: ['note'],
           additionalProperties: false,
         },
         response: {
           200: schemaAuthTokenRead,
-          404: {
-            type: 'object',
-            properties: {
-              statusCode: { type: 'number' },
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
+          400: { $ref: 'HttpError' },
+          404: { $ref: 'HttpError' },
         },
       },
     },
     async function putAuthTokenHandler (request, reply) {
       const { id: userId, jti: currentJti } = request.user
       const { jti } = request.params
-      const { note } = request.body
+      const { note, protect } = request.body
 
       // Check if token exists and belongs to user
       const checkQuery = SQL`
@@ -77,10 +74,23 @@ export async function putAuthToken (fastify, _opts) {
         return reply.notFound('Auth token not found')
       }
 
-      // Update the note
+      // Build update fields dynamically
+      const updateFields = []
+      if (note !== undefined) {
+        updateFields.push(SQL`note = ${note}`)
+      }
+      if (protect !== undefined) {
+        updateFields.push(SQL`protect = ${protect}`)
+      }
+
+      if (updateFields.length === 0) {
+        return reply.badRequest('No fields to update')
+      }
+
+      // Update the note and/or protect status
       const updateQuery = SQL`
         UPDATE auth_tokens
-        SET note = ${note}
+        SET ${SQL.glue(updateFields, ', ')}
         WHERE jti = ${jti}
           AND owner_id = ${userId}
       `
@@ -99,7 +109,7 @@ export async function putAuthToken (fastify, _opts) {
         throw new Error('Failed to retrieve updated token')
       }
 
-      return updatedToken
+      return reply.code(200).send(updatedToken)
     }
   )
 }

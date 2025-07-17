@@ -214,6 +214,120 @@ await suite('update auth token', async () => {
       assert.notStrictEqual(updateBody.updated_at, originalUpdatedAt, 'updated_at should change after update')
       assert.ok(new Date(updateBody.updated_at) > new Date(originalUpdatedAt), 'New updated_at should be later')
     })
+
+    await t.test('successfully updates protect status', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      // Get current token's JTI
+      const listRes = await app.inject({
+        method: 'GET',
+        url: '/api/user/auth-tokens',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        }
+      })
+
+      const listBody = JSON.parse(listRes.payload)
+      const tokenJti = listBody.data[0].jti
+
+      // Update protect to true
+      const updateRes = await app.inject({
+        method: 'PUT',
+        url: `/api/user/auth-tokens/${tokenJti}`,
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          protect: true
+        }
+      })
+
+      assert.strictEqual(updateRes.statusCode, 200, 'Should return 200 OK')
+      const updateBody = JSON.parse(updateRes.payload)
+      assert.strictEqual(updateBody.protect, true, 'Protect should be true')
+      assert.strictEqual(updateBody.jti, tokenJti, 'Should return the same token')
+    })
+
+    await t.test('can update both note and protect in same request', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      // Get current token's JTI
+      const listRes = await app.inject({
+        method: 'GET',
+        url: '/api/user/auth-tokens',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        }
+      })
+
+      const listBody = JSON.parse(listRes.payload)
+      const tokenJti = listBody.data[0].jti
+
+      // Update both fields
+      const updateRes = await app.inject({
+        method: 'PUT',
+        url: `/api/user/auth-tokens/${tokenJti}`,
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          note: 'Protected session',
+          protect: true
+        }
+      })
+
+      assert.strictEqual(updateRes.statusCode, 200, 'Should return 200 OK')
+      const updateBody = JSON.parse(updateRes.payload)
+      assert.strictEqual(updateBody.note, 'Protected session', 'Note should be updated')
+      assert.strictEqual(updateBody.protect, true, 'Protect should be true')
+    })
+
+    await t.test('can set protect to false', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      // Get current token's JTI
+      const listRes = await app.inject({
+        method: 'GET',
+        url: '/api/user/auth-tokens',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        }
+      })
+
+      const listBody = JSON.parse(listRes.payload)
+      const tokenJti = listBody.data[0].jti
+
+      // First set protect to true
+      await app.inject({
+        method: 'PUT',
+        url: `/api/user/auth-tokens/${tokenJti}`,
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          protect: true
+        }
+      })
+
+      // Then set it to false
+      const updateRes = await app.inject({
+        method: 'PUT',
+        url: `/api/user/auth-tokens/${tokenJti}`,
+        headers: {
+          authorization: `Bearer ${user.token}`
+        },
+        payload: {
+          protect: false
+        }
+      })
+
+      assert.strictEqual(updateRes.statusCode, 200, 'Should return 200 OK')
+      const updateBody = JSON.parse(updateRes.payload)
+      assert.strictEqual(updateBody.protect, false, 'Protect should be false')
+    })
   })
 
   await test('update auth token - validation', async (t) => {
@@ -312,7 +426,7 @@ await suite('update auth token', async () => {
         payload: {}
       })
 
-      assert.strictEqual(updateRes.statusCode, 400, 'Should require note field')
+      assert.strictEqual(updateRes.statusCode, 400, 'Should require at least one field to update')
     })
 
     await t.test('returns 400 for invalid UUID format', async (t) => {

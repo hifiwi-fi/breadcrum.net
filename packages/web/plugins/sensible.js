@@ -6,7 +6,9 @@ import fp from 'fastify-plugin'
  * @see https://github.com/fastify/fastify-sensible
  */
 export default fp(async function (fastify, _) {
-  fastify.register(import('@fastify/sensible'))
+  fastify.register(import('@fastify/sensible'), {
+    sharedSchemaId: 'HttpError'
+  })
 }, {
   name: 'sensible',
   dependencies: [],

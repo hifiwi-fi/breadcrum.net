@@ -32,22 +32,8 @@ export async function deleteAuthToken (fastify, _opts) {
             type: 'null',
             description: 'Token successfully deleted',
           },
-          400: {
-            type: 'object',
-            properties: {
-              statusCode: { type: 'number' },
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
-          404: {
-            type: 'object',
-            properties: {
-              statusCode: { type: 'number' },
-              error: { type: 'string' },
-              message: { type: 'string' },
-            },
-          },
+          400: { $ref: 'HttpError' },
+          404: { $ref: 'HttpError' },
         },
       },
     },
@@ -72,8 +58,7 @@ export async function deleteAuthToken (fastify, _opts) {
         return reply.notFound('Auth token not found')
       }
 
-      reply.code(204)
-      return null
+      return reply.code(204).send()
     }
   )
 }

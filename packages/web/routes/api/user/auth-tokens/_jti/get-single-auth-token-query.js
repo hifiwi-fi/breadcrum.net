@@ -62,6 +62,7 @@ export const getSingleAuthTokenQuery = ({
       user_agent,
       ip,
       note,
+      protect,
       ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}
     FROM auth_tokens
     WHERE jti = ${jti}
