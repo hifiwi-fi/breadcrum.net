@@ -2,6 +2,7 @@
  * @import { FastifyInstance } from 'fastify'
  * @import { TypeUserRead } from './schemas/schema-user-read.js'
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
+ * @import { QueryResult } from 'pg'
  */
 
 import SQL from '@nearform/sql'
@@ -24,8 +25,9 @@ export async function getUser (getUserParams) {
   const client = pg ?? fastify.pg
   const query = getUserQuery(getUserQueryParams)
 
-  const results = (await client.query(query))
-  return /** @type {TypeUserRead | undefined} */ (results.rows[0])
+  /** @type {QueryResult<TypeUserRead>} */
+  const results = await client.query(query)
+  return results.rows[0]
 }
 
 /**

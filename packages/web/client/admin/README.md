@@ -2,7 +2,7 @@
 title: "👨‍💼 Admin Pages"
 noindex: true
 ---
-# Admin pannel
+# Admin panel
 
 - [Users](./users/)
 - [Flags](./flags/)

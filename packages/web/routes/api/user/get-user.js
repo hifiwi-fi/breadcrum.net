@@ -24,15 +24,13 @@ export async function getUserRoute (fastify, _opts) {
         },
       },
     },
+
     async function getUserHandler (request, reply) {
       const userId = request.user.id
 
       const user = await getUser({ fastify, userId })
-
       if (user) {
-        // TODO refresh token
-        reply.status(200)
-        return user
+        reply.status(200).send({ ...user })
       } else {
         return reply.notFound('User not found')
       }

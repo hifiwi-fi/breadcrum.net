@@ -1,4 +1,7 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+// @ts-expect-error
 import { useEffect, useState } from 'uland-isomorphic'
 import { useLSP } from './useLSP.js'
 

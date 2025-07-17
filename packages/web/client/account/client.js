@@ -1,23 +1,22 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
+
+// @ts-expect-error
+import { Component, html, render, useEffect } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { usernameField } from './username/username-field.js'
 import { passwordField } from './password/password-field.js'
 import { newsletterField } from './newsletter/newsletter-field.js'
 import { emailField } from './email/email-field.js'
-import { authTokensField } from './auth-tokens/auth-tokens-field.js'
+import { useReload } from '../hooks/useReload.js'
 
 export const page = Component(() => {
   const window = useWindow()
 
-  const [dataReload, setDataReload] = useState(0)
+  const { reload: reloadUser, signal: userReloadSignal } = useReload()
 
-  const reload = useCallback(() => {
-    setDataReload(dataReload + 1)
-  }, [dataReload, setDataReload])
-
-  const { user, loading } = useUser({ reload: dataReload })
+  const { user, loading } = useUser({ reload: userReloadSignal })
 
   useEffect(() => {
     if (!user && !loading) {
@@ -43,10 +42,10 @@ export const page = Component(() => {
           `
           : null
         }
-        ${usernameField({ user, reload })}
+        ${usernameField({ user, reload: reloadUser })}
         ${passwordField()}
-        ${emailField({ user, reload })}
-        ${newsletterField({ user, reload })}
+        ${emailField({ user, reload: reloadUser })}
+        ${newsletterField({ user, reload: reloadUser })}
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
@@ -56,12 +55,11 @@ export const page = Component(() => {
         ${user?.admin
           ? html`
             <dt>admin section</dt>
-            <dd><a href="/admin/">Admin pannel</a></dd>
+            <dd><a href="/admin/">Admin panel</a></dd>
           `
           : null
         }
-        ${authTokensField({ user })}
-     </dl>
+      </dl>
     </div>
 `
 })
