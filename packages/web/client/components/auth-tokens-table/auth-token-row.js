@@ -1,6 +1,5 @@
 /* eslint-env browser */
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
-import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
 import { diffToken } from '../../lib/diff-auth-token.js'
 import { authTokenRowEdit } from './auth-token-row-edit.js'

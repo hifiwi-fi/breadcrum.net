@@ -1,5 +1,4 @@
 /* eslint-env browser */
-import { fetch } from 'fetch-undici'
 import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { useUser } from '../../../hooks/useUser.js'
 import { useLSP } from '../../../hooks/useLSP.js'

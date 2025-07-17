@@ -1,6 +1,5 @@
 /* eslint-env browser */
 import { useEffect, useState } from 'uland-isomorphic'
-import { fetch } from 'fetch-undici'
 import { useLSP } from './useLSP.js'
 
 let userRequest = null

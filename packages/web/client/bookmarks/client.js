@@ -2,7 +2,6 @@
 import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useQuery } from '../hooks/useQuery.js'
-import { fetch } from 'fetch-undici'
 import { useLSP } from '../hooks/useLSP.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { bookmarkList } from '../components/bookmark/bookmark-list.js'

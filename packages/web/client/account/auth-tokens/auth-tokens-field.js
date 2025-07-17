@@ -1,6 +1,5 @@
 /* eslint-env browser */
 import { Component, html, useEffect, useState, useCallback } from 'uland-isomorphic'
-import { fetch } from 'fetch-undici'
 import { useLSP } from '../../hooks/useLSP.js'
 import { authTokensTable } from '../../components/auth-tokens-table/auth-tokens-table.js'
 import { useQuery } from '../../hooks/useQuery.js'
