@@ -59,9 +59,9 @@ async function build (t, env, serverOptions) {
 
   // tear down our app after we are done
   t.after(async () => {
-    console.log('Closing app...')
+    // console.log('Closing app...')
     await app.close()
-    console.log('App closed...')
+    // console.log('App closed...')
     // Add a small delay to ensure resources are released
     await new Promise(resolve => setTimeout(resolve, 100))
   })

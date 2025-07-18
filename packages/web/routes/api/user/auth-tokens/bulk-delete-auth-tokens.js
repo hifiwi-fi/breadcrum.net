@@ -11,7 +11,7 @@ import { schemaBulkDeleteResponse } from './schemas/schema-bulk-delete-response.
  */
 export async function bulkDeleteAuthTokens (fastify, _opts) {
   fastify.delete(
-    '/bulk',
+    '/',
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {

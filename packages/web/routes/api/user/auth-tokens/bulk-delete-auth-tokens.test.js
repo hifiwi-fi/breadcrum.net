@@ -30,7 +30,7 @@ await suite('bulk delete auth tokens', async () => {
       const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -66,7 +66,7 @@ await suite('bulk delete auth tokens', async () => {
       // Delete all created tokens
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -117,7 +117,7 @@ await suite('bulk delete auth tokens', async () => {
       const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -153,7 +153,7 @@ await suite('bulk delete auth tokens', async () => {
       const veryOldDate = new Date('2020-01-01')
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -188,7 +188,7 @@ await suite('bulk delete auth tokens', async () => {
       // Perform dry run
       const dryRunRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -225,7 +225,7 @@ await suite('bulk delete auth tokens', async () => {
       const veryOldDate = new Date('2020-01-01')
       const dryRunRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -262,7 +262,7 @@ await suite('bulk delete auth tokens', async () => {
       const sixDaysAgo = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -292,7 +292,7 @@ await suite('bulk delete auth tokens', async () => {
       const now = new Date()
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -324,7 +324,7 @@ await suite('bulk delete auth tokens', async () => {
       const fifteenDaysAgo = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -353,7 +353,7 @@ await suite('bulk delete auth tokens', async () => {
       const fourDaysAgo = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000)
       const dryRunRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -393,7 +393,7 @@ await suite('bulk delete auth tokens', async () => {
       const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -435,7 +435,7 @@ await suite('bulk delete auth tokens', async () => {
       const cutoffDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       const dryRunRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -467,7 +467,7 @@ await suite('bulk delete auth tokens', async () => {
       const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -488,7 +488,7 @@ await suite('bulk delete auth tokens', async () => {
       const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -511,7 +511,7 @@ await suite('bulk delete auth tokens', async () => {
       const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
       const deleteRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -535,7 +535,7 @@ await suite('bulk delete auth tokens', async () => {
 
       const invalidDateRes = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -565,7 +565,7 @@ await suite('bulk delete auth tokens', async () => {
         /** @type {any} */
         const res = await app.inject({
           method: 'DELETE',
-          url: '/api/user/auth-tokens/bulk',
+          url: '/api/user/auth-tokens',
           headers: {
             authorization: `Bearer ${user.token}`
           },
@@ -584,7 +584,7 @@ await suite('bulk delete auth tokens', async () => {
 
       const res = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: `Bearer ${user.token}`
         },
@@ -601,7 +601,7 @@ await suite('bulk delete auth tokens', async () => {
     await t.test('returns 401 when unauthenticated', async () => {
       const res = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         payload: {
           last_seen_before: new Date().toISOString()
         }
@@ -613,7 +613,7 @@ await suite('bulk delete auth tokens', async () => {
     await t.test('returns 401 with invalid token', async () => {
       const res = await app.inject({
         method: 'DELETE',
-        url: '/api/user/auth-tokens/bulk',
+        url: '/api/user/auth-tokens',
         headers: {
           authorization: 'Bearer invalid-token'
         },
