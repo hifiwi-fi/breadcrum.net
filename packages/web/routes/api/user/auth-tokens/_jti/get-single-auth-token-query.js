@@ -67,7 +67,7 @@ export const getSingleAuthTokenQuery = ({
     FROM auth_tokens
     WHERE jti = ${jti}
       AND owner_id = ${userId}
-    LIMIT 1
+    FETCH FIRST 1 ROW ONLY
   `
 
   return query

@@ -386,7 +386,7 @@ await suite('bulk delete auth tokens', async () => {
       // Protect the middle token
       await app.pg.query(
         'UPDATE auth_tokens SET protect = true WHERE jti = $1',
-        [tokens[1].jti]
+        [tokens?.[1]?.jti]
       )
 
       // Try to delete all old tokens
@@ -410,7 +410,7 @@ await suite('bulk delete auth tokens', async () => {
       // Verify protected token still exists
       const checkQuery = await app.pg.query(
         'SELECT jti FROM auth_tokens WHERE jti = $1',
-        [tokens[1].jti]
+        [tokens?.[1]?.jti]
       )
       assert.strictEqual(checkQuery.rowCount, 1, 'Protected token should still exist')
     })
@@ -428,7 +428,7 @@ await suite('bulk delete auth tokens', async () => {
       // Protect one token
       await app.pg.query(
         'UPDATE auth_tokens SET protect = true WHERE jti = $1',
-        [tokens[0].jti]
+        [tokens?.[0]?.jti]
       )
 
       // Dry run to delete all old tokens
@@ -450,7 +450,7 @@ await suite('bulk delete auth tokens', async () => {
       const dryRunBody = JSON.parse(dryRunRes.payload)
       assert.strictEqual(dryRunBody.deleted_count, 1, 'Should only count unprotected token')
       assert.strictEqual(dryRunBody.deleted_tokens.length, 1, 'Should only return unprotected token')
-      assert.strictEqual(dryRunBody.deleted_tokens[0].jti, tokens[1].jti, 'Should return the unprotected token')
+      assert.strictEqual(dryRunBody.deleted_tokens?.[0]?.jti, tokens?.[1]?.jti, 'Should return the unprotected token')
     })
 
     await t.test('never deletes current session token', async (t) => {

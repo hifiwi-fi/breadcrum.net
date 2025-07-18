@@ -93,7 +93,7 @@ export async function listAuthTokens (fastify, _opts) {
         },
       },
     },
-    async function listAuthTokensHandler (request, _reply) {
+    async function listAuthTokensHandler (request, reply) {
       return fastify.pg.transact(async client => {
         const userId = request.user.id
         const currentJti = request.user.jti

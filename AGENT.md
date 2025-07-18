@@ -23,3 +23,8 @@ This is preferable to casting the return value:
 const results = await client.query(query)
 return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 ```
+
+## SQL
+
+- Breadcrum uses posgres
+- Use `FETCH FIRST n ROWS ONLY` over `LIMIT`

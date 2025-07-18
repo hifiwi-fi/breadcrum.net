@@ -80,15 +80,6 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
 
       const tokensToDelete = await fastify.pg.query(selectQuery)
 
-      if (tokensToDelete.rowCount === 0) {
-        const response = {
-          deleted_count: 0,
-          deleted_tokens: [],
-          dry_run: dryRun
-        }
-        return reply.code(dryRun ? 202 : 200).send(response)
-      }
-
       // If dry run, return what would be deleted without actually deleting
       if (dryRun) {
         return reply.code(202).send({
@@ -96,6 +87,15 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
           deleted_tokens: tokensToDelete.rows,
           dry_run: true
         })
+      }
+
+      if (tokensToDelete.rowCount === 0) {
+        const response = {
+          deleted_count: 0,
+          deleted_tokens: [],
+          dry_run: dryRun
+        }
+        return reply.code(dryRun ? 202 : 200).send(response)
       }
 
       // Delete the tokens (excluding protected ones)
@@ -110,7 +110,7 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
       const deleteResult = await fastify.pg.query(deleteQuery)
 
       return reply.code(200).send({
-        deleted_count: deleteResult.rowCount,
+        deleted_count: deleteResult.rowCount ?? 0,
         deleted_tokens: tokensToDelete.rows,
         dry_run: false
       })
