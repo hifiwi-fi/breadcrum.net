@@ -10,38 +10,36 @@ import { passwordField } from './password/password-field.js'
 import { newsletterField } from './newsletter/newsletter-field.js'
 import { emailField } from './email/email-field.js'
 import { useReload } from '../hooks/useReload.js'
+import { disabledField } from './disabled/disabled-field.js'
+import { useAuthTokens } from '../hooks/useAuthTokens.js'
 
 export const page = Component(() => {
   const window = useWindow()
 
   const { reload: reloadUser, signal: userReloadSignal } = useReload()
-
   const { user, loading } = useUser({ reload: userReloadSignal })
 
   useEffect(() => {
-    if (!user && !loading) {
+    if ((!user && !loading) && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
   }, [user, loading])
 
+  const {
+    tokensError,
+    tokens,
+    // reloadAuthTokens,
+    before,
+    after,
+    beforeParams,
+    afterParams
+  } = useAuthTokens()
+
   return html`
     <div>
       <dl>
-        ${user?.disabled
-          ? html`
-            <dt><marquee direction="right">Account Disabled</marquee></dt>
-            <dd>
-              <p>Your account has been disabled${user?.disabled_reason ? html`<span> for the following reason:</span>` : html`<span>.</span>`}</p>
-              ${user?.disabled_reason
-                ? html`<p>${user?.disabled_reason}</p>`
-                : null
-              }
-              <p>Please contact <a href="mailto:support@breadcrum.net">support@breadcrum.net</a> to resolve this issue.</p>
-            </dd>
-          `
-          : null
-        }
+        ${disabledField({ user })}
         ${usernameField({ user, reload: reloadUser })}
         ${passwordField()}
         ${emailField({ user, reload: reloadUser })}
@@ -60,6 +58,12 @@ export const page = Component(() => {
           : null
         }
       </dl>
+      <pre>${JSON.stringify(tokens, null, 2)}</pre>
+      <pre>${JSON.stringify(before, null, 2)}</pre>
+      <pre>${JSON.stringify(after, null, 2)}</pre>
+      <pre>${JSON.stringify(beforeParams, null, 2)}</pre>
+      <pre>${JSON.stringify(afterParams, null, 2)}</pre>
+      ${tokensError ? html`<pre>${JSON.stringify(tokensError, null, 2)}</pre>` : null}
     </div>
 `
 })

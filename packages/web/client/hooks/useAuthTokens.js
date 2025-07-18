@@ -1,5 +1,9 @@
 /// <reference lib="dom" />
 
+/**
+ * @import { TypeAuthTokenRead } from '../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ */
+
 // @ts-expect-error
 import { useEffect, useState } from 'uland-isomorphic'
 import { useUser } from './useUser.js'
@@ -7,39 +11,33 @@ import { useQuery } from './useQuery.js'
 import { useLSP } from './useLSP.js'
 import { useReload } from './useReload.js'
 
-export function useBookmarks () {
+export function useAuthTokens () {
   const { user } = useUser()
   const state = useLSP()
   const { query } = useQuery()
-  const [bookmarks, setBookmarks] = useState()
-  const [bookmarksLoading, setBookmarksLoading] = useState(false)
-  const [bookmarksError, setBookmarksError] = useState(null)
 
+  /** @type {[TypeAuthTokenRead[] | null, (authTokens: TypeAuthTokenRead[] | null) => void]} */
+  const [tokens, setTokens] = useState()
+  /** @type {[boolean, (loading: boolean) => void]} */
+  const [tokensLoading, setTokensLoading] = useState(false)
+  /** @type {[Error | null, (err: Error | null) => void]} */
+  const [tokensError, setTokensError] = useState(null)
+
+  /** @type {[string | null, (before: string | null) => void]} */
   const [before, setBefore] = useState()
+  /** @type {[string | null, (after: string | null) => void]} */
   const [after, setAfter] = useState()
 
-  const { reload: reloadBookmarks, signal: bookmarksReloadSignal } = useReload()
+  const { reload: reloadAuthTokens, signal: authTokensReloadSignal } = useReload()
 
-  // Load bookmarks
+  // Load auth-tokens
   useEffect(() => {
-    async function getBookmarks () {
-      // TODO: port SWR or use https://usehooks.com/useAsync/
-      setBookmarksLoading(true)
-      setBookmarksError(null)
-      const pageParams = new URLSearchParams(query ?? '')
+    async function getAuthTokens () {
+      setTokensLoading(true)
+      setTokensError(null)
+      const params = new URLSearchParams(query ?? '')
 
-      // Transform date string to date object
-      const pagePramsBefore = pageParams.get('before')
-      const pageParamsAfter = pageParams.get('after')
-      if (pagePramsBefore) pageParams.set('before', (new Date(+pagePramsBefore)).toISOString())
-      if (pageParamsAfter) pageParams.set('after', (new Date(+pageParamsAfter)).toISOString())
-
-      pageParams.set('sensitive', state.sensitive.toString())
-      pageParams.set('toread', state.toread.toString())
-      pageParams.set('starred', state.starred.toString())
-
-      // Be selective about this
-      const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/user/auth-tokens?${params.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json',
@@ -48,9 +46,9 @@ export function useBookmarks () {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        setBookmarks(body?.data)
-        setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
-        setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
+        setTokens(body?.data)
+        setBefore(body?.pagination?.before)
+        setAfter(body?.pagination?.after)
         if (body?.pagination?.top) {
           const newParams = new URLSearchParams(query ?? '')
           let modified = false
@@ -74,32 +72,32 @@ export function useBookmarks () {
     }
 
     if (user) {
-      getBookmarks()
-        .then(() => { console.log('bookmarks done') })
-        .catch(err => { console.error(err); setBookmarksError(err) })
-        .finally(() => { setBookmarksLoading(false) })
+      getAuthTokens()
+        .then(() => { console.log('tokens loaded') })
+        .catch(err => { console.error(err); setTokensError(err) })
+        .finally(() => { setTokensLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, bookmarksReloadSignal])
+  }, [query, state.apiUrl, authTokensReloadSignal])
 
   let beforeParams
   if (before) {
     beforeParams = new URLSearchParams(query ?? '')
-    beforeParams.set('before', before.valueOf())
+    beforeParams.set('before', before)
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
     afterParams = new URLSearchParams(query ?? '')
-    afterParams.set('after', after.valueOf())
+    afterParams.set('after', after)
     afterParams.delete('before')
   }
 
   return {
-    bookmarksLoading,
-    bookmarksError,
-    bookmarks,
-    reloadBookmarks,
+    tokensLoading,
+    tokensError,
+    tokens,
+    reloadAuthTokens,
     before,
     after,
     beforeParams,

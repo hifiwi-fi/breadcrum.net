@@ -1,5 +1,9 @@
 /// <reference lib="dom" />
 
+/**
+ * @import { TypeBookmarkRead } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
+ */
+
 // @ts-expect-error
 import { useEffect, useState } from 'uland-isomorphic'
 import { useUser } from './useUser.js'
@@ -11,11 +15,16 @@ export function useBookmarks () {
   const { user } = useUser()
   const state = useLSP()
   const { query } = useQuery()
+  /** @type {[TypeBookmarkRead[] | null, (bookmarks: TypeBookmarkRead[] | null) => void]} */
   const [bookmarks, setBookmarks] = useState()
+  /** @type {[boolean, (loading: boolean) => void]} */
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
+  /** @type {[Error | null, (err: Error | null) => void]} */
   const [bookmarksError, setBookmarksError] = useState(null)
 
+  /** @type {[Date | null, (before: Date | null) => void]} */
   const [before, setBefore] = useState()
+  /** @type {[Date | null, (after: Date | null) => void]} */
   const [after, setAfter] = useState()
 
   const { reload: reloadBookmarks, signal: bookmarksReloadSignal } = useReload()
@@ -84,14 +93,14 @@ export function useBookmarks () {
   let beforeParams
   if (before) {
     beforeParams = new URLSearchParams(query ?? '')
-    beforeParams.set('before', before.valueOf())
+    beforeParams.set('before', String(before.valueOf()))
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
     afterParams = new URLSearchParams(query ?? '')
-    afterParams.set('after', after.valueOf())
+    afterParams.set('after', String(after.valueOf()))
     afterParams.delete('before')
   }
 
