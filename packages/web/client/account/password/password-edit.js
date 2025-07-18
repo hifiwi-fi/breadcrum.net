@@ -1,17 +1,33 @@
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+// @ts-expect-error
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
-export const passwordEdit = Component(({ onSave, onCancelEdit }) => {
+/**
+ * @typedef {({
+ *  onSave,
+ *  onCancelEdit,
+ * }: {
+ *  onSave?: (formState: { password: string }) => Promise<void> | void,
+ *  onCancelEdit?: () => void,
+ * }) => any} PasswordEdit
+ */
+
+/**
+ * @type {PasswordEdit}
+ */
+export const passwordEdit = Component(/** @type{PasswordEdit} */({ onSave, onCancelEdit }) => {
   const [error, setError] = useState(null)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
     const form = formRef.current
-
     const password = form.password.value
     const confirmPassword = form.confirmPassword.value
 
@@ -26,7 +42,7 @@ export const passwordEdit = Component(({ onSave, onCancelEdit }) => {
     }
 
     try {
-      await onSave(formState)
+      await onSave?.(formState)
     } catch (err) {
       setDisabled(false)
       setError(err)

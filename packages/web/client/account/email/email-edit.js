@@ -1,11 +1,33 @@
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
+ */
+// @ts-expect-error
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
-export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
+/**
+ * @typedef {({
+ *  user,
+ *  onSave,
+ *  onCancelEdit,
+ * }: {
+ *  user: TypeUserRead | null,
+ *  onSave?: (formState: { email: string }) => Promise<void> | void,
+ *  onCancelEdit?: () => void,
+ * }) => any} EmailEdit
+ */
+
+/**
+ * @type {EmailEdit}
+ */
+export const emailEdit = Component(/** @type{EmailEdit} */({ user, onSave, onCancelEdit }) => {
   const [error, setError] = useState(null)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
@@ -13,7 +35,7 @@ export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
     const form = formRef.current
     const email = form.email.value
 
-    if (email === user.email) {
+    if (email === user?.email) {
       setError(new Error('New email must be different than current email'))
       setDisabled(false)
       return
@@ -24,12 +46,12 @@ export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
     }
 
     try {
-      await onSave(formState)
+      await onSave?.(formState)
     } catch (err) {
       setDisabled(false)
       setError(err)
     }
-  }, [user.email, setDisabled, setError, formRef?.current, onSave])
+  }, [user?.email, setDisabled, setError, formRef?.current, onSave])
 
   return html`
     <div class='bc-account-email-edit'>
@@ -39,7 +61,7 @@ export const emailEdit = Component(({ user, onSave, onCancelEdit }) => {
         <div>
           <label class='block'>
             email:
-            <input class='block' minlength="1" maxlength="200" type="email" name="email" value="${user.email}"/>
+            <input class='block' minlength="1" maxlength="200" type="email" name="email" value="${user?.email}"/>
           </label>
         </div>
         <div class="bc-account-email-edit-submit-line">
