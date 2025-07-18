@@ -1,5 +1,6 @@
 import SQL from '@nearform/sql'
 import { schemaAuthTokenRead } from '../schemas/schema-auth-token-read.js'
+import { schemaAuthTokenUpdate } from '../schemas/schema-auth-token-update.js'
 import { getSingleAuthToken } from './get-single-auth-token-query.js'
 
 /**
@@ -33,21 +34,7 @@ export async function putAuthToken (fastify, _opts) {
           },
           required: ['jti'],
         },
-        body: {
-          type: 'object',
-          properties: {
-            note: {
-              type: ['string', 'null'],
-              maxLength: 255,
-              description: 'A note to identify the session (e.g., "Work laptop", "Home PC")',
-            },
-            protect: {
-              type: 'boolean',
-              description: 'When true, prevents the token from being bulk deleted',
-            },
-          },
-          additionalProperties: false,
-        },
+        body: schemaAuthTokenUpdate,
         response: {
           200: schemaAuthTokenRead,
           400: { $ref: 'HttpError' },
@@ -81,10 +68,6 @@ export async function putAuthToken (fastify, _opts) {
       }
       if (protect !== undefined) {
         updateFields.push(SQL`protect = ${protect}`)
-      }
-
-      if (updateFields.length === 0) {
-        return reply.badRequest('No fields to update')
       }
 
       // Update the note and/or protect status

@@ -1,4 +1,5 @@
 import SQL from '@nearform/sql'
+import { schemaBulkDeleteRequest } from './schemas/schema-bulk-delete-request.js'
 import { schemaBulkDeleteResponse } from './schemas/schema-bulk-delete-response.js'
 
 /**
@@ -17,26 +18,7 @@ export async function bulkDeleteAuthTokens (fastify, _opts) {
         tags: ['auth-tokens'],
         summary: 'Bulk delete auth tokens',
         description: 'Delete all auth tokens that have not been used since a specified date. Cannot delete the current session or protected tokens.',
-        body: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            last_seen_before: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Delete tokens that were last seen before this date',
-            },
-            dry_run: {
-              type: 'boolean',
-              description: 'If true, shows what would be deleted without actually deleting',
-            },
-            allow_recent_deletes: {
-              type: 'boolean',
-              description: 'Required to delete tokens used within the last 7 days',
-            },
-          },
-          required: ['last_seen_before'],
-        },
+        body: schemaBulkDeleteRequest,
         response: {
           200: schemaBulkDeleteResponse,
           202: schemaBulkDeleteResponse,

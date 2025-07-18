@@ -27,35 +27,26 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
       description: 'When the token was last updated',
     },
     user_agent: {
-      type: ['string', 'null'],
+      type: ['string'],
+      nullable: true,
       description: 'The last user agent used with this token',
     },
     ip: {
-      type: ['string', 'null'],
+      type: ['string'],
+      nullable: true,
       description: 'The last IP address used with this token',
     },
     note: {
-      type: ['string', 'null'],
-      description: 'User-defined note to identify/describe the session',
+      type: ['string'],
+      maxLength: 255,
+      nullable: true,
+      default: null,
+      description: 'A note to identify the session (e.g., "Work laptop", "Home PC")',
     },
     protect: {
       type: 'boolean',
+      default: false,
       description: 'When true, prevents the token from being bulk deleted',
-    },
-  }
-})
-
-export const authTokenReadProps = /** @type {const} @satisfies {JSONSchema} */ ({
-  type: 'object',
-  required: ['jti', 'created_at', 'last_seen', 'is_current', 'last_seen_micros'],
-  properties: {
-    last_seen_micros: {
-      type: 'string',
-      description: 'Microsecond precision timestamp for pagination',
-    },
-    is_current: {
-      type: 'boolean',
-      description: 'Whether this token is the one currently being used for this request',
     },
   }
 })

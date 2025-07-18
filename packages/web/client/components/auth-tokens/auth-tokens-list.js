@@ -1,16 +1,39 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
+/**
+ * @import { TypeAuthTokenRead } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ */
+
 // @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
-import { bookmarkEdit } from './bookmark-edit.js'
-import { bookmarkView } from './bookmark-view.js'
+import { authTokensEdit } from './auth-tokens-edit.js'
+import { authTokensView } from './auth-tokens-view.js'
 import { diffBookmark } from '../../lib/diff-bookmark.js'
+import { diffToken } from '../../lib/diff-auth-token.js'
 
-export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
+/**
+ * @typedef {({
+ *  authToken,
+ *  reload,
+ *  onDelete
+ * }: {
+ *  authToken: TypeAuthTokenRead | null,
+ *  reload?: () => void,
+ *  onDelete?: () => void,
+ * }) => any} AuthTokenList
+ */
+
+ /**
+  * @type {AuthTokenList}
+  */
+export const bookmarkList = Component((/** @type{AuthTokenList} */({ authToken, reload, onDelete }) => {
   const state = useLSP()
+
+  /** @type {[boolean, (editing: boolean) => void]} */
   const [editing, setEditing] = useState(false)
+  /** @type {[boolean, (deleted: boolean) => void]} */
   const [deleted, setDeleted] = useState(false)
 
   const handleEdit = useCallback(() => {
@@ -21,8 +44,8 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newBookmark) => {
-    const payload = diffBookmark(bookmark, newBookmark)
+  const handleSave = useCallback(async (newAuthToken) => {
+    const payload = diffToken(authToken, newAuthToken)
 
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
 

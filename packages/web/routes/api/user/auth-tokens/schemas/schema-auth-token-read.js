@@ -1,4 +1,4 @@
-import { authTokenProps, authTokenReadProps } from './auth-token-base.js'
+import { authTokenProps } from './auth-token-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
@@ -7,6 +7,21 @@ import { authTokenProps, authTokenReadProps } from './auth-token-base.js'
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeAuthTokenRead
  */
+
+export const authTokenReadProps = /** @type {const} @satisfies {JSONSchema} */ ({
+  type: 'object',
+  required: ['jti', 'created_at', 'last_seen', 'is_current', 'last_seen_micros'],
+  properties: {
+    last_seen_micros: {
+      type: 'string',
+      description: 'Microsecond precision timestamp for pagination',
+    },
+    is_current: {
+      type: 'boolean',
+      description: 'Whether this token is the one currently being used for this request',
+    },
+  }
+})
 
 export const schemaAuthTokenRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',

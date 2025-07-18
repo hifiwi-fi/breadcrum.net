@@ -28,8 +28,9 @@ export const page = Component(() => {
 
   const {
     tokensError,
+    tokensLoading,
     tokens,
-    // reloadAuthTokens,
+    reloadAuthTokens,
     before,
     after,
     beforeParams,
@@ -58,12 +59,23 @@ export const page = Component(() => {
           : null
         }
       </dl>
-      <pre>${JSON.stringify(tokens, null, 2)}</pre>
-      <pre>${JSON.stringify(before, null, 2)}</pre>
-      <pre>${JSON.stringify(after, null, 2)}</pre>
-      <pre>${JSON.stringify(beforeParams, null, 2)}</pre>
-      <pre>${JSON.stringify(afterParams, null, 2)}</pre>
-      ${tokensError ? html`<pre>${JSON.stringify(tokensError, null, 2)}</pre>` : null}
+      <div>Auth Tokens</div>
+      <div>
+        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
+      </div>
+
+      ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
+      ${tokensError ? html`<div>${tokensError.message}</div>` : null}
+
+      ${Array.isArray(tokens)
+        ? tokens.map(b => html.for(b, b.jti)`${authTokensList({ bookmark: b, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
+        : null}
+
+      <div>
+        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
+      </div>
     </div>
 `
 })

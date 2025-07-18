@@ -1,3 +1,5 @@
+import { authTokenProps } from './auth-token-base.js'
+
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
  * @typedef {typeof schemaBulkDeleteResponse} SchemaBulkDeleteResponse
@@ -22,16 +24,8 @@ export const schemaBulkDeleteResponse = /** @type {const} @satisfies {JSONSchema
         type: 'object',
         additionalProperties: false,
         properties: {
-          jti: {
-            type: 'string',
-            format: 'uuid',
-            description: 'The JWT ID of the deleted token',
-          },
-          last_seen: {
-            type: 'string',
-            format: 'date-time',
-            description: 'When the token was last used',
-          },
+          jti: authTokenProps.properties.jti,
+          last_seen: authTokenProps.properties.last_seen,
         },
         required: ['jti', 'last_seen'],
       },

@@ -10,6 +10,8 @@ import SQL from '@nearform/sql'
  * @typedef {Object} JwtUser
  * @property {string} username - The username
  * @property {string} id - The UUID user id
+ * @property {string | null} [note] - Optional note for the auth token
+ * @property {boolean} [protect] - Optional protect status for the auth token
  */
 
 /**
@@ -118,10 +120,12 @@ export default fp(async function (fastify, _) {
       const ip = Array.isArray(this.request.ips) ? [...this.request.ips].pop() : this.request.ip
 
       const query = SQL`
-        insert into auth_tokens (owner_id, user_agent, ip) values (
+        insert into auth_tokens (owner_id, user_agent, ip, note, protect) values (
           ${user.id},
           ${userAgent || null},
-          ${ip || null}::inet
+          ${ip || null}::inet,
+          ${user.note || null},
+          ${user.protect || false}
         )
         returning jti;`
 
