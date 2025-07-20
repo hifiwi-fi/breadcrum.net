@@ -44,13 +44,13 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 - **Test resource cleanup**: Tests that create resources (users, tokens, etc.) should clean them up using appropriate test lifecycle hooks (`t.after()`)
 - **Database cascade deletes**: Resources should be designed with proper foreign key constraints and cascade deletes to automatically clean up dependent resources
 - **Auto-formatting**: Use `npm run test:eslint -- --fix` to automatically fix ESLint formatting errors
-- **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/top-bun`) to skip the resolve step and look up docs directly
+- **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/domstack`) to skip the resolve step and look up docs directly
 
 ## Client-Side Code
 
-- Client-side code is written using top-bun in the `packages/web/client` folder
+- Client-side code is written using @domstack/static in the `packages/web/client` folder
 - All client-side code is directly runnable in Node.js and browsers via esbuild
-- Client-side JavaScript bundles are built using top-bun's build system with esbuild
+- Client-side JavaScript bundles are built using @domstack/static's build system with esbuild
 - Page-specific client code goes in `client.js` files alongside page files
 - Layout-specific client code goes in `.layout.client.js` files
 - Global client code goes in `global.client.js`
@@ -78,7 +78,7 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `npm run test:node` - Run node tests with c8 coverage
 - `npm run test:eslint` - Run eslint
 - `npm run watch` - Start development server with file watching
-- `npm run build` - Build client assets with top-bun
+- `npm run build` - Build client assets with @domstack/static
 - `npm run migrate` - Run database migrations with postgrator
 - `npm run prod-sim` - Start production simulation
 - `npm run print-routes` - Print all fastify routes

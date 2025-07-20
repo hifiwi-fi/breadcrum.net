@@ -1,8 +1,7 @@
 import builder from 'xmlbuilder'
 
 /**
- * @template T
- * @typedef {import('top-bun').TemplateFunction<T>} TemplateFunction
+ * @import { TemplateFunction } from '@domstack/static'
  */
 
 /** @type {TemplateFunction<{

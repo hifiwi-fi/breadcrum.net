@@ -1,6 +1,5 @@
 /**
- * @template T
- * @typedef {import('top-bun').PageFunction<T>} PageFunction
+ * @import { PageFunction } from '@domstack/static'
  */
 
 export const vars = {
