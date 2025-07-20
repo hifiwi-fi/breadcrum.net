@@ -2,7 +2,7 @@ import { feedProps, feedReadProps } from '../../schemas/feed-base.js'
 import { feedDetailsHandler } from './feed-details-handler.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

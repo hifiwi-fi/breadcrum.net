@@ -4,7 +4,7 @@ import { PASSWORD_RESET_EXP, PASSWORD_RESET_TOKEN } from './password-reset-token
 import { userEditableUserProps } from '../schemas/user-base.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

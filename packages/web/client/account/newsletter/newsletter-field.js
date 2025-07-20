@@ -1,18 +1,37 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
+ */
+// @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 
-export const newsletterField = Component(({ user, reload }) => {
+/**
+ * @typedef {({
+ *  user,
+ *  reload,
+ * }: {
+ *  user: TypeUserRead | null,
+ *  reload: () => void,
+ * }) => any} NewsletterField
+ */
+
+/**
+ * @type {NewsletterField}
+ */
+export const newsletterField = Component(/** @type{NewsletterField} */({ user, reload }) => {
   const state = useLSP()
   const [error, setError] = useState(null)
   const [disabled, setDisabled] = useState(false)
 
-  const handleToggle = useCallback(async (ev) => {
+  const handleToggle = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
-    const newSubscriptionState = !user.newsletter_subscription
+    const newSubscriptionState = !user?.newsletter_subscription
 
     const formState = {
       newsletter_subscription: newSubscriptionState,
@@ -39,7 +58,7 @@ export const newsletterField = Component(({ user, reload }) => {
     } finally {
       setDisabled(false)
     }
-  }, [setDisabled, setError, user?.newsletter_subscription])
+  }, [state.apiUrl, setDisabled, setError, user?.newsletter_subscription, reload])
 
   return html`
   <dt>Newsletter</dt>

@@ -1,10 +1,20 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+// @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { passwordEdit } from './password-edit.js'
 import { passwordView } from './password-view.js'
 
-export const passwordField = Component(() => {
+/**
+ * @typedef {() => any} PasswordField
+ */
+
+/**
+ * @type {PasswordField}
+ */
+export const passwordField = Component(/** @type{PasswordField} */() => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
@@ -16,7 +26,7 @@ export const passwordField = Component(() => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async ({ password }) => {
+  const handleSave = useCallback(async (/** @type {{ password: string }} */{ password }) => {
     const endpoint = `${state.apiUrl}/user`
     const response = await fetch(endpoint, {
       method: 'put',

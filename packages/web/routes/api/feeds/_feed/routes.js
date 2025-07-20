@@ -3,7 +3,7 @@ import { putFeed } from './put-feed.js'
 import { deleteFeed } from './delete-feed.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

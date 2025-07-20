@@ -2,8 +2,7 @@ import { html } from 'uland-isomorphic'
 import { dirname } from 'node:path'
 
 /**
- * @template T
- * @typedef {import('top-bun').LayoutFunction<T>} LayoutFunction
+ * @import { LayoutFunction } from '@domstack/static'
  */
 
 /**

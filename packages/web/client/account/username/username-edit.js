@@ -1,11 +1,33 @@
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
+ */
+// @ts-expect-error
 import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
-export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
+/**
+ * @typedef {({
+ *  user,
+ *  onSave,
+ *  onCancelEdit,
+ * }: {
+ *  user: TypeUserRead | null,
+ *  onSave?: (formState: { username: string }) => Promise<void> | void,
+ *  onCancelEdit?: () => void,
+ * }) => any} UsernameEdit
+ */
+
+/**
+ * @type {UsernameEdit}
+ */
+export const usernameEdit = Component(/** @type{UsernameEdit} */({ user, onSave, onCancelEdit }) => {
   const [error, setError] = useState(null)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
@@ -19,7 +41,7 @@ export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
     }
 
     try {
-      await onSave(formState)
+      await onSave?.(formState)
     } catch (err) {
       setDisabled(false)
       setError(err)
@@ -34,7 +56,7 @@ export const usernameEdit = Component(({ user, onSave, onCancelEdit }) => {
       <div>
           <label class='block'>
             username:
-            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user.username}" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user?.username}" autocorrect="off" autocapitalize="off" spellcheck="false"/>
           </label>
         </div>
         <div class="bc-account-username-edit-submit-line">

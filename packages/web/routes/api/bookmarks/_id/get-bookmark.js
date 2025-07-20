@@ -1,7 +1,7 @@
 import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import {
  *  SchemaBookmarkWithArchivesAndEpisodes,
  * } from '../schemas/schema-bookmark-with-archives-and-episodes.js'

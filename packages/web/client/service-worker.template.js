@@ -1,5 +1,5 @@
 /**
- * @import {TemplateAsyncIterator} from 'top-bun'
+ * @import {TemplateAsyncIterator} from '@domstack/static'
  */
 
 import { stripIndent as js } from 'common-tags'

@@ -1,3 +1,6 @@
+/// <reference lib="dom" />
+
+// @ts-expect-error
 import { useRef, useReducer, useCallback, useEffect } from 'uland-isomorphic'
 
 export function useFetch (url, options) {

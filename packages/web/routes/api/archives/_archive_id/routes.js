@@ -3,7 +3,7 @@ import { putArchiveRoute } from './put-archive.js'
 import { deleteArchiveRoute } from './delete-archive.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 /**
  * @import { SchemaBookmarkCreate } from './schemas/schema-bookmark-create.js'
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
 import { oneLineTrim } from 'common-tags'

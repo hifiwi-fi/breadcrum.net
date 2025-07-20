@@ -2,7 +2,7 @@ import { resendAccountEmailVerificationHandler } from './resend-account-confirma
 import { resendPendingEmailVerificationHandler } from './resend-pending-confirmation.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

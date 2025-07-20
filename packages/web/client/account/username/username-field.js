@@ -1,10 +1,29 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
+ */
+// @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { usernameEdit } from './username-edit.js'
 import { usernameView } from './username-view.js'
 
-export const usernameField = Component(({ user, reload }) => {
+/**
+ * @typedef {({
+ *  user,
+ *  reload,
+ * }: {
+ *  user: TypeUserRead | null,
+ *  reload: () => void,
+ * }) => any} UsernameField
+ */
+
+/**
+ * @type {UsernameField}
+ */
+export const usernameField = Component(/** @type{UsernameField} */({ user, reload }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
@@ -16,7 +35,7 @@ export const usernameField = Component(({ user, reload }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async ({ username }) => {
+  const handleSave = useCallback(async (/** @type {{ username: string }} */{ username }) => {
     const endpoint = `${state.apiUrl}/user`
     const response = await fetch(endpoint, {
       method: 'put',
@@ -33,7 +52,7 @@ export const usernameField = Component(({ user, reload }) => {
     } else {
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     }
-  }, [user?.username, state.apiUrl, setEditing])
+  }, [user?.username, state.apiUrl, setEditing, reload])
 
   return html`
   ${

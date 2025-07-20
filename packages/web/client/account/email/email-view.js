@@ -1,7 +1,29 @@
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
+ */
+// @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 
-export const emailView = Component(({ user, onEdit, reload }) => {
+/**
+ * @typedef {({
+ *  user,
+ *  onEdit,
+ *  reload,
+ * }: {
+ *  user: TypeUserRead | null,
+ *  onEdit?: () => void,
+ *  reload: () => void,
+ * }) => any} EmailView
+ */
+
+/**
+ * @type {EmailView}
+ */
+export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reload }) => {
   const state = useLSP()
   const [error, setError] = useState(null)
 
@@ -12,7 +34,7 @@ export const emailView = Component(({ user, onEdit, reload }) => {
   const [emailUpdateVerificationRequested, setEmailUpdateVerificationRequested] = useState(false)
   const [cancellingEmailUpdate, setCancellingEmailUpdate] = useState(false)
 
-  const handleEmailConfirmRequest = useCallback(async (ev) => {
+  const handleEmailConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setRequestingEmailVerification(true)
     setError(null)
@@ -38,9 +60,9 @@ export const emailView = Component(({ user, onEdit, reload }) => {
     } finally {
       setRequestingEmailVerification(false)
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, setRequestingEmailVerification, setError, setEmailVerificationRequested])
 
-  const handleEmailUpdateConfirmRequest = useCallback(async (ev) => {
+  const handleEmailUpdateConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setRequestingEmailUpdateVerification(true)
     setError(null)
@@ -66,9 +88,9 @@ export const emailView = Component(({ user, onEdit, reload }) => {
     } finally {
       setRequestingEmailUpdateVerification(false)
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
 
-  const handleCancelEmailUpdate = useCallback(async (ev) => {
+  const handleCancelEmailUpdate = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setCancellingEmailUpdate(true)
     setError(null)
@@ -90,7 +112,7 @@ export const emailView = Component(({ user, onEdit, reload }) => {
       setError(err)
       setCancellingEmailUpdate(false)
     }
-  })
+  }, [state.apiUrl, setCancellingEmailUpdate, setError, reload])
 
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
@@ -108,7 +130,7 @@ export const emailView = Component(({ user, onEdit, reload }) => {
           }</button></div>`
         : null}
       ${user?.disabled_email
-      ? html`<div>This email is disabled due to delivery issues. Please reach out to support@breadcrum.net for furthur help, or update to a new email address.</div>`
+      ? html`<div>This email is disabled due to delivery issues. Please reach out to support@breadcrum.net for further help, or update to a new email address.</div>`
       : null}
       ${user?.pending_email_update
       ? html`

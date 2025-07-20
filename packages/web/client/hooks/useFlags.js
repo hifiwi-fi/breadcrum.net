@@ -1,5 +1,7 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { fetch } from 'fetch-undici'
+
+// @ts-expect-error
 import { useEffect, useState } from 'uland-isomorphic'
 import { useLSP } from './useLSP.js'
 

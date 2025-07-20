@@ -2,7 +2,7 @@ import { getFeeds } from './get-feeds.js'
 import { putFeeds } from './put-feeds.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**

@@ -1,5 +1,5 @@
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 import { getQueueStates } from './get-queue-states.js'
 import { getQueues } from './get-queues.js'

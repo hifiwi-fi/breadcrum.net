@@ -1,23 +1,40 @@
+/// <reference lib="dom" />
+
 /* eslint-env browser */
+
+/**
+ * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
+ */
+
+// @ts-expect-error
 import { useEffect, useState } from 'uland-isomorphic'
-import { fetch } from 'fetch-undici'
 import { useLSP } from './useLSP.js'
 
+/** @type {Promise<Response> | null} */
 let userRequest = null
 
+/**
+ * @param {{
+ *   reload?: number
+ * }} [params]
+ */
 export function useUser ({
   reload,
 } = {}) {
   const state = useLSP()
 
+  /** @type {[boolean, (loadingState: boolean) => void]} */
   const [loading, setLoading] = useState(false)
+  /** @type {[Error | null, (error: Error | null) => void]} */
   const [error, setError] = useState(null)
+  /** @type {[number, (dataRefresh: number) => void]} */
   const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {
     // TODO: set cache header correctly for authenticated pages and remove this
 
     // Refresh the page on back nav
+    /** @param {PageTransitionEvent} event */
     function pageNavHandler (event) {
       if (event.persisted) {
         console.log('refreshing state')
@@ -51,9 +68,10 @@ export function useUser ({
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const clone = response.clone()
+        /** @type {TypeUserRead} */
         const body = await clone.json()
         for (const k of Object.keys(body)) {
-          if (state.user?.[k] !== body[k]) {
+          if (state.user?.[/** @type {keyof TypeUserRead} */ (k)] !== body[/** @type {keyof TypeUserRead} */ (k)]) {
             console.log('Updating user state')
             state.user = body
             break

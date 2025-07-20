@@ -3,7 +3,7 @@ import { putBookmark } from './put-bookmark.js'
 import { deleteBookmark } from './delete-bookmark.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts' from './schemas/schema-bookmark-with-archives-and-episodes.js'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts' from './schemas/schema-bookmark-with-archives-and-episodes.js'
  */
 
 /**

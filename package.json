@@ -60,6 +60,6 @@
     "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg",
     "new-blogpost": "node scripts/create-blogpost.js --title",
     "publish-draft": "node scripts/publish-blogpost.js",
-    "watch-tb": "npm run -w @breadcrum/web top-bun-watch"
+    "watch-tb": "npm run -w @breadcrum/web domstack-watch"
   }
 }

@@ -1,4 +1,7 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+// @ts-expect-error
 import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { bookmarkEdit } from './bookmark-edit.js'

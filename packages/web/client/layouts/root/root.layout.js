@@ -1,4 +1,4 @@
-/** @import { LayoutFunction } from 'top-bun' */
+/** @import { LayoutFunction } from '@domstack/static' */
 
 import { html, render } from 'uland-isomorphic'
 import { header } from '../../components/header/index.js'

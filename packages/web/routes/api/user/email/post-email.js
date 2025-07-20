@@ -1,11 +1,10 @@
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 import SQL from '@nearform/sql'
 import { EMAIL_CONFIRM_TOKEN_EXP, EMAIL_CONFIRM_TOKEN } from './email-confirm-tokens.js'
 import { userEditableUserProps } from '../schemas/user-base.js'
-// @ts-ignore
 import { resolveEmail } from 'resolve-email'
 
 /**
@@ -68,17 +67,20 @@ export async function postEmailRoute (fastify, _opts) {
           return reply.conflict('An account already exists with the requested email address')
         }
 
-        const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
+        // Only validate email if EMAIL_VALIDATION is enabled
+        if (fastify.config.EMAIL_VALIDATION) {
+          const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
 
-        request.log[emailError ? 'error' : 'info']({
-          email,
-          emailResolves,
-          mxRecords,
-          emailError,
-        })
+          request.log[emailError ? 'error' : 'info']({
+            email,
+            emailResolves,
+            mxRecords,
+            emailError,
+          })
 
-        if (!emailResolves) {
-          return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
+          if (!emailResolves) {
+            return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
+          }
         }
 
         const updates = [

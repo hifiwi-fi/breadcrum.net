@@ -2,7 +2,7 @@ import { getArchivesRoute } from './get-archives.js'
 import { putArchives } from './put-archives.js'
 
 /**
- * @import { FastifyPluginAsyncJsonSchemaToTs } from '@bret/type-provider-json-schema-to-ts'
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
 /**
