@@ -11,7 +11,6 @@ import { newsletterField } from './newsletter/newsletter-field.js'
 import { emailField } from './email/email-field.js'
 import { useReload } from '../hooks/useReload.js'
 import { disabledField } from './disabled/disabled-field.js'
-import { useAuthTokens } from '../hooks/useAuthTokens.js'
 
 export const page = Component(() => {
   const window = useWindow()
@@ -25,17 +24,6 @@ export const page = Component(() => {
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
   }, [user, loading])
-
-  const {
-    tokensError,
-    tokensLoading,
-    tokens,
-    reloadAuthTokens,
-    before,
-    after,
-    beforeParams,
-    afterParams
-  } = useAuthTokens()
 
   return html`
     <div>
@@ -59,23 +47,6 @@ export const page = Component(() => {
           : null
         }
       </dl>
-      <div>Auth Tokens</div>
-      <div>
-        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
-      </div>
-
-      ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
-      ${tokensError ? html`<div>${tokensError.message}</div>` : null}
-
-      ${Array.isArray(tokens)
-        ? tokens.map(b => html.for(b, b.jti)`${authTokensList({ bookmark: b, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
-        : null}
-
-      <div>
-        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
-      </div>
     </div>
 `
 })
