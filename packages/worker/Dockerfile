@@ -5,7 +5,7 @@
 ## Do not pass secrets here.
 ARG ENV=production
 ARG NODE_ENV=production
-ARG NODE_VERSION=23
+ARG NODE_VERSION=24
 
 FROM node:${NODE_VERSION}-alpine AS base
 

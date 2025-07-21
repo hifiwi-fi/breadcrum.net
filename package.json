@@ -11,7 +11,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=23.0.0"
+    "node": ">=24.0.0"
   },
   "devDependencies": {
     "@voxpelli/tsconfig": "^15.0.0",
