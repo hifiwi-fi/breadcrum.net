@@ -1,4 +1,4 @@
-import { request as undiciRequest } from 'undici'
+import { Client, interceptors } from 'undici'
 import { pipeline } from 'node:stream/promises'
 import gunzip from 'gunzip-maybe'
 import concat from 'concat-stream'
@@ -24,36 +24,46 @@ export async function fetchHTML ({ url }) {
   const requestURL = url
   const ua = uaHacks[requestURL.hostname] ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
 
-  const response = await undiciRequest(requestURL, {
-    headers: {
-      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-      'user-agent': ua,
-    },
-    maxRedirections: 3,
-    autoSelectFamily: true,
-    headersTimeout: 15000,
-    bodyTimeout: 15000,
-  })
+  const client = new Client(requestURL.origin).compose(
+    interceptors.redirect({ maxRedirections: 3 })
+  )
 
-  if (response.statusCode > 299) {
-    const text = await response.body.text()
-    throw new Error(`Fetch HTML error (${response.statusCode}): ` + text)
-  }
+  try {
+    const response = await client.request({
+      path: requestURL.pathname + requestURL.search,
+      method: 'GET',
+      headers: {
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'user-agent': ua,
+      },
+      // @ts-expect-error Not in the types for some reason
+      autoSelectFamily: true,
+      headersTimeout: 15000,
+      bodyTimeout: 15000,
+    })
 
-  let html
-  if (response.headers['content-encoding'] === 'gzip') {
-    await pipeline(response.body, gunzip(), concat(gotData))
-
-    /**
-     * @param  {Buffer} htmlData
-     */
-    function gotData (htmlData) {
-      html = htmlData.toString('utf8')
+    if (response.statusCode > 299) {
+      const text = await response.body.text()
+      throw new Error(`Fetch HTML error (${response.statusCode}): ` + text)
     }
-  } else {
-    // If the content is not gzip-encoded, process it as usual
-    html = await response.body.text()
-  }
 
-  return html
+    let html
+    if (response.headers['content-encoding'] === 'gzip') {
+      await pipeline(response.body, gunzip(), concat(gotData))
+
+      /**
+       * @param  {Buffer} htmlData
+       */
+      function gotData (htmlData) {
+        html = htmlData.toString('utf8')
+      }
+    } else {
+      // If the content is not gzip-encoded, process it as usual
+      html = await response.body.text()
+    }
+
+    return html
+  } finally {
+    await client.close()
+  }
 }

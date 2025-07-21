@@ -68,7 +68,7 @@ export function makeArchivePgBossP ({ fastify }) {
         fastify.otel.archiveProcessingSeconds.record(totalDuration)
         fastify.otel.archiveJobFailedCounter.add(1)
 
-        log.error({ error: handledError, archiveId }, 'Error resolving Archive')
+        log.error(handledError, 'Error resolving Archive')
 
         if (archiveId && userId) {
           const errorQuery = SQL`
