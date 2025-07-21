@@ -7,26 +7,26 @@ import { useWindow } from './useWindow.js'
 const QueryContext = createContext()
 
 if (typeof window !== 'undefined') {
-  QueryContext.provide(window.location.search)
+  QueryContext.provide(new URLSearchParams(window.location.search))
   window.addEventListener('popstate', /** @param {Event} _ev */ (_ev) => {
-    QueryContext.provide(window.location.search)
+    QueryContext.provide(new URLSearchParams(window.location.search))
   })
 }
 
 /**
  * @returns {{
- *   query: string | null,
+ *   query: URLSearchParams | null,
  *   pushState: (url: string) => void
  * }}
  */
 export function useQuery () {
   const window = useWindow()
-  /** @type {string | null} */
+  /** @type {URLSearchParams | null} */
   const query = useContext(QueryContext)
 
   const pushState = useCallback(/** @param {string} url */ (url) => {
     const searchParams = (new URL(url)).search
-    QueryContext.provide(searchParams)
+    QueryContext.provide(new URLSearchParams(searchParams))
     window?.history.pushState({}, '', url)
   }, [window])
 
