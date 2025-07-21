@@ -47,8 +47,8 @@ export async function getSchedules (fastify, _opts) {
                     name: { type: 'string', description: 'Schedule name' },
                     cron: { type: 'string', description: 'Cron expression' },
                     timezone: { type: 'string', description: 'Timezone for cron execution' },
-                    data: { type: ['object', 'null'], additionalProperties: true, description: 'Job data template' },
-                    options: { type: ['object', 'null'], additionalProperties: true, description: 'Job options' },
+                    data: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job data template' },
+                    options: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job options' },
                     created_on: { type: 'string', format: 'date-time', description: 'Schedule creation time' },
                     updated_on: { type: 'string', format: 'date-time', description: 'Last update time' },
                   }

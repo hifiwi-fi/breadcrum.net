@@ -95,12 +95,12 @@ export async function getJobs (fastify, _opts) {
                     retry_count: { type: 'integer', description: 'Number of retry attempts' },
                     retry_limit: { type: 'integer', description: 'Maximum retry attempts' },
                     created_on: { type: 'string', format: 'date-time', description: 'Job creation time' },
-                    started_on: { type: ['string', 'null'], format: 'date-time', description: 'Job start time' },
-                    completed_on: { type: ['string', 'null'], format: 'date-time', description: 'Job completion time' },
+                    started_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Job start time' },
+                    completed_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Job completion time' },
                     keep_until: { type: 'string', format: 'date-time', description: 'Job retention time' },
                     data: { type: 'object', additionalProperties: true, description: 'Job payload' },
-                    output: { type: ['object', 'null'], additionalProperties: true, description: 'Job output' },
-                    singleton_key: { type: ['string', 'null'], description: 'Singleton key if applicable' },
+                    output: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job output' },
+                    singleton_key: { type: ['string'], nullable: true, description: 'Singleton key if applicable' },
                   }
                 }
               },

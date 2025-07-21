@@ -137,7 +137,8 @@ await suite('get specific auth token', async () => {
       assert.ok(token.jti, 'Should have jti')
       assert.ok(token.created_at, 'Should have created_at')
       assert.ok(token.last_seen, 'Should have last_seen')
-      assert.ok(token.last_seen_micros, 'Should have last_seen_micros')
+      assert.ok(!token.last_seen_micros, 'Should not have last_seen_micros')
+      assert.ok(token.updated_at, 'Should have updated_at')
       assert.strictEqual(typeof token.is_current, 'boolean', 'Should have is_current boolean')
 
       // Check optional fields exist (can be null)

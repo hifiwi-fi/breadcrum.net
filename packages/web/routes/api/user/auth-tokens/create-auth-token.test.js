@@ -212,7 +212,7 @@ await suite('create auth token', async () => {
       assert.ok(authToken.jti, 'Should have jti')
       assert.ok(authToken.created_at, 'Should have created_at')
       assert.ok(authToken.last_seen, 'Should have last_seen')
-      assert.ok(authToken.last_seen_micros, 'Should have last_seen_micros')
+      assert.ok(!authToken.last_seen_micros, 'Should not have last_seen_micros')
       assert.ok(authToken.updated_at, 'Should have updated_at')
       assert.strictEqual(typeof authToken.is_current, 'boolean', 'Should have is_current boolean')
       assert.strictEqual(typeof authToken.protect, 'boolean', 'Should have protect boolean')

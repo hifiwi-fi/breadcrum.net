@@ -66,12 +66,14 @@ export async function listAuthTokens (fastify, _opts) {
                 type: 'object',
                 properties: {
                   before: {
-                    type: ['string', 'null'],
+                    type: ['string'],
+                    nullable: true,
                     pattern: '^\\d+:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
                     description: 'Cursor for fetching previous page (microseconds:jti)',
                   },
                   after: {
-                    type: ['string', 'null'],
+                    type: ['string'],
+                    nullable: true,
                     pattern: '^\\d+:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
                     description: 'Cursor for fetching next page (microseconds:jti)',
                   },

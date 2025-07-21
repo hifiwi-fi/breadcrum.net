@@ -18,7 +18,8 @@ export default async function tagsMergeRoutes (fastify, _opts) {
           type: 'object',
           properties: {
             source: {
-              type: ['array', 'null'],
+              type: ['array'],
+              nullable: true,
               items: {
                 type: 'string', minLength: 1, maxLength: 255,
               },

@@ -100,7 +100,7 @@ export async function getSummary (fastify, _opts) {
                     created_on: { type: 'string', format: 'date-time', description: 'When job was created' },
                     completed_on: { type: 'string', format: 'date-time', description: 'When job failed' },
                     retry_count: { type: 'integer', description: 'Number of retry attempts' },
-                    output: { type: ['object', 'null'], additionalProperties: true, description: 'Error output' },
+                    output: { type: ['object'], nullable: true, additionalProperties: true, description: 'Error output' },
                   }
                 }
               },
@@ -108,7 +108,7 @@ export async function getSummary (fastify, _opts) {
                 type: 'object',
                 description: 'Maintenance status',
                 properties: {
-                  last_run: { type: ['string', 'null'], format: 'date-time', description: 'Last maintenance run' },
+                  last_run: { type: ['string'], nullable: true, format: 'date-time', description: 'Last maintenance run' },
                   overdue: { type: 'boolean', description: 'Whether maintenance is overdue' },
                 }
               }

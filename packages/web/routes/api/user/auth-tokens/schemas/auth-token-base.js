@@ -40,12 +40,10 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
       type: ['string'],
       maxLength: 255,
       nullable: true,
-      default: null,
       description: 'A note to identify the session (e.g., "Work laptop", "Home PC")',
     },
     protect: {
       type: 'boolean',
-      default: false,
       description: 'When true, prevents the token from being bulk deleted',
     },
   }

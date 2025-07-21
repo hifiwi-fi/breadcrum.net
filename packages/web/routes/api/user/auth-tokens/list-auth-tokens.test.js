@@ -14,7 +14,7 @@ await suite('list auth tokens', async () => {
 
     await t.test('returns paginated list of tokens', async (t) => {
       const user = await createTestUser(app, t)
-      if (!user) return // Registration disabled
+      if (!user) assert.fail('Could not create a user')
 
       const listRes = await app.inject({
         method: 'GET',
@@ -73,7 +73,7 @@ await suite('list auth tokens', async () => {
       // Check date formats
       assert.ok(new Date(token.created_at).getTime() > 0, 'created_at should be valid date')
       assert.ok(new Date(token.last_seen).getTime() > 0, 'last_seen should be valid date')
-      assert.ok(/^\d+$/.test(token.last_seen_micros), 'last_seen_micros should be numeric string')
+      assert.ok(!('last_seen_micros' in token), 'last_seen_micros should not be anything')
     })
   })
 

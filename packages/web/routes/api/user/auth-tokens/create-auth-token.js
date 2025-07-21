@@ -32,7 +32,7 @@ export async function createAuthToken (fastify, _opts) {
     },
     async function createAuthTokenHandler (request, reply) {
       const { id: userId, username, jti: currentJti } = request.user
-      const { note, protect = false } = request.body
+      const { note, protect } = request.body
 
       // Create the JWT token using the decorated function with note and protect
       const token = await reply.createJWTToken({

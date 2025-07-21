@@ -27,18 +27,24 @@ import SQL from '@nearform/sql'
  */
 
 /**
+ * @typedef {TypeAuthTokenRead & {
+ *   last_seen_micros: string
+ * }} AuthTokenQueryRead
+ */
+
+/**
  * Retrieves auth tokens based on the provided query parameters.
  *
  * @function getAuthTokens
  * @param {GetAuthTokensParams} getAuthTokensParams - Parameters to shape the query.
- * @returns {Promise<TypeAuthTokenRead[]>} An array of auth token objects.
+ * @returns {Promise<AuthTokenQueryRead[]>} An array of auth token objects.
  */
 export async function getAuthTokens (getAuthTokensParams) {
   const { fastify, pg, ...getAuthTokensQueryParams } = getAuthTokensParams
   const client = pg ?? fastify.pg
   const query = getAuthTokensQuery(getAuthTokensQueryParams)
 
-  /** @type {QueryResult<TypeAuthTokenRead>} */
+  /** @type {QueryResult<AuthTokenQueryRead>} */
   const results = await client.query(query)
   return results.rows
 }

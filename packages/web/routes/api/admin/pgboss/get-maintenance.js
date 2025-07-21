@@ -35,9 +35,9 @@ export async function getMaintenance (fastify, _opts) {
           200: {
             type: 'object',
             properties: {
-              version: { type: ['integer', 'null'], description: 'pg-boss schema version' },
-              maintained_on: { type: ['string', 'null'], format: 'date-time', description: 'Last maintenance run time' },
-              monitored_on: { type: ['string', 'null'], format: 'date-time', description: 'Last monitor run time' },
+              version: { type: ['integer'], nullable: true, description: 'pg-boss schema version' },
+              maintained_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Last maintenance run time' },
+              monitored_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Last monitor run time' },
               maintenance_interval_seconds: { type: 'integer', description: 'Maintenance interval in seconds' },
               monitor_interval_seconds: { type: 'integer', description: 'Monitor interval in seconds' },
               archive_completed_after_seconds: { type: 'integer', description: 'Archive completed jobs after seconds' },

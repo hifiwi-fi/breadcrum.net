@@ -82,8 +82,8 @@ export async function getArchivesRoute (fastify, _opts) {
               pagination: {
                 type: 'object',
                 properties: {
-                  before: { type: ['string', 'null'], format: 'date-time' },
-                  after: { type: ['string', 'null'], format: 'date-time' },
+                  before: { type: ['string'], nullable: true, format: 'date-time' },
+                  after: { type: ['string'], nullable: true, format: 'date-time' },
                   top: { type: 'boolean' },
                   bottom: { type: 'boolean' },
                 },

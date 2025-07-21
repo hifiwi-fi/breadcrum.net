@@ -54,7 +54,7 @@ export async function getQueues (fastify, _opts) {
                     retry_backoff: { type: 'boolean', description: 'Use exponential backoff for retries' },
                     expire_seconds: { type: 'integer', description: 'Job expiration time in seconds' },
                     retention_minutes: { type: 'integer', description: 'How long to keep completed jobs in minutes' },
-                    dead_letter: { type: ['string', 'null'], description: 'Dead letter queue name' },
+                    dead_letter: { type: ['string'], nullable: true, description: 'Dead letter queue name' },
                     created_on: { type: 'string', format: 'date-time', description: 'Queue creation time' },
                     updated_on: { type: 'string', format: 'date-time', description: 'Last update time' },
                   }

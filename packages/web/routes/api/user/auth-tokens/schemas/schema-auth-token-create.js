@@ -11,8 +11,14 @@ export const schemaAuthTokenCreate = /** @type {const} @satisfies {JSONSchema} *
   $id: 'schema:breadcrum:auth-token:create',
   additionalProperties: false,
   properties: {
-    note: authTokenProps.properties.note,
-    protect: authTokenProps.properties.protect,
+    note: {
+      ...authTokenProps.properties.note,
+      default: null
+    },
+    protect: {
+      ...authTokenProps.properties.protect,
+      default: false
+    },
   },
-  required: ['protect'],
+  required: [],
 })
