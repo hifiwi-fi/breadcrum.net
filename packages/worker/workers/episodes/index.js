@@ -35,6 +35,8 @@ export function makeEpisodePgBossP ({ fastify }) {
 
       const jobStartTime = performance.now()
 
+      log.info({ userId, url, bookmarkTitle, episodeId, medium }, 'processing episode')
+
       try {
         const media = await getYTDLPMetadata({
           url,

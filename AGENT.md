@@ -4,12 +4,36 @@ This is a TypeScript-in-JavaScript type checked codebase. All code uses JSDoc co
 
 ## JSDoc Typing Patterns
 
+### Use newer @import syntax in jsdoc/ts-in-js
+
+Avoid inline imports as much as possible and prefer the newer @import syntax placed near the top level imports.
+
+Instead of this:
+
+```javascript
+/** @type {import('pg').QueryResult<TypeUserRead>} */
+const results = await client.query(query)
+```
+
+Do this
+
+```javascript
+/** @import {QueryResult} from 'pg' */
+
+// Other imports/code...
+
+/** @type {QueryResult<TypeUserRead>} */
+const results = await client.query(query)
+```
+
 ### Typing Database Query Results
 
 When working with PostgreSQL queries using `pg`, you can type the query results without casting by declaring the type on the variable:
 
 ```javascript
-/** @type {import('pg').QueryResult<TypeUserRead>} */
+/** @import {QueryResult} from 'pg' */
+
+/** @type {QueryResult<TypeUserRead>} */
 const results = await client.query(query)
 return results.rows[0] // Automatically typed as TypeUserRead | undefined
 ```

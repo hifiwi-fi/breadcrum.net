@@ -66,6 +66,7 @@ const PinoLevelToSeverityLookup = {
 export const options = {
   trustProxy: true,
   genReqId: function (/* req */) { return hid() },
+  disableRequestLogging: true,
   logger: {
     mixin () {
       return {

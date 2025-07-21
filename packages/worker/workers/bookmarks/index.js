@@ -48,10 +48,11 @@ export function makeBookmarkPgBossP ({ fastify }) {
       const pg = fastify.pg
 
       const jobStartTime = performance.now()
-
       // Get full job metadata to access retry count
       const jobWithMetadata = await fastify.pgboss.boss.getJobById(job.name, job.id)
       const retryCount = jobWithMetadata?.retryCount || 0
+
+      log.info({ userId, bookmarkId, url, resolveBookmark, resolveArchive, resolveEpisode, userProvidedMeta: Boolean(userProvidedMeta), retryCount }, 'processing bookmark')
 
       /** workingUrl is the URL to fetch subsequent data with. It is probably normalized but might not be. */
       const workingUrl = new URL(url)
@@ -62,6 +63,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       /** @type { YTDLPMetadata | undefined } */
       let media
       if (resolveEpisode) {
+        log.info({ url }, 'resolving episode')
         try {
           media = await getYTDLPMetadata({
             url,
@@ -89,6 +91,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       let document
       if (resolveBookmark || resolveArchive /* TODO: && !youtube */) {
         // TODO: Handle xhtml, pdfs etc.
+        log.info({ resolveBookmark, resolveArchive }, 'resolving document')
         const fetchStartTime = performance.now()
         try {
           const html = await fetchHTML({ url: workingUrl })
@@ -121,6 +124,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       let pageMetadata
       if (resolveBookmark && document) {
         const metadataStartTime = performance.now()
+        log.info({ }, 'resolving bookmark with document')
         try {
           pageMetadata = await getSiteMetadata({
             url: workingUrl,
@@ -152,6 +156,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       /** @type {ReadabilityParseResult | undefined} */
       let article
       if (resolveArchive && document) {
+        log.info({ }, 'resolving archive with document')
         try {
           article = await extractArchive({ document })
         } catch (err) {
@@ -173,6 +178,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       if (resolveEpisode && media) {
         const mediaUrlFound = media?.url
         const upcomingData = upcomingCheck({ media })
+        log.info({ upcomingData, mediaUrlFound }, 'resolving episode')
         /** @type {CreatedEpisode | undefined} */
         let episodeEntity
         try {
@@ -244,6 +250,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       }
 
       if (resolveBookmark && pageMetadata) {
+        log.info({ }, 'resolving metadata')
         // Set the tags
         if (pageMetadata?.tags?.length > 0 && !(userProvidedMeta?.tags?.length > 0)) {
           await putTagsQuery({
@@ -287,6 +294,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       }
 
       if (resolveArchive && article && article.title && article.content) {
+        log.info({ }, 'creating archive')
         const { id: archiveId } = await createArchive({
           client: pg,
           userId,

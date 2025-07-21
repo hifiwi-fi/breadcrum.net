@@ -30,7 +30,6 @@ export async function fetchHTML ({ url }) {
       'user-agent': ua,
     },
     maxRedirections: 3,
-    // @ts-ignore
     autoSelectFamily: true,
     headersTimeout: 15000,
     bodyTimeout: 15000,

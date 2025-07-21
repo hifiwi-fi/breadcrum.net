@@ -36,6 +36,7 @@ export function makeArchivePgBossP ({ fastify }) {
       const jobStartTime = performance.now()
 
       try {
+        log.info({ url, userId, archiveId }, 'processing document')
         const fetchStartTime = performance.now()
         const html = await fetchHTML({ url: new URL(url) })
         const fetchDuration = (performance.now() - fetchStartTime) / 1000
