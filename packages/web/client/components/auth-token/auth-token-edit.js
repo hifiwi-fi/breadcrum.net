@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeAuthTokenRead } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ * @import { SchemaAuthTokenRead } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js';
 */
 
@@ -17,7 +17,7 @@ import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic
  *  onCancelEdit,
  *  legend
  * }: {
- *  authToken: TypeAuthTokenRead,
+ *  authToken: SchemaAuthTokenRead,
  *  onSave?: (newAuthToken: TypeAuthTokenUpdate) => Promise<void>,
  *  onDeleteAuthToken?: () => Promise<void>,
  *  onCancelEdit?: () => void,

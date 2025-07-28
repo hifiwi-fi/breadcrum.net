@@ -1,12 +1,34 @@
 .bc-auth-token-view {
-  padding-bottom: 4px;
-  margin-bottom: 4px;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--accent-background);
 }
 
+.bc-auth-token-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+/* Status and note row */
+.bc-auth-token-status-note-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.bc-auth-token-label {
+  color: var(--accent-foreground);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
 .bc-auth-token-note {
-  font-weight: 600;
+  font-weight: 500;
   word-break: break-word;
+  min-width: 0;
 }
 
 .bc-auth-token-note-empty {
@@ -14,70 +36,115 @@
   font-style: italic;
 }
 
-.bc-auth-token-status-badges {
-  display: inline-flex;
-  gap: 0.5em;
-  margin-left: 0.5em;
-}
-
 .bc-auth-token-current-badge,
 .bc-auth-token-protected-badge {
-  color: var(--accent-foreground);
   font-size: 0.8em;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-weight: 500;
+  flex-shrink: 0;
 }
 
 .bc-auth-token-current-badge {
   color: var(--bc-episodes-color);
+  background-color: color-mix(in srgb, var(--bc-episodes-color) 10%, transparent);
 }
 
-.bc-auth-token-title-line {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 0.5em;
-  align-items: center;
-}
-
-.bc-auth-token-jti {
-  font-size: 0.8em;
+.bc-auth-token-protected-badge {
   color: var(--accent-foreground);
+  background-color: var(--accent-background);
 }
 
-.bc-auth-token-jti code {
+/* JTI separator and value styling */
+.bc-auth-token-separator {
+  color: var(--accent-midground);
+  font-weight: 300;
+}
+
+.bc-auth-token-jti-value {
   font-family: var(--font-code);
+  font-size: 0.9em;
+  word-break: break-all;
+  min-width: 0;
+}
+
+/* Dates row */
+.bc-auth-token-dates {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .bc-date {
-  font-size: 0.8em;
+  font-size: 0.8rem;
+  min-width: 0;
 }
 
-.bc-date a {
+.bc-date {
   color: var(--accent-foreground);
 }
 
-.bc-auth-token-details {
+/* Source and JTI row */
+.bc-auth-token-source-jti-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.25em;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--accent-foreground);
 }
 
-.bc-auth-token-source {
-  font-size: 0.8em;
+/* Client info row */
+.bc-auth-token-client-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
   color: var(--accent-foreground);
+}
+
+.bc-auth-token-source,
+.bc-auth-token-user-agent,
+.bc-auth-token-ip {
+  min-width: 0;
+  word-break: break-word;
 }
 
 .bc-auth-token-source-value {
   font-weight: 500;
   text-transform: capitalize;
+  color: var(--text);
 }
 
-.bc-auth-token-user-agent,
-.bc-auth-token-ip {
-  font-size: 0.8em;
-  color: var(--accent-foreground);
-}
-
-.bc-auth-token-user-agent code,
 .bc-auth-token-ip code {
   font-family: var(--font-code);
+  font-size: 0.9em;
   word-break: break-all;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 600px) {
+  .bc-auth-token-dates {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bc-auth-token-source-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bc-auth-token-client-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+
+}
+
+@media (max-width: 400px) {
+  .bc-auth-token-header-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

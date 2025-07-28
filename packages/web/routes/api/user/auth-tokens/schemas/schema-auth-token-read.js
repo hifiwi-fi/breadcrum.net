@@ -5,7 +5,8 @@ import { authTokenProps } from './auth-token-base.js'
  * @typedef {typeof schemaAuthTokenRead} SchemaAuthTokenRead
  * @typedef {FromSchema<SchemaAuthTokenRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
- * }>} TypeAuthTokenRead
+ * }>} TypeAuthTokenReadSerialize
+ * @typedef {FromSchema<SchemaAuthTokenRead>} TypeAuthTokenReadClient
  */
 
 export const schemaAuthTokenRead = /** @type {const} @satisfies {JSONSchema} */ ({
