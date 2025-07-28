@@ -1,6 +1,6 @@
 import '@fastify/jwt'
 import 'fastify'
-import { JwtUser, JwtUserWithTokenId } from './jwt.js'
+import { JwtUser, JwtUserWithTokenId, AuthTokenSource } from './jwt.js'
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -18,7 +18,7 @@ declare module 'fastify' {
      * @returns The generated JWT token.
      * @throws If no jti is returned when creating an auth token.
      */
-    createJWTToken(user: JwtUser): Promise<string>;
+    createJWTToken(user: JwtUser, source: AuthTokenSource): Promise<string>;
 
     /**
      * Sets a JWT cookie from the given token.

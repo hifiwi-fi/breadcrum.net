@@ -52,8 +52,10 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 
 ## SQL
 
-- Breadcrum uses posgres
+- Breadcrum uses postgres
 - Use `FETCH FIRST n ROWS ONLY` over `LIMIT`
+- Use lowercase SQL keywords and identifiers (e.g., `alter table`, `drop column`, `create index`)
+- SQL files should follow lowercase style consistently
 
 ## Testing
 
@@ -69,6 +71,8 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 - **Database cascade deletes**: Resources should be designed with proper foreign key constraints and cascade deletes to automatically clean up dependent resources
 - **Auto-formatting**: Use `npm run test:eslint -- --fix` to automatically fix ESLint formatting errors
 - **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/domstack`) to skip the resolve step and look up docs directly
+- Avoid branching or skipping tests. If something isn't right fail the tests.
+- Avoid using colsole debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
 
 ## Client-Side Code
 
@@ -85,6 +89,71 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 /// <reference lib="dom" />
 /* eslint-env browser */
 ```
+
+## uhtml Template Constraints
+
+- **Single interpolation per attribute**: uhtml only supports one tagged template interpolation per HTML attribute
+  ```javascript
+  // ❌ Won't work - multiple interpolations
+  class="${someClass} ${anotherClass}"
+
+  // ✅ Works - single interpolation
+  class="${`${someClass} ${anotherClass}`}"
+  class="${someClass + ' ' + anotherClass}"
+  ```
+
+- **Use classnames for conditional classes**: Import and use `classnames` as `cn` for class attribute toggles
+  ```javascript
+  import cn from 'classnames'
+
+  // Use cn for conditional classes
+  class="${cn({
+    'bc-item': true,
+    'bc-item-active': isActive,
+    'bc-item-disabled': isDisabled
+  })}"
+  ```
+
+- **DOM attributes, not React conventions**: uhtml uses actual DOM attribute names
+  ```javascript
+  // ❌ Wrong - React style
+  <div className="my-class" />
+
+  // ✅ Correct - DOM attributes
+  <div class="my-class" />
+  ```
+
+- **Special attribute prefixes**:
+  - `?attribute=${value}` - Boolean attributes (added when truthy, removed when falsy)
+    ```javascript
+    <button ?disabled=${isLoading}>Submit</button>
+    ```
+  - `.property=${value}` - Direct property setter
+    ```javascript
+    <input .value=${inputValue} />
+    ```
+  - `@event=${handler}` or `onevent=${handler}` - Event listeners
+    ```javascript
+    <button @click=${handleClick}>Click me</button>
+    <button onclick=${handleClick}>Click me</button>
+    ```
+  - `ref=${object}` - Element references (object.current or callback)
+  - `aria=${object}` - Aria attributes object
+  - `.dataset=${object}` - Data attributes object
+
+### uhtml Template Guidelines
+
+- **Single interpolation per attribute**: uhtml only supports one template interpolation per HTML attribute
+  ```js
+  // ❌ Wrong - multiple interpolations
+  class="${someClass} ${anotherClass}"
+
+  // ✅ Correct - single interpolation
+  class="${`${someClass} ${anotherClass}`}"
+  ```
+- **Use classnames for class toggles**: Always import and use `classnames` as `cn` for conditional classes
+  ```js
+  import cn
 
 ## Package.json Scripts
 

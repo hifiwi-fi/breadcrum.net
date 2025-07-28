@@ -18,11 +18,10 @@ import SQL from '@nearform/sql'
  *
  * @function getBookmark
  * @param {GetBookmarksParams} getBookmarksParams - Parameters to shape the query.
- * @returns {Promise<TypeBookmarkRead| undefined >} A bookmark object or null if not found.
+ * @returns {Promise<TypeBookmarkRead | undefined >} A bookmark object or null if not found.
  */
 export async function getBookmark (getBookmarksParams) {
-  /** @type {TypeBookmarkRead | undefined } */
-  const bookmark = (await getBookmarks(getBookmarksParams))?.[0]
+  const bookmark = (await getBookmarks(getBookmarksParams))[0]
   return bookmark
 }
 

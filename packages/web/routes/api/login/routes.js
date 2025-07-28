@@ -71,7 +71,7 @@ export default async function loginRoutes (fastify, _opts) {
       if (foundUser) {
         const user = rows.pop()
 
-        const token = await reply.createJWTToken({ id: user.id, username: user.username })
+        const token = await reply.createJWTToken({ id: user.id, username: user.username }, 'web')
         reply.setJWTCookie(token)
 
         reply.statusCode = 201

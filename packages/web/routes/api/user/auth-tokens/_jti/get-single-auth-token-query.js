@@ -1,12 +1,13 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { TypeAuthTokenRead } from '../schemas/schema-auth-token-read.js'
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  * @import { QueryResult } from 'pg'
  * @import { SqlStatement } from '@nearform/sql'
+ * @import { AuthTokenQueryRead, AuthTokenQueryReadDbResult } from '../get-auth-tokens-query.js'
  */
 
 import SQL from '@nearform/sql'
+import { parseUserAgent } from '../get-auth-tokens-query.js'
 
 /**
  * @typedef {GetSingleAuthTokenQueryParams & {
@@ -21,16 +22,24 @@ import SQL from '@nearform/sql'
  *
  * @function getSingleAuthToken
  * @param {GetSingleAuthTokenParams} getSingleAuthTokenParams - Parameters to shape the query.
- * @returns {Promise<TypeAuthTokenRead | undefined>} An auth token object or undefined if not found.
+ * @returns {Promise<AuthTokenQueryRead | undefined>} An auth token object or undefined if not found.
  */
 export async function getSingleAuthToken (getSingleAuthTokenParams) {
   const { fastify, pg, ...getSingleAuthTokenQueryParams } = getSingleAuthTokenParams
   const client = pg ?? fastify.pg
   const query = getSingleAuthTokenQuery(getSingleAuthTokenQueryParams)
 
-  /** @type {QueryResult<TypeAuthTokenRead>} */
+  /** @type {QueryResult<AuthTokenQueryReadDbResult>} */
   const results = await client.query(query)
-  return results.rows[0]
+
+  const rawResult = results.rows[0]
+  if (!rawResult) {
+    return undefined
+  }
+
+  const parsedResult = parseUserAgent(rawResult)
+
+  return parsedResult
 }
 
 /**
@@ -62,6 +71,7 @@ export const getSingleAuthTokenQuery = ({
       user_agent,
       ip,
       note,
+      source,
       protect,
       ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}
     FROM auth_tokens

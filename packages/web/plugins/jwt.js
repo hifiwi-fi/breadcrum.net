@@ -7,7 +7,7 @@ import SQL from '@nearform/sql'
  */
 
 /**
- * @typedef {Object} JwtUser
+ * @typedef {object} JwtUser
  * @property {string} username - The username
  * @property {string} id - The UUID user id
  * @property {string | null} [note] - Optional note for the auth token
@@ -18,6 +18,10 @@ import SQL from '@nearform/sql'
  * @typedef {JwtUser & { jti: string }} JwtUserWithTokenId
  * @property {string} jti - The ID of the JWT auth token
  */
+
+/**
+  * @typedef {'web' | 'api'} AuthTokenSource
+  */
 
 /**
  * This plugins adds jwt token support
@@ -112,20 +116,22 @@ export default fp(async function (fastify, _) {
      *
      * @async
      * @param {JwtUser} user - The user object containing the username and id.
+     * @param {AuthTokenSource} source - What source we should mark the API token as.
      * @returns {Promise<string>} The generated JWT token.
      * @throws {Error} If no jti is returned when creating an auth token.
      */
-    async function (user) {
+    async function (user, source) {
       const userAgent = this.request.headers['user-agent']
       const ip = Array.isArray(this.request.ips) ? [...this.request.ips].pop() : this.request.ip
 
       const query = SQL`
-        insert into auth_tokens (owner_id, user_agent, ip, note, protect) values (
+        insert into auth_tokens (owner_id, user_agent, ip, note, protect, source) values (
           ${user.id},
           ${userAgent || null},
           ${ip || null}::inet,
           ${user.note || null},
-          ${user.protect || false}
+          ${user.protect || false},
+          ${source}
         )
         returning jti;`
 

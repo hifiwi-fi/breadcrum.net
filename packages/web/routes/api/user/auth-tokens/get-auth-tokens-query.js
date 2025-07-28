@@ -1,12 +1,12 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { TypeAuthTokenRead } from './schemas/schema-auth-token-read.js'
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  * @import { QueryResult } from 'pg'
  * @import { SqlStatement } from '@nearform/sql'
  */
 
 import SQL from '@nearform/sql'
+import Useragent from 'useragent'
 
 /**
  * @typedef {object} GetAuthTokensQueryParams
@@ -27,12 +27,6 @@ import SQL from '@nearform/sql'
  */
 
 /**
- * @typedef {TypeAuthTokenRead & {
- *   last_seen_micros: string
- * }} AuthTokenQueryRead
- */
-
-/**
  * Retrieves auth tokens based on the provided query parameters.
  *
  * @function getAuthTokens
@@ -44,13 +38,86 @@ export async function getAuthTokens (getAuthTokensParams) {
   const client = pg ?? fastify.pg
   const query = getAuthTokensQuery(getAuthTokensQueryParams)
 
-  /** @type {QueryResult<AuthTokenQueryRead>} */
+  /** @type {QueryResult<AuthTokenQueryReadDbResult>} */
   const results = await client.query(query)
-  return results.rows
+
+  /** @type {AuthTokenQueryRead[]} */
+  const reshaped = results.rows.map(parseUserAgent)
+
+  return reshaped
 }
 
 /**
- * Constructs a SQL query to fetch auth tokens for a specific user.
+ *
+ * @param {AuthTokenQueryReadDbResult} authToken
+ * @returns AuthTokenQueryRead
+ */
+export function parseUserAgent (authToken) {
+  const parsedAgent = authToken.user_agent ? Useragent.lookup(authToken.user_agent) : null
+  return {
+    ...authToken,
+    user_agent: parsedAgent
+      ? {
+          family: parsedAgent.family,
+          major: parsedAgent.major,
+          minor: parsedAgent.minor,
+          patch: parsedAgent.patch,
+          device: { ...parsedAgent.device },
+          os: { ...parsedAgent.os },
+          raw: authToken.user_agent
+        }
+      : null
+  }
+}
+
+/**
+ * @typedef {object} Device
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ */
+
+/**
+ * @typedef {object} OS
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ */
+
+/**
+ * @typedef {object} UserAgentJson
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ * @property {Device} device
+ * @property {OS} os
+ * @property {string} raw
+ */
+
+/**
+ * @typedef {object} AuthTokenQueryRead
+ * @property {string} jti
+ * @property {"web" | "api"} source
+ * @property {Date} created_at
+ * @property {Date} updated_at
+ * @property {Date} last_seen
+ * @property {string} last_seen_micros
+ * @property {boolean} is_current
+ * @property {boolean} protect
+ * @property {string | null} note
+ * @property {UserAgentJson | null} user_agent
+ * @property {string | null} ip
+ */
+
+/**
+ * @typedef {Omit<AuthTokenQueryRead, 'user_agent'> & { user_agent: string }} AuthTokenQueryReadDbResult
+ */
+
+/**
+ * Constructs a SQL query to fetch auth tokens for a specißfic user.
  *
  * @function getAuthTokensQuery
  * @param {GetAuthTokensQueryParams} params - Parameters to shape the query.
@@ -105,6 +172,7 @@ export const getAuthTokensQuery = ({
         ip,
         note,
         protect,
+        source,
         ${currentJti ? SQL`(jti = ${currentJti}) as is_current` : SQL`false as is_current`}
       FROM auth_tokens
       WHERE owner_id = ${userId}
@@ -127,6 +195,7 @@ export const getAuthTokensQuery = ({
       ip,
       note,
       protect,
+      source,
       is_current
     FROM tokens_page
     ORDER BY last_seen ${sortAsc ? SQL`ASC` : SQL`DESC`}, jti ${sortAsc ? SQL`ASC` : SQL`DESC`}

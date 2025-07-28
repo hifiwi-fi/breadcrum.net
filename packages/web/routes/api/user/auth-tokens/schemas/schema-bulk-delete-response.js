@@ -36,5 +36,5 @@ export const schemaBulkDeleteResponse = /** @type {const} @satisfies {JSONSchema
       description: 'Indicates if this was a dry run (no actual deletion)',
     },
   },
-  required: ['deleted_count', 'deleted_tokens'],
+  required: ['deleted_count', 'deleted_tokens', 'dry_run'],
 })

@@ -1,0 +1,83 @@
+.bc-auth-token-view {
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-auth-token-note {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.bc-auth-token-note-empty {
+  color: var(--accent-foreground);
+  font-style: italic;
+}
+
+.bc-auth-token-status-badges {
+  display: inline-flex;
+  gap: 0.5em;
+  margin-left: 0.5em;
+}
+
+.bc-auth-token-current-badge,
+.bc-auth-token-protected-badge {
+  color: var(--accent-foreground);
+  font-size: 0.8em;
+}
+
+.bc-auth-token-current-badge {
+  color: var(--bc-episodes-color);
+}
+
+.bc-auth-token-title-line {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.bc-auth-token-jti {
+  font-size: 0.8em;
+  color: var(--accent-foreground);
+}
+
+.bc-auth-token-jti code {
+  font-family: var(--font-code);
+}
+
+.bc-date {
+  font-size: 0.8em;
+}
+
+.bc-date a {
+  color: var(--accent-foreground);
+}
+
+.bc-auth-token-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+}
+
+.bc-auth-token-source {
+  font-size: 0.8em;
+  color: var(--accent-foreground);
+}
+
+.bc-auth-token-source-value {
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.bc-auth-token-user-agent,
+.bc-auth-token-ip {
+  font-size: 0.8em;
+  color: var(--accent-foreground);
+}
+
+.bc-auth-token-user-agent code,
+.bc-auth-token-ip code {
+  font-family: var(--font-code);
+  word-break: break-all;
+}

@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import SQL from '@nearform/sql'
 
 /**
  * Creates a test user and returns credentials plus cleanup function
@@ -30,8 +31,7 @@ export async function createTestUser (app, t) {
 
   // If registration is disabled, return null
   if (registerRes.statusCode === 403) {
-    console.log('Registration is disabled, skipping test')
-    return null
+    throw new Error('Registration is disabled, skipping test')
   }
 
   if (registerRes.statusCode !== 201) {
@@ -97,7 +97,7 @@ export async function createMultipleTokens (app, username, password, count) {
  * Creates tokens with specific last_seen dates
  * @param {import('fastify').FastifyInstance} app
  * @param {string} userId
- * @param {Array<{daysAgo: number}>} tokenSpecs
+ * @param {Array<{daysAgo: number, source?: 'web' | 'api' }>} tokenSpecs
  * @returns {Promise<Array<{jti: string, last_seen: Date}>>}
  */
 export async function createTokensWithDates (app, userId, tokenSpecs) {
@@ -106,13 +106,15 @@ export async function createTokensWithDates (app, userId, tokenSpecs) {
 
   for (const spec of tokenSpecs) {
     const lastSeen = new Date(now.getTime() - spec.daysAgo * 24 * 60 * 60 * 1000)
+    const source = spec.source ?? 'web'
     const jti = randomUUID()
 
-    await app.pg.query(
-      `INSERT INTO auth_tokens (jti, owner_id, created_at, last_seen, user_agent, ip)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [jti, userId, lastSeen, lastSeen, 'Test Agent', '127.0.0.1']
-    )
+    const query = SQL`
+       INSERT INTO auth_tokens (jti, owner_id, created_at, last_seen, user_agent, ip, source)
+       VALUES (${jti}, ${userId}, ${lastSeen}, ${lastSeen}, ${'Test Agent'}, ${'127.0.0.1'}, ${source})
+     `
+
+    await app.pg.query(query)
 
     tokens.push({ jti, last_seen: lastSeen })
   }

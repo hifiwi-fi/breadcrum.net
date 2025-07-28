@@ -12,7 +12,7 @@ export const schemaAuthTokenRead = /** @type {const} @satisfies {JSONSchema} */ 
   type: 'object',
   $id: 'schema:breadcrum:auth-token:read',
   additionalProperties: false,
-  required: ['jti', 'created_at', 'last_seen', 'updated_at', 'is_current', 'protect', 'note', 'user_agent', 'ip'],
+  required: ['jti', 'created_at', 'last_seen', 'updated_at', 'is_current', 'protect', 'note', 'user_agent', 'ip', 'source'],
   properties: {
     ...authTokenProps.properties,
     is_current: {
