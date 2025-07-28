@@ -1,0 +1,24 @@
+.bc-auth-token-edit {
+  width: 100%;
+}
+
+.bc-auth-token-edit fieldset {
+  min-width: 0;
+}
+
+.bc-auth-token-edit input[type="text"] {
+  width: 100%;
+}
+
+.bc-auth-token-legend {
+  font-size: var(--small-font-size);
+}
+
+.bc-auth-token-note-edit {
+  font-family: var(--font-body);
+}
+
+.bc-auth-token-edit-submit-line {
+  display: flex;
+  justify-content: space-between;
+}

@@ -141,7 +141,7 @@ export default async function registerRoutes (fastify, _opts) {
 
         await client.query('commit')
 
-        const token = await reply.createJWTToken({ id: user.id, username: user.username })
+        const token = await reply.createJWTToken({ id: user.id, username: user.username }, 'web')
         reply.setJWTCookie(token)
 
         fastify.otel.userCreatedCounter.add(1)

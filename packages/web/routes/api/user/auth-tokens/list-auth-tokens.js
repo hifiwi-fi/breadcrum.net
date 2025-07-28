@@ -3,6 +3,7 @@ import { getAuthTokens } from './get-auth-tokens-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { TypeAuthTokenReadSerialize } from './schemas/schema-auth-token-read.js'
  */
 
 /**
@@ -106,6 +107,7 @@ export async function listAuthTokens (fastify, _opts) {
           sort: sortOrder,
         } = request.query
 
+        /** @type {TypeAuthTokenReadSerialize[]} */
         const tokens = await getAuthTokens({
           fastify,
           pg: client,

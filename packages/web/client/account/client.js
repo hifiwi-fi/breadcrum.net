@@ -11,6 +11,7 @@ import { newsletterField } from './newsletter/newsletter-field.js'
 import { emailField } from './email/email-field.js'
 import { useReload } from '../hooks/useReload.js'
 import { disabledField } from './disabled/disabled-field.js'
+import { authTokens } from './auth-tokens/auth-tokens-field.js'
 
 export const page = Component(() => {
   const window = useWindow()
@@ -46,6 +47,7 @@ export const page = Component(() => {
           `
           : null
         }
+        ${authTokens()}
       </dl>
     </div>
 `

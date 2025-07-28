@@ -40,7 +40,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     } else {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
-  }, [bookmark, state.apiUrl, reload, setEditing])
+  }, [bookmark.id, state.apiUrl, reload, setEditing])
 
   const handleDeleteBookmark = useCallback(async (ev) => {
     await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {

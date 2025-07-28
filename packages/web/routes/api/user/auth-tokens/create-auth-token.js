@@ -5,6 +5,7 @@ import { getSingleAuthToken } from './_jti/get-single-auth-token-query.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { JwtUserWithTokenId } from '../../../../plugins/jwt.js'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -25,8 +26,7 @@ export async function createAuthToken (fastify, _opts) {
         description: 'Create a new auth token (session) for the authenticated user with optional note and protect status',
         body: schemaAuthTokenCreate,
         response: {
-          201: schemaAuthTokenCreateResponse,
-          400: { $ref: 'HttpError' },
+          201: schemaAuthTokenCreateResponse
         },
       },
     },
@@ -40,7 +40,7 @@ export async function createAuthToken (fastify, _opts) {
         username,
         note,
         protect
-      })
+      }, 'api')
 
       // Decode the token to get the jti
       /** @type {JwtUserWithTokenId | null} */
@@ -51,6 +51,8 @@ export async function createAuthToken (fastify, _opts) {
       const newJti = decodedToken.jti
 
       // Get the full auth token details
+
+      /** @type { ExtractResponseType<typeof reply.code<201>>['auth_token'] | undefined } */
       const authToken = await getSingleAuthToken({
         fastify,
         userId,
