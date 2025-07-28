@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 // @ts-expect-error
-import { Component, html, render, useEffect } from 'uland-isomorphic'
+import { Component, html, render, useEffect, useCallback } from 'uland-isomorphic'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { usernameField } from './username/username-field.js'
@@ -12,12 +12,15 @@ import { emailField } from './email/email-field.js'
 import { useReload } from '../hooks/useReload.js'
 import { disabledField } from './disabled/disabled-field.js'
 import { useAuthTokens } from '../hooks/useAuthTokens.js'
+import { authTokenList } from '../components/auth-token/auth-token-list.js'
+import { useQuery } from '../hooks/useQuery.js'
 
 export const page = Component(() => {
   const window = useWindow()
 
   const { reload: reloadUser, signal: userReloadSignal } = useReload()
   const { user, loading } = useUser({ reload: userReloadSignal })
+  const { pushState } = useQuery()
 
   useEffect(() => {
     if ((!user && !loading) && window) {
@@ -36,6 +39,12 @@ export const page = Component(() => {
     beforeParams,
     afterParams
   } = useAuthTokens()
+
+  const onPageNav = useCallback((/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
+    ev.preventDefault()
+    pushState(ev.currentTarget.href)
+    // window?.scrollTo({ top: 0 })
+  }, [window, pushState])
 
   return html`
     <div>
@@ -61,20 +70,20 @@ export const page = Component(() => {
       </dl>
       <div>Auth Tokens</div>
       <div>
-        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
+        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
       </div>
 
       ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
 
       ${Array.isArray(tokens)
-        ? tokens.map(b => html.for(b, b.jti)`${authTokensList({ bookmark: b, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
+        ? tokens.map(t => html.for(t, t.jti)`${authTokenList({ authToken: t, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
         : null}
 
       <div>
-        ${before ? html`<a href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a href=${'./?' + afterParams}>later</span>` : null}
+        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
       </div>
     </div>
 `

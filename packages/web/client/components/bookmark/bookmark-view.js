@@ -1,4 +1,7 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
+
+// @ts-expect-error
 import { Component, html } from 'uland-isomorphic'
 import { toread } from '../toread/index.js'
 import { star } from '../star/index.js'
@@ -18,13 +21,19 @@ export const bookmarkView = Component(({
   const window = useWindow()
   const { pushState } = useQuery()
 
-  const onPageNav = (ev) => {
-    const url = new URL(window.location)
-    const newUrl = new URL(ev.currentTarget.href)
+  const onPageNav = (/** @type{MouseEvent} */ ev) => {
+    const target = ev?.currentTarget
+    const newHref = target && 'href' in target ? target.href : undefined
+    if (window && typeof newHref === 'string') {
+      const url = new URL(window.location.href)
+      const newUrl = new URL(newHref)
 
-    if (url.pathname === newUrl.pathname) {
-      ev.preventDefault()
-      pushState(ev.currentTarget.href)
+      if (url.pathname === newUrl.pathname) {
+        ev.preventDefault()
+        pushState(newHref)
+      }
+    } else {
+      console.warn('Missing window or href', { window, newHref })
     }
   }
 

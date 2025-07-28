@@ -75,10 +75,16 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 - Client-side code is written using @domstack/static in the `packages/web/client` folder
 - All client-side code is directly runnable in Node.js and browsers via esbuild
 - Client-side JavaScript bundles are built using @domstack/static's build system with esbuild
-- Page-specific client code goes in `client.js` files alongside page files
+- Page-specific client code goes in `client.js` files alongside page files.
 - Layout-specific client code goes in `.layout.client.js` files
 - Global client code goes in `global.client.js`
 - All client code supports ESM imports and can import from npm packages
+- When working on client side code (anything that runs in the browser) in the `pacakges/web/client` folder, always ensure we set the following headers/pragma:
+
+```js
+/// <reference lib="dom" />
+/* eslint-env browser */
+```
 
 ## Package.json Scripts
 
