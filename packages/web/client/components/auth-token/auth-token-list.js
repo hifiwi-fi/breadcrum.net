@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 /**
- * @import { SchemaAuthTokenRead } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js';
  */
 
@@ -19,7 +19,7 @@ import { diffToken } from '../../lib/diff-auth-token.js'
  *  reload,
  *  onDelete
  * }: {
- *  authToken: SchemaAuthTokenRead,
+ *  authToken: TypeAuthTokenReadClient,
  *  reload?: () => void,
  *  onDelete?: () => void,
  * }) => any} AuthTokenList

@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 /**
- * @import { SchemaAuthTokenRead } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js';
 */
 
@@ -17,7 +17,7 @@ import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic
  *  onCancelEdit,
  *  legend
  * }: {
- *  authToken: SchemaAuthTokenRead,
+ *  authToken?: TypeAuthTokenReadClient,
  *  onSave?: (newAuthToken: TypeAuthTokenUpdate) => Promise<void>,
  *  onDeleteAuthToken?: () => Promise<void>,
  *  onCancelEdit?: () => void,
@@ -101,14 +101,20 @@ export const authTokenEdit = Component(/** @type{AuthTokenView} */({
           <div>
             <label class='block'>
               note:
-              <input class='block bc-auth-token-note-edit' type="text" name="note" value="${t.note}"/>
+              <input class='block bc-auth-token-note-edit' type="text" name="note" value="${t?.note}"/>
             </label>
+            <span class="bc-help-text">
+              Auth token notes let you add a human readable label to remember where they are used.
+            </span>
           </div>
           <div>
             <label>
               protect:
-              <input type="checkbox" name="protect" ?checked="${t.protect}">
+              <input type="checkbox" name="protect" ?checked="${t?.protect}">
             </label>
+            <span class="bc-help-text">
+              Protected tokens will not be deleted in bulk cleanup operations.
+            </span>
           </div>
 
           <div class="bc-auth-token-edit-submit-line">
@@ -116,16 +122,16 @@ export const authTokenEdit = Component(/** @type{AuthTokenView} */({
               ${onSave ? html`<input name="submit-button" type="submit">` : null}
               ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
             </div>
-            <div>
-              ${onDeleteAuthToken
-                ? deleteConfirm
+            ${onDeleteAuthToken
+              ? html`<div>${deleteConfirm
                   ? html`
-                    <button onClick=${handleCancelDelete}>Cancel</button>
-                    <button onClick=${handleDeleteAuthToken}>Destroy</button>`
-                  : html`<button ?disabled=${t.is_current} onClick=${handleInitiateDelete}>Delete</button>`
-                : null
-              }
-            </div>
+                      <button onClick=${handleCancelDelete}>Cancel</button>
+                      <button onClick=${handleDeleteAuthToken}>Destroy</button>`
+                  : html`
+                    <button ?disabled=${t?.is_current} onClick=${handleInitiateDelete}>Delete</button>`}
+                </div>`
+              : null
+            }
           </div>
           ${error ? html`<div class="error-box">${error.message}</div>` : null}
         </fieldset>

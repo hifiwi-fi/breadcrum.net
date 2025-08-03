@@ -1,0 +1,21 @@
+@import './auth-token-edit.css';
+
+.bc-token-create-copy-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bc-token-create-copy-line a {
+  display: flex;
+  align-items: center;
+}
+
+.bc-token-create-copy-line .bc-token-create-copy-line-select {
+  flex-grow: 1;
+}
+
+.bc-feed-header-help-text {
+  margin-top: 0.5em;
+  margin-bottom: 10px;
+}

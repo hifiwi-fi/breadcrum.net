@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { SchemaAuthTokenRead } from '../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ * @import { TypeAuthTokenReadClient } from '../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  */
 
 // @ts-expect-error
@@ -16,7 +16,7 @@ export function useAuthTokens () {
   const state = useLSP()
   const { query } = useQuery()
 
-  /** @type {[SchemaAuthTokenRead[] | null, (authTokens: SchemaAuthTokenRead[] | null) => void]} */
+  /** @type {[TypeAuthTokenReadClient[] | null, (authTokens: TypeAuthTokenReadClient[] | null) => void]} */
   const [tokens, setTokens] = useState()
   /** @type {[boolean, (loading: boolean) => void]} */
   const [tokensLoading, setTokensLoading] = useState(false)
