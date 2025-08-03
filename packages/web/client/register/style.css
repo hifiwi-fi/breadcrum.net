@@ -10,3 +10,11 @@
   align-items: center;
   gap: 5px;
 }
+
+.bc-register-terms {
+  display: flex;
+  justify-content: center;
+  font-size: 0.8em;
+  margin-top: 1em;
+  color: var(--accent-foreground);
+}

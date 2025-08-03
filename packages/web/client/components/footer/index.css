@@ -12,12 +12,17 @@
   overflow-y: hidden;
   white-space:nowrap;
   scrollbar-width: none;
+  color: var(--accent-foreground);
 }
 
 .bc-footer::-webkit-scrollbar {
   display: none;
 }
 
+
+.bc-footer-rounded {
+  border-radius: 3px !important;
+}
 
 /* fairly arbitrary. Just make sure the content justification */
 @media screen and (max-width: 500px) {

@@ -49,6 +49,7 @@ export function useAuthTokens () {
         setTokens(body?.data)
         setBefore(body?.pagination?.before)
         setAfter(body?.pagination?.after)
+
         if (body?.pagination?.top) {
           const newParams = new URLSearchParams(query ?? '')
           let modified = false

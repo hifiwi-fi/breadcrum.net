@@ -14,6 +14,13 @@ By using {{ vars.siteName }}, you agree to the practices described in this polic
 
 ---
 
+## 0. Privacy Aims
+
+{{ vars.siteName }} is for private fair-use by individuals and is committed to content neutrality and user privacy.
+That said, do not store any content that is illegal under US law or content that will disrupt or interfear with the operation of the service.
+
+---
+
 ## 1. What We Collect
 
 We collect the following types of information:

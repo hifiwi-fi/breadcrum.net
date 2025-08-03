@@ -39,7 +39,7 @@ export async function listAuthTokens (fastify, _opts) {
               type: 'integer',
               minimum: 1,
               maximum: 100,
-              default: 20,
+              default: 5, // You only really need to see the last most of the time.
               description: 'Number of tokens to return per page',
             },
             sort: {

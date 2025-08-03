@@ -9,13 +9,13 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useWindow } from '../../hooks/useWindow.js'
 
 /**
- * @typedef {() => any} DisabledField
+ * @typedef {() => any} AuthTokensField
  */
 
 /**
- * @type {DisabledField}
+ * @type {AuthTokensField}
  */
-export const authTokens = Component(/** @type{DisabledField} */() => {
+export const authTokens = Component(/** @type{AuthTokensField} */() => {
   const window = useWindow()
   const {
     tokensError,

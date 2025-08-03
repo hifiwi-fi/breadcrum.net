@@ -108,6 +108,11 @@ export const page = Component(() => {
         </div>
       </fieldset>
     </form>
+    <div class="bc-register-terms">
+      <p>
+        By registering you agree to our <a href="/legal/terms/">Terms of Service</a> and <a href="/legal/privacy/">Privacy Policy</a>.
+      </p>
+    </div>
   </div>
   ${userError
     ? html`<div>${userError?.message}</div>`
