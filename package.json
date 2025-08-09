@@ -14,10 +14,9 @@
     "node": ">=24.0.0"
   },
   "devDependencies": {
-    "@voxpelli/tsconfig": "^15.0.0",
+    "@voxpelli/tsconfig": "^16.0.0",
     "auto-changelog": "^2.0.0",
     "custompatch": "^1.1.4",
-    "dependency-cruiser": "^16.3.2",
     "gh-release": "^7.0.0",
     "knip": "^5.37.1",
     "neostandard": "^0.12.0",
@@ -57,7 +56,6 @@
     "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
     "deploy:worker": "flyctl deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
     "knip": "knip --dependencies",
-    "deps": "depcruise . --include-only \"^packages\" --collapse 3 --output-type dot | dot -T svg > dependency-graph.svg",
     "new-blogpost": "node scripts/create-blogpost.js --title",
     "publish-draft": "node scripts/publish-blogpost.js",
     "watch-tb": "npm run -w @breadcrum/web domstack-watch"
