@@ -17,7 +17,7 @@
     "@voxpelli/tsconfig": "^16.0.0",
     "auto-changelog": "^2.0.0",
     "custompatch": "^1.1.4",
-    "dependency-cruiser": "^16.3.2",
+    "dependency-cruiser": "^17.0.1",
     "gh-release": "^7.0.0",
     "knip": "^5.37.1",
     "neostandard": "^0.12.0",
