@@ -17,6 +17,11 @@ updates:
       opentelemetry:
         patterns:
           - "@opentelemetry/*"
+      typescript:
+        patterns:
+          - "@voxpelli/tsconfig"
+          - "@types/node"
+          - "typescript"
 
   # Worker
   - package-ecosystem: "docker"
