@@ -52,7 +52,10 @@
     "postgrator-cli": "^9.0.0",
     "resolve-email": "^4.0.1",
     "undici": "^7.0.0",
-    "useragent": "^2.3.0"
+    "useragent": "^2.3.0",
+    "preact": "^10.27.0",
+    "preact-render-to-string": "^6.5.13",
+    "htm": "^3.1.1"
   },
   "optionalDependencies": {
     "sodium-native": "^5.0.1"
