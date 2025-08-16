@@ -10,9 +10,10 @@ import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { diffArchive } from './diff-archive.js'
+import { typedComponent } from '../../lib/typed-component.js'
 
-import { archiveEdit } from './archive-edit.js'
-import { archiveView } from './archive-view.js'
+import { ArchiveEdit } from './archive-edit.js'
+import { ArchiveView } from './archive-view.js'
 
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient & {
@@ -68,17 +69,17 @@ export const archiveList = ({ archive, reload, onDelete, fullView }) => {
     ${deleted
       ? null
       : editing
-        ? archiveEdit({
+        ? typedComponent(ArchiveEdit, {
             archive,
             onSave: handleSave,
             onDeleteArchive: handleDeleteArchive,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${archive?.id}</code>`,
           })
-        : archiveView({
+        : typedComponent(ArchiveView, {
             archive,
             onEdit: handleEdit,
-            fullView: fullView || false,
+            fullView: fullView || false
           })
     }
   </div>`

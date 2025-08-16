@@ -2,10 +2,11 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeAuthTokenCreateResponseClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-create-response.js'
+ * @import { FunctionComponent } from 'preact'
  */
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { manageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**
@@ -13,20 +14,15 @@ import { manageAuthTokenCreateField } from './auth-token-manage-create.js'
  */
 
 /**
- * @typedef {({
- *  reload,
- * }: {
- *  reload: () => void,
- * }) => any} AuthTokenManageField
+ * @typedef {object} AuthTokenManageFieldProps
+ * @property {() => void} reload
  */
 
 /**
- * @type {AuthTokenManageField}
+ * @type {FunctionComponent<AuthTokenManageFieldProps>}
  */
-export const manageAuthTokenField = Component(/** @type{AuthTokenManageField} */({ reload }) => {
-  /** @type {[EditMode, (mode: EditMode) => void]} */
-  const [editMode, setEditMode] = useState(null)
-  /** @type {[TypeAuthTokenCreateResponseClient | null, (newToken: TypeAuthTokenCreateResponseClient | null) => void]} */
+export const manageAuthTokenField = ({ reload }) => {
+  const [editMode, setEditMode] = useState(/** @type {EditMode} */(null))
 
   const handleCreateMode = useCallback(() => {
     setEditMode('creating')
@@ -61,4 +57,4 @@ export const manageAuthTokenField = Component(/** @type{AuthTokenManageField} */
   }
   </div>
   `
-})
+}

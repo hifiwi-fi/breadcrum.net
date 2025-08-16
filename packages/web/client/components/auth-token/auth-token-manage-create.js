@@ -2,33 +2,28 @@
 /* eslint-env browser */
 
 /**
+ * @import { FunctionComponent } from 'preact'
  * @import { TypeAuthTokenCreateResponseClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-create-response.js'
+ * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
  */
-// @ts-expect-error
-import { Component, useRef, html, useState, useCallback } from 'uland-isomorphic'
+
+import { html } from 'htm/preact'
+import { useRef, useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { authTokenEdit } from './auth-token-edit.js'
 
 /**
- * @typedef {'creating' | 'cleaning' | null } EditMode
+ * @typedef {object} AuthTokenManageCreateFieldProps
+ * @property {() => void} handleCancelEditMode
+ * @property {() => void} reload
  */
 
 /**
- * @typedef {({
- *  reload,
- * }: {
- *  handleCancelEditMode: () => void
- *  reload: () => void,
- * }) => any} AuthTokenManageCreateField
+ * @type {FunctionComponent<AuthTokenManageCreateFieldProps>}
  */
-
-/**
- * @type {AuthTokenManageCreateField}
- */
-export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCreateField} */({ handleCancelEditMode, reload }) => {
+export const manageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => {
   const state = useLSP()
-  /** @type {[TypeAuthTokenCreateResponseClient | null, (newToken: TypeAuthTokenCreateResponseClient | null) => void]} */
-  const [newToken, setNewToken] = useState(null)
+  const [newToken, setNewToken] = useState(/** @type {TypeAuthTokenCreateResponseClient | null} */(null))
   const copyButton = useRef()
 
   const handleHideNewToken = useCallback(() => {
@@ -36,7 +31,7 @@ export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCre
     handleCancelEditMode()
   }, [handleCancelEditMode])
 
-  const handleCreateSave = useCallback(async (/** @type {{ note: string, protect: boolean  }} */{ note, protect }) => {
+  const handleCreateSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */{ note, protect }) => {
     const endpoint = `${state.apiUrl}/user/auth-tokens`
     const response = await fetch(endpoint, {
       method: 'post',
@@ -61,19 +56,20 @@ export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCre
 
   const handleNewTokenCopy = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */_ev) => {
     const token = newToken?.token
+    const button = /** @type {HTMLButtonElement | null} */ (/** @type {unknown} */ (copyButton.current))
     try {
       if (token) {
         await navigator.clipboard.writeText(token)
-        copyButton.current.innerText = 'Copied'
+        if (button) button.innerText = 'Copied'
         console.log('copied feed to clipboard')
       } else {
         throw new Error('New token not found')
       }
     } catch (e) {
       console.error(e)
-      copyButton.current.innerText = 'Error'
+      if (button) button.innerText = 'Error'
     }
-  }, [copyButton.current, newToken?.token])
+  }, [newToken?.token])
 
   return html`
   ${newToken
@@ -103,4 +99,4 @@ export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCre
           })}`
     : null
   }`
-})
+}

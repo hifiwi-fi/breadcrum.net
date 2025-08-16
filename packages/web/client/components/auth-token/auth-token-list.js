@@ -2,33 +2,29 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
- * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js';
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
+ * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
  */
 
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { authTokenEdit } from './auth-token-edit.js'
 import { authTokenView } from './auth-token-view.js'
 import { diffToken } from '../../lib/diff-auth-token.js'
 
 /**
- * @typedef {({
- *  authToken,
- *  reload,
- *  onDelete
- * }: {
- *  authToken: TypeAuthTokenReadClient,
- *  reload?: () => void,
- *  onDelete?: () => void,
- * }) => any} AuthTokenList
+ * @typedef {object} AuthTokenListProps
+ * @property {TypeAuthTokenReadClient} authToken
+ * @property {() => void} [reload]
+ * @property {() => void} [onDelete]
  */
 
 /**
-  * @type {AuthTokenList}
-  */
-export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, reload, onDelete }) => {
+ * @type {FunctionComponent<AuthTokenListProps>}
+ */
+export const authTokenList = ({ authToken, reload, onDelete }) => {
   const state = useLSP()
 
   /** @type {[boolean, (editing: boolean) => void]} */
@@ -37,21 +33,21 @@ export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, 
   const [deleted, setDeleted] = useState(false)
 
   /**
-   * @type () => void
+   * @type {() => void}
    */
   const handleEdit = useCallback(() => {
     setEditing(true)
   }, [setEditing])
 
   /**
-   * @type () => void
+   * @type {() => void}
    */
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
   }, [setEditing])
 
   /**
-   * @type (newAuthToken: TypeAuthTokenUpdate) => Promise<void>
+   * @type {(newAuthToken: TypeAuthTokenUpdate) => Promise<void>}
    */
   const handleSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */newAuthToken) => {
     const payload = diffToken(authToken, newAuthToken)
@@ -67,7 +63,7 @@ export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, 
     })
 
     if (response.ok) {
-      reload?.()
+      if (reload) reload()
       setEditing(false)
     } else {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
@@ -75,7 +71,7 @@ export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, 
   }, [authToken.jti, state.apiUrl, reload, setEditing])
 
   /**
-   * @type () => Promise<void>
+   * @type {() => Promise<void>}
    */
   const handleDeleteAuthToken = useCallback(async () => {
     await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
@@ -86,8 +82,8 @@ export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, 
     })
 
     setDeleted(true)
-    onDelete?.()
-  }, [state.apiUrl, authToken.jti, setDeleted, reload])
+    if (onDelete) onDelete()
+  }, [state.apiUrl, authToken.jti, setDeleted, onDelete])
 
   return html`
   <div class="bc-auth-token">
@@ -107,4 +103,4 @@ export const authTokenList = Component(/** @type{AuthTokenList} */({ authToken, 
           })
     }
   </div>`
-})
+}

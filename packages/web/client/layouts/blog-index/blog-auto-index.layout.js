@@ -4,6 +4,7 @@
  */
 import { html } from 'htm/preact'
 import { dirname } from 'node:path'
+import { render } from 'preact-render-to-string'
 
 import blogIndexLayout from './blog-index.layout.js'
 
@@ -17,7 +18,7 @@ export default function blogAutoIndexLayout (args) {
     return dir === path
   }).sort((a, b) => new Date(b.vars.publishDate).getTime() - new Date(a.vars.publishDate).getTime())
 
-  const wrappedChildren = html`
+  const headerContent = html`
     <ul class="blog-index-list">
       ${folderPages.map(p => {
         const publishDate = p.vars.publishDate ? new Date(p.vars.publishDate) : null
@@ -34,11 +35,14 @@ export default function blogAutoIndexLayout (args) {
           </li>`
         })}
     </ul>
-    ${typeof children === 'string'
-      ? html(Object.assign([children], { raw: [children] }))
-      : children
-    }
   `
+
+  const wrappedChildren = typeof children === 'string'
+    ? render(headerContent) + children
+    : html`
+        ${headerContent}
+        ${children}
+      `
 
   return blogIndexLayout({ children: wrappedChildren, ...rest })
 }

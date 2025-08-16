@@ -5,6 +5,7 @@
 
 import { html } from 'htm/preact'
 import { sep } from 'node:path'
+import { render } from 'preact-render-to-string'
 import { Breadcrumb } from '../../components/breadcrumb/index.js'
 
 /**
@@ -21,14 +22,18 @@ import defaultRootLayout from '../root/root.layout.js'
 export default function blogIndexLayout (args) {
   const { children, ...rest } = args
   const pathSegments = args.page.path.split(sep)
-  const wrappedChildren = html`
-    ${Breadcrumb({ pathSegments })}
-    <h1>${args.vars.title}</h1>
-    ${typeof children === 'string'
-      ? html(Object.assign([children], { raw: [children] }))
-      : children
-    }
-  `
+
+  const headerContent = html`
+     <${Breadcrumb} pathSegments=${pathSegments} />
+     <h1>${args.vars.title}</h1>
+   `
+
+  const wrappedChildren = typeof children === 'string'
+    ? render(headerContent) + children
+    : html`
+        ${headerContent}
+        ${children}
+      `
 
   return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
 }

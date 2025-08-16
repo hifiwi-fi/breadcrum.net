@@ -17,7 +17,7 @@ import cn from 'classnames'
  *   big?: boolean
  * }>}
  */
-export const archiveTitle = ({
+export const ArchiveTitle = ({
   archive = {},
   small,
   big,

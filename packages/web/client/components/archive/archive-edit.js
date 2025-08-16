@@ -16,7 +16,7 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  * onCancelEdit?: () => void,
  * legend?: string | ComponentChild
 }>} */
-export const archiveEdit = ({
+export const ArchiveEdit = ({
   archive: ar,
   onSave,
   onDeleteArchive,

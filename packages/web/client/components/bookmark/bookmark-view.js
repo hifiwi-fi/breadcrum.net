@@ -8,7 +8,7 @@ import { Star } from '../star/index.js'
 import { Sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
-import { expandText } from '../expand-text/index.js'
+import { ExpandText } from '../expand-text/index.js'
 import cn from 'classnames'
 
 export const bookmarkView = Component(({
@@ -66,7 +66,7 @@ export const bookmarkView = Component(({
       ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
       ${b.summary
         ? html`<div class='bc-bookmark-summary-display'>
-            ${expandText({
+            ${ExpandText({
               children: b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`),
             })}
           </div>`

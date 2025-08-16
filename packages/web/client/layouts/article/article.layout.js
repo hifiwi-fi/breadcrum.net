@@ -6,7 +6,8 @@
 import { html } from 'htm/preact'
 import { sep } from 'node:path'
 import { Breadcrumb } from '../../components/breadcrumb/index.js'
-import { articleHeader } from '../../components/article-header/index.js'
+import { ArticleHeader } from '../../components/article-header/index.js'
+import { typedComponent } from '../../lib/typed-component.js'
 
 import defaultRootLayout from '../root/root.layout.js'
 
@@ -29,9 +30,9 @@ export default function articleLayout (args) {
   const vars = rest.vars
   const pathSegments = page.path.split(sep)
   const wrappedChildren = html`
-    ${Breadcrumb({ pathSegments })}
+    <${Breadcrumb} pathSegments=${pathSegments} />
     <article class="bc-article h-entry" itemscope itemtype="http://schema.org/NewsArticle">
-        ${articleHeader({
+        ${typedComponent(ArticleHeader, {
             title: vars.title,
             authorImgUrl: vars.authorImgUrl,
             authorImgAlt: vars.authorImgAlt,
@@ -41,12 +42,13 @@ export default function articleLayout (args) {
             updatedDate: vars.updatedDate
         })}
 
-      <section class="e-content" itemprop="articleBody">
-        ${typeof children === 'string'
-          ? html(Object.assign([children], { raw: [children] }))
-          : children
-        }
-      </section>
+      ${typeof children === 'string'
+        ? html`<section class="e-content" itemprop="articleBody" dangerouslySetInnerHTML="${{ __html: children }}" />`
+        : html`
+            <section class="e-content" itemprop="articleBody">
+              ${children}
+            </section>`
+      }
 
       <footer class="blog-footer">
         <p>Wan't to follow along for future updates? Follow our <a href="/docs/social/">socials and feeds</a>!</p>
@@ -67,7 +69,7 @@ export default function articleLayout (args) {
       lang="en"
       loading="lazy"
     ></giscus-widget>
-    ${Breadcrumb({ pathSegments })}
+    <${Breadcrumb} pathSegments=${pathSegments} />
   `
 
   return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })

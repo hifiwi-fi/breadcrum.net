@@ -26,9 +26,11 @@ const data: { id: number, name: string } = {...}
 function process(item: { id: number, name: string }) {...}
 ```
 
-### Use newer @import syntax in jsdoc/ts-in-js
+### Use newer @import syntax in jsdoc/ts-in-js for types only
 
-Avoid inline imports as much as possible and prefer the newer @import syntax placed near the top level imports.
+The @import syntax is for TYPE IMPORTS ONLY. Regular imports (functions, classes, values) still use standard ES module import syntax.
+
+Avoid inline type imports and prefer the newer @import syntax placed near the top level imports.
 
 Instead of this:
 
@@ -48,25 +50,40 @@ Do this
 const results = await client.query(query)
 ```
 
-### Import Consolidation
-
-**Consolidate imports from the same module** - combine multiple imports from the same module into a single @import statement:
+Note: Only use @import for types. Regular imports use standard syntax:
 
 ```javascript
-// ❌ Avoid separate imports from same module
+/** @import {QueryResult} from 'pg' */  // Type import
+import { Pool } from 'pg'  // Regular import for the actual Pool class
+```
+
+### Import Consolidation
+
+**Consolidate type imports from the same module** - combine multiple type imports from the same module into a single @import statement:
+
+```javascript
+// ❌ Avoid separate type imports from same module
 /** @import { FunctionComponent } from 'preact' */
 /** @import { ComponentChild } from 'preact' */
 /** @import { QueryResult } from 'pg' */
 /** @import { Pool } from 'pg' */
 
-// ✅ Consolidate imports from same module
+// ✅ Consolidate type imports from same module
 /** @import { FunctionComponent, ComponentChild } from 'preact' */
 /** @import { QueryResult, Pool } from 'pg' */
 ```
 
-### Preact Component Import Syntax
+Remember: @import is for types only. Regular imports still use standard ES module syntax and should be consolidated using standard import syntax:
 
-For preact components, always use the @import syntax at the top of the file:
+```javascript
+// ✅ Regular imports consolidated normally
+import { render, hydrate } from 'preact'
+import { Pool, Client } from 'pg'
+```
+
+### Preact Component Type Import Syntax
+
+For preact component types, always use the @import syntax at the top of the file:
 
 ```javascript
 /**
@@ -74,15 +91,23 @@ For preact components, always use the @import syntax at the top of the file:
  */
 ```
 
-Never use inline import syntax like `import('preact').ComponentChild` - always use the @import syntax instead:
+Never use inline import syntax like `import('preact').ComponentChild` - always use the @import syntax for types:
 
 ```javascript
-// ❌ Avoid inline imports
+// ❌ Avoid inline type imports
 legend?: string | import('preact').ComponentChild
 
-// ✅ Use @import syntax
+// ✅ Use @import syntax for types
 /** @import { ComponentChild } from 'preact' */
 legend?: string | ComponentChild
+```
+
+For actual preact functions/components, use regular imports:
+
+```javascript
+/** @import { FunctionComponent } from 'preact' */  // Type import
+import { render } from 'preact'  // Regular import
+import { html } from 'htm/preact'  // Regular import
 ```
 
 ### Prefer Schema-Based Types
@@ -244,17 +269,41 @@ HTM is JSX-like syntax in plain JavaScript with no transpiler necessary. It uses
 
 - **Standard JSX event handlers**: `<button onClick=${handleClick}>Click me</button>`
 
-### Converting String Children to HTM Templates
+### Handling String Content in Layouts
 
-When working with string HTML content that needs to be rendered as JSX, convert it to a proper TemplateStringsArray-like object:
+When working with string HTML content in layouts, there are two main approaches depending on the context:
+
+#### For Single Element Containers
+Use `dangerouslySetInnerHTML` when rendering into a single element:
 
 ```js
-// For string children in layouts
 ${typeof children === 'string'
-  ? html(Object.assign([children], { raw: [children] }))
-  : children
+  ? html`<section class="content" dangerouslySetInnerHTML="${{ __html: children }}" />`
+  : html`<section class="content">${children}</section>`
 }
 ```
+
+#### For Multi-Child Fragments or String Concatenation
+When you need to mix string content with other components in a fragment, use `preact-render-to-string` for string concatenation:
+
+```js
+import { render } from 'preact-render-to-string'
+
+// Render components to strings and concatenate
+const headerContent = html`
+  <h1>${args.vars.title}</h1>
+  <nav>Navigation here</nav>
+`
+
+const wrappedChildren = typeof children === 'string'
+  ? render(headerContent) + children  // String concatenation
+  : html`
+      ${headerContent}
+      ${children}
+    `
+```
+
+This technique is necessary because the `html` tagged template function expects proper template syntax, not arbitrary string interpolation. String rendering and concatenation is the correct approach when you need to combine rendered components with string HTML content.
 
 ### HTM Template Guidelines
 
@@ -326,6 +375,59 @@ export default () => {
 }
 ```
 
+### Component Syntax
+
+**❌ NEVER use direct function calls** - they break component identity and reconciliation:
+```js
+// ❌ DANGEROUS - breaks React/Preact reconciliation
+${MyComponent({ prop: value })}
+```
+
+**✅ Use HTM component syntax** for proper component mounting:
+```js
+// ✅ Correct - proper component identity
+<${MyComponent} prop=${value} />
+```
+
+**✅ For type safety, use a typed component helper**:
+```js
+/**
+ * Typed component helper for better type checking with HTM
+ * @template T
+ * @param {FunctionComponent<T>} component
+ * @param {T} props
+ */
+const typedComponent = (component, props) =>
+  html`<${component} ...${props} />`
+
+// Usage with full type checking:
+${typedComponent(MyComponent, { prop: value, onSave: handler })}
+```
+
+**When to use each approach:**
+- **HTM component syntax**: Use for simple props (better performance)
+  ```js
+  <${Header} />
+  <${Breadcrumb} pathSegments=${pathSegments} />
+  ```
+- **typedComponent**: Use for complex props (better type checking)
+  ```js
+  ${typedComponent(ArticleHeader, {
+    title: vars.title,
+    authorImgUrl: null,
+    authorImgAlt: null,
+    publishDate: vars.publishDate,
+    updatedDate: vars.updatedDate
+  })}
+  ```
+
+**Why direct function calls are dangerous:**
+- Break component identity (React/Preact can't track components properly)
+- Prevent proper reconciliation and diffing
+- Can cause hooks to reset unexpectedly
+- Break React DevTools component tree
+- Prevent optimizations like memoization
+
 ## Component Conversion Checklist
 
 When converting components from uland to preact:
@@ -333,13 +435,14 @@ When converting components from uland to preact:
 1. **Update imports**: `uland-isomorphic` → `htm/preact` + `preact/hooks`
 2. **Remove Component wrappers**: `Component(() => {...})` → `() => {...}`
 3. **Add proper typing**: Use `@import` statements and specific types
-4. **Fix string children**: Use `html(Object.assign([children], { raw: [children] }))`
-5. **Add DOM headers**: For client-side code, include `/// <reference lib="dom" />` and `/* eslint-env browser */`
-6. **Use schema types**: Import from schema files instead of redefining
-7. **Check diagnostics**: Fix all TypeScript errors before considering complete
-8. **Avoid any types**: Always use specific types that describe actual data
-9. **Handle optional callbacks**: Check existence before calling: `if (onSave) await onSave(...)`
-10. **Type-cast errors**: Use `/** @type {Error} */(err)` in catch blocks
+4. **Fix string children**: Use `dangerouslySetInnerHTML` for single elements or `render()` + string concatenation for fragments
+5. **Fix component syntax**: **NEVER use direct function calls** - use HTM component syntax: `${MyComponent({ prop: value })}` → `<${MyComponent} prop=${value} />` or typed helper
+6. **Add DOM headers**: For client-side code, include `/// <reference lib="dom" />` and `/* eslint-env browser */`
+7. **Use schema types**: Import from schema files instead of redefining
+8. **Check diagnostics**: Fix all TypeScript errors before considering complete
+9. **Avoid any types**: Always use specific types that describe actual data
+10. **Handle optional callbacks**: Check existence before calling: `if (onSave) await onSave(...)`
+11. **Type-cast errors**: Use `/** @type {Error} */(err)` in catch blocks
 
 ## Package.json Scripts
 

@@ -2,44 +2,35 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
- * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js';
-*/
+ * @import { FunctionComponent, ComponentChild } from 'preact'
+ * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
+ * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
+ */
 
-// @ts-expect-error
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+import { html } from 'htm/preact'
+import { useRef, useState, useCallback } from 'preact/hooks'
 
 /**
- * @typedef {({
- *  authToken,
- *  onSave,
- *  onDeleteAuthToken,
- *  onCancelEdit,
- *  legend
- * }: {
- *  authToken?: TypeAuthTokenReadClient,
- *  onSave?: (newAuthToken: TypeAuthTokenUpdate) => Promise<void>,
- *  onDeleteAuthToken?: () => Promise<void>,
- *  onCancelEdit?: () => void,
- *  legend?: any,
- * }) => any} AuthTokenView
+ * @typedef {object} AuthTokenEditProps
+ * @property {TypeAuthTokenReadClient} [authToken]
+ * @property {(newAuthToken: TypeAuthTokenUpdate) => Promise<void>} [onSave]
+ * @property {() => Promise<void>} [onDeleteAuthToken]
+ * @property {() => void} [onCancelEdit]
+ * @property {string | ComponentChild} [legend]
  */
 
 /**
-  * @type {AuthTokenView}
-  */
-export const authTokenEdit = Component(/** @type{AuthTokenView} */({
+ * @type {FunctionComponent<AuthTokenEditProps>}
+ */
+export const authTokenEdit = ({
   authToken: t,
   onSave,
   onDeleteAuthToken,
   onCancelEdit,
   legend
 }) => {
-  /** @type {[Error | null, (err: Error | null) => void]} */
-  const [error, setError] = useState(null)
-  /** @type {[boolean, (confirm: boolean) => void]} */
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-  /** @type {[boolean, (disabled: boolean) => void]} */
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
@@ -53,51 +44,59 @@ export const authTokenEdit = Component(/** @type{AuthTokenView} */({
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  /** @type {() => Promise<void>} */
+  /** @type {(ev: Event) => Promise<void>} */
   const handleDeleteAuthToken = useCallback(async (/** @type{Event} */ ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
     try {
-      await onDeleteAuthToken?.()
+      if (onDeleteAuthToken) await onDeleteAuthToken()
     } catch (err) {
-      const handledError = err instanceof Error ? err : new Error('Unknown error', { cause: err })
       setDisabled(false)
-      setError(handledError)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, onDeleteAuthToken])
 
   /**
-   * @type{ (ev: SubmitEvent) => Promise<void>}
+   * @type {(ev: SubmitEvent) => Promise<void>}
    */
   const handleSave = useCallback(async (/** @type{SubmitEvent} */ ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
-    const form = formRef.current
-    const note = form.note.value
-    const protect = form.protect.checked
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
+
+    const noteElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('note'))
+    const protectElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('protect'))
+
+    if (!noteElement || !protectElement) return
 
     const formState = {
-      note,
-      protect
+      note: noteElement.value,
+      protect: protectElement.checked
     }
 
     try {
-      await onSave?.(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Unknown error', { cause: err })
       setDisabled(false)
-      setError(error)
+      setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave])
+  }, [setDisabled, setError, onSave])
 
   return html`
     <div class='bc-auth-token-edit'>
       <form ref="${formRef}" class="edit-auth-token-form" id="edit-auth-token-form" onsubmit=${handleSave}>
         <fieldset ?disabled=${disabled}>
-          ${legend ? html`<legend class="bc-auth-token-legend">${legend}</legend>` : null}
+          ${legend
+? html`<legend class="bc-auth-token-legend">${
+            typeof legend === 'string'
+              ? legend
+              : legend
+          }</legend>`
+: null}
           <div>
             <label class='block'>
               note:
@@ -133,9 +132,9 @@ export const authTokenEdit = Component(/** @type{AuthTokenView} */({
               : null
             }
           </div>
-          ${error ? html`<div class="error-box">${error.message}</div>` : null}
+          ${error ? html`<div class="error-box">${error?.message}</div>` : null}
         </fieldset>
       </form>
     </div>
     `
-})
+}

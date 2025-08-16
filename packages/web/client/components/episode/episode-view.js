@@ -5,7 +5,7 @@ import format from 'format-duration'
 import { textIcon } from '../text-icon/index.js'
 import { episodeTitle } from '../episode-title/index.js'
 import { corsMedia } from '../cors-media/cors-media.js'
-import { expandText } from '../expand-text/index.js'
+import { ExpandText } from '../expand-text/index.js'
 
 export const episodeView = Component(({
   episode: e,
@@ -70,7 +70,7 @@ export const episodeView = Component(({
       ${
         e?.text_content // Watch your whitepsace here
           ? html`
-            ${expandText({
+            ${ExpandText({
               children: e?.text_content,
               pre: true,
             })}

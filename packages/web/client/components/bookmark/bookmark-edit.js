@@ -6,7 +6,7 @@ import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
 import { episodeTitle } from '../episode-title/index.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { archiveTitle } from '../archive-title/index.js'
+import { ArchiveTitle } from '../archive-title/index.js'
 
 export const bookmarkEdit = Component(({
   bookmark: b,
@@ -369,7 +369,7 @@ export const bookmarkEdit = Component(({
               archives:
             </label>
             ${b.archives.map(
-                ar => html.for(ar, ar.id)`${archiveTitle({ archive: ar, small: true })}`
+                ar => html.for(ar, ar.id)`${ArchiveTitle({ archive: ar, small: true })}`
               )
           }`
             : null

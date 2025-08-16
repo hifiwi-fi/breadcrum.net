@@ -7,8 +7,8 @@
  */
 
 import { html } from 'htm/preact'
-import { archiveTitle } from '../archive-title/index.js'
-import { expandText } from '../expand-text/index.js'
+import { ArchiveTitle } from '../archive-title/index.js'
+import { ExpandText } from '../expand-text/index.js'
 
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient & {
@@ -18,7 +18,7 @@ import { expandText } from '../expand-text/index.js'
  * onEdit?: () => void, // TODO: Add when editing is supported
  * fullView?: boolean
 }>} */
-export const archiveView = ({
+export const ArchiveView = ({
   archive: ar,
   onEdit = () => {}, // TODO: Add when editing is supported
   fullView,
@@ -26,7 +26,7 @@ export const archiveView = ({
   return html`
     <div class="bc-archive-view">
 
-      ${archiveTitle({ archive: ar, big: fullView })}
+      <${ArchiveTitle} archive=${ar} big=${!!fullView} />
 
       <div class="bc-archive-url-display">
         ${fullView ? '🗄️ ' : ''}<a href="${ar.url}">${ar.site_name || ar.url.replace(/^https?:\/\//, '')}</a>${ar.byline ? ` · ${ar.byline}` : null}
@@ -43,9 +43,7 @@ export const archiveView = ({
         ar?.excerpt && !fullView
           ? html`
             <div class="bc-archive-excerpt">
-              ${expandText({
-                children: ar?.excerpt,
-              })}
+              <${ExpandText} children=${ar?.excerpt} />
             </div>
           `
           : null
@@ -79,9 +77,7 @@ export const archiveView = ({
       ${
         ar?.html_content
         ? html`
-          <div class="bc-archive-html-content">
-            ${html(Object.assign([ar?.html_content], { raw: [ar?.html_content] }))}
-          </div>
+          <div class="bc-archive-html-content" dangerouslySetInnerHTML="${{ __html: ar.html_content }}" />
         `
         : ar?.text_content // Watch your whitepsace here
           ? html`

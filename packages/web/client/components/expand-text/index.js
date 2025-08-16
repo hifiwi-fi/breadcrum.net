@@ -2,7 +2,7 @@ import { Component, html, useCallback, useState, useRef } from 'uland-isomorphic
 import { useWindow } from '../../hooks/useWindow.js'
 import cn from 'classnames'
 
-export const expandText = Component(({
+export const ExpandText = Component(({
   children,
   defaultExpandState,
   classNames = [],
