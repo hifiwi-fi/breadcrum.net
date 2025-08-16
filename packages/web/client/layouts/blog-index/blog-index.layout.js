@@ -1,6 +1,6 @@
 import { html } from 'uland-isomorphic'
 import { sep } from 'node:path'
-import { breadcrumb } from '../../components/breadcrumb/index.js'
+import { Breadcrumb } from '../../components/breadcrumb/index.js'
 
 /**
  * @import { LayoutFunction } from '@domstack/static'
@@ -25,7 +25,7 @@ export default function blogIndexLayout (args) {
   const { children, ...rest } = args
   const pathSegments = args.page.path.split(sep)
   const wrappedChildren = html`
-    ${breadcrumb({ pathSegments })}
+    ${Breadcrumb({ pathSegments })}
     <h1>${args.vars.title}</h1>
     ${typeof children === 'string'
       ? html([children])

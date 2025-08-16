@@ -1,7 +1,17 @@
-import { Component, html } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { FunctionComponent } from 'preact'
+*/
+
+import { html } from 'htm/preact'
 import cn from 'classnames'
 
-export const breadcrumb = Component(({
+/** @type{FunctionComponent<{
+ * pathSegments: string[]
+}>} */
+export const Breadcrumb = ({
   pathSegments,
 }) => {
   return html`
@@ -16,7 +26,7 @@ export const breadcrumb = Component(({
         </ol>
     </nav>
   `
-})
+}
 
 const relativePathSegment = '../'
 function generateRelativePathSegment (segment, index, segmentLength) {

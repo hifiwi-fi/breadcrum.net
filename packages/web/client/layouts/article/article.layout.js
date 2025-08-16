@@ -1,6 +1,6 @@
 import { html } from 'uland-isomorphic'
 import { sep } from 'node:path'
-import { breadcrumb } from '../../components/breadcrumb/index.js'
+import { Breadcrumb } from '../../components/breadcrumb/index.js'
 import { articleHeader } from '../../components/article-header/index.js'
 
 import defaultRootLayout from '../root/root.layout.js'
@@ -11,7 +11,7 @@ export default function articleLayout (args) {
   const vars = rest.vars
   const pathSegments = page.path.split(sep)
   const wrappedChildren = html`
-    ${breadcrumb({ pathSegments })}
+    ${Breadcrumb({ pathSegments })}
     <article class="bc-article h-entry" itemscope itemtype="http://schema.org/NewsArticle">
         ${articleHeader({
             title: vars.title,
@@ -49,7 +49,7 @@ export default function articleLayout (args) {
       lang="en"
       loading="lazy"
     ></giscus-widget>
-    ${breadcrumb({ pathSegments })}
+    ${Breadcrumb({ pathSegments })}
   `
 
   return defaultRootLayout({ children: wrappedChildren, ...rest })
