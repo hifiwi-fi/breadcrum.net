@@ -1,9 +1,11 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render } from 'uland-isomorphic'
+import { html } from 'htm/preact'
+import { render } from 'preact'
 // import { useUser } from './hooks/useUser.js'
 import { badge } from './components/badge/badge.js'
 
-export const page = Component(() => {
+export const page = () => {
   // const { user } = useUser()
 
   // useEffect(() => {
@@ -216,8 +218,11 @@ export const page = Component(() => {
         </div>
       </div>
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(page(), container)
+  }
 }

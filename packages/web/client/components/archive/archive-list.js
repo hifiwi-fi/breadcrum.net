@@ -1,12 +1,28 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { diffArchive } from './diff-archive.js'
 
 import { archiveEdit } from './archive-edit.js'
 import { archiveView } from './archive-view.js'
 
-export const archiveList = Component(({ archive, reload, onDelete, fullView }) => {
+/** @type {FunctionComponent<{
+ * archive: TypeArchiveReadClient & {
+ *   bookmark: { id: string, title: string }
+ * },
+ * reload: () => void,
+ * onDelete: () => void,
+ * fullView?: boolean
+}>} */
+export const archiveList = ({ archive, reload, onDelete, fullView }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -19,7 +35,7 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newArchive) => {
+  const handleSave = useCallback(/** @param {{ title: string }} newArchive */ async (newArchive) => {
     const payload = diffArchive(archive, newArchive)
     const endpoint = `${state.apiUrl}/archives/${archive.id}`
 
@@ -35,7 +51,7 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     setEditing(false)
   }, [archive, state.apiUrl, reload, setEditing])
 
-  const handleDeleteArchive = useCallback(async (ev) => {
+  const handleDeleteArchive = useCallback(async () => {
     await fetch(`${state.apiUrl}/archives/${archive.id}`, {
       method: 'delete',
       headers: {
@@ -62,8 +78,8 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
         : archiveView({
             archive,
             onEdit: handleEdit,
-            fullView,
+            fullView: fullView || false,
           })
     }
   </div>`
-})
+}

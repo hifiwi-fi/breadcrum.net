@@ -1,14 +1,28 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html } from 'uland-isomorphic'
 
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ */
+
+import { html } from 'htm/preact'
 import { archiveTitle } from '../archive-title/index.js'
 import { expandText } from '../expand-text/index.js'
 
-export const archiveView = Component(({
+/** @type {FunctionComponent<{
+ * archive: TypeArchiveReadClient & {
+ *   bookmark: { id: string, title: string },
+ *   error?: string
+ * },
+ * onEdit?: () => void, // TODO: Add when editing is supported
+ * fullView?: boolean
+}>} */
+export const archiveView = ({
   archive: ar,
-  onEdit = () => {},
+  onEdit = () => {}, // TODO: Add when editing is supported
   fullView,
-} = {}) => {
+}) => {
   return html`
     <div class="bc-archive-view">
 
@@ -32,7 +46,7 @@ export const archiveView = Component(({
               ${expandText({
                 children: ar?.excerpt,
               })}
-            </div?
+            </div>
           `
           : null
       }
@@ -44,6 +58,13 @@ export const archiveView = Component(({
           </time>
         </a>
       </div>
+
+      <!-- TODO: Add Edit button when editing is supported
+      <div>
+        <button onClick=${onEdit}>Edit</button>
+      </div>
+      -->
+
 
       ${ar.error
         ? html`
@@ -59,7 +80,7 @@ export const archiveView = Component(({
         ar?.html_content
         ? html`
           <div class="bc-archive-html-content">
-            ${html([ar?.html_content])}
+            ${html(Object.assign([ar?.html_content], { raw: [ar?.html_content] }))}
           </div>
         `
         : ar?.text_content // Watch your whitepsace here
@@ -70,4 +91,4 @@ export const archiveView = Component(({
       }
     </div>
   `
-})
+}

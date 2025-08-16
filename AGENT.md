@@ -4,6 +4,28 @@ This is a TypeScript-in-JavaScript type checked codebase. All code uses JSDoc co
 
 ## JSDoc Typing Patterns
 
+### Avoid any types
+
+Never use `any` types - always use specific types that describe the actual data structure. Instead of:
+
+```javascript
+// ❌ Avoid
+const data: any = {...}
+
+// ❌ Avoid
+function process(item: any) {...}
+```
+
+Use specific types:
+
+```javascript
+// ✅ Good
+const data: { id: number, name: string } = {...}
+
+// ✅ Good
+function process(item: { id: number, name: string }) {...}
+```
+
 ### Use newer @import syntax in jsdoc/ts-in-js
 
 Avoid inline imports as much as possible and prefer the newer @import syntax placed near the top level imports.
@@ -24,6 +46,92 @@ Do this
 
 /** @type {QueryResult<TypeUserRead>} */
 const results = await client.query(query)
+```
+
+### Import Consolidation
+
+**Consolidate imports from the same module** - combine multiple imports from the same module into a single @import statement:
+
+```javascript
+// ❌ Avoid separate imports from same module
+/** @import { FunctionComponent } from 'preact' */
+/** @import { ComponentChild } from 'preact' */
+/** @import { QueryResult } from 'pg' */
+/** @import { Pool } from 'pg' */
+
+// ✅ Consolidate imports from same module
+/** @import { FunctionComponent, ComponentChild } from 'preact' */
+/** @import { QueryResult, Pool } from 'pg' */
+```
+
+### Preact Component Import Syntax
+
+For preact components, always use the @import syntax at the top of the file:
+
+```javascript
+/**
+ * @import { FunctionComponent, ComponentChild, JSX } from 'preact'
+ */
+```
+
+Never use inline import syntax like `import('preact').ComponentChild` - always use the @import syntax instead:
+
+```javascript
+// ❌ Avoid inline imports
+legend?: string | import('preact').ComponentChild
+
+// ✅ Use @import syntax
+/** @import { ComponentChild } from 'preact' */
+legend?: string | ComponentChild
+```
+
+### Prefer Schema-Based Types
+
+Always import types from schema files instead of redefining them manually:
+
+```javascript
+// ✅ Good - import from schema
+/** @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js' */
+
+archive: TypeArchiveReadClient
+
+// ❌ Avoid - manual type definition
+archive: {
+  id: string,
+  title: string,
+  url: string,
+  // ... many more fields
+}
+```
+
+This ensures:
+- Single source of truth for types
+- Automatic updates when schemas change
+- Consistency across components
+
+### Form Element Access Pattern
+
+When accessing form elements through refs, use proper type casting with null checks:
+
+```javascript
+const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+if (!form) return
+
+const titleElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('title'))
+if (!titleElement) return
+const title = titleElement.value
+```
+
+### Error Handling in Components
+
+Always type-cast errors and check for optional callbacks:
+
+```javascript
+try {
+  if (onSave) await onSave(formState)
+} catch (err) {
+  setError(/** @type {Error} */(err))
+}
 ```
 
 ### Typing Database Query Results
@@ -90,9 +198,13 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 /* eslint-env browser */
 ```
 
-## uhtml Template Constraints
+## Preact/HTM Template Constraints
 
-- **Single interpolation per attribute**: uhtml only supports one tagged template interpolation per HTML attribute
+HTM is JSX-like syntax in plain JavaScript with no transpiler necessary. It uses standard JavaScript Tagged Templates.
+
+### HTM Syntax Features
+
+- **Single interpolation per attribute**: htm only supports one tagged template interpolation per HTML attribute
   ```javascript
   // ❌ Won't work - multiple interpolations
   class="${someClass} ${anotherClass}"
@@ -114,36 +226,39 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
   })}"
   ```
 
-- **DOM attributes, not React conventions**: uhtml uses actual DOM attribute names
-  ```javascript
-  // ❌ Wrong - React style
-  <div className="my-class" />
+- **Spread props**: `<div ...${props}>` (note the three dots inside the interpolation)
 
-  // ✅ Correct - DOM attributes
-  <div class="my-class" />
-  ```
+- **Self-closing tags**: `<div />`
 
-- **Special attribute prefixes**:
-  - `?attribute=${value}` - Boolean attributes (added when truthy, removed when falsy)
-    ```javascript
-    <button ?disabled=${isLoading}>Submit</button>
-    ```
-  - `.property=${value}` - Direct property setter
-    ```javascript
-    <input .value=${inputValue} />
-    ```
-  - `@event=${handler}` or `onevent=${handler}` - Event listeners
-    ```javascript
-    <button @click=${handleClick}>Click me</button>
-    <button onclick=${handleClick}>Click me</button>
-    ```
-  - `ref=${object}` - Element references (object.current or callback)
-  - `aria=${object}` - Aria attributes object
-  - `.dataset=${object}` - Data attributes object
+- **Components**: `<${Foo}>` where `Foo` is a component reference
 
-### uhtml Template Guidelines
+- **Boolean attributes**: `<div draggable />` (no value needed)
 
-- **Single interpolation per attribute**: uhtml only supports one template interpolation per HTML attribute
+- **HTML's optional quotes**: `<div class=foo>` (quotes optional for simple values)
+
+- **Component end-tags**: `<${Footer}>footer content<//>`
+
+- **Multiple root elements** (fragments): `<div /><div />`
+
+- **HTML-style comments**: `<div><!-- comment --></div>`
+
+- **Standard JSX event handlers**: `<button onClick=${handleClick}>Click me</button>`
+
+### Converting String Children to HTM Templates
+
+When working with string HTML content that needs to be rendered as JSX, convert it to a proper TemplateStringsArray-like object:
+
+```js
+// For string children in layouts
+${typeof children === 'string'
+  ? html(Object.assign([children], { raw: [children] }))
+  : children
+}
+```
+
+### HTM Template Guidelines
+
+- **Single interpolation per attribute**: htm only supports one template interpolation per HTML attribute
   ```js
   // ❌ Wrong - multiple interpolations
   class="${someClass} ${anotherClass}"
@@ -153,7 +268,78 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
   ```
 - **Use classnames for class toggles**: Always import and use `classnames` as `cn` for conditional classes
   ```js
-  import cn
+  import cn from 'classnames'
+  ```
+- **HTML comments**: Use HTML-style comments for TODO items or disabled functionality
+  ```js
+  <!-- TODO: Add Edit button when editing is supported -->
+  ```
+
+## Converting from uland-isomorphic to Preact
+
+When converting uland-isomorphic components to preact:
+
+### Component Definition
+```js
+// ❌ uland pattern
+import { Component, html } from 'uland-isomorphic'
+export const MyComponent = Component(() => {
+  return html`<div>content</div>`
+})
+
+// ✅ preact pattern
+import { html } from 'htm/preact'
+export const MyComponent = () => {
+  return html`<div>content</div>`
+}
+```
+
+### Client-Side Rendering
+```js
+// ❌ uland pattern
+import { render } from 'uland-isomorphic'
+render(document.querySelector('.container'), component)
+
+// ✅ preact pattern
+import { render } from 'preact'
+const container = document.querySelector('.container')
+if (container) {
+  render(component(), container)
+}
+```
+
+### Isomorphic Page Wrapper
+```js
+// ❌ uland pattern
+import { html } from 'uland-isomorphic'
+import { page } from './client.js'
+
+export default () => {
+  return html`${page()}`
+}
+
+// ✅ preact pattern
+import { page } from './client.js'
+
+export default () => {
+  return page()
+}
+```
+
+## Component Conversion Checklist
+
+When converting components from uland to preact:
+
+1. **Update imports**: `uland-isomorphic` → `htm/preact` + `preact/hooks`
+2. **Remove Component wrappers**: `Component(() => {...})` → `() => {...}`
+3. **Add proper typing**: Use `@import` statements and specific types
+4. **Fix string children**: Use `html(Object.assign([children], { raw: [children] }))`
+5. **Add DOM headers**: For client-side code, include `/// <reference lib="dom" />` and `/* eslint-env browser */`
+6. **Use schema types**: Import from schema files instead of redefining
+7. **Check diagnostics**: Fix all TypeScript errors before considering complete
+8. **Avoid any types**: Always use specific types that describe actual data
+9. **Handle optional callbacks**: Check existence before calling: `if (onSave) await onSave(...)`
+10. **Type-cast errors**: Use `/** @type {Error} */(err)` in catch blocks
 
 ## Package.json Scripts
 
