@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 /**
- * @import { VNode, FunctionComponent, RenderableProps } from 'preact'
+ * @import { VNode, FunctionComponent } from 'preact'
  */
 
 import { html } from 'htm/preact'

@@ -1,8 +1,25 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html } from 'uland-isomorphic'
-import { userRow } from './user-row.js'
 
-export const userTable = Component(({ users, reload, onDelete }) => {
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeAdminUserRead } from '../../../routes/api/admin/users/schema-admin-user-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { UserRow } from './user-row.js'
+
+/**
+ * @typedef {object} UserTableProps
+ * @property {TypeAdminUserRead[]} users
+ * @property {() => void} reload
+ * @property {() => void} onDelete
+ */
+
+/**
+ * @type {FunctionComponent<UserTableProps>}
+ */
+export const UserTable = ({ users, reload, onDelete }) => {
   return html`
     <table class="bc-admin-users-table">
       <thead>
@@ -23,12 +40,10 @@ export const userTable = Component(({ users, reload, onDelete }) => {
         </tr>
       </thead>
       <tbody>
-        ${users.map(u => html.for(u, u.id)`${userRow({
-          user: u,
-          reload,
-          onDelete,
-        })}`)}
+        ${users.map(u => html`
+          <${UserRow} key=${u.id} user=${u} reload=${reload} onDelete=${onDelete} />
+        `)}
       </tbody>
     </table>
   `
-})
+}

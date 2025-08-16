@@ -6,12 +6,17 @@
  * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
  */
 
+/**
+ * @typedef {object} ArchiveFormState
+ * @property {string} title
+ */
+
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback } from 'preact/hooks'
 
 /** @type {FunctionComponent<{
  * archive?: TypeArchiveReadClient,
- * onSave?: (formState: { title: string }) => Promise<void>,
+ * onSave?: (formState: ArchiveFormState) => Promise<void>,
  * onDeleteArchive?: () => Promise<void>,
  * onCancelEdit?: () => void,
  * legend?: string | ComponentChild

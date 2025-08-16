@@ -4,16 +4,17 @@
 /**
  * @import { FunctionComponent } from 'preact'
  * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ * @import { ArchiveFormState } from './archive-edit.js'
  */
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { diffArchive } from './diff-archive.js'
 import { tc } from '../../lib/typed-component.js'
 
 import { ArchiveEdit } from './archive-edit.js'
 import { ArchiveView } from './archive-view.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient & {
@@ -36,8 +37,8 @@ export const archiveList = ({ archive, reload, onDelete, fullView }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(/** @param {{ title: string }} newArchive */ async (newArchive) => {
-    const payload = diffArchive(archive, newArchive)
+  const handleSave = useCallback(/** @param {ArchiveFormState} newArchive */ async (newArchive) => {
+    const payload = diffUpdate(archive, newArchive)
     const endpoint = `${state.apiUrl}/archives/${archive.id}`
 
     await fetch(endpoint, {

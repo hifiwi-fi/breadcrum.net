@@ -1,29 +1,50 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 
-import { Component, html, useCallback } from 'uland-isomorphic'
-// import cn from 'classnames'
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
 
-export const search = Component(
-  ({
-    placeholder = 'Search...',
-    value,
-    onSearch = (query) => {},
-  }) => {
-    const handleSearch = useCallback((ev) => {
-      ev.preventDefault()
-      const query = ev.currentTarget.search.value
-      onSearch(query)
-    }, [onSearch])
+import { html } from 'htm/preact'
+import { useCallback } from 'preact/hooks'
 
-    return html`
+/**
+ * @typedef {object} SearchProps
+ * @property {string} [placeholder]
+ * @property {string} [value]
+ * @property {(query: string) => void} [onSearch]
+ */
+
+/**
+ * @type {FunctionComponent<SearchProps>}
+ */
+export const Search = ({
+  placeholder = 'Search...',
+  value,
+  onSearch = () => {},
+}) => {
+  const handleSearch = useCallback((/** @type {SubmitEvent & {currentTarget: HTMLFormElement}} */ev) => {
+    ev.preventDefault()
+    const form = ev.currentTarget
+    const formData = new FormData(form)
+    const query = /** @type {string} */(formData.get('search') || '')
+    onSearch(query)
+  }, [onSearch])
+
+  return html`
     <div class="bc-search-container">
       <search role="search">
         <form onsubmit="${handleSearch}" class="search-form">
-          <input value="${value}" class="search-bar" placeholder="${placeholder}" type="search" name="search">
-          <input name="search-button" type="submit" value="search">
+          <input
+            value="${value}"
+            class="search-bar"
+            placeholder="${placeholder}"
+            type="search"
+            name="search"
+          />
+          <input name="search-button" type="submit" value="search" />
         </form>
       </search>
     </div>
-    `
-  }
-)
+  `
+}
