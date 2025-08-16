@@ -12,7 +12,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { BookmarkEdit } from './bookmark-edit.js'
 import { BookmarkView } from './bookmark-view.js'
-import { diffBookmark } from '../../lib/diff-bookmark.js'
+import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 
 /**
  * @typedef {object} BookmarkListProps
@@ -38,7 +38,10 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
   }, [setEditing])
 
   const handleSave = useCallback(async (/** @type {any} */newBookmark) => {
-    const payload = diffBookmark(bookmark, newBookmark)
+    const payload = diffUpdate(bookmark, newBookmark, {
+      tags: arraySetEqual,
+      archive_urls: arraySetEqual,
+    })
 
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
 

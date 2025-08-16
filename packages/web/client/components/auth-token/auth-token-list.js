@@ -13,7 +13,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { AuthTokenEdit } from './auth-token-edit.js'
 import { AuthTokenView } from './auth-token-view.js'
-import { diffToken } from '../../lib/diff-auth-token.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 
 /**
  * @typedef {object} AuthTokenListProps
@@ -45,7 +45,7 @@ export const authTokenList = ({ authToken, reload, onDelete }) => {
    * @type {(newAuthToken: TypeAuthTokenUpdate) => Promise<void>}
    */
   const handleSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */newAuthToken) => {
-    const payload = diffToken(authToken, newAuthToken)
+    const payload = diffUpdate(authToken, newAuthToken)
 
     const endpoint = `${state.apiUrl}/user/auth-tokens/${authToken.jti}`
 

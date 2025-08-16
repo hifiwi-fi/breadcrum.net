@@ -3,7 +3,7 @@ import { Component, html, useState, useCallback } from 'uland-isomorphic'
 import { useLSP } from '../../hooks/useLSP.js'
 import { userRowEdit } from './user-row-edit.js'
 import { userRowView } from './user-row-view.js'
-import { diffUser } from '../../lib/diff-user.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 
 export const userRow = Component(({ user, reload, onDelete }) => {
   const state = useLSP()
@@ -19,7 +19,7 @@ export const userRow = Component(({ user, reload, onDelete }) => {
   }, [setEditing])
 
   const handleSave = useCallback(async (newUser) => {
-    const payload = diffUser(user, newUser)
+    const payload = diffUpdate(user, newUser)
 
     const endpoint = `${state.apiUrl}/admin/users/${user.id}`
 

@@ -6,7 +6,7 @@ import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
-import { diffBookmark } from '../../lib/diff-bookmark.js'
+import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 
 export const page = Component(() => {
   const state = useLSP()
@@ -98,7 +98,10 @@ export const page = Component(() => {
   async function handleSaveBookmark (newBookmark) {
     // Clean request for updates
     const payload = existingBookmark
-      ? diffBookmark(bookmark, newBookmark)
+      ? diffUpdate(bookmark, newBookmark, {
+        tags: arraySetEqual,
+        archive_urls: arraySetEqual,
+      })
       : newBookmark
 
     if (Object.keys(payload).length === 0) {

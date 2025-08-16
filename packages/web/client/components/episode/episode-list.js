@@ -11,7 +11,7 @@ import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
-import { diffEpisode } from './diff-episode.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 import { EpisodeEdit } from './episode-edit.js'
 import { EpisodeView } from './episode-view.js'
 
@@ -40,7 +40,7 @@ export const EpisodeList = ({ episode, reload, onDelete, clickForPreview }) => {
   }, [setEditing])
 
   const handleSave = useCallback(async (/** @type {EpisodeUpdateData} */newEpisode) => {
-    const payload = diffEpisode(episode, newEpisode)
+    const payload = diffUpdate(episode, newEpisode)
     const endpoint = `${state.apiUrl}/episodes/${episode.id}`
 
     await fetch(endpoint, {
