@@ -10,7 +10,8 @@
 import { html } from 'htm/preact'
 import { useRef, useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { authTokenEdit } from './auth-token-edit.js'
+import { tc } from '../../lib/typed-component.js'
+import { AuthTokenEdit } from './auth-token-edit.js'
 
 /**
  * @typedef {object} AuthTokenManageCreateFieldProps
@@ -21,7 +22,7 @@ import { authTokenEdit } from './auth-token-edit.js'
 /**
  * @type {FunctionComponent<AuthTokenManageCreateFieldProps>}
  */
-export const manageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => {
+export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => {
   const state = useLSP()
   const [newToken, setNewToken] = useState(/** @type {TypeAuthTokenCreateResponseClient | null} */(null))
   const copyButton = useRef()
@@ -92,11 +93,11 @@ export const manageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => 
   }
 
   ${!newToken
-    ? html`${authTokenEdit({ // Important this stays wrapped in html
+    ? tc(AuthTokenEdit, {
               onSave: handleCreateSave,
               onCancelEdit: handleCancelEditMode,
               legend: 'Create Auth Token'
-          })}`
+          })
     : null
   }`
 }

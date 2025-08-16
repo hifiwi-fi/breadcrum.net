@@ -10,8 +10,9 @@
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { authTokenEdit } from './auth-token-edit.js'
-import { authTokenView } from './auth-token-view.js'
+import { tc } from '../../lib/typed-component.js'
+import { AuthTokenEdit } from './auth-token-edit.js'
+import { AuthTokenView } from './auth-token-view.js'
 import { diffToken } from '../../lib/diff-auth-token.js'
 
 /**
@@ -32,16 +33,10 @@ export const authTokenList = ({ authToken, reload, onDelete }) => {
   /** @type {[boolean, (deleted: boolean) => void]} */
   const [deleted, setDeleted] = useState(false)
 
-  /**
-   * @type {() => void}
-   */
   const handleEdit = useCallback(() => {
     setEditing(true)
   }, [setEditing])
 
-  /**
-   * @type {() => void}
-   */
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
   }, [setEditing])
@@ -90,14 +85,14 @@ export const authTokenList = ({ authToken, reload, onDelete }) => {
     ${deleted
       ? null
       : editing
-        ? authTokenEdit({
+        ? tc(AuthTokenEdit, {
             authToken,
             onSave: handleSave,
             onDeleteAuthToken: handleDeleteAuthToken,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${authToken.jti}</code>`,
           })
-        : authTokenView({
+        : tc(AuthTokenView, {
             authToken,
             onEdit: handleEdit,
           })

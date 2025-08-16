@@ -14,5 +14,5 @@ import { html } from 'htm/preact'
  * @param {T} props
  * @returns {VNode}
  */
-export const typedComponent = (component, props) =>
+export const tc = (component, props) =>
   html`<${component} ...${props} />`

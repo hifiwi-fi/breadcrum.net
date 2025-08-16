@@ -10,7 +10,7 @@ import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { diffArchive } from './diff-archive.js'
-import { typedComponent } from '../../lib/typed-component.js'
+import { tc } from '../../lib/typed-component.js'
 
 import { ArchiveEdit } from './archive-edit.js'
 import { ArchiveView } from './archive-view.js'
@@ -69,14 +69,14 @@ export const archiveList = ({ archive, reload, onDelete, fullView }) => {
     ${deleted
       ? null
       : editing
-        ? typedComponent(ArchiveEdit, {
+        ? tc(ArchiveEdit, {
             archive,
             onSave: handleSave,
             onDeleteArchive: handleDeleteArchive,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${archive?.id}</code>`,
           })
-        : typedComponent(ArchiveView, {
+        : tc(ArchiveView, {
             archive,
             onEdit: handleEdit,
             fullView: fullView || false

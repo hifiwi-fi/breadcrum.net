@@ -7,7 +7,7 @@ import { html } from 'htm/preact'
 import { sep } from 'node:path'
 import { Breadcrumb } from '../../components/breadcrumb/index.js'
 import { ArticleHeader } from '../../components/article-header/index.js'
-import { typedComponent } from '../../lib/typed-component.js'
+import { tc } from '../../lib/typed-component.js'
 
 import defaultRootLayout from '../root/root.layout.js'
 
@@ -28,7 +28,7 @@ export default function articleLayout (args) {
   const wrappedChildren = html`
     <${Breadcrumb} pathSegments=${pathSegments} />
     <article class="h-entry" itemscope itemtype="http://schema.org/TechArticle">
-        ${typedComponent(ArticleHeader, {
+        ${tc(ArticleHeader, {
             title: vars.title,
             authorImgUrl: null,
             authorImgAlt: null,

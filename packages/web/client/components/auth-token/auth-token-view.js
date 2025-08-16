@@ -19,7 +19,7 @@ import cn from 'classnames'
 /**
  * @type {FunctionComponent<AuthTokenViewProps>}
  */
-export const authTokenView = ({
+export const AuthTokenView = ({
   authToken: t,
   onEdit = () => {},
 }) => {

@@ -22,7 +22,7 @@ import { useRef, useState, useCallback } from 'preact/hooks'
 /**
  * @type {FunctionComponent<AuthTokenEditProps>}
  */
-export const authTokenEdit = ({
+export const AuthTokenEdit = ({
   authToken: t,
   onSave,
   onDeleteAuthToken,

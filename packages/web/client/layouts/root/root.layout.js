@@ -4,7 +4,7 @@ import { html } from 'htm/preact'
 import { render } from 'preact-render-to-string'
 import { Header } from '../../components/header/index.js'
 import { Footer } from '../../components/footer/index.js'
-import { typedComponent } from '../../lib/typed-component.js'
+import { tc } from '../../lib/typed-component.js'
 
 /*
 
@@ -118,7 +118,7 @@ export default function defaultRootLayout ({
           ? html`<main class="bc-main" dangerouslySetInnerHTML="${{ __html: children }}"/>`
           : html`<main class="bc-main">${children}</main>`
         }
-        ${typedComponent(Footer, {
+        ${tc(Footer, {
           version,
           mastodonUrl,
           discordUrl,

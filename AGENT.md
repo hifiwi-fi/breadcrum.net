@@ -375,6 +375,21 @@ export default () => {
 }
 ```
 
+### Component Naming Convention
+
+**FunctionComponents should use capitalized function names** (class name style):
+```js
+// ✅ Good - capitalized component names
+export const ArticleHeader = ({ title, publishDate }) => { ... }
+export const Breadcrumb = ({ pathSegments }) => { ... }
+
+// ❌ Avoid - lowercase function names
+export const articleHeader = ({ title, publishDate }) => { ... }
+export const breadcrumb = ({ pathSegments }) => { ... }
+```
+
+This follows React/Preact conventions and makes it clear these are components, not regular functions.
+
 ### Component Syntax
 
 **❌ NEVER use direct function calls** - they break component identity and reconciliation:
@@ -397,11 +412,11 @@ ${MyComponent({ prop: value })}
  * @param {FunctionComponent<T>} component
  * @param {T} props
  */
-const typedComponent = (component, props) =>
+export const tc = (component, props) =>
   html`<${component} ...${props} />`
 
 // Usage with full type checking:
-${typedComponent(MyComponent, { prop: value, onSave: handler })}
+${tc(MyComponent, { prop: value, onSave: handler })}
 ```
 
 **When to use each approach:**
@@ -410,9 +425,9 @@ ${typedComponent(MyComponent, { prop: value, onSave: handler })}
   <${Header} />
   <${Breadcrumb} pathSegments=${pathSegments} />
   ```
-- **typedComponent**: Use for complex props (better type checking)
+- **tc**: Use for complex props (better type checking)
   ```js
-  ${typedComponent(ArticleHeader, {
+  ${tc(ArticleHeader, {
     title: vars.title,
     authorImgUrl: null,
     authorImgAlt: null,
@@ -436,7 +451,7 @@ When converting components from uland to preact:
 2. **Remove Component wrappers**: `Component(() => {...})` → `() => {...}`
 3. **Add proper typing**: Use `@import` statements and specific types
 4. **Fix string children**: Use `dangerouslySetInnerHTML` for single elements or `render()` + string concatenation for fragments
-5. **Fix component syntax**: **NEVER use direct function calls** - use HTM component syntax: `${MyComponent({ prop: value })}` → `<${MyComponent} prop=${value} />` or typed helper
+5. **Fix component syntax**: **NEVER use direct function calls** - use HTM component syntax: `${MyComponent({ prop: value })}` → `<${MyComponent} prop=${value} />` or `tc` helper
 6. **Add DOM headers**: For client-side code, include `/// <reference lib="dom" />` and `/* eslint-env browser */`
 7. **Use schema types**: Import from schema files instead of redefining
 8. **Check diagnostics**: Fix all TypeScript errors before considering complete

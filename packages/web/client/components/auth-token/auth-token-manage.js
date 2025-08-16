@@ -7,7 +7,8 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { manageAuthTokenCreateField } from './auth-token-manage-create.js'
+import { tc } from '../../lib/typed-component.js'
+import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**
  * @typedef {'creating' | 'cleaning' | null } EditMode
@@ -44,7 +45,10 @@ export const manageAuthTokenField = ({ reload }) => {
   }
 
   ${editMode === 'creating'
-    ? html`${manageAuthTokenCreateField({ handleCancelEditMode, reload })}`
+    ? tc(ManageAuthTokenCreateField, {
+        handleCancelEditMode,
+        reload
+      })
     : null
   }
 
