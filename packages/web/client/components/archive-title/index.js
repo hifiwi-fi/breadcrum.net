@@ -1,21 +1,35 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-/* eslint-disable camelcase */
-import { Component, html } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ */
+
+import { html } from 'htm/preact'
 import cn from 'classnames'
 
-export const archiveTitle = Component(
-  (
-    {
-      archive: { id, url, title, site_name, length, excerpt, languange, byline, direction, error, ready } = {},
-      small,
-      big,
-    } = {}
-  ) => {
-    const href = small === true
-      ? `/archives/view/?id=${id}`
-      : url
+/**
+ * Archive title component
+ * @type {FunctionComponent<{
+ *   archive?: TypeArchiveReadClient,
+ *   small?: boolean,
+ *   big?: boolean
+ * }>}
+ */
+export const archiveTitle = ({
+  archive = {},
+  small,
+  big,
+} = {}) => {
+  const { id, url, title } = archive
+  // Handle error property safely - check if it exists on the archive object
+  const error = 'error' in archive ? archive.error : undefined
+  const href = small === true
+    ? `/archives/view/?id=${id}`
+    : url
 
-    return html`
+  return html`
     <div class="${cn({
       'bc-archives-title-container-small': small,
     })}">
@@ -39,5 +53,4 @@ export const archiveTitle = Component(
       </div>
     </div>
   `
-  }
-)
+}
