@@ -1,10 +1,28 @@
-import { html } from 'uland-isomorphic'
+/**
+ * @import { LayoutFunction } from '@domstack/static'
+ * @import { RootLayoutVars } from '../root/root.layout.js'
+ */
+
+import { html } from 'htm/preact'
 import { sep } from 'node:path'
 import { Breadcrumb } from '../../components/breadcrumb/index.js'
 import { articleHeader } from '../../components/article-header/index.js'
 
 import defaultRootLayout from '../root/root.layout.js'
 
+/**
+ * @typedef {{
+ * title: string,
+ * authorImgUrl?: string,
+ * authorImgAlt?: string,
+ * authorName?: string,
+ * authorUrl?: string,
+ * publishDate: string,
+ * updatedDate: string
+ * }} ArticleLayoutVars
+ */
+
+/** @type {LayoutFunction<RootLayoutVars & ArticleLayoutVars>} */
 export default function articleLayout (args) {
   const { children, ...rest } = args
   const page = rest.page
@@ -25,8 +43,8 @@ export default function articleLayout (args) {
 
       <section class="e-content" itemprop="articleBody">
         ${typeof children === 'string'
-          ? html([children])
-          : children /* Support both uhtml and string children. Optional. */
+          ? html(Object.assign([children], { raw: [children] }))
+          : children
         }
       </section>
 
@@ -52,5 +70,5 @@ export default function articleLayout (args) {
     ${Breadcrumb({ pathSegments })}
   `
 
-  return defaultRootLayout({ children: wrappedChildren, ...rest })
+  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
 }

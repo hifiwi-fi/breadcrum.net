@@ -1,21 +1,13 @@
-import { html } from 'uland-isomorphic'
-import { dirname } from 'node:path'
-
 /**
+ * @import { BlogIndexVars } from './blog-index.layout.js'
  * @import { LayoutFunction } from '@domstack/static'
  */
-
-/**
- * @typedef {import('./blog-index.layout.js').BlogIndexVars} BlogIndexVars
- */
-
-/**
- * @typedef {BlogIndexVars} AutoBlogIndexVars
- */
+import { html } from 'htm/preact'
+import { dirname } from 'node:path'
 
 import blogIndexLayout from './blog-index.layout.js'
 
-/** @type {LayoutFunction<AutoBlogIndexVars>} */
+/** @type {LayoutFunction<BlogIndexVars>} */
 export default function blogAutoIndexLayout (args) {
   const { children, ...rest } = args
 
@@ -23,7 +15,7 @@ export default function blogAutoIndexLayout (args) {
     const dir = dirname(folderPage.pageInfo.path)
     const path = args.page.path
     return dir === path
-  }).sort((a, b) => new Date(b.vars.publishDate) - new Date(a.vars.publishDate))
+  }).sort((a, b) => new Date(b.vars.publishDate).getTime() - new Date(a.vars.publishDate).getTime())
 
   const wrappedChildren = html`
     <ul class="blog-index-list">
@@ -43,8 +35,8 @@ export default function blogAutoIndexLayout (args) {
         })}
     </ul>
     ${typeof children === 'string'
-      ? html([children])
-      : children /* Support both uhtml and string children. Optional. */
+      ? html(Object.assign([children], { raw: [children] }))
+      : children
     }
   `
 

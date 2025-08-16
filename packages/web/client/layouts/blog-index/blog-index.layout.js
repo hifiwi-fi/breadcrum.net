@@ -1,14 +1,11 @@
-import { html } from 'uland-isomorphic'
-import { sep } from 'node:path'
-import { Breadcrumb } from '../../components/breadcrumb/index.js'
-
 /**
  * @import { LayoutFunction } from '@domstack/static'
+ * @import { RootLayoutVars } from '../root/root.layout.js'
  */
 
-/**
- * @typedef {import('../root/root.layout.js').RootLayoutVars} RootLayoutVars
- */
+import { html } from 'htm/preact'
+import { sep } from 'node:path'
+import { Breadcrumb } from '../../components/breadcrumb/index.js'
 
 /**
  * @typedef {RootLayoutVars & {
@@ -28,11 +25,10 @@ export default function blogIndexLayout (args) {
     ${Breadcrumb({ pathSegments })}
     <h1>${args.vars.title}</h1>
     ${typeof children === 'string'
-      ? html([children])
-      : children /* Support both uhtml and string children. Optional. */
+      ? html(Object.assign([children], { raw: [children] }))
+      : children
     }
   `
 
-  // @ts-ignore
-  return defaultRootLayout({ children: wrappedChildren, ...rest })
+  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
 }

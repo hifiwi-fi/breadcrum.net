@@ -1,3 +1,8 @@
+/**
+ * @import { LayoutFunction } from '@domstack/static'
+ * @import { RootLayoutVars } from '../root/root.layout.js'
+*/
+
 import { html } from 'htm/preact'
 import { sep } from 'node:path'
 import { Breadcrumb } from '../../components/breadcrumb/index.js'
@@ -5,6 +10,14 @@ import { articleHeader } from '../../components/article-header/index.js'
 
 import defaultRootLayout from '../root/root.layout.js'
 
+/**
+ * @typedef {{
+ * publishDate: string,
+ * updatedDate: string
+ }} DocsLayoutVars
+ */
+
+/** @type {LayoutFunction<RootLayoutVars & DocsLayoutVars>} */
 export default function articleLayout (args) {
   const { children, ...rest } = args
   const page = rest.page
@@ -23,16 +36,13 @@ export default function articleLayout (args) {
             publishDate: vars.publishDate,
             updatedDate: vars.updatedDate
         })}
-
-      <section class="bc-docs-main e-content" itemprop="articleBody">
-        ${typeof children === 'string'
-          ? html([children])
-          : children /* Support both uhtml and string children. Optional. */
-        }
-      </section>
+      ${typeof children === 'string'
+       ? html`<section class="bc-docs-main e-content" itemprop="articleBody" dangerouslySetInnerHTML="${{ __html: children }}"/>`
+       : html`<section class="bc-docs-main e-content" itemprop="articleBody">${children}</main>`
+       }
     </article>
     ${Breadcrumb({ pathSegments })}
   `
 
-  return defaultRootLayout({ children: wrappedChildren, ...rest })
+  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
 }

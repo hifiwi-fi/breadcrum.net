@@ -114,8 +114,8 @@ export default function defaultRootLayout ({
            <${Header} />
          </header>
          ${typeof children === 'string'
-          ? html`<main className="bc-main" dangerouslySetInnerHTML="${{ __html: children }}"/>`
-          : html`<main className="bc-main">${children}</main>`
+          ? html`<main class="bc-main" dangerouslySetInnerHTML="${{ __html: children }}"/>`
+          : html`<main class="bc-main">${children}</main>`
         }
         <${Footer}
           version=${version}

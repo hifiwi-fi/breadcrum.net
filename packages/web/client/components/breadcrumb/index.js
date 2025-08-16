@@ -29,6 +29,12 @@ export const Breadcrumb = ({
 }
 
 const relativePathSegment = '../'
+/**
+ * @param {string} segment - The current path segment
+ * @param {number} index - The index of the current segment
+ * @param {number} segmentLength - The total number of segments
+ * @returns {string} The relative path for the segment
+ */
 function generateRelativePathSegment (segment, index, segmentLength) {
   const segmentCount = segmentLength - index
   if (index === segmentLength - 1) return './'
