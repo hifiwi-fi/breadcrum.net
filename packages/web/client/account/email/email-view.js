@@ -121,7 +121,7 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
       ${!user?.pending_email_update ? html`<button onClick=${onEdit}>Edit</button>` : null}
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
-          onclick="${handleEmailConfirmRequest}"
+          onClick="${handleEmailConfirmRequest}"
           ?disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
           ${
             emailVerificationRequested
@@ -138,14 +138,14 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
         ${user?.pending_email_update} (update pending verification)
         <div>
         <button
-          onclick="${handleEmailUpdateConfirmRequest}"
+          onClick="${handleEmailUpdateConfirmRequest}"
           ?disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
             emailUpdateVerificationRequested
               ? 'Email update verification resent'
               : 'Resend email update confirmation'
           }</button>
         <button
-          onclick="${handleCancelEmailUpdate}"
+          onClick="${handleCancelEmailUpdate}"
           ?disabled="${cancellingEmailUpdate}"
         >
           ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}

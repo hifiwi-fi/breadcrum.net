@@ -45,8 +45,8 @@ export const authTokens = Component(/** @type{AuthTokensField} */() => {
       </div>
       <div>${manageAuthTokenField({ reload: reloadAuthTokens })}</div>
       <div>
-        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+        ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
       </div>
 
       ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
@@ -57,8 +57,8 @@ export const authTokens = Component(/** @type{AuthTokensField} */() => {
         : null}
 
       <div>
-        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+        ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
       </div>
     </dd>
   `

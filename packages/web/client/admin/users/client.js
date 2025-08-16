@@ -108,8 +108,8 @@ export const page = Component(() => {
 
   return html`
     <div>
-      ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
     ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
@@ -120,8 +120,8 @@ export const page = Component(() => {
     }
 
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>
 `
 })

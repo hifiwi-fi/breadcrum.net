@@ -140,8 +140,8 @@ export const page = Component(() => {
     })}
 
     <div>
-      ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+      ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
       🔎
       🔖 <a href="${`../bookmarks?query=${pageParams.get('query')}`}">bookmarks</a>
       🗄️ <a href="${`../archives?query=${pageParams.get('query')}`}">archives</a>
@@ -156,8 +156,8 @@ export const page = Component(() => {
       : null}
 
     <div>
-      ${prev ? html`<a onclick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${next ? html`<a onclick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+      ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
     </div>
 `
 })

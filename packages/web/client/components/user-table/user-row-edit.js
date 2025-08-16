@@ -79,8 +79,8 @@ export const userRowEdit = Component(({
   return html`
     <tr ref="${rowRef}" class="bc-user-row-edit">
         <td>
-          ${onSave ? html`<button name="submit-button" onclick=${handleSave}>Save</button>` : null}
-          ${onCancelEdit ? html`<button onclick=${onCancelEdit}>Cancel</button>` : null}
+          ${onSave ? html`<button name="submit-button" onClick=${handleSave}>Save</button>` : null}
+          ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           ${onDelete
             ? deleteConfirm
               ? html`

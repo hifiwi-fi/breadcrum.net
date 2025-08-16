@@ -126,8 +126,8 @@ export const page = Component(() => {
     onSearch: handleSearch,
   })}
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   <div>
   ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
   ${archivesError ? html`<div>${archivesError.message}</div>` : null}
@@ -135,8 +135,8 @@ export const page = Component(() => {
       ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
       : null}
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   <div>
 `
 })

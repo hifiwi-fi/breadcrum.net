@@ -120,15 +120,15 @@ export const authTokenEdit = Component(/** @type{AuthTokenView} */({
           <div class="bc-auth-token-edit-submit-line">
             <div class="button-cluster">
               ${onSave ? html`<input name="submit-button" type="submit">` : null}
-              ${onCancelEdit ? html`<button type="button" onclick="${onCancelEdit}">Cancel</button>` : null}
+              ${onCancelEdit ? html`<button type="button" onClick="${onCancelEdit}">Cancel</button>` : null}
             </div>
             ${onDeleteAuthToken
               ? html`<div>${deleteConfirm
                   ? html`
-                      <button onclick="${handleCancelDelete}">Cancel</button>
-                      <button onclick="${handleDeleteAuthToken}">Destroy</button>`
+                      <button onClick="${handleCancelDelete}">Cancel</button>
+                      <button onClick="${handleDeleteAuthToken}">Destroy</button>`
                   : html`
-                    <button ?disabled="${t?.is_current}" onclick="${handleInitiateDelete}">Delete</button>`}
+                    <button ?disabled="${t?.is_current}" onClick="${handleInitiateDelete}">Delete</button>`}
                 </div>`
               : null
             }

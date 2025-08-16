@@ -29,7 +29,7 @@ export const expandText = Component(({
   return html`
     <div
       ref="${expandRef}"
-      onclick="${handleClick}"
+      onClick="${handleClick}"
       class="${
         cn(
           'bc-epand-text',

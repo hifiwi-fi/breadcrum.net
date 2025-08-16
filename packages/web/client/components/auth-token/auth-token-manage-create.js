@@ -48,7 +48,7 @@ export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCre
 
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
       const data = await response.json()
-        setNewToken(data)
+      setNewToken(data)
       reload()
     } else {
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
@@ -82,11 +82,11 @@ export const manageAuthTokenCreateField = Component(/** @type{AuthTokenManageCre
           class="bc-token-create-copy-line-select"
           type="text"
           readonly
-          onclick=${handleNewTokenSelect}
+          onClick=${handleNewTokenSelect}
           value="${newToken.token}"
         >
-        <button type="button" ref=${copyButton} onclick=${handleNewTokenCopy}>Copy</button>
-        <button type="button" onclick="${handleHideNewToken}">Hide</button>
+        <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
+        <button type="button" onClick="${handleHideNewToken}">Hide</button>
       </div>
       <div class="bc-help-text bc-token-create-copy-help-text">
         ℹ️ New auth token created. Save it in a safe place as it will never be shown again.

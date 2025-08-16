@@ -52,7 +52,7 @@ export const page = Component(() => {
 
       <p>This will flush all cache keys from the Redis instance used by the app. Use with caution.</p>
 
-      <button ?disabled=${isSubmitting} onclick=${handleFlushCache}>
+      <button ?disabled=${isSubmitting} onClick=${handleFlushCache}>
         ${isSubmitting ? 'Flushing…' : 'Flush Redis Cache'}
       </button>
 

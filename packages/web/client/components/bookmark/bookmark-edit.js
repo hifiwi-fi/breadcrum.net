@@ -342,10 +342,10 @@ export const bookmarkEdit = Component(({
 
             <div class="bc-help-text">
               ↬:
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://ghostarchive.org/search?term=${encodeURIComponent(b?.url)}`}">ghostarchive.org</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://ghostarchive.org/search?term=${encodeURIComponent(b?.url)}`}">ghostarchive.org</a>,
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>,
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
             </div>
 
             ${archiveURLs.length > 0
@@ -357,8 +357,8 @@ export const bookmarkEdit = Component(({
             }
 
             <div>
-              <button onclick=${handleAddArchiveURL}>add</button>
-              ${archiveURLs.length > 1 ? html`<button onclick=${handleUndoAddArchiveURL}>remove</button>` : null}
+              <button onClick=${handleAddArchiveURL}>add</button>
+              ${archiveURLs.length > 1 ? html`<button onClick=${handleUndoAddArchiveURL}>remove</button>` : null}
             </div>
 
         </details>
@@ -439,7 +439,7 @@ export const bookmarkEdit = Component(({
             <input type="checkbox" name="custom-episode-url" onchange="${handleCustomEpisodeURLCheckboxChange}">
             custom url
           </label>
-          <button onclick="${handlePreviewRefresh}">refresh preview</button>
+          <button onClick="${handlePreviewRefresh}">refresh preview</button>
           </div>
 
           <input class="${cn({
@@ -452,7 +452,7 @@ export const bookmarkEdit = Component(({
             ? html`
             <span class="bc-help-text bc-episode-preview-title">
               <span>${episodePreview.src_type === 'video' ? '📼' : episodePreview.src_type === 'audio' ? '💿' : null}</span>
-              <a onclick=${handleNewWindowLink} target="_blank" href="${episodePreview.url}">${`${episodePreview.title}.${episodePreview.ext}`}</a>
+              <a onClick=${handleNewWindowLink} target="_blank" href="${episodePreview.url}">${`${episodePreview.title}.${episodePreview.ext}`}</a>
               <span>(${format(episodePreview.duration * 1000)})</span>
             <span>
             `
@@ -488,7 +488,7 @@ export const bookmarkEdit = Component(({
             <div class="bc-help-text">
               Version ${bookmarkletVersion}
               ${bookmarkletUpdateAvailable
-                ? html`<a onclick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
+                ? html`<a onClick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
               : null}
             </div>
             `

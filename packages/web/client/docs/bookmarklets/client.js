@@ -28,10 +28,10 @@ const bookmarkletCopyLine = Component(() => {
         class="bc-bookmarklet-copy-select"
         type="text"
         readonly
-        onclick=${handleSelect}
+        onClick=${handleSelect}
         value="${bookmarklet}"
       >
-      <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
+      <button ref=${copyButton} onClick=${handleCopy}>Copy</button>
     </div>
     <span class="bc-help-text">Or create a Bookmark and set the URL to the above script.</span>
   </div>

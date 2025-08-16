@@ -54,8 +54,8 @@ export const manageAuthTokenField = Component(/** @type{AuthTokenManageField} */
 
   ${!editMode
     ? html`
-      <button type="button" onclick="${handleCreateMode}">Create auth token</button>
-      <button type="button" onclick="${handleCleanMode}">Cleanup old tokens</button>
+      <button type="button" onClick="${handleCreateMode}">Create auth token</button>
+      <button type="button" onClick="${handleCleanMode}">Cleanup old tokens</button>
     `
     : null
   }

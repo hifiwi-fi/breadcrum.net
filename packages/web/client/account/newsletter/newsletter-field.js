@@ -64,7 +64,7 @@ export const newsletterField = Component(/** @type{NewsletterField} */({ user, r
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input onclick="${handleToggle}" type="checkbox" name="newsletter-subscription" ?disabled=${disabled} .indeterminate=${disabled} .checked=${user?.newsletter_subscription}>
+      <input onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" ?disabled=${disabled} .indeterminate=${disabled} .checked=${user?.newsletter_subscription}>
       Subscribed
     </label>
     ${error ? html`<div class="error-box">${error.message}</div>` : null}

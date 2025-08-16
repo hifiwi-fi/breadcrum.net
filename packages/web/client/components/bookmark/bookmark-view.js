@@ -76,7 +76,7 @@ export const bookmarkView = Component(({
         ? html`
           <div class="bc-tags-display">
             🏷
-            ${b.tags.map(tag => html` <a onclick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
+            ${b.tags.map(tag => html` <a onClick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
           </div>`
         : null
       }

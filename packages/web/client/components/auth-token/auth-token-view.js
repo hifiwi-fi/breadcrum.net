@@ -88,7 +88,7 @@ export const authTokenView = Component(/** @type{AuthTokenView} */({
         </div>
       </div>
       <div>
-        <button type="button" onclick=${onEdit}>Edit</button>
+        <button type="button" onClick=${onEdit}>Edit</button>
       </div>
     </div>`
 })

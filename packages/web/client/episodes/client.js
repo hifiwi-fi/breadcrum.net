@@ -126,8 +126,8 @@ export const page = Component(() => {
     onSearch: handleSearch,
   })}
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   <div>
   ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
   ${episodesError ? html`<div>${episodesError.message}</div>` : null}
@@ -135,8 +135,8 @@ export const page = Component(() => {
       ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes, onDelete: reloadEpisodes, clickForPreview: true })}`)
       : null}
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   <div>
 `
 })

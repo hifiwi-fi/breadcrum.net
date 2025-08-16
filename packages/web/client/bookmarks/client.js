@@ -53,13 +53,13 @@ export const page = Component(() => {
       onSearch: handleSearch,
     })}
     <div>
-      ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
     </div>
 
     <div>
       <span>🔖 <a href="./add">add +</a></span>
-      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onclick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
+      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onClick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
     </div>
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
@@ -68,8 +68,8 @@ export const page = Component(() => {
       : null}
 
   <div>
-    ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
   </div>
 `
 })
