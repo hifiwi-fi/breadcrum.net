@@ -1,8 +1,11 @@
 /* eslint-disable camelcase */
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
+import { schemaEpisodePreview } from '../schemas/episode-preview.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { MediumTypes } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -24,6 +27,7 @@ export async function getPreview (fastify, _opts) {
         tags: ['episodes'],
         querystring: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             medium: { enum: ['video', 'audio'], default: 'video' },
             url: { type: 'string', format: 'uri' },
@@ -31,37 +35,15 @@ export async function getPreview (fastify, _opts) {
           required: ['url'],
         },
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              title: {
-                type: 'string',
-              },
-              ext: {
-                type: 'string',
-              },
-              url: {
-                type: 'string',
-              },
-              duration: {
-                type: 'number',
-              },
-              channel: {
-                type: 'string',
-              },
-              src_type: {
-                type: 'string',
-              },
-              filesize_approx: {
-                type: 'number',
-              },
-            },
-          },
+          200: schemaEpisodePreview
         },
       },
     },
     async function getPreviewHandler (request, reply) {
-      const { url, medium } = request.query
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      const { url } = request.query
+      /** @type {MediumTypes} */
+      const medium = request.query.medium
       const metadata = await fastify.getYTDLPMetadataWrapper({ url, medium })
 
       const {
@@ -74,15 +56,18 @@ export async function getPreview (fastify, _opts) {
       const src_type = resolveType(metadata)
 
       // TODO: what are we doing here
-      return {
-        title,
-        ext,
+      /** @type{ReturnBody} */
+      const returnBody = {
+        title: title ?? null,
+        ext: ext ?? null,
         url: metadata.url,
-        duration,
-        channel,
-        src_type,
-        filesize_approx,
+        duration: duration ?? null,
+        channel: channel ?? null,
+        src_type: src_type ?? null,
+        filesize_approx: filesize_approx ?? null,
       }
+
+      return returnBody
     }
   )
 }

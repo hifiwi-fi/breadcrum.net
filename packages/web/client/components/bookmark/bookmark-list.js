@@ -1,14 +1,30 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { bookmarkEdit } from './bookmark-edit.js'
-import { bookmarkView } from './bookmark-view.js'
+import { tc } from '../../lib/typed-component.js'
+import { BookmarkEdit } from './bookmark-edit.js'
+import { BookmarkView } from './bookmark-view.js'
 import { diffBookmark } from '../../lib/diff-bookmark.js'
 
-export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
+/**
+ * @typedef {object} BookmarkListProps
+ * @property {TypeBookmarkReadClient} bookmark
+ * @property {() => void} reload
+ * @property {() => void} onDelete
+ */
+
+/**
+ * @type {FunctionComponent<BookmarkListProps>}
+ */
+export const BookmarkList = ({ bookmark, reload, onDelete }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -21,7 +37,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newBookmark) => {
+  const handleSave = useCallback(async (/** @type {any} */newBookmark) => {
     const payload = diffBookmark(bookmark, newBookmark)
 
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
@@ -42,7 +58,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     }
   }, [bookmark.id, state.apiUrl, reload, setEditing])
 
-  const handleDeleteBookmark = useCallback(async (ev) => {
+  const handleDeleteBookmark = useCallback(async () => {
     await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
@@ -52,9 +68,9 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
 
     setDeleted(true)
     onDelete()
-  }, [state.apiUrl, bookmark.id, setDeleted, reload])
+  }, [state.apiUrl, bookmark.id, setDeleted, onDelete])
 
-  const handleToggleToRead = useCallback(async (ev) => {
+  const handleToggleToRead = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
@@ -70,7 +86,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     reload()
   }, [state.apiUrl, bookmark.id, reload, bookmark.toread])
 
-  const handleToggleStarred = useCallback(async (ev) => {
+  const handleToggleStarred = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
@@ -86,7 +102,7 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     reload()
   }, [state.apiUrl, bookmark.id, reload, bookmark.starred])
 
-  const handleToggleSensitive = useCallback(async (ev) => {
+  const handleToggleSensitive = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
     await fetch(endpoint, {
       method: 'put',
@@ -107,14 +123,14 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
     ${deleted
       ? null
       : editing
-        ? bookmarkEdit({
+        ? tc(BookmarkEdit, {
             bookmark,
             onSave: handleSave,
             onDeleteBookmark: handleDeleteBookmark,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${bookmark?.id}</code>`,
           })
-        : bookmarkView({
+        : tc(BookmarkView, {
             bookmark,
             onEdit: handleEdit,
             onToggleToread: handleToggleToRead,
@@ -123,4 +139,4 @@ export const bookmarkList = Component(({ bookmark, reload, onDelete }) => {
           })
     }
   </div>`
-})
+}

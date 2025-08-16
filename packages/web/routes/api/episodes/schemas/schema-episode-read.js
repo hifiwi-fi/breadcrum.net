@@ -8,6 +8,7 @@ import { schemaFeedJoin } from '../../feeds/schemas/schema-feed-join.js'
  * @typedef {FromSchema<SchemaEpisodeRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeEpisodeRead
+ * @typedef {FromSchema<SchemaEpisodeRead>} TypeEpisodeReadClient
  */
 
 export const schemaEpisodeRead = /** @type {const} @satisfies {JSONSchema} */ ({

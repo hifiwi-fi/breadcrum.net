@@ -1,8 +1,12 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html } from 'uland-isomorphic'
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js'
+ */
+
+import { html } from 'htm/preact'
 import { ToRead } from '../toread/index.js'
 import { Star } from '../star/index.js'
 import { Sensitive } from '../sensitive/index.js'
@@ -11,13 +15,25 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { ExpandText } from '../expand-text/index.js'
 import cn from 'classnames'
 
-export const bookmarkView = Component(({
+/**
+ * @typedef {object} BookmarkViewProps
+ * @property {TypeBookmarkReadClient} bookmark
+ * @property {() => void} [onEdit]
+ * @property {() => void} [onToggleToread]
+ * @property {() => void} [onToggleStarred]
+ * @property {() => void} [onToggleSensitive]
+ */
+
+/**
+ * @type {FunctionComponent<BookmarkViewProps>}
+ */
+export const BookmarkView = ({
   bookmark: b,
   onEdit = () => {},
   onToggleToread = () => {},
   onToggleStarred = () => {},
   onToggleSensitive = () => {},
-} = {}) => {
+}) => {
   const window = useWindow()
   const { pushState } = useQuery()
 
@@ -40,18 +56,9 @@ export const bookmarkView = Component(({
   return html`
     <div class="bc-bookmark-view">
       <div class="bc-bookmark-title-line">
-        ${ToRead({
-          toread: b.toread,
-          onclick: onToggleToread,
-        })}
-        ${Star({
-          starred: b.starred,
-          onclick: onToggleStarred,
-        })}
-        ${Sensitive({
-          sensitive: b.sensitive,
-          onclick: onToggleSensitive,
-        })}
+        <${ToRead} toread=${b.toread} onclick=${onToggleToread} />
+        <${Star} starred=${b.starred} onclick=${onToggleStarred} />
+        <${Sensitive} sensitive=${b.sensitive} onclick=${onToggleSensitive} />
         <a class="${cn({
           'bc-bookmark-title': true,
           'bc-bookmark-title-toread': b.toread,
@@ -66,9 +73,7 @@ export const bookmarkView = Component(({
       ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
       ${b.summary
         ? html`<div class='bc-bookmark-summary-display'>
-            ${ExpandText({
-              children: b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`),
-            })}
+            <${ExpandText} children=${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)} />
           </div>`
         : null}
       <div>
@@ -108,4 +113,4 @@ export const bookmarkView = Component(({
         <button onClick=${onEdit}>Edit</button>
       </div>
     </div>`
-})
+}

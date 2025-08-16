@@ -1,52 +1,77 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 /* eslint-disable camelcase */
-import { Component, html } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
 import cn from 'classnames'
 
-export const episodeTitle = Component(
-  (
-    {
-      episode: { id, url, error, ready, type, medium, display_title } = {},
-      small,
-    } = {}
-  ) => {
-    const href = small === true
-      ? `/episodes/view/?id=${id}`
-      : url
+/**
+ * @typedef {object} Episode
+ * @property {string} [id]
+ * @property {string} [url]
+ * @property {boolean} [error]
+ * @property {boolean} [ready]
+ * @property {'redirect' | 'raw' | 'b2_file'} [type]
+ * @property {'video' | 'audio'} [medium]
+ * @property {string} [display_title]
+ */
 
-    return html`
-    <div class="${cn({
-      'bc-episode-title-container': true,
-      'bc-episode-title-container-small': small,
-    })}">
-        ${
-          error
-            ? '❌'
-            : ready
-              ? '✅'
-              : '⏱️'
-        }
-        ${
-          type === 'redirect'
-          ? '☁️'
-          : type === 'raw'
-            ? '🍣'
-            : type === 'b2_file'
-              ? '🗄'
-              : null
-        }
-        ${
-          medium === 'video'
-            ? '📼'
-            : medium === 'audio'
-              ? '💿'
-              : null
-        }
+/**
+ * @typedef {object} EpisodeTitleProps
+ * @property {Episode} [episode]
+ * @property {boolean} [small]
+ */
 
-        <a href="${href}" target="${small ? null : '_blank'}">
-          ${display_title}
-        </a>
-      </div>
-  `
-  }
-)
+/**
+ * @type {FunctionComponent<EpisodeTitleProps>}
+ */
+export const EpisodeTitle = ({
+  episode: { id, url, error, ready, type, medium, display_title } = {},
+  small,
+}) => {
+  const href = small === true
+    ? `/episodes/view/?id=${id}`
+    : url
+
+  return html`
+  <div class="${cn({
+    'bc-episode-title-container': true,
+    'bc-episode-title-container-small': small,
+  })}">
+      ${
+        error
+          ? '❌'
+          : ready
+            ? '✅'
+            : '⏱️'
+      }
+      ${
+        type === 'redirect'
+        ? '☁️'
+        : type === 'raw'
+          ? '🍣'
+          : type === 'b2_file'
+            ? '🗄'
+            : null
+      }
+      ${
+        medium === 'video'
+          ? '📼'
+          : medium === 'audio'
+            ? '💿'
+            : null
+      }
+
+      <a href="${href}" target="${small ? null : '_blank'}">
+        ${display_title}
+      </a>
+    </div>
+`
+}
+
+// Legacy export for backwards compatibility
+export const episodeTitle = EpisodeTitle
