@@ -4,15 +4,13 @@
  */
 
 /* eslint-env browser */
-// @ts-expect-error
-import { useEffect, useState } from 'uland-isomorphic'
+import { useEffect, useState } from 'preact/hooks'
 import { state } from './state.js'
 
 /**
  * @returns {StateType}
  */
 export function useLSP () {
-  /** @type {[StateType, (newState: StateType) => void]} */
   const [lsp, setLSP] = useState(state)
   useEffect(() => {
     /** @param {Event} _ev */

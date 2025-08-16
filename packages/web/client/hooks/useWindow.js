@@ -1,5 +1,6 @@
-// @ts-ignore
-import { useEffect, useState } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
+import { useEffect, useState } from 'preact/hooks'
 
 /**
  * Hook to safely access the window object in both browser and server environments
@@ -8,7 +9,7 @@ import { useEffect, useState } from 'uland-isomorphic'
 export function useWindow () {
   /** @type {Window | null} */
   const wr = (typeof window !== 'undefined') ? window : null
-  /** @type {[Window | null, (window: Window | null) => void]} */
+
   const [w, setW] = useState(wr)
 
   useEffect(() => {

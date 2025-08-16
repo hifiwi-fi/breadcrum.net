@@ -54,6 +54,7 @@
     "undici": "^7.0.0",
     "useragent": "^2.3.0",
     "preact": "^10.27.0",
+    "@preact/signals": "^2.2.1",
     "preact-render-to-string": "^6.5.13",
     "htm": "^3.1.1"
   },

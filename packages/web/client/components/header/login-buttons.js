@@ -1,7 +1,11 @@
-import { Component, html } from 'uland-isomorphic'
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+import { html } from 'htm/preact'
 import { useWindow } from '../../hooks/useWindow.js'
 
-export const loginButtons = Component(() => {
+/** @type{FunctionComponent<{}>} */
+export const LoginButtons = () => {
   const window = useWindow()
 
   return html`
@@ -35,4 +39,4 @@ export const loginButtons = Component(() => {
       : null
     }
   `
-})
+}

@@ -1,11 +1,11 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
 /**
  * @import { TypeAuthTokenReadClient } from '../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  */
 
-// @ts-expect-error
-import { useEffect, useState } from 'uland-isomorphic'
+import { useEffect, useState } from 'preact/hooks'
 import { useUser } from './useUser.js'
 import { useQuery } from './useQuery.js'
 import { useLSP } from './useLSP.js'
@@ -16,17 +16,13 @@ export function useAuthTokens () {
   const state = useLSP()
   const { query } = useQuery()
 
-  /** @type {[TypeAuthTokenReadClient[] | null, (authTokens: TypeAuthTokenReadClient[] | null) => void]} */
-  const [tokens, setTokens] = useState()
+  const [tokens, setTokens] = useState(/** @type {TypeAuthTokenReadClient[] | null} */(null))
   /** @type {[boolean, (loading: boolean) => void]} */
   const [tokensLoading, setTokensLoading] = useState(false)
-  /** @type {[Error | null, (err: Error | null) => void]} */
-  const [tokensError, setTokensError] = useState(null)
+  const [tokensError, setTokensError] = useState(/** @type {Error | null} */(null))
 
-  /** @type {[string | null, (before: string | null) => void]} */
-  const [before, setBefore] = useState()
-  /** @type {[string | null, (after: string | null) => void]} */
-  const [after, setAfter] = useState()
+  const [before, setBefore] = useState(/** @type {string | null} */(null))
+  const [after, setAfter] = useState(/** @type {string | null} */(null))
 
   const { reload: reloadAuthTokens, signal: authTokensReloadSignal } = useReload()
 

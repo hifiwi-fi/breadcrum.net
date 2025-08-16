@@ -6,8 +6,7 @@
  * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
  */
 
-// @ts-expect-error
-import { useEffect, useState } from 'uland-isomorphic'
+import { useEffect, useState } from 'preact/hooks'
 import { useLSP } from './useLSP.js'
 
 /** @type {Promise<Response> | null} */
@@ -23,11 +22,8 @@ export function useUser ({
 } = {}) {
   const state = useLSP()
 
-  /** @type {[boolean, (loadingState: boolean) => void]} */
   const [loading, setLoading] = useState(false)
-  /** @type {[Error | null, (error: Error | null) => void]} */
-  const [error, setError] = useState(null)
-  /** @type {[number, (dataRefresh: number) => void]} */
+  const [error, setError] = useState(/** @type{Error | null} */(null))
   const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {

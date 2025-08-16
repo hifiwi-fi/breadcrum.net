@@ -1,14 +1,25 @@
-import { Component, html } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
 
-export const sensitive = Component(({
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
+
+/** @type{FunctionComponent<{
+ * sensitive: boolean,
+ * onToggleSensitive: (ev: MouseEvent) => void
+}>} */
+export const sensitive = ({
   sensitive = false,
-  onclick = () => {},
+  onToggleSensitive = () => {},
 }) => {
   return html`
-    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onclick=${onclick}>
+    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${onToggleSensitive}>
       ${sensitive
         ? '🤫'
         : '🫥'
         }
     </span>`
-})
+}
