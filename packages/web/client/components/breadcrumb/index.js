@@ -8,7 +8,7 @@
 import { html } from 'htm/preact'
 import cn from 'classnames'
 
-/** @type{FunctionComponent<{
+/** @type {FunctionComponent<{
  * pathSegments: string[]
 }>} */
 export const Breadcrumb = ({
