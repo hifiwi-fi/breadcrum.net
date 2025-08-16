@@ -72,6 +72,3 @@ export const EpisodeTitle = ({
     </div>
 `
 }
-
-// Legacy export for backwards compatibility
-export const episodeTitle = EpisodeTitle

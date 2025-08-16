@@ -1,21 +1,40 @@
-import { Component, html, useCallback, useState, useRef } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { FunctionComponent, ComponentChild } from 'preact'
+ */
+
+import { html } from 'htm/preact'
+import { useCallback, useState, useRef } from 'preact/hooks'
 import { useWindow } from '../../hooks/useWindow.js'
 import cn from 'classnames'
 
-export const ExpandText = Component(({
+/**
+ * @typedef {object} ExpandTextProps
+ * @property {ComponentChild} children
+ * @property {boolean} [defaultExpandState]
+ * @property {string[]} [classNames]
+ * @property {boolean} [pre]
+ */
+
+/**
+ * @type {FunctionComponent<ExpandTextProps>}
+ */
+export const ExpandText = ({
   children,
   defaultExpandState,
   classNames = [],
   pre,
 }) => {
   const window = useWindow()
-  const expandRef = useRef()
+  const expandRef = useRef(/** @type {HTMLDivElement | null} */(null))
   const [expanded, setExpanded] = useState(defaultExpandState)
 
   const getSelectedText = useCallback(() => {
-    const selection = window.getSelection()
-    if (expandRef.current.contains(selection?.anchorNode)) {
-      return selection?.toString()
+    const selection = window?.getSelection()
+    if (expandRef.current && selection && expandRef.current.contains(selection.anchorNode)) {
+      return selection.toString()
     }
     return ''
   }, [expandRef, window])
@@ -43,4 +62,4 @@ export const ExpandText = Component(({
         ${children}
       </div>
   `
-})
+}

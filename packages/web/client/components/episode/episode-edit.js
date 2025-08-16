@@ -1,47 +1,75 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
-export const episodeEdit = Component(({
+/**
+ * @import { FunctionComponent, ComponentChild } from 'preact'
+ * @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
+
+/**
+ * @typedef {object} EpisodeUpdateData
+ * @property {string} title
+ * @property {boolean} explicit
+ */
+
+/**
+ * @typedef {object} EpisodeEditProps
+ * @property {TypeEpisodeReadClient} [episode]
+ * @property {(formState: EpisodeUpdateData) => Promise<void>} [onSave]
+ * @property {() => Promise<void>} [onDeleteEpisode]
+ * @property {() => void} [onCancelEdit]
+ * @property {string | ComponentChild} [legend]
+ */
+
+/**
+ * @type {FunctionComponent<EpisodeEditProps>}
+ */
+export const EpisodeEdit = ({
   episode: e,
   onSave,
   onDeleteEpisode,
   onCancelEdit,
   legend,
-} = {}) => {
-  const [error, setError] = useState(null)
+}) => {
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
 
-  const handleInitiateDelete = useCallback((ev) => {
+  const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const handleCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback(() => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  const handleDeleteEpisode = useCallback(async (ev) => {
+  const handleDeleteEpisode = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
     try {
-      await onDeleteEpisode()
+      if (onDeleteEpisode) await onDeleteEpisode()
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, onDeleteEpisode])
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {SubmitEvent} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
     const form = formRef.current
-    // const url = form.url.value
-    const title = form.title.value
-    const explicit = form.explicit.checked
+    if (!form) return
+
+    // @ts-expect-error title is a shadowed property
+    const title = /** @type{string} */ (form['title'].value)
+    const explicit = /** @type{boolean} */(form['explicit'].checked)
 
     const formState = {
       title,
@@ -49,14 +77,14 @@ export const episodeEdit = Component(({
     }
 
     try {
-      await onSave(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, formRef?.current, onSave])
 
-  // Parent can delay passing a bookmark to disable the form.
+  // Parent can delay passing an episode to disable the form.
   const initializing = e == null
 
   return html`
@@ -68,7 +96,7 @@ export const episodeEdit = Component(({
             <label class='block'>
               url:
               <input disabled class='block bc-episode-url-edit' type="url" name="url" value="${e?.url}"/>
-            </labe>
+            </label>
           </div>
           <div>
             <label class="block">
@@ -104,4 +132,4 @@ export const episodeEdit = Component(({
       </form>
     </div>
   `
-})
+}
