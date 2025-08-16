@@ -79,7 +79,7 @@ export const CorsMedia = ({
       ? thumbnail
         ? html`
           <div class="bc-cors-media-thumbnail-group" tabindex="0" role="button" aria-pressed="false" onClick="${handlePreviewClick}" onKeyDown="${handleKeydown}">
-            <img class='bc-cors-media-thumbnail' src="${thumbnail}">
+            <img class='bc-cors-media-thumbnail' src="${thumbnail}" />
           </div>`
         : html`<div onKeyDown="${handleKeydown}" tabindex="0" role="button" aria-pressed="false" onClick="${handlePreviewClick}" class='bc-cors-media-placeholder'><${PlayIcon} /></div>`
       : null

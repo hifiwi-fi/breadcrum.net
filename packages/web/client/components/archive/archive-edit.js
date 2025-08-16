@@ -95,13 +95,13 @@ export const ArchiveEdit = ({
           <div>
             <label class="block">
               title:
-              <input class="block" type="text" name="title" value="${ar?.title}">
+              <input class="block" type="text" name="title" value="${ar?.title}" />
             </label>
           </div>
 
           <div class="bc-archive-edit-submit-line">
             <div class="button-cluster">
-              ${onSave ? html`<input name="submit-button" type="submit">` : null}
+              ${onSave ? html`<input name="submit-button" type="submit" />` : null}
               ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
             </div>
             <div>

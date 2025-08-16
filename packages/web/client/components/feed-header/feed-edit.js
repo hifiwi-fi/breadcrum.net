@@ -126,13 +126,13 @@ export const FeedEdit = ({
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" ?checked="${f?.explicit}">
+              <input type="checkbox" name="explicit" ?checked="${f?.explicit}" />
             </label>
           </div>
 
           <div class="bc-feed-edit-submit-line">
             <div class="button-cluster">
-              ${onSave ? html`<input name="submit-button" type="submit">` : null}
+              ${onSave ? html`<input name="submit-button" type="submit" />` : null}
               ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
             </div>
             <div>

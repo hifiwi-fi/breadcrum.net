@@ -109,7 +109,7 @@ export const AuthTokenEdit = ({
           <div>
             <label>
               protect:
-              <input type="checkbox" name="protect" ?checked="${t?.protect}">
+              <input type="checkbox" name="protect" ?checked="${t?.protect}" />
             </label>
             <span class="bc-help-text">
               Protected tokens will not be deleted in bulk cleanup operations.
@@ -118,7 +118,7 @@ export const AuthTokenEdit = ({
 
           <div class="bc-auth-token-edit-submit-line">
             <div class="button-cluster">
-              ${onSave ? html`<input name="submit-button" type="submit">` : null}
+              ${onSave ? html`<input name="submit-button" type="submit" />` : null}
               ${onCancelEdit ? html`<button type="button" onClick="${onCancelEdit}">Cancel</button>` : null}
             </div>
             ${onDeleteAuthToken

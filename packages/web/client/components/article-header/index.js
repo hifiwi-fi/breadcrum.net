@@ -38,7 +38,7 @@ export const ArticleHeader = ({
               ? html`
                   <address class="author-info p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
                     ${authorImgUrl
-                    ? html`<img height="40" width="40"  src="${authorImgUrl}" alt="${authorImgAlt}" class="u-photo" itemprop="image">`
+                    ? html`<img height="40" width="40"  src="${authorImgUrl}" alt="${authorImgAlt}" class="u-photo" itemprop="image" />`
                       : null
                     }
                     ${authorName && authorUrl

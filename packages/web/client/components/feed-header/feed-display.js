@@ -52,7 +52,7 @@ export const FeedDisplay = ({
     <div class="bc-feed-display">
       <div class="bc-feed-info">
         <div class="bc-feed-image">
-          <img width="100" height="100" src="${f.image_url ?? '/static/bread.png'}">
+          <img width="100" height="100" src="${f.image_url ?? '/static/bread.png'}" />
         </div>
 
         <h1 class="bc-feed-title">
@@ -74,14 +74,14 @@ export const FeedDisplay = ({
         </div>
 
         <div class="bc-feed-feed-url-line">
-          <a href=${`/api/feeds/${f.id}?format=json`}><img width="32" src="/static/atom.svg"></a>
+          <a href=${`/api/feeds/${f.id}?format=json`}><img width="32" src="/static/atom.svg" /></a>
           <input
             class="bc-feed-header-select"
             type="text"
             readonly
             onClick=${handleSelect}
             value="${f.feed_url}"
-          >
+          />
           <button ref=${copyButtonRef} onClick=${handleCopy}>Copy</button>
         </div>
         <div class="bc-help-text bc-feed-header-help-text">

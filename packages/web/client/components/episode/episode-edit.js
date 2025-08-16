@@ -101,19 +101,19 @@ export const EpisodeEdit = ({
           <div>
             <label class="block">
               title:
-              <input class="block" type="text" name="title" value="${e?.title}">
+              <input class="block" type="text" name="title" value="${e?.title}" />
             </label>
           </div>
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" ?checked="${e?.explicit}">
+              <input type="checkbox" name="explicit" ?checked="${e?.explicit}" />
             </label>
           </div>
 
           <div class="bc-episode-edit-submit-line">
             <div class="button-cluster">
-              ${onSave ? html`<input name="submit-button" type="submit">` : null}
+              ${onSave ? html`<input name="submit-button" type="submit" />` : null}
               ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
             </div>
             <div>

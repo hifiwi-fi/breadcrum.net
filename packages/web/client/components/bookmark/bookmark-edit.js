@@ -298,7 +298,7 @@ export const BookmarkEdit = ({
         <div>
           <label class='block'>
             url:
-            <input class='block bc-bookmark-url-edit' type="url" name="url" value="${b?.url}" oninput="${handleBookmarkURLInput}">
+            <input class='block bc-bookmark-url-edit' type="url" name="url" value="${b?.url}" oninput="${handleBookmarkURLInput}" />
           </label>
         </div>
 
@@ -306,7 +306,7 @@ export const BookmarkEdit = ({
         <div>
           <label class="block">
             title:
-            <input class="block" type="text" name="title" value="${b?.title}">
+            <input class="block" type="text" name="title" value="${b?.title}" />
           </label>
         </div>
 
@@ -329,22 +329,22 @@ export const BookmarkEdit = ({
               autocapitalize="off"
               autocorrect="off"
               value="${b?.tags?.join(' ')}"
-            >
+            />
           </label>
         </div>
 
         <!-- Bookmark Options -->
         <div>
           <label>
-            <input type="checkbox" name="toread" ?checked="${b?.toread}">
+            <input type="checkbox" name="toread" ?checked="${b?.toread}" />
             to read
           </label>
           <label>
-            <input type="checkbox" name="starred" ?checked="${b?.starred}">
+            <input type="checkbox" name="starred" ?checked="${b?.starred}" />
             starred
           </label>
           <label>
-            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
+            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}" />
             sensitive
           </label>
         </div>
@@ -380,7 +380,7 @@ export const BookmarkEdit = ({
 
             ${archiveURLs.length > 0
               ? html`${archiveURLs.map(
-                  (url, i) => html`<input class='bc-bookmark-archive-url-edit' placeholder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" value="${url}">`
+                  (url, i) => html`<input class='bc-bookmark-archive-url-edit' placeholder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" value="${url}" />`
                 )
             }`
               : null
@@ -421,7 +421,7 @@ export const BookmarkEdit = ({
         <!-- Readability Archive Options -->
         <div>
           <label>
-            <input type="checkbox" name="createArchive">
+            <input type="checkbox" name="createArchive" />
             create new archive
           </label>
           <span class="bc-help-text">
@@ -432,7 +432,7 @@ export const BookmarkEdit = ({
         <!-- Bookmark Create Episode -->
         <div>
           <label>
-            <input type="checkbox" onChange="${handleCreateEpisodeCheckbox}" name="createEpisode">
+            <input type="checkbox" onChange="${handleCreateEpisodeCheckbox}" name="createEpisode" />
             create new episode
           </label>
           <span class="bc-help-text">
@@ -452,7 +452,7 @@ export const BookmarkEdit = ({
                 value="video"
                 ?checked="${true}"
                 onChange="${handleEpisodeMediumSelect}"
-              >
+              />
               <span>video</span>
             </label>
 
@@ -462,11 +462,11 @@ export const BookmarkEdit = ({
                 name="episodeMedium"
                 value="audio"
                 onChange=${handleEpisodeMediumSelect}
-              >
+              />
               <span>audio</span>
             </label>
           <label>
-            <input type="checkbox" name="custom-episode-url" onChange="${handleCustomEpisodeURLCheckboxChange}">
+            <input type="checkbox" name="custom-episode-url" onChange="${handleCustomEpisodeURLCheckboxChange}" />
             custom url
           </label>
           <button onClick="${handlePreviewRefresh}">refresh preview</button>
@@ -475,7 +475,7 @@ export const BookmarkEdit = ({
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
             'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked,
-          })}" type="url" name="createEpisodeURL" value="${b?.url}">
+          })}" type="url" name="createEpisodeURL" value="${b?.url}" />
 
           ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}
           ${episodePreview
@@ -497,7 +497,7 @@ export const BookmarkEdit = ({
         <!-- Bookmark Submission Line -->
         <div class="bc-bookmark-edit-submit-line">
           <div class="button-cluster">
-            ${onSave ? html`<input name="submit-button" type="submit">` : null}
+            ${onSave ? html`<input name="submit-button" type="submit" />` : null}
             ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           </div>
           <div>

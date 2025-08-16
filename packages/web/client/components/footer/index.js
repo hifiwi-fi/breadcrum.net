@@ -55,22 +55,22 @@ export const Footer = ({
       © <a href="https://hifiwi.fi">HifiWi.fi</a>
     </div>
     <a class="flex-center preserve-icon" href="/feed.xml" aria-label="Subscribe to the RSS feed" title="Subscribe to the RSS feed">
-      <img height="16" width="16" src="/static/atom.svg" alt="Atom feed icon">
+      <img height="16" width="16" src="/static/atom.svg" alt="Atom feed icon" />
     </a>
     <a class="flex-center preserve-icon" href="/feed.json" aria-label="Subscribe to the JSON feed" title="Subscribe to the JSON feed">
-      <img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg" alt="JSON feed icon">
+      <img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg" alt="JSON feed icon" />
     </a>
     <a class="flex-center preserve-icon" href="${siteTwitterUrl}" rel="me" aria-label="Follow us on X" title="Follow us on X">
-      <img class="bc-footer-rounded" height="16" width="16" src="/static/twtr.svg" alt="X icon">
+      <img class="bc-footer-rounded" height="16" width="16" src="/static/twtr.svg" alt="X icon" />
     </a>
     <a class="flex-center preserve-icon" href="${discordUrl}" aria-label="Join us on Discord" title="Join us on Discord">
-      <img height="16" width="16" src="/static/discord.svg" alt="Discord icon">
+      <img height="16" width="16" src="/static/discord.svg" alt="Discord icon" />
     </a>
     <a class="flex-center preserve-icon" href="${mastodonUrl}" rel="me" aria-label="Follow us on Mastodon" title="Follow us on Mastodon">
-      <img height="16" width="16" src="/static/mastodon.svg" alt="Mastodon icon">
+      <img height="16" width="16" src="/static/mastodon.svg" alt="Mastodon icon" />
     </a>
     <a class="flex-center preserve-icon" href="${bSkyUrl}" rel="me" aria-label="Follow us on Bsky" title="Follow us on Bsky">
-      <img height="16" width="16" src="/static/bsky.svg" alt="Bsky icon">
+      <img height="16" width="16" src="/static/bsky.svg" alt="Bsky icon" />
     </a>
     <div>🇺🇸</div>
   </footer>
