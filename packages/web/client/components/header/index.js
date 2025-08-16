@@ -11,9 +11,9 @@ import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
-import { sensitive } from '../sensitive/index.js'
-import { toread } from '../toread/index.js'
-import { star } from '../star/index.js'
+import { Sensitive } from '../sensitive/index.js'
+import { ToRead } from '../toread/index.js'
+import { Star } from '../star/index.js'
 import { LoginButtons } from './login-buttons.js'
 
 /** @type{FunctionComponent<{}>} */
@@ -35,7 +35,7 @@ export const Header = () => {
     state.starred = !state.starred
   }, [])
 
-  const onPageNav = /** @param {Event} ev */ (ev) => {
+  const onPageNav = (/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ ev) => {
     if (window?.location) {
       const url = new URL(window.location.toString())
       const newUrl = new URL(ev.currentTarget?.href)
@@ -62,9 +62,9 @@ export const Header = () => {
             <div><a onClick='${onPageNav}' class="bc-decoration-none" href='/bookmarks/'>🔖<span class='bc-header-link-text'> bookmarks</span></a></div>
             <div><a class="bc-decoration-none" href='/tags/'>🏷<span class='bc-header-link-text'> tags</span></a></div>
             <div><a class="bc-decoration-none" href='/feeds/'>📡<span class='bc-header-link-text'> feeds</span></a></div>
-            <div class="bc-header-button">${toread({ toread: state.toread, onclick: handleToreadToggle })}</div>
-            <div class="bc-header-button">${star({ starred: state.starred, onclick: handleStarToggle })}</div>
-            <div class="bc-header-button">${sensitive({ sensitive: state.sensitive, onclick: handleSensitiveToggle })}</div>
+            <div class="bc-header-button"><${ToRead} toread=${state.toread} onToggleRead=${handleToreadToggle} /></div>
+            <div class="bc-header-button"><${Star} starred=${state.starred} onToggleStar=${handleStarToggle}/></div>
+            <div class="bc-header-button"><${Sensitive} sensitive=${state.sensitive} onToggleSensitive=${handleSensitiveToggle}/></div>
             <div>· <a href='/logout/'>logout</a></div>`
       }
     </div>

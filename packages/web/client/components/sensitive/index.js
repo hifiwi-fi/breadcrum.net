@@ -11,7 +11,7 @@ import { html } from 'htm/preact'
  * sensitive: boolean,
  * onToggleSensitive: (ev: MouseEvent) => void
 }>} */
-export const sensitive = ({
+export const Sensitive = ({
   sensitive = false,
   onToggleSensitive = () => {},
 }) => {

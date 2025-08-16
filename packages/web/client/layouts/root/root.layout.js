@@ -37,6 +37,8 @@ export default function defaultRootLayout ({
     image,
     imageAlt,
     siteTwitter,
+    siteTwitterUrl,
+    bSkyUrl,
     head,
   },
   scripts,
@@ -115,7 +117,13 @@ export default function defaultRootLayout ({
           ? html`<main className="bc-main" dangerouslySetInnerHTML="${{ __html: children }}"/>`
           : html`<main className="bc-main">${children}</main>`
         }
-        <${Footer} version=${version} mastodonUrl=${mastodonUrl} discordUrl=${discordUrl}/>
+        <${Footer}
+          version=${version}
+          mastodonUrl=${mastodonUrl}
+          discordUrl=${discordUrl}
+          siteTwitterUrl=${siteTwitterUrl}
+          bSkyUrl=${bSkyUrl}
+        />
        </div>
      </body>
    `)}

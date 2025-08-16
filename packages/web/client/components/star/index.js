@@ -12,7 +12,7 @@ import cn from 'classnames'
  * starred: boolean,
  * onToggleStar: (ev: MouseEvent) => void
 }>} */
-export const star = ({
+export const Star = ({
   starred = false,
   onToggleStar = () => {},
 }) => {

@@ -3,9 +3,9 @@
 
 // @ts-expect-error
 import { Component, html } from 'uland-isomorphic'
-import { toread } from '../toread/index.js'
-import { star } from '../star/index.js'
-import { sensitive } from '../sensitive/index.js'
+import { ToRead } from '../toread/index.js'
+import { Star } from '../star/index.js'
+import { Sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { expandText } from '../expand-text/index.js'
@@ -40,15 +40,15 @@ export const bookmarkView = Component(({
   return html`
     <div class="bc-bookmark-view">
       <div class="bc-bookmark-title-line">
-        ${toread({
+        ${ToRead({
           toread: b.toread,
           onclick: onToggleToread,
         })}
-        ${star({
+        ${Star({
           starred: b.starred,
           onclick: onToggleStarred,
         })}
-        ${sensitive({
+        ${Sensitive({
           sensitive: b.sensitive,
           onclick: onToggleSensitive,
         })}

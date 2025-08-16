@@ -1,4 +1,8 @@
-import { Component, html } from 'uland-isomorphic'
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
 
 /**
  * Footer component. STATIC. NOT CURRENTLTY CLIENT RENDERED
@@ -8,7 +12,15 @@ import { Component, html } from 'uland-isomorphic'
   *   discordUrl: string
  }}
  */
-export const footer = Component(({
+
+/** @type{FunctionComponent<{
+ * version: string,
+ * mastodonUrl: string,
+ * discordUrl: string
+ * siteTwitterUrl: string
+ * bSkyUrl: string
+}>} */
+export const Footer = ({
   version,
   mastodonUrl,
   discordUrl,
@@ -63,4 +75,4 @@ export const footer = Component(({
     <div>🇺🇸</div>
   </footer>
   `
-})
+}

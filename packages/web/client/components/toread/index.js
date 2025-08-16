@@ -9,7 +9,7 @@ import cn from 'classnames'
  * toread: boolean,
  * onToggleRead: (ev: MouseEvent) => void
 }>} */
-export const toread = ({
+export const ToRead = ({
   toread = false,
   onToggleRead = () => {},
 }) => {
