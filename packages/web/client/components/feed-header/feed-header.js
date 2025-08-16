@@ -1,12 +1,30 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeFeedRead } from '../../../routes/api/feeds/schemas/schema-feed-read.js'
+ * @import { FeedUpdateData } from './feed-edit.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
+import { tc } from '../../lib/typed-component.js'
+import { FeedDisplay } from './feed-display.js'
+import { FeedEdit } from './feed-edit.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 
-import { feedDisplay } from './feed-display.js'
-import { feedEdit } from './feed-edit.js'
-import { diffFeed } from '../../lib/diff-feed.js'
+/**
+ * @typedef {object} FeedHeaderProps
+ * @property {TypeFeedRead} feed
+ * @property {() => void} reload
+ */
 
-export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
+/**
+ * @type {FunctionComponent<FeedHeaderProps>}
+ */
+export const FeedHeader = ({ feed, reload }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -19,8 +37,8 @@ export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newFeed) => {
-    const payload = diffFeed(feed, newFeed)
+  const handleSave = useCallback(async (/** @type {FeedUpdateData} */newFeed) => {
+    const payload = diffUpdate(feed, newFeed)
 
     const endpoint = `${state.apiUrl}/feeds/${feed.id}`
     await fetch(endpoint, {
@@ -35,7 +53,7 @@ export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
     setEditing(false)
   }, [feed, state.apiUrl, reload, setEditing])
 
-  const onDeleteFeed = useCallback(async (ev) => {
+  const onDeleteFeed = useCallback(async () => {
     // TODO implement this when feed CRUD is added
   }, [state.apiUrl, feed?.id, setDeleted, reload])
 
@@ -44,20 +62,17 @@ export const feedHeader = Component(({ feed, feeds, reload, loading }) => {
     ${deleted
       ? null
       : editing
-        ? feedEdit({
+        ? tc(FeedEdit, {
             feed,
             onSave: handleSave,
             onDeleteFeed,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${feed?.id}</code>`,
-            loading,
           })
-        : feedDisplay({
+        : tc(FeedDisplay, {
             feed,
-            feeds,
             onEdit: handleEdit,
-            loading,
           })
     }
   </div>`
-})
+}

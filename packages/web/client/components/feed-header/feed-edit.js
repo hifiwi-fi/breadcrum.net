@@ -1,48 +1,77 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
-export const feedEdit = Component(({
+/**
+ * @import { FunctionComponent, ComponentChild } from 'preact'
+ * @import { TypeFeedRead } from '../../../routes/api/feeds/schemas/schema-feed-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
+
+/**
+ * @typedef {object} FeedUpdateData
+ * @property {string} title
+ * @property {string} description
+ * @property {boolean} explicit
+ */
+
+/**
+ * @typedef {object} FeedEditProps
+ * @property {TypeFeedRead} [feed]
+ * @property {(formState: FeedUpdateData) => Promise<void>} [onSave]
+ * @property {() => Promise<void>} [onDeleteFeed]
+ * @property {() => void} [onCancelEdit]
+ * @property {string | ComponentChild} [legend]
+ */
+
+/**
+ * @type {FunctionComponent<FeedEditProps>}
+ */
+export const FeedEdit = ({
   feed: f,
   onSave,
   onDeleteFeed,
   onCancelEdit,
   legend,
-} = {}) => {
-  const [error, setError] = useState(null)
+}) => {
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
 
-  const handleInitiateDelete = useCallback((ev) => {
+  const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const handleCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback(() => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  const handleDeleteFeed = useCallback(async (ev) => {
+  const handleDeleteFeed = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
     try {
-      await onDeleteFeed()
+      if (onDeleteFeed) await onDeleteFeed()
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, onDeleteFeed])
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {SubmitEvent} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
-    const form = formRef.current
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
 
-    const title = form.title.value
-    const description = form.description.value
-    const explicit = form.explicit.checked
+    // @ts-expect-error Shadowed form value
+    const title = /** @type {string} */(form['title'].value)
+    const description = /** @type {string} */(form['description'].value)
+    const explicit = /** @type {boolean} */(form['explicit'].checked)
 
     const formState = {
       title,
@@ -51,14 +80,14 @@ export const feedEdit = Component(({
     }
 
     try {
-      await onSave(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave])
+  }, [setDisabled, setError, onSave])
 
-  // Parent can delay passing a bookmark to disable the form.
+  // Parent can delay passing a feed to disable the form.
   const initializing = f == null
 
   return html`
@@ -122,4 +151,4 @@ export const feedEdit = Component(({
       </form>
     </div>
   `
-})
+}
