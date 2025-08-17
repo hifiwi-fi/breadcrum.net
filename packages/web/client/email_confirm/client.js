@@ -1,19 +1,28 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useState, useEffect } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useQuery } from '../hooks/useQuery.js'
+import { useWindow } from '../hooks/useWindow.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { query } = useQuery()
   const { user, loading, error: userError } = useUser()
+  const window = useWindow()
   const [confirming, setConfirming] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !loading && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
@@ -24,12 +33,13 @@ export const page = Component(() => {
       setConfirming(true)
       setErrorMessage(null)
 
-      const token = query.get('token')
+      const token = query?.get('token')
 
       if (!token) throw new Error('Missing email confirmation token')
       if (token.length !== 64) throw new Error('Invalid token')
 
-      const update = JSON.parse(query.get('update'))
+      const updateParam = query?.get('update')
+      const update = updateParam ? JSON.parse(updateParam) : null
 
       try {
         const response = await fetch(`${state.apiUrl}/user/email:verify`, {
@@ -48,21 +58,27 @@ export const page = Component(() => {
         }
       } catch (err) {
         console.error(err)
-        setErrorMessage(err.message)
+        setErrorMessage(/** @type {Error} */(err).message)
       } finally {
         setConfirming(false)
       }
     }
 
-    confirmEmail()
-  }, [])
+    if (query) {
+      confirmEmail().catch(err => {
+        console.error(err)
+        setErrorMessage(/** @type {Error} */(err).message)
+        setConfirming(false)
+      })
+    }
+  }, [query, state.apiUrl])
 
   return html`
     ${user
       ? confirmed
         ? html`
           <div>
-            ${query && JSON.parse(query.get('update'))
+            ${query && query.get('update') && JSON.parse(query.get('update') || '{}')
               ? 'Email address successfully updated!'
               : 'Email address confirmed!'
             }
@@ -72,8 +88,8 @@ export const page = Component(() => {
           <div class="bc-confirm-email">
             ${query
               ? html`
-                ${!query.get('token') ? html`<div>Missing email confirm token<div>` : null}
-                ${query.get('token')?.length !== 64 ? html`<div>Invalid email confirmation token<div>` : null}
+                ${!query.get('token') ? html`<div>Missing email confirm token</div>` : null}
+                ${query.get('token')?.length !== 64 ? html`<div>Invalid email confirmation token</div>` : null}
               `
               : null
             }
@@ -86,12 +102,15 @@ export const page = Component(() => {
       `
       : html`
         <div>Please login to confirm your email address.</div>
-        <div>Redirecting to <a href="/login?redirect=TODO">login</a></button>
+        <div>Redirecting to <a href="/login?redirect=${window ? encodeURIComponent(window.location.pathname + window.location.search) : '/email_confirm'}">login</a></div>
         `
     }
-`
-})
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
