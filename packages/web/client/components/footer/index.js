@@ -18,14 +18,14 @@ import { html } from 'htm/preact'
  * mastodonUrl: string,
  * discordUrl: string
  * siteTwitterUrl: string
- * bSkyUrl: string
+ * bskyUrl: string
 }>} */
 export const Footer = ({
   version,
   mastodonUrl,
   discordUrl,
   siteTwitterUrl,
-  bSkyUrl,
+  bskyUrl,
 }) => {
   return html`
   <footer class="bc-footer">
@@ -69,7 +69,7 @@ export const Footer = ({
     <a class="flex-center preserve-icon" href="${mastodonUrl}" rel="me" aria-label="Follow us on Mastodon" title="Follow us on Mastodon">
       <img height="16" width="16" src="/static/mastodon.svg" alt="Mastodon icon" />
     </a>
-    <a class="flex-center preserve-icon" href="${bSkyUrl}" rel="me" aria-label="Follow us on Bsky" title="Follow us on Bsky">
+    <a class="flex-center preserve-icon" href="${bskyUrl}" rel="me" aria-label="Follow us on Bsky" title="Follow us on Bsky">
       <img height="16" width="16" src="/static/bsky.svg" alt="Bsky icon" />
     </a>
     <div>🇺🇸</div>

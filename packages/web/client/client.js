@@ -1,9 +1,10 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
+
 import { html } from 'htm/preact'
 import { render } from 'preact'
 // import { useUser } from './hooks/useUser.js'
-import { badge } from './components/badge/badge.js'
+import { Badge } from './components/badge/badge.js'
 
 export const page = () => {
   // const { user } = useUser()
@@ -14,7 +15,7 @@ export const page = () => {
 
   return html`
     <div class="bc-marketing">
-      ${badge(html`<a href="/register">Early Access</a>`)}
+      <${Badge}><a href="/register">Early Access</a><//>
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png">

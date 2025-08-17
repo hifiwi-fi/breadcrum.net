@@ -1,4 +1,6 @@
 /** @import { LayoutFunction } from '@domstack/static' */
+/** @import { GlobalVars } from '../../globals/global.vars.js' */
+/** @import { VNode } from 'preact' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact-render-to-string'
@@ -14,16 +16,22 @@ If you need to render components inside, you need attach them in the global clie
 */
 
 /**
- * @typedef {{
- *  title: string,
- *  siteName: string,
- *  noindex: boolean,
- *  description: string,
- *  [key: string]: any
+ * Root layout variables type - extends GlobalVars with layout-specific properties
+ * @typedef {GlobalVars & {
+ *  title?: string,
+ *  noindex?: boolean,
+ *  description?: string,
+ *  image?: string,
+ *  imageAlt?: string,
+ *  head?: string,
  * }} RootLayoutVars
  */
 
-/** @type {LayoutFunction<RootLayoutVars>} */
+/**
+  * @typedef {string | VNode} PageReturn
+  */
+
+/** @type {LayoutFunction<RootLayoutVars, PageReturn>} */
 export default function defaultRootLayout ({
   vars: {
     title,
@@ -39,7 +47,7 @@ export default function defaultRootLayout ({
     imageAlt,
     siteTwitter,
     siteTwitterUrl,
-    bSkyUrl,
+    bskyUrl,
     head,
   },
   scripts,
@@ -123,7 +131,7 @@ export default function defaultRootLayout ({
           mastodonUrl,
           discordUrl,
           siteTwitterUrl,
-          bSkyUrl,
+          bskyUrl,
         })}
        </div>
      </body>

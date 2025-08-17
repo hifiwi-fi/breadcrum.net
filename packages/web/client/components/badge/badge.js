@@ -1,13 +1,13 @@
-/** @import { FunctionComponent } from 'preact' */
+/** @import { FunctionComponent, ComponentChild } from 'preact' */
 
 import { html } from 'htm/preact'
 
 /**
  * Badge component for displaying small status or label text
- * @type {FunctionComponent<{ text: string }>}
+ * @type {FunctionComponent<{ children: ComponentChild }>}
  */
-export const Badge = ({ text }) => {
+export const Badge = ({ children }) => {
   return html`
-    <div class="bc-badge">${text}</div>
+    <div class="bc-badge">${children}</div>
   `
 }

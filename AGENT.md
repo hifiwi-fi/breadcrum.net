@@ -261,7 +261,9 @@ HTM is JSX-like syntax in plain JavaScript with no transpiler necessary. It uses
 
 - **HTML's optional quotes**: `<div class=foo>` (quotes optional for simple values)
 
-- **Component end-tags**: `<${Footer}>footer content<//>`
+- **Component end-tags**: `<${Footer}>footer content<//>` or `<${Footer}>footer content<//>`
+
+  **Note**: Use `<//>` as the preferred closing tag syntax for HTM components. While `<//` works, `<//>` is more consistent with JSX conventions.
 
 - **Multiple root elements** (fragments): `<div /><div />`
 

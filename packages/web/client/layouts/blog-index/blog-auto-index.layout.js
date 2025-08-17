@@ -1,6 +1,7 @@
 /**
- * @import { BlogIndexVars } from './blog-index.layout.js'
  * @import { LayoutFunction } from '@domstack/static'
+ * @import { BlogIndexVars } from './blog-index.layout.js'
+ * @import { PageReturn } from '../root/root.layout.js'
  */
 import { html } from 'htm/preact'
 import { dirname } from 'node:path'
@@ -8,7 +9,7 @@ import { render } from 'preact-render-to-string'
 
 import blogIndexLayout from './blog-index.layout.js'
 
-/** @type {LayoutFunction<BlogIndexVars>} */
+/** @type {LayoutFunction<BlogIndexVars, PageReturn>} */
 export default function blogAutoIndexLayout (args) {
   const { children, ...rest } = args
 

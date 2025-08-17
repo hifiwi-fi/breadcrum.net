@@ -1,6 +1,6 @@
 /**
  * @import { LayoutFunction } from '@domstack/static'
- * @import { RootLayoutVars } from '../root/root.layout.js'
+ * @import { RootLayoutVars, PageReturn } from '../root/root.layout.js'
  */
 
 import { html } from 'htm/preact'
@@ -12,18 +12,19 @@ import { tc } from '../../lib/typed-component.js'
 import defaultRootLayout from '../root/root.layout.js'
 
 /**
- * @typedef {{
- * title: string,
- * authorImgUrl?: string,
- * authorImgAlt?: string,
- * authorName?: string,
- * authorUrl?: string,
- * publishDate: string,
- * updatedDate: string
+ * Article layout variables type - extends RootLayoutVars with article-specific properties
+ * @typedef {RootLayoutVars & {
+ *  title: string,
+ *  authorImgUrl?: string,
+ *  authorImgAlt?: string,
+ *  authorName?: string,
+ *  authorUrl?: string,
+ *  publishDate: string,
+ *  updatedDate: string
  * }} ArticleLayoutVars
  */
 
-/** @type {LayoutFunction<RootLayoutVars & ArticleLayoutVars>} */
+/** @type {LayoutFunction<ArticleLayoutVars, PageReturn>} */
 export default function articleLayout (args) {
   const { children, ...rest } = args
   const page = rest.page
