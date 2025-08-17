@@ -59,7 +59,7 @@ export async function getAdminUsers (fastify, _opts) {
                 type: 'array',
                 items: {
                   type: 'object',
-                  properties: fullSerializedAdminUserProps,
+                  properties: fullSerializedAdminUserProps.properties,
                 },
               },
               pagination: {

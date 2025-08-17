@@ -19,7 +19,7 @@ export async function putAdminUser (fastify, opts) {
           additionalProperties: false,
           minProperties: 1,
           properties: {
-            ...adminEditableUserProps,
+            ...adminEditableUserProps.properties,
           },
         },
         params: {

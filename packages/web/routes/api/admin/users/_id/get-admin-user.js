@@ -23,7 +23,7 @@ export async function getAdminUser (fastify, opts) {
         response: {
           200: {
             type: 'object',
-            properties: fullSerializedAdminUserProps,
+            properties: fullSerializedAdminUserProps.properties,
           },
         },
       },
