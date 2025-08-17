@@ -2,7 +2,7 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeBookmarkRead } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
+ * @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
  */
 
 import { useEffect, useState } from 'preact/hooks'
@@ -16,7 +16,7 @@ export function useBookmarks () {
   const state = useLSP()
   const { query } = useQuery()
 
-  const [bookmarks, setBookmarks] = useState(/** @type {TypeBookmarkRead[] | null} */(null))
+  const [bookmarks, setBookmarks] = useState(/** @type {TypeBookmarkReadClient[] | null} */(null))
   const [bookmarksLoading, setBookmarksLoading] = useState(false)
   const [bookmarksError, setBookmarksError] = useState(/** @type {Error | null} */(null))
   const [before, setBefore] = useState(/** @type {Date | null} */(null))

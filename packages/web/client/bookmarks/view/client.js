@@ -1,23 +1,32 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState, useCallback } from 'preact/hooks'
+import { tc } from '../../lib/typed-component.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { bookmarkList } from '../../components/bookmark/bookmark-list.js'
+import { BookmarkList } from '../../components/bookmark/bookmark-list.js'
 import { useTitle } from '../../hooks/useTitle.js'
-import { search } from '../../components/search/index.js'
+import { Search } from '../../components/search/index.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
   const window = useWindow()
-  const [bookmark, setBookmark] = useState(null)
+  const [bookmark, setBookmark] = useState(/** @type {TypeBookmarkReadClient | null} */(null))
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
-  const [bookmarkError, setBookmarkError] = useState(null)
+  const [bookmarkError, setBookmarkError] = useState(/** @type {Error | null} */(null))
   const [dataReload, setDataReload] = useState(0)
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !loading && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
@@ -29,12 +38,16 @@ export const page = Component(() => {
   }, [dataReload, setDataReload])
 
   const handleDelete = useCallback(() => {
-    const beforeString = new Date(bookmark.created_at).valueOf()
-    window.location.replace(`/bookmarks?after=${beforeString}`)
-  })
+    if (bookmark && window) {
+      const beforeString = new Date(bookmark.created_at).valueOf()
+      window.location.replace(`/bookmarks?after=${beforeString}`)
+    }
+  }, [bookmark?.created_at])
 
   useEffect(() => {
     async function getBookmark () {
+      if (!window) return
+
       setBookmarkLoading(true)
       setBookmarkError(null)
 
@@ -44,11 +57,12 @@ export const page = Component(() => {
 
       if (!id) {
         window.location.replace('/bookmarks')
+        return
       }
 
       const requestParams = new URLSearchParams()
 
-      requestParams.set('sensitive', state.sensitive)
+      requestParams.set('sensitive', state.sensitive.toString())
 
       const response = await fetch(`${state.apiUrl}/bookmarks/${id}?${requestParams.toString()}`, {
         method: 'get',
@@ -58,6 +72,7 @@ export const page = Component(() => {
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        /** @type {TypeBookmarkReadClient} */
         const body = await response.json()
         setBookmark(body)
       } else {
@@ -69,7 +84,10 @@ export const page = Component(() => {
     if (user) {
       getBookmark()
         .then(() => { console.log('bookmarks done') })
-        .catch(err => { console.error(err); setBookmarkError(err) })
+        .catch(err => {
+          console.error(err)
+          setBookmarkError(/** @type {Error} */(err))
+        })
         .finally(() => { setBookmarkLoading(false) })
     }
   }, [dataReload, state.apiUrl, state.sensitive])
@@ -77,23 +95,34 @@ export const page = Component(() => {
   const title = bookmark?.title ? ['🔖', bookmark?.title] : []
   useTitle(...title)
 
-  const handleSearch = useCallback((query) => {
-    window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */ query) => {
+    if (window) {
+      window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
   return html`
     <div>
-      ${search({
-        placeholder: 'Search Bookmarks...',
-        onSearch: handleSearch,
-      })}
+      <${Search}
+        placeholder="Search Bookmarks..."
+        onSearch=${handleSearch}
+      />
       ${bookmarkLoading ? html`<div>...</div>` : null}
       ${bookmarkError ? html`<div>${bookmarkError.message}</div>` : null}
-      ${bookmark ? bookmarkList({ bookmark, reload, onDelete: handleDelete }) : null}
+      ${bookmark
+        ? tc(BookmarkList, {
+            bookmark,
+            reload,
+            onDelete: handleDelete
+          })
+        : null}
     </div>
-`
-})
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

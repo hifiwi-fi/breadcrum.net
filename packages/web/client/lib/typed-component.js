@@ -12,7 +12,10 @@ import { html } from 'htm/preact'
  * @template T
  * @param {FunctionComponent<T>} component
  * @param {T} props
+ * @param {string | number} [key] - Optional key for React reconciliation
  * @returns {VNode}
  */
-export const tc = (component, props) =>
-  html`<${component} ...${props} />`
+export const tc = (component, props, key) =>
+  key !== undefined
+    ? html`<${component} key=${key} ...${props} />`
+    : html`<${component} ...${props} />`

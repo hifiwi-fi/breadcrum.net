@@ -1,15 +1,21 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, render, useEffect, useCallback } from 'uland-isomorphic'
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useCallback } from 'preact/hooks'
+import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { bookmarkList } from '../components/bookmark/bookmark-list.js'
-import { search } from '../components/search/index.js'
+import { BookmarkList } from '../components/bookmark/bookmark-list.js'
+import { Search } from '../components/search/index.js'
 import { useBookmarks } from '../hooks/useBookmarks.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const { user, loading } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
@@ -35,26 +41,30 @@ export const page = Component(() => {
 
   const onPageNav = useCallback((/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window?.scrollTo({ top: 0 })
+    if (pushState && window) {
+      pushState(ev.currentTarget.href)
+      window.scrollTo({ top: 0 })
+    }
   }, [window, pushState])
 
-  const handleSearch = useCallback((query) => {
-    window?.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */ query) => {
+    if (window) {
+      window.location.replace(`/search/bookmarks/?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
-  const tagFilterRemovedParams = new URLSearchParams(query)
+  const tagFilterRemovedParams = new URLSearchParams(query || '')
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
 
   return html`
-    ${search({
-      placeholder: 'Search Bookmarks...',
-      onSearch: handleSearch,
-    })}
+    <${Search}
+      placeholder="Search Bookmarks..."
+      onSearch=${handleSearch}
+    />
     <div>
       ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
     </div>
 
     <div>
@@ -64,16 +74,25 @@ export const page = Component(() => {
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html.for(b, b.id)`${bookmarkList({ bookmark: b, reload: reloadBookmarks, onDelete: reloadBookmarks })}`)
+      ? bookmarks.map(b => html`
+          ${tc(BookmarkList, {
+            bookmark: b,
+            reload: reloadBookmarks,
+            onDelete: reloadBookmarks
+          }, b.id)}
+        `)
       : null}
 
-  <div>
-    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  </div>
-`
-})
+    <div>
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+    </div>
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
