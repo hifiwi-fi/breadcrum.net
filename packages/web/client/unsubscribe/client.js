@@ -1,24 +1,37 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useState, useEffect, useCallback, useRef } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
 import { useLSP } from '../hooks/useLSP.js'
 import { useQuery } from '../hooks/useQuery.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { query } = useQuery()
   const [unsubscribing, setUnsubscribing] = useState(false)
-  const [unsubscribed, setUnsubscribed] = useState(null)
-  const [error, setError] = useState(null)
+  const [unsubscribed, setUnsubscribed] = useState(/** @type {string | null} */(null))
+  const [error, setError] = useState(/** @type {Error | null} */(null))
 
-  const formRef = useRef()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
 
-  const handleUnsubscribe = useCallback(async (ev) => {
+  const handleUnsubscribe = useCallback(async (/** @type {Event | undefined} */ ev = undefined) => {
     ev?.preventDefault()
     setUnsubscribing(true)
     setError(null)
 
     try {
-      const email = formRef.current.email.value
+      const form = /** @type {HTMLFormElement | null} */ (formRef.current)
+      if (!form) return
+
+      const emailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email'))
+      if (!emailElement) return
+
+      const email = emailElement.value
 
       const response = await fetch(`${state.apiUrl}/user/email/unsubscribe?email=${email}`, {
         method: 'post',
@@ -35,7 +48,7 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.error(err)
-      setError(err)
+      setError(/** @type {Error} */(err))
     } finally {
       setUnsubscribing(false)
     }
@@ -44,7 +57,7 @@ export const page = Component(() => {
 
   useEffect(() => {
     if (query?.get('email')) {
-      handleUnsubscribe().catch(err => setError(err))
+      handleUnsubscribe().catch(err => setError(/** @type {Error} */(err)))
     }
   }, [])
 
@@ -58,7 +71,7 @@ export const page = Component(() => {
         `
         : html`
           <div class="bc-unsubscribe">
-            <form ref="${formRef}" class="bc-unsubscribe-form" id="bc-unsubscribe-form" onsubmit=${handleUnsubscribe}>
+            <form ref=${formRef} class="bc-unsubscribe-form" id="bc-unsubscribe-form" onsubmit=${handleUnsubscribe}>
             <fieldset ?disabled=${unsubscribing}>
               <legend>Unsubscribe</legend>
               <div>
@@ -67,7 +80,7 @@ export const page = Component(() => {
                 </div>
                 <label class="block">
                   Email:
-                  <input class="block" type="email" name="email" .value=${query?.get('email')} />
+                  <input class="block" type="email" name="email" value=${query?.get('email') || ''} />
                 </label>
               </div>
               <div class="button-cluster">
@@ -85,8 +98,11 @@ export const page = Component(() => {
       : null
       }
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
