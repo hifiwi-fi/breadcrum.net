@@ -1,29 +1,41 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useState, useEffect } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser()
   const { query } = useQuery()
   const [resetting, setResetting] = useState(false)
   const [reset, setReset] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))
 
   useEffect(() => {
     if (user && !loading) window.location.replace('/account')
   }, [user])
 
-  async function resetPassword (ev) {
+  async function resetPassword (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
     setResetting(true)
     setErrorMessage(null)
 
-    const password = ev.currentTarget.password.value
-    const userId = query.get('user_id')
-    const token = query.get('token')
+    const form = /** @type {HTMLFormElement} */ (ev.currentTarget)
+    const passwordElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('password'))
+
+    if (!passwordElement) return
+
+    const password = passwordElement.value
+    const userId = query?.get('user_id')
+    const token = query?.get('token')
 
     if (!userId) throw new Error('Missing userId in reset link. Did you modify the URL?')
     if (!token) throw new Error('Missing token in reset link. Did you modify the URL?')
@@ -37,7 +49,7 @@ export const page = Component(() => {
         body: JSON.stringify({
           password,
           userId,
-          token: query.get('token'),
+          token: query?.get('token'),
         }),
         credentials: 'omit',
       })
@@ -50,7 +62,7 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.error(err)
-      setErrorMessage(err.message)
+      setErrorMessage(/** @type {Error} */(err).message)
     } finally {
       setResetting(false)
     }
@@ -91,12 +103,15 @@ export const page = Component(() => {
       `
       : html`
         <div>Logged in as ${user.username}</div>
-        <div>Redirecting to <a href="/account">account</a></button>
+        <div>Redirecting to <a href="/account">account</a></div>
         `
     }
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
