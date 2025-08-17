@@ -85,7 +85,6 @@
     "p-map": "^7.0.0",
     "type-fest": "^4.26.1",
     "typescript": "~5.9.0",
-    "uland-isomorphic": "^2.0.0",
     "why-is-node-running": "^3.2.2",
     "xmlbuilder": "^15.1.1"
   },
