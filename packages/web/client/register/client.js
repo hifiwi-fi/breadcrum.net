@@ -1,15 +1,22 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useFlags } from '../hooks/useFlags.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const { user, loading, error: userError } = useUser()
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
   const { flags, loading: flagsLoading } = useFlags()
-  const [registerError, setRegisterError] = useState(null)
+  const [registerError, setRegisterError] = useState(/** @type {Error | null} */(null))
 
   useEffect(() => {
     if ((user && !loading)) {
@@ -17,16 +24,24 @@ export const page = Component(() => {
     }
   }, [user])
 
-  async function onRegister (ev) {
+  async function onRegister (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
     setSubmitting(true)
     setRegisterError(null)
 
     try {
-      const email = ev.currentTarget.email.value
-      const username = ev.currentTarget.username.value
-      const password = ev.currentTarget.password.value
-      const newsletter_subscription = ev.currentTarget.newsletter_subscription.checked // eslint-disable-line camelcase
+      const form = /** @type {HTMLFormElement} */ (ev.currentTarget)
+      const emailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email'))
+      const usernameElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('username'))
+      const passwordElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('password'))
+      const newsletterElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('newsletter_subscription'))
+
+      if (!emailElement || !usernameElement || !passwordElement || !newsletterElement) return
+
+      const email = emailElement.value
+      const username = usernameElement.value
+      const password = passwordElement.value
+      const newsletter_subscription = newsletterElement.checked // eslint-disable-line camelcase
 
       const response = await fetch(`${state.apiUrl}/register`, {
         method: 'post',
@@ -45,7 +60,7 @@ export const page = Component(() => {
     } catch (err) {
       console.log(err)
       setSubmitting(false)
-      setRegisterError(err)
+      setRegisterError(/** @type {Error} */(err))
     }
   }
 
@@ -120,10 +135,11 @@ export const page = Component(() => {
   }
   ${registerError ? html`<p>${registerError.message}</p>` : null}
 `
-})
+}
 
-try {
-  render(document.querySelector('.bc-main'), page)
-} catch {
-  // swallow
+if (typeof window !== 'undefined') {
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
