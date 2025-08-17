@@ -1,24 +1,23 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
 
 /**
- * @typedef {({
- *  onSave,
- *  onCancelEdit,
- * }: {
+ * @typedef {{
  *  onSave?: (formState: { password: string }) => Promise<void> | void,
  *  onCancelEdit?: () => void,
- * }) => any} PasswordEdit
+ * }} PasswordEditProps
  */
 
 /**
- * @type {PasswordEdit}
+ * @type {FunctionComponent<PasswordEditProps>}
  */
-export const passwordEdit = Component(/** @type{PasswordEdit} */({ onSave, onCancelEdit }) => {
-  const [error, setError] = useState(null)
+export const PasswordEdit = ({ onSave, onCancelEdit }) => {
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
@@ -27,9 +26,15 @@ export const passwordEdit = Component(/** @type{PasswordEdit} */({ onSave, onCan
     setDisabled(true)
     setError(null)
 
-    const form = formRef.current
-    const password = form.password.value
-    const confirmPassword = form.confirmPassword.value
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
+
+    const passwordElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('password'))
+    const confirmPasswordElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('confirmPassword'))
+    if (!passwordElement || !confirmPasswordElement) return
+
+    const password = passwordElement.value
+    const confirmPassword = confirmPasswordElement.value
 
     if (password !== confirmPassword) {
       setError(new Error('Passwords do not match'))
@@ -42,31 +47,31 @@ export const passwordEdit = Component(/** @type{PasswordEdit} */({ onSave, onCan
     }
 
     try {
-      await onSave?.(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave])
+  }, [setDisabled, setError, onSave])
 
   return html`
     <div class='bc-account-password-edit'>
       <form ref="${formRef}" class="bc-account-password-edit-form" id="bc-account-password-edit-form" onsubmit=${handleSave}>
-      <fieldset ?disabled=${disabled}>
+      <fieldset disabled=${disabled}>
         <legend class="bc-account-password-edit-legend">Edit password</legend>
         <div>
           <label class='block'>
             password:
-            <input class="block" type="password" minlength="8" maxlength="255" name="password">
+            <input class="block" type="password" minLength="8" maxLength="255" name="password" />
           </label>
           <label class='block'>
             confirm password:
-            <input class="block" type="password" minlength="8" maxlength="255" name="confirmPassword">
+            <input class="block" type="password" minLength="8" maxLength="255" name="confirmPassword" />
           </label>
         </div>
         <div class="bc-account-password-edit-submit-line">
           <div class="button-cluster">
-            ${onSave ? html`<input name="submit-button" type="submit">` : null}
+            ${onSave ? html`<input name="submit-button" type="submit" />` : null}
             ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           </div>
         </div>
@@ -75,4 +80,4 @@ export const passwordEdit = Component(/** @type{PasswordEdit} */({ onSave, onCan
     </form>
     </div>
   `
-})
+}

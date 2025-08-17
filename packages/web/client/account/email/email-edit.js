@@ -1,29 +1,25 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
 
 /**
- * @typedef {({
- *  user,
- *  onSave,
- *  onCancelEdit,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  onSave?: (formState: { email: string }) => Promise<void> | void,
  *  onCancelEdit?: () => void,
- * }) => any} EmailEdit
+ * }} EmailEditProps
  */
 
 /**
- * @type {EmailEdit}
+ * @type {FunctionComponent<EmailEditProps>}
  */
-export const emailEdit = Component(/** @type{EmailEdit} */({ user, onSave, onCancelEdit }) => {
-  const [error, setError] = useState(null)
+export const EmailEdit = ({ user, onSave, onCancelEdit }) => {
+  const [error, setError] = useState(/** @type { Error | null } */(null))
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
@@ -32,8 +28,12 @@ export const emailEdit = Component(/** @type{EmailEdit} */({ user, onSave, onCan
     setDisabled(true)
     setError(null)
 
-    const form = formRef.current
-    const email = form.email.value
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
+
+    const emailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email'))
+    if (!emailElement) return
+    const email = emailElement.value
 
     if (email === user?.email) {
       setError(new Error('New email must be different than current email'))
@@ -46,27 +46,27 @@ export const emailEdit = Component(/** @type{EmailEdit} */({ user, onSave, onCan
     }
 
     try {
-      await onSave?.(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
-  }, [user?.email, setDisabled, setError, formRef?.current, onSave])
+  }, [user?.email, setDisabled, setError, onSave])
 
   return html`
     <div class='bc-account-email-edit'>
       <form ref="${formRef}" class="bc-account-email-edit-form" id="bc-account-email-edit-form" onsubmit=${handleSave}>
-      <fieldset ?disabled=${disabled}>
+      <fieldset disabled=${disabled}>
         <legend class="bc-account-email-edit-legend">Edit email</legend>
         <div>
           <label class='block'>
             email:
-            <input class='block' minlength="1" maxlength="200" type="email" name="email" value="${user?.email}"/>
+            <input class='block' minLength="1" maxLength="200" type="email" name="email" value="${user?.email}"/>
           </label>
         </div>
         <div class="bc-account-email-edit-submit-line">
           <div class="button-cluster">
-            ${onSave ? html`<input name="submit-button" type="submit">` : null}
+            ${onSave ? html`<input name="submit-button" type="submit" />` : null}
             ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           </div>
         </div>
@@ -75,4 +75,4 @@ export const emailEdit = Component(/** @type{EmailEdit} */({ user, onSave, onCan
     </form>
     </div>
   `
-})
+}

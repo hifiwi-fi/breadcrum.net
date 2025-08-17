@@ -1,8 +1,10 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, useCallback } from 'uland-isomorphic'
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useCallback } from 'preact/hooks'
 import { useAuthTokens } from '../../hooks/useAuthTokens.js'
 import { authTokenList } from '../../components/auth-token/auth-token-list.js'
 import { useQuery } from '../../hooks/useQuery.js'
@@ -10,13 +12,13 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { manageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
 
 /**
- * @typedef {() => any} AuthTokensField
+ * @typedef {{}} AuthTokensProps
  */
 
 /**
- * @type {AuthTokensField}
+ * @type {FunctionComponent<AuthTokensProps>}
  */
-export const authTokens = Component(/** @type{AuthTokensField} */() => {
+export const AuthTokens = () => {
   const window = useWindow()
   const {
     tokensError,
@@ -43,23 +45,23 @@ export const authTokens = Component(/** @type{AuthTokensField} */() => {
       <div class="bc-help-text">
         ℹ️ Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
       </div>
-      <div>${manageAuthTokenField({ reload: reloadAuthTokens })}</div>
+      <div><${manageAuthTokenField} reload=${reloadAuthTokens} /></div>
       <div>
         ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
       </div>
 
       ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
 
       ${Array.isArray(tokens)
-        ? tokens.map(t => html.for(t, t.jti)`${authTokenList({ authToken: t, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
+        ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} reload=${reloadAuthTokens} onDelete=${reloadAuthTokens} />`)
         : null}
 
       <div>
         ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
+        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
       </div>
     </dd>
   `
-})
+}

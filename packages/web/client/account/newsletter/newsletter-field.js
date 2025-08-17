@@ -1,29 +1,26 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
- * @typedef {({
- *  user,
- *  reload,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  reload: () => void,
- * }) => any} NewsletterField
+ * }} NewsletterFieldProps
  */
 
 /**
- * @type {NewsletterField}
+ * @type {FunctionComponent<NewsletterFieldProps>}
  */
-export const newsletterField = Component(/** @type{NewsletterField} */({ user, reload }) => {
+export const NewsletterField = ({ user, reload }) => {
   const state = useLSP()
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
 
   const handleToggle = useCallback(async (/** @type {Event} */ev) => {
@@ -54,7 +51,7 @@ export const newsletterField = Component(/** @type{NewsletterField} */({ user, r
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
     } catch (err) {
-      setError(err)
+      setError(/** @type {Error} */(err))
     } finally {
       setDisabled(false)
     }
@@ -64,10 +61,10 @@ export const newsletterField = Component(/** @type{NewsletterField} */({ user, r
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" ?disabled=${disabled} .indeterminate=${disabled} .checked=${user?.newsletter_subscription}>
+      <input onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${disabled} indeterminate=${disabled} checked=${user?.newsletter_subscription} />
       Subscribed
     </label>
     ${error ? html`<div class="error-box">${error.message}</div>` : null}
   </dd>
   `
-})
+}

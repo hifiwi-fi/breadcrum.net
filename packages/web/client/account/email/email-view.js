@@ -1,31 +1,27 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
- * @typedef {({
- *  user,
- *  onEdit,
- *  reload,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
  *  reload: () => void,
- * }) => any} EmailView
+ * }} EmailViewProps
  */
 
 /**
- * @type {EmailView}
+ * @type {FunctionComponent<EmailViewProps>}
  */
-export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reload }) => {
+export const EmailView = ({ user, onEdit, reload }) => {
   const state = useLSP()
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(/** @type { Error | null } */(null))
 
   const [requestingEmailVerification, setRequestingEmailVerification] = useState(false)
   const [emailVerificationRequested, setEmailVerificationRequested] = useState(false)
@@ -56,7 +52,7 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     } catch (err) {
-      setError(err)
+      setError(/** @type {Error} */(err))
     } finally {
       setRequestingEmailVerification(false)
     }
@@ -84,7 +80,7 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     } catch (err) {
-      setError(err)
+      setError(/** @type {Error} */(err))
     } finally {
       setRequestingEmailUpdateVerification(false)
     }
@@ -109,7 +105,7 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
       }
     } catch (err) {
       console.error(err)
-      setError(err)
+      setError(/** @type {Error} */(err))
       setCancellingEmailUpdate(false)
     }
   }, [state.apiUrl, setCancellingEmailUpdate, setError, reload])
@@ -122,7 +118,7 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
           onClick="${handleEmailConfirmRequest}"
-          ?disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
+          disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
           ${
             emailVerificationRequested
               ? 'Email verification resent'
@@ -139,14 +135,14 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
         <div>
         <button
           onClick="${handleEmailUpdateConfirmRequest}"
-          ?disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
+          disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
             emailUpdateVerificationRequested
               ? 'Email update verification resent'
               : 'Resend email update confirmation'
           }</button>
         <button
           onClick="${handleCancelEmailUpdate}"
-          ?disabled="${cancellingEmailUpdate}"
+          disabled="${cancellingEmailUpdate}"
         >
           ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}
         </button>
@@ -158,4 +154,4 @@ export const emailView = Component(/** @type{EmailView} */({ user, onEdit, reloa
       ${error ? html`<div class="error-box">${error.message}</div>` : null}
     </dd>
   `
-})
+}

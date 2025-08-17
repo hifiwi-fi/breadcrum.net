@@ -1,20 +1,22 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { passwordEdit } from './password-edit.js'
-import { passwordView } from './password-view.js'
+import { PasswordEdit } from './password-edit.js'
+import { PasswordView } from './password-view.js'
 
 /**
- * @typedef {() => any} PasswordField
+ * @typedef {{}} PasswordFieldProps
  */
 
 /**
- * @type {PasswordField}
+ * @type {FunctionComponent<PasswordFieldProps>}
  */
-export const passwordField = Component(/** @type{PasswordField} */() => {
+export const PasswordField = () => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
@@ -47,13 +49,13 @@ export const passwordField = Component(/** @type{PasswordField} */() => {
   return html`
   ${
     editing
-    ? passwordEdit({
-      onSave: handleSave,
-      onCancelEdit: handleCancelEdit,
-    })
-    : passwordView({
-      onEdit: handleEdit,
-    })
+    ? html`<${PasswordEdit}
+        onSave=${handleSave}
+        onCancelEdit=${handleCancelEdit}
+      />`
+    : html`<${PasswordView}
+        onEdit=${handleEdit}
+      />`
   }
   `
-})
+}

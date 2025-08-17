@@ -1,29 +1,26 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { emailEdit } from './email-edit.js'
-import { emailView } from './email-view.js'
+import { EmailEdit } from './email-edit.js'
+import { EmailView } from './email-view.js'
 
 /**
- * @typedef {({
- *  user,
- *  reload,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  reload: () => void,
- * }) => any} EmailField
+ * }} EmailFieldProps
  */
 
 /**
- * @type {EmailField}
+ * @type {FunctionComponent<EmailFieldProps>}
  */
-export const emailField = Component(/** @type{EmailField} */({ user, reload }) => {
+export const EmailField = ({ user, reload }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
@@ -56,16 +53,16 @@ export const emailField = Component(/** @type{EmailField} */({ user, reload }) =
   return html`
   ${
     editing
-    ? emailEdit({
-      user,
-      onSave: handleSave,
-      onCancelEdit: handleCancelEdit,
-    })
-    : emailView({
-      user,
-      onEdit: handleEdit,
-      reload,
-    })
+    ? html`<${EmailEdit}
+        user=${user}
+        onSave=${handleSave}
+        onCancelEdit=${handleCancelEdit}
+      />`
+    : html`<${EmailView}
+        user=${user}
+        onEdit=${handleEdit}
+        reload=${reload}
+      />`
   }
   `
-})
+}
