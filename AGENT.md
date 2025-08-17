@@ -26,6 +26,22 @@ const data: { id: number, name: string } = {...}
 function process(item: { id: number, name: string }) {...}
 ```
 
+### Use @ts-expect-error over @ts-ignore
+
+Always use `@ts-expect-error` instead of `@ts-ignore` for TypeScript error suppression:
+
+```javascript
+// ✅ Good - will fail if error is fixed, alerting us to remove the comment
+// @ts-expect-error - No type definitions available for @breadcrum/bookmarklet
+import getBookmarklet from '@breadcrum/bookmarklet'
+
+// ❌ Avoid - continues to suppress even when unnecessary
+// @ts-ignore - No type definitions available for @breadcrum/bookmarklet
+import getBookmarklet from '@breadcrum/bookmarklet'
+```
+
+This ensures error suppressions are removed when they become obsolete.
+
 ### Use newer @import syntax in jsdoc/ts-in-js for types only
 
 The @import syntax is for TYPE IMPORTS ONLY. Regular imports (functions, classes, values) still use standard ES module import syntax.
