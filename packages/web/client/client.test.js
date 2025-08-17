@@ -4,7 +4,7 @@ import { page } from './client.js'
 import { render } from 'preact-render-to-string'
 
 suite('Main client page tests', () => {
-  test('Main page component renders without errors', async (t) => {
+  test('Main page component renders without errors', async () => {
     let rendered
     assert.doesNotThrow(() => {
       rendered = render(page())

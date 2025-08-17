@@ -45,11 +45,13 @@ export const Page = () => {
     async function getUsers () {
       setUsersLoading(true)
       setUsersError(null)
-      const pageParams = new URLSearchParams(query)
+      const pageParams = new URLSearchParams(query || '')
 
       // Transform date string to date object
-      if (pageParams.get('before')) pageParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
-      if (pageParams.get('after')) pageParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
+      const beforeParam = pageParams.get('before')
+      if (beforeParam) pageParams.set('before', (new Date(+beforeParam)).toISOString())
+      const afterParam = pageParams.get('after')
+      if (afterParam) pageParams.set('after', (new Date(+afterParam)).toISOString())
 
       try {
         // Be selective about this
@@ -66,7 +68,7 @@ export const Page = () => {
           setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
           setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
           if (body?.pagination?.top && window) {
-            const newParams = new URLSearchParams(query)
+            const newParams = new URLSearchParams(query || '')
             let modified = false
             if (newParams.get('before')) {
               newParams.delete('before')
@@ -79,7 +81,7 @@ export const Page = () => {
 
             if (modified) {
               const qs = newParams.toString()
-              window.history.replaceState(null, null, qs ? `.?${qs}` : '.')
+              window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
             }
           }
         } else {
@@ -114,14 +116,14 @@ export const Page = () => {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query)
+    beforeParams = new URLSearchParams(query || '')
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query)
+    afterParams = new URLSearchParams(query || '')
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }
