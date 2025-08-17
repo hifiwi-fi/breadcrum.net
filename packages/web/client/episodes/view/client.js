@@ -1,25 +1,34 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState, useCallback } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState, useCallback } from 'preact/hooks'
+import { tc } from '../../lib/typed-component.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
-import { episodeList } from '../../components/episode/episode-list.js'
-import { search } from '../../components/search/index.js'
+import { EpisodeList } from '../../components/episode/episode-list.js'
+import { Search } from '../../components/search/index.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
   const window = useWindow()
 
-  const [episode, setEpisode] = useState()
+  const [episode, setEpisode] = useState(/** @type {TypeEpisodeReadClient | undefined} */(undefined))
   const [episodeLoading, setEpisodeLoading] = useState(false)
-  const [episodeError, setEpisodeError] = useState(null)
+  const [episodeError, setEpisodeError] = useState(/** @type {Error | null} */(null))
 
   const [episodeReload, setEpisodeReload] = useState(0)
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !loading && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
@@ -31,13 +40,17 @@ export const page = Component(() => {
   }, [episodeReload, setEpisodeReload])
 
   const handleDelete = useCallback(() => {
-    window.location.replace(`/bookmarks/view?id=${episode.bookmark.id}`)
+    if (episode?.bookmark?.id && window) {
+      window.location.replace(`/bookmarks/view?id=${episode.bookmark.id}`)
+    }
   }, [episode?.bookmark?.id])
 
   useEffect(() => {
     const controller = new AbortController()
 
     async function getEpisode () {
+      if (!window) return
+
       setEpisodeLoading(true)
       setEpisodeError(null)
 
@@ -52,8 +65,8 @@ export const page = Component(() => {
 
       const requestParams = new URLSearchParams()
 
-      requestParams.set('sensitive', state.sensitive)
-      requestParams.set('include_feed', true)
+      requestParams.set('sensitive', state.sensitive.toString())
+      requestParams.set('include_feed', 'true')
 
       const response = await fetch(`${state.apiUrl}/episodes/${id}?${requestParams.toString()}`, {
         method: 'get',
@@ -67,7 +80,7 @@ export const page = Component(() => {
         const body = await response.json()
         setEpisode(body)
       } else {
-        setEpisode(null)
+        setEpisode(undefined)
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
     }
@@ -75,7 +88,10 @@ export const page = Component(() => {
     if (user) {
       getEpisode()
         .then(() => { console.log('episode done') })
-        .catch(err => { console.error(err); setEpisodeError(err) })
+        .catch(err => {
+          console.error(err)
+          setEpisodeError(/** @type {Error} */(err))
+        })
         .finally(() => { setEpisodeLoading(false) })
     }
   }, [episodeReload, state.apiUrl, state.sensitive])
@@ -83,23 +99,35 @@ export const page = Component(() => {
   const title = episode?.display_title ? ['📼', episode?.display_title] : []
   useTitle(...title)
 
-  const handleSearch = useCallback((query) => {
-    window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */query) => {
+    if (window) {
+      window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
   return html`
     <div>
-      ${search({
-        placeholder: 'Search Episodes...',
-        onSearch: handleSearch,
-      })}
+      <${Search}
+        placeholder="Search Episodes..."
+        onSearch=${handleSearch}
+      />
       ${episodeLoading ? html`<div>...</div>` : null}
       ${episodeError ? html`<div>${episodeError.message}</div>` : null}
-      ${episode ? episodeList({ episode, reload: reloadEpisode, onDelete: handleDelete, clickForPreview: false }) : null}
+      ${episode
+        ? tc(EpisodeList, {
+            episode,
+            reload: reloadEpisode,
+            onDelete: handleDelete,
+            clickForPreview: false
+          })
+        : null}
     </div>
-`
-})
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

@@ -1,24 +1,33 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useCallback, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeEpisodeReadClient } from '../../routes/api/episodes/schemas/schema-episode-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useCallback, useState } from 'preact/hooks'
+import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { episodeList } from '../components/episode/episode-list.js'
-import { search } from '../components/search/index.js'
+import { EpisodeList } from '../components/episode/episode-list.js'
+import { Search } from '../components/search/index.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
 
-  const [episodes, setEpisodes] = useState()
+  const [episodes, setEpisodes] = useState(/** @type {TypeEpisodeReadClient[] | undefined} */(undefined))
   const [episodesLoading, setEpisodesLoading] = useState(false)
-  const [episodesError, setEpisodesError] = useState(null)
+  const [episodesError, setEpisodesError] = useState(/** @type {Error | null} */(null))
 
-  const [before, setBefore] = useState()
-  const [after, setAfter] = useState()
+  const [before, setBefore] = useState(/** @type {Date | undefined} */(undefined))
+  const [after, setAfter] = useState(/** @type {Date | undefined} */(undefined))
 
   // Need a better way to trigger reloads
   const [episodeReload, setEpisodeReload] = useState(0)
@@ -28,7 +37,7 @@ export const page = Component(() => {
 
   // Require a user
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !loading && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
@@ -41,16 +50,19 @@ export const page = Component(() => {
     async function getEpisodes () {
       setEpisodesLoading(true)
       setEpisodesError(null)
-      const pageParams = new URLSearchParams(query)
+      const pageParams = new URLSearchParams(query || '')
       const requestParams = new URLSearchParams()
 
       // Transform date string to date object
-      if (pageParams.get('before')) requestParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
-      if (pageParams.get('after')) requestParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
-      if (pageParams.get('bid')) requestParams.set('bookmark_id', pageParams.get('bid'))
+      const beforeParam = pageParams.get('before')
+      const afterParam = pageParams.get('after')
+      if (beforeParam) requestParams.set('before', (new Date(+beforeParam)).toISOString())
+      if (afterParam) requestParams.set('after', (new Date(+afterParam)).toISOString())
+      const bidParam = pageParams.get('bid')
+      if (bidParam) requestParams.set('bookmark_id', bidParam)
 
-      requestParams.set('sensitive', state.sensitive)
-      requestParams.set('include_feed', true)
+      requestParams.set('sensitive', state.sensitive.toString())
+      requestParams.set('include_feed', 'true')
 
       const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
@@ -63,11 +75,11 @@ export const page = Component(() => {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
         setEpisodes(body?.data)
-        setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
-        setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
+        setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : undefined)
+        setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : undefined)
 
-        if (body?.pagination?.top) {
-          const newParams = new URLSearchParams(query)
+        if (body?.pagination?.top && window) {
+          const newParams = new URLSearchParams(query || '')
           let modified = false
           if (newParams.get('before')) {
             newParams.delete('before')
@@ -80,7 +92,7 @@ export const page = Component(() => {
 
           if (modified) {
             const qs = newParams.toString()
-            window.history.replaceState(null, null, qs ? `.?${qs}` : '.')
+            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
           }
         }
       } else {
@@ -91,56 +103,71 @@ export const page = Component(() => {
     if (user) {
       getEpisodes()
         .then(() => { console.log('episodes done') })
-        .catch(err => { console.error(err); setEpisodesError(err) })
+        .catch(err => {
+          console.error(err)
+          setEpisodesError(/** @type {Error} */(err))
+        })
         .finally(() => { setEpisodesLoading(false) })
     }
   }, [query, state.apiUrl, state.sensitive, episodeReload])
 
-  const onPageNav = useCallback((ev) => {
+  const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
+    if (pushState && window) {
+      pushState(ev.currentTarget.href)
+      window.scrollTo({ top: 0 })
+    }
   }, [window, pushState])
 
-  const handleSearch = useCallback((query) => {
-    window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */query) => {
+    if (window) {
+      window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query)
-    beforeParams.set('before', before.valueOf())
+    beforeParams = new URLSearchParams(query || '')
+    beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query)
-    afterParams.set('after', after.valueOf())
+    afterParams = new URLSearchParams(query || '')
+    afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }
 
   return html`
-  ${search({
-    placeholder: 'Search Episodes...',
-    onSearch: handleSearch,
-  })}
-  <div>
-    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
-  ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
-  ${episodesError ? html`<div>${episodesError.message}</div>` : null}
-  ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload: reloadEpisodes, onDelete: reloadEpisodes, clickForPreview: true })}`)
+    <${Search}
+      placeholder="Search Episodes..."
+      onSearch=${handleSearch}
+    />
+    <div>
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+    </div>
+    ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
+    ${episodesError ? html`<div>${episodesError.message}</div>` : null}
+    ${Array.isArray(episodes)
+      ? episodes.map(e => tc(EpisodeList, {
+          episode: e,
+          reload: reloadEpisodes,
+          onDelete: reloadEpisodes,
+          clickForPreview: true
+        }, e.id))
       : null}
-  <div>
-    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
-`
-})
+    <div>
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+    </div>
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
