@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaSchedulesRead } from './schemas/schema-schedules-read.js'
 
 /**
  * @typedef {Object} ScheduleRow
@@ -18,7 +20,7 @@ import SQL from '@nearform/sql'
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *   }
  * }>}
  */
@@ -36,30 +38,12 @@ export async function getSchedules (fastify, _opts) {
         hide: true,
         description: 'Get all scheduled/cron jobs',
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              schedules: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string', description: 'Schedule name' },
-                    cron: { type: 'string', description: 'Cron expression' },
-                    timezone: { type: 'string', description: 'Timezone for cron execution' },
-                    data: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job data template' },
-                    options: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job options' },
-                    created_on: { type: 'string', format: 'date-time', description: 'Schedule creation time' },
-                    updated_on: { type: 'string', format: 'date-time', description: 'Last update time' },
-                  }
-                }
-              }
-            }
-          }
+          200: schemaSchedulesRead
         }
       },
     },
-    async function getSchedulesHandler (_request, _reply) {
+    async function getSchedulesHandler (_request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         const query = SQL`
           SELECT
@@ -77,9 +61,12 @@ export async function getSchedules (fastify, _opts) {
         /** @type {QueryResult<ScheduleRow>} */
         const result = await fastify.pg.query(query)
 
-        return {
+        /** @type {ReturnBody} */
+        const returnBody = {
           schedules: result.rows
         }
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get schedules')
         throw error

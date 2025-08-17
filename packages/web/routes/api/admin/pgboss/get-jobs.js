@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaJobsRead } from './schemas/schema-jobs-read.js'
 
 /**
  * @typedef {Object} JobRow
@@ -29,7 +31,8 @@ import SQL from '@nearform/sql'
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [
+ *       { pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *   }
  * }>}
  */
@@ -80,45 +83,12 @@ export async function getJobs (fastify, _opts) {
           }
         },
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              jobs: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'string', format: 'uuid', description: 'Job ID' },
-                    name: { type: 'string', description: 'Queue name' },
-                    state: { type: 'string', description: 'Current job state' },
-                    priority: { type: 'integer', description: 'Job priority' },
-                    retry_count: { type: 'integer', description: 'Number of retry attempts' },
-                    retry_limit: { type: 'integer', description: 'Maximum retry attempts' },
-                    created_on: { type: 'string', format: 'date-time', description: 'Job creation time' },
-                    started_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Job start time' },
-                    completed_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Job completion time' },
-                    keep_until: { type: 'string', format: 'date-time', description: 'Job retention time' },
-                    data: { type: 'object', additionalProperties: true, description: 'Job payload' },
-                    output: { type: ['object'], nullable: true, additionalProperties: true, description: 'Job output' },
-                    singleton_key: { type: ['string'], nullable: true, description: 'Singleton key if applicable' },
-                  }
-                }
-              },
-              pagination: {
-                type: 'object',
-                properties: {
-                  total: { type: 'integer', description: 'Total number of jobs matching filters' },
-                  offset: { type: 'integer', description: 'Current offset' },
-                  limit: { type: 'integer', description: 'Current limit' },
-                  hasMore: { type: 'boolean', description: 'Whether there are more results' }
-                }
-              }
-            }
-          }
+          200: schemaJobsRead
         }
       },
     },
-    async function getJobsHandler (request, _reply) {
+    async function getJobsHandler (request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         const {
           state,
@@ -196,7 +166,8 @@ export async function getJobs (fastify, _opts) {
         /** @type {QueryResult<JobRow>} */
         const jobsResult = await fastify.pg.query(jobsQuery)
 
-        return {
+        /** @type {ReturnBody} */
+        const returnBody = {
           jobs: jobsResult.rows,
           pagination: {
             total,
@@ -205,6 +176,8 @@ export async function getJobs (fastify, _opts) {
             hasMore: offset + limit < total
           }
         }
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get jobs')
         throw error

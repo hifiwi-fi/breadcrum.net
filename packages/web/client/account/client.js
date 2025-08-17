@@ -1,6 +1,10 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { useEffect } from 'preact/hooks'
@@ -14,6 +18,7 @@ import { useReload } from '../hooks/useReload.js'
 import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 
+/** @type {FunctionComponent} */
 export const Page = () => {
   const window = useWindow()
 

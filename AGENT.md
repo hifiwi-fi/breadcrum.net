@@ -183,6 +183,209 @@ const results = await client.query(query)
 return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 ```
 
+### API Route Typing Patterns
+
+When working with Fastify routes, use proper schema validation and type extraction:
+
+#### Schema-Based Route Definitions
+
+Always import and use predefined schemas instead of inline definitions:
+
+```javascript
+// ✅ Good - use imported schemas
+import { schemaUserRead } from './schemas/schema-user-read.js'
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   }
+ * }>}
+ */
+export async function getUser (fastify, _opts) {
+  fastify.get('/', {
+    schema: {
+      response: {
+        200: schemaUserRead
+      }
+    }
+  }, async function getUserHandler (request, reply) {
+    // handler implementation
+  })
+}
+```
+
+#### Date Deserialization
+
+Use the `SerializerSchemaOptions.deserialize` option to automatically convert date-time strings to Date objects on the server side:
+
+```javascript
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
+ *   }
+ * }>}
+ */
+```
+
+This ensures that date-time fields in responses are properly typed as `Date | null` objects for nullable fields, or `Date` for non-nullable fields. Use `Date | null` in the output type to handle nullable date fields properly.
+
+#### Response Type Extraction
+
+Extract response types using `ExtractResponseType` with the specific status code:
+
+```javascript
+/**
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ */
+
+async function handler (request, reply) {
+  /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+
+  /** @type {ReturnBody} */
+  const returnBody = {
+    // properly typed response data
+  }
+
+  return reply.code(200).send(returnBody)
+}
+```
+
+#### Return Value Pattern
+
+Always use `reply.code().send()` for explicit status codes and proper type narrowing:
+
+```javascript
+// ✅ Good - explicit status code with send
+return reply.code(201).send({
+  token,
+  auth_token: authToken,
+})
+
+// ❌ Avoid - implicit return without status code
+return {
+  token,
+  auth_token: authToken,
+}
+```
+
+This pattern ensures:
+- Explicit HTTP status codes
+- Proper type extraction with `ExtractResponseType`
+- Type safety for response bodies
+- Consistent error handling
+
+#### Nullable Fields in Schemas
+
+For nullable fields in JSON schemas, use the `nullable: true` property instead of type arrays:
+
+```javascript
+// ✅ Good - use nullable property
+{
+  type: 'string',
+  nullable: true,
+  format: 'date-time',
+  description: 'Optional date field'
+}
+
+// ❌ Avoid - type arrays for nullable
+{
+  type: ['string', 'null'],
+  format: 'date-time',
+  description: 'Optional date field'
+}
+```
+
+This ensures proper JSON Schema validation and TypeScript type generation.
+
+#### Required Nullable Fields vs Optional Fields
+
+Prefer required nullable fields over optional fields in schemas for consistency and clarity:
+
+```javascript
+// ✅ Good - required nullable field
+{
+  type: 'object',
+  required: ['id', 'name', 'updated_at'],
+  properties: {
+    id: { type: 'string' },
+    name: { type: 'string' },
+    updated_at: {
+      type: 'string',
+      nullable: true,
+      format: 'date-time'
+    }
+  }
+}
+
+// ❌ Avoid - optional field
+{
+  type: 'object',
+  required: ['id', 'name'],
+  properties: {
+    id: { type: 'string' },
+    name: { type: 'string' },
+    updated_at: {
+      type: 'string',
+      format: 'date-time'
+    }
+  }
+}
+```
+
+This pattern ensures:
+- Consistent handling of null vs undefined
+- Better alignment with database query results
+- Clearer API contracts
+
+#### Schema Type Exports
+
+Where you define schemas, always export a `FromSchema` type without deserialization options for use in other parts of the application:
+
+```javascript
+/**
+ * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
+ * @typedef {typeof schemaUserRead} SchemaUserRead
+ * @typedef {FromSchema<SchemaUserRead>} TypeUserRead
+ */
+
+export const schemaUserRead = /** @type {const} @satisfies {JSONSchema} */ ({
+  type: 'object',
+  // ... schema definition
+})
+```
+
+This provides a base type that can be imported and used throughout the application without route-specific deserialization transformations.
+
+#### Database Query Types
+
+Define query result types next to your queries, separate from schemas, to ensure query types align with schema types:
+
+```javascript
+/**
+ * @typedef {Object} UserRow
+ * @property {string} id - User UUID
+ * @property {string} name - User name
+ * @property {Date|null} updated_at - Last update time
+ * @property {string} email - User email
+ */
+
+const getUserQuery = SQL`
+  SELECT id, name, updated_at, email
+  FROM users
+  WHERE id = ${userId}
+`
+
+/** @type {QueryResult<UserRow>} */
+const result = await fastify.pg.query(getUserQuery)
+```
+
+This pattern ensures:
+- Query types are maintained alongside query definitions
+- Easy verification that database types match schema expectations
+- Clear documentation of what the database returns
+
 ## SQL
 
 - Breadcrum uses postgres

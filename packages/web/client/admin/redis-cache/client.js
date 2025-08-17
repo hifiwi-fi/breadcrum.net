@@ -1,24 +1,33 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState, useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useWindow } from '../../hooks/useWindow.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
+  const window = useWindow()
 
   useEffect(() => {
-    if (!user && !loading) {
+    if ((!user && !loading) && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
-  }, [user])
+  }, [user, loading, window])
 
-  const [status, setStatus] = useState(null)
-  const [error, setError] = useState(null)
+  const [status, setStatus] = useState(/** @type {string | null} */(null))
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  async function handleFlushCache () {
+  const handleFlushCache = useCallback(async () => {
     setIsSubmitting(true)
     setStatus(null)
     setError(null)
@@ -40,11 +49,11 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.error(err)
-      setError(err.message || 'Unknown error')
+      setError(/** @type {Error} */(err))
     } finally {
       setIsSubmitting(false)
     }
-  }
+  }, [state.apiUrl])
 
   return html`
     <div class="bc-flush-cache">
@@ -52,16 +61,19 @@ export const page = Component(() => {
 
       <p>This will flush all cache keys from the Redis instance used by the app. Use with caution.</p>
 
-      <button ?disabled=${isSubmitting} onClick=${handleFlushCache}>
+      <button disabled=${isSubmitting} onClick=${handleFlushCache}>
         ${isSubmitting ? 'Flushing…' : 'Flush Redis Cache'}
       </button>
 
       ${status ? html`<p class="success">${status}</p>` : null}
-      ${error ? html`<p class="error">${error}</p>` : null}
+      ${error ? html`<p class="error">${error.message}</p>` : null}
     </div>
   `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
