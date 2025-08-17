@@ -597,11 +597,21 @@ This follows React/Preact conventions and makes it clear these are components, n
 
 ### Component Syntax
 
-**❌ NEVER use direct function calls** - they break component identity and reconciliation:
+**🚨 CRITICAL: NEVER call Preact function components directly** - they break component identity and reconciliation:
 ```js
-// ❌ DANGEROUS - breaks React/Preact reconciliation
+// ❌ DANGEROUS - breaks React/Preact reconciliation and hooks
 ${MyComponent({ prop: value })}
+
+// ❌ DANGEROUS - direct function calls break everything
+MyComponent()
+
+// ❌ DANGEROUS - even in tests and page wrappers
+export default () => {
+  return Page()  // This breaks hooks!
+}
 ```
+
+**⚠️ This applies EVERYWHERE**: Tests, page wrappers, component composition - components must ALWAYS be called through HTM syntax, never as direct function calls.
 
 **✅ Use HTM component syntax** for proper component mounting:
 ```js

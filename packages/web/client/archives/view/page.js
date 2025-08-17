@@ -1,6 +1,6 @@
-import { html } from 'uland-isomorphic'
-import { page } from './client.js'
+import { html } from 'htm/preact'
+import { Page } from './client.js'
 
 export default () => {
-  return html`${page()}`
+  return html`<${Page} />`
 }

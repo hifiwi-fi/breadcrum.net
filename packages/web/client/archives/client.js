@@ -1,24 +1,42 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useCallback, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeArchiveReadClient } from '../../routes/api/archives/schemas/schema-archive-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useCallback, useState } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { archiveList } from '../components/archive/archive-list.js'
-import { search } from '../components/search/index.js'
+import { Search } from '../components/search/index.js'
 
-export const page = Component(() => {
+/**
+ * @typedef {Object} ArchivesResponse
+ * @property {TypeArchiveReadClient[]} data
+ * @property {Object} pagination
+ * @property {string | null} pagination.before
+ * @property {string | null} pagination.after
+ * @property {boolean} pagination.top
+ * @property {boolean} pagination.bottom
+ */
+
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
 
-  const [archives, setArchives] = useState()
+  const [archives, setArchives] = useState(/** @type {TypeArchiveReadClient[] | undefined} */(undefined))
   const [archivesLoading, setArchivesLoading] = useState(false)
-  const [archivesError, setArchivesError] = useState(null)
+  const [archivesError, setArchivesError] = useState(/** @type {Error | null} */(null))
 
-  const [before, setBefore] = useState()
-  const [after, setAfter] = useState()
+  const [before, setBefore] = useState(/** @type {Date | null} */(null))
+  const [after, setAfter] = useState(/** @type {Date | null} */(null))
 
   // Need a better way to trigger reloads
   const [archiveReload, setArchiveReload] = useState(0)
@@ -28,30 +46,33 @@ export const page = Component(() => {
 
   // Require a user
   useEffect(() => {
-    if (!user && !loading) {
+    if ((!user && !loading) && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
-  }, [user, loading])
+  }, [user, loading, window])
 
   // Load archives
   useEffect(() => {
     async function getArchives () {
       setArchivesLoading(true)
       setArchivesError(null)
-      const pageParams = new URLSearchParams(query)
+      const pageParams = new URLSearchParams(query || '')
       const reqParams = new URLSearchParams()
 
       // Transform date string to date object
-      if (pageParams.get('before')) reqParams.set('before', (new Date(+pageParams.get('before'))).toISOString())
-      if (pageParams.get('after')) reqParams.set('after', (new Date(+pageParams.get('after'))).toISOString())
-      if (pageParams.get('bid')) reqParams.set('bookmark_id', pageParams.get('bid'))
+      const beforeParam = pageParams.get('before')
+      const afterParam = pageParams.get('after')
+      const bidParam = pageParams.get('bid')
+      if (beforeParam) reqParams.set('before', (new Date(+beforeParam)).toISOString())
+      if (afterParam) reqParams.set('after', (new Date(+afterParam)).toISOString())
+      if (bidParam) reqParams.set('bookmark_id', bidParam)
 
-      reqParams.set('sensitive', state.sensitive)
-      reqParams.set('toread', state.toread)
-      reqParams.set('starred', state.starred)
-      reqParams.set('full_archives', false)
-      reqParams.set('ready', true)
+      reqParams.set('sensitive', state.sensitive.toString())
+      reqParams.set('toread', state.toread.toString())
+      reqParams.set('starred', state.starred.toString())
+      reqParams.set('full_archives', 'false')
+      reqParams.set('ready', 'true')
 
       const response = await fetch(`${state.apiUrl}/archives?${reqParams.toString()}`, {
         method: 'get',
@@ -61,13 +82,14 @@ export const page = Component(() => {
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        /** @type {ArchivesResponse} */
         const body = await response.json()
         setArchives(body?.data)
         setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : null)
         setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : null)
 
         if (body?.pagination?.top) {
-          const newParams = new URLSearchParams(query)
+          const newParams = new URLSearchParams(query || '')
           let modified = false
           if (newParams.get('before')) {
             newParams.delete('before')
@@ -78,9 +100,9 @@ export const page = Component(() => {
             modified = true
           }
 
-          if (modified) {
+          if (modified && window) {
             const qs = newParams.toString()
-            window.history.replaceState(null, null, qs ? `.?${qs}` : '.')
+            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
           }
         }
       } else {
@@ -91,56 +113,75 @@ export const page = Component(() => {
     if (user) {
       getArchives()
         .then(() => { console.log('archives done') })
-        .catch(err => { console.error(err); setArchivesError(err) })
+        .catch(err => {
+          console.error(err)
+          setArchivesError(/** @type {Error} */(err))
+        })
         .finally(() => { setArchivesLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archiveReload])
+  }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archiveReload, user, window])
 
-  const onPageNav = useCallback((ev) => {
+  const onPageNav = useCallback((/** @type {Event} */ ev) => {
     ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
+    const target = /** @type {HTMLAnchorElement | null} */ (ev.currentTarget)
+    if (pushState && window && target?.href) {
+      pushState(target.href)
+      window.scrollTo({ top: 0 })
+    }
   }, [window, pushState])
 
-  const handleSearch = useCallback((query) => {
-    window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */ query) => {
+    if (window) {
+      window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query)
-    beforeParams.set('before', before.valueOf())
+    beforeParams = new URLSearchParams(query || '')
+    beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query)
-    afterParams.set('after', after.valueOf())
+    afterParams = new URLSearchParams(query || '')
+    afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }
 
   return html`
-  ${search({
-    placeholder: 'Search Archives...',
-    onSearch: handleSearch,
-  })}
-  <div>
-    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
-  ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
-  ${archivesError ? html`<div>${archivesError.message}</div>` : null}
-  ${Array.isArray(archives)
-      ? archives.map(ar => html.for(ar, ar.id)`${archiveList({ archive: ar, reload: reloadArchives, onDelete: reloadArchives, clickForPreview: true })}`)
-      : null}
-  <div>
-    ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-    ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-  <div>
-`
-})
+    <${Search}
+      placeholder="Search Archives..."
+      onSearch=${handleSearch}
+    />
+    <div>
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+    </div>
+    ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
+    ${archivesError ? html`<div>${archivesError.message}</div>` : null}
+    ${Array.isArray(archives)
+        ? archives.map(ar => html`
+            <${archiveList}
+              key=${ar.id}
+              archive=${ar}
+              reload=${reloadArchives}
+              onDelete=${reloadArchives}
+              clickForPreview=${true}
+            />
+          `)
+        : null}
+    <div>
+      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
+      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+    </div>
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }
