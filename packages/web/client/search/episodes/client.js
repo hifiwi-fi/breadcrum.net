@@ -1,25 +1,34 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useCallback, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useCallback, useState } from 'preact/hooks'
+import { tc } from '../../lib/typed-component.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
-import { search } from '../../components/search/index.js'
-import { episodeList } from '../../components/episode/episode-list.js'
+import { Search } from '../../components/search/index.js'
+import { EpisodeList } from '../../components/episode/episode-list.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
   const { user, loading } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
 
-  const [episodes, setEpisodes] = useState()
+  const [episodes, setEpisodes] = useState(/** @type {TypeEpisodeReadClient[] | undefined} */(undefined))
   const [episodesLoading, setEpisodesLoading] = useState(false)
-  const [episodesError, setEpisodesError] = useState(null)
+  const [episodesError, setEpisodesError] = useState(/** @type {Error | null} */(null))
 
-  const [next, setNext] = useState()
-  const [prev, setPrev] = useState()
+  const [next, setNext] = useState(/** @type {any} */(undefined))
+  const [prev, setPrev] = useState(/** @type {any} */(undefined))
 
   const [dataReload, setDataReload] = useState(0)
   const reload = useCallback(() => {
@@ -28,18 +37,18 @@ export const page = Component(() => {
 
   // Require a user
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !loading && window) {
       const redirectTarget = `${window.location.pathname}${window.location.search}`
       window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
     }
   }, [user, loading])
 
-  const pageParams = new URLSearchParams(query)
+  const pageParams = new URLSearchParams(query || '')
 
   // Search episodes
   useEffect(() => {
     async function getEpisodes () {
-      console.log('loading bookmark results')
+      console.log('loading episode results')
       setEpisodesLoading(true)
       setEpisodesError(null)
 
@@ -50,9 +59,9 @@ export const page = Component(() => {
       if (pageParams.get('id')) queryParams.set('id', pageParams.get('id') ?? '')
       if (pageParams.get('rank')) queryParams.set('rank', pageParams.get('rank') ?? '')
       if (pageParams.get('reverse')) queryParams.set('reverse', pageParams.get('reverse') ?? '')
-      queryParams.set('sensitive', state.sensitive)
-      queryParams.set('toread', state.toread)
-      queryParams.set('starred', state.starred)
+      queryParams.set('sensitive', state.sensitive.toString())
+      queryParams.set('toread', state.toread.toString())
+      queryParams.set('starred', state.starred.toString())
 
       const response = await fetch(`${state.apiUrl}/search/episodes?${queryParams.toString()}`, {
         method: 'get',
@@ -67,8 +76,8 @@ export const page = Component(() => {
         setNext(body?.pagination?.next)
         setPrev(body?.pagination?.prev)
 
-        if (body?.pagination?.top) {
-          const newParams = new URLSearchParams(query)
+        if (body?.pagination?.top && window) {
+          const newParams = new URLSearchParams(query || '')
           let modified = false
           if (newParams.get('id')) {
             newParams.delete('id')
@@ -85,7 +94,7 @@ export const page = Component(() => {
 
           if (modified) {
             const qs = newParams.toString()
-            window.history.replaceState(null, null, qs ? `.?${qs}` : '.')
+            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
           }
         }
       } else {
@@ -96,27 +105,34 @@ export const page = Component(() => {
     if (user) {
       getEpisodes()
         .then(() => { console.log('episodes done') })
-        .catch(err => { console.error(err); setEpisodesError(err) })
+        .catch(err => {
+          console.error(err)
+          setEpisodesError(/** @type {Error} */(err))
+        })
         .finally(() => { setEpisodesLoading(false) })
     }
   }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
 
-  const title = pageParams.get('query') ? ['📼', pageParams.get('query'), '|', 'Episodes Search'] : []
+  const title = pageParams.get('query') ? ['📼', pageParams.get('query') || '', '|', 'Episodes Search'] : []
   useTitle(...title)
 
-  const onPageNav = useCallback((ev) => {
+  const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ ev) => {
     ev.preventDefault()
-    pushState(ev.currentTarget.href)
-    window.scrollTo({ top: 0 })
+    if (pushState && window) {
+      pushState(ev.currentTarget.href)
+      window.scrollTo({ top: 0 })
+    }
   }, [window, pushState])
 
-  const handleSearch = useCallback((query) => {
-    window.location.replace(`./?query=${encodeURIComponent(query)}`)
+  const handleSearch = useCallback((/** @type {string} */ query) => {
+    if (window) {
+      window.location.replace(`./?query=${encodeURIComponent(query)}`)
+    }
   }, [window])
 
   let nextParams
   if (next) {
-    nextParams = new URLSearchParams(query)
+    nextParams = new URLSearchParams(query || '')
     nextParams.set('query', next.query)
     nextParams.set('rank', next.rank)
     nextParams.set('id', next.id)
@@ -125,7 +141,7 @@ export const page = Component(() => {
 
   let prevParams
   if (prev) {
-    prevParams = new URLSearchParams(query)
+    prevParams = new URLSearchParams(query || '')
     prevParams.set('query', prev.query)
     prevParams.set('rank', prev.rank)
     prevParams.set('id', prev.id)
@@ -133,35 +149,44 @@ export const page = Component(() => {
   }
 
   return html`
-    ${search({
-      placeholder: 'Search Episodes...',
-      value: pageParams.get('query'),
-      onSearch: handleSearch,
-    })}
+    <${Search}
+      placeholder="Search Episodes..."
+      value=${pageParams.get('query') || undefined}
+      onSearch=${handleSearch}
+    />
 
     <div>
       ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
       ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
       🔎
-      🔖 <a href="${`../bookmarks?query=${pageParams.get('query')}`}">bookmarks</a>
-      🗄️ <a href="${`../archives?query=${pageParams.get('query')}`}">archives</a>
-      📼 <a href="${`../episodes?query=${pageParams.get('query')}`}">episodes</a>
+      🔖 <a href="${`../bookmarks?query=${pageParams.get('query') || ''}`}">bookmarks</a>
+      🗄️ <a href="${`../archives?query=${pageParams.get('query') || ''}`}">archives</a>
+      📼 <a href="${`../episodes?query=${pageParams.get('query') || ''}`}">episodes</a>
     </div>
 
     ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
     ${episodesError ? html`<div>${episodesError.message}</div>` : null}
 
     ${Array.isArray(episodes)
-      ? episodes.map(e => html.for(e, e.id)`${episodeList({ episode: e, reload, onDelete: reload })}`)
+      ? episodes.map(e => html`
+          ${tc(EpisodeList, {
+            episode: e,
+            reload,
+            onDelete: reload
+          }, e.id)}
+        `)
       : null}
 
     <div>
       ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
       ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
     </div>
-`
-})
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

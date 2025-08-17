@@ -14,7 +14,7 @@ export const schemaArchiveRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:archive:read',
   additionalProperties: false,
-  required: ['created_at', 'url', 'extraction_method'],
+  required: ['created_at', 'url', 'extraction_method', 'bookmark'],
   properties: {
     ...archiveReadProps.properties,
     ...archiveProps.properties,

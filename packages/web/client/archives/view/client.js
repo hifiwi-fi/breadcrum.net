@@ -11,7 +11,7 @@ import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
-import { archiveList } from '../../components/archive/archive-list.js'
+import { ArchiveList } from '../../components/archive/archive-list.js'
 import { Search } from '../../components/search/index.js'
 
 /** @type {FunctionComponent} */
@@ -119,7 +119,7 @@ export const Page = () => {
       ${archiveError ? html`<div>${archiveError.message}</div>` : null}
       ${archive
 ? html`
-        <${archiveList}
+        <${ArchiveList}
           archive=${archive}
           reload=${reloadArchive}
           onDelete=${handleDelete}

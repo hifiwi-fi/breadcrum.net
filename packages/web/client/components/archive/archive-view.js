@@ -11,10 +11,7 @@ import { ArchiveTitle } from '../archive-title/index.js'
 import { ExpandText } from '../expand-text/index.js'
 
 /** @type {FunctionComponent<{
- * archive: TypeArchiveReadClient & {
- *   bookmark: { id: string, title: string },
- *   error?: string
- * },
+ * archive: TypeArchiveReadClient,
  * onEdit?: () => void, // TODO: Add when editing is supported
  * fullView?: boolean
 }>} */

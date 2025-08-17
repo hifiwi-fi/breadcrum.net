@@ -17,14 +17,12 @@ import { ArchiveView } from './archive-view.js'
 import { diffUpdate } from '../../lib/diff-update.js'
 
 /** @type {FunctionComponent<{
- * archive: TypeArchiveReadClient & {
- *   bookmark: { id: string, title: string }
- * },
+ * archive: TypeArchiveReadClient,
  * reload: () => void,
  * onDelete: () => void,
  * fullView?: boolean
 }>} */
-export const archiveList = ({ archive, reload, onDelete, fullView }) => {
+export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)

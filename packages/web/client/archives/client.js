@@ -11,7 +11,7 @@ import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { archiveList } from '../components/archive/archive-list.js'
+import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
 
 /**
@@ -163,7 +163,7 @@ export const Page = () => {
     ${archivesError ? html`<div>${archivesError.message}</div>` : null}
     ${Array.isArray(archives)
         ? archives.map(ar => html`
-            <${archiveList}
+            <${ArchiveList}
               key=${ar.id}
               archive=${ar}
               reload=${reloadArchives}
