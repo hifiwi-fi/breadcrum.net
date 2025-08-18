@@ -545,58 +545,7 @@ This technique is necessary because the `html` tagged template function expects 
   <!-- TODO: Add Edit button when editing is supported -->
   ```
 
-## Converting from uland-isomorphic to Preact
-
-When converting uland-isomorphic components to preact:
-
-### Component Definition
-```js
-// ❌ uland pattern
-import { Component, html } from 'uland-isomorphic'
-export const MyComponent = Component(() => {
-  return html`<div>content</div>`
-})
-
-// ✅ preact pattern
-import { html } from 'htm/preact'
-export const MyComponent = () => {
-  return html`<div>content</div>`
-}
-```
-
-### Client-Side Rendering
-```js
-// ❌ uland pattern
-import { render } from 'uland-isomorphic'
-render(document.querySelector('.container'), component)
-
-// ✅ preact pattern
-import { render } from 'preact'
-const container = document.querySelector('.container')
-if (container) {
-  render(component(), container)
-}
-```
-
-### Isomorphic Page Wrapper
-```js
-// ❌ uland pattern
-import { html } from 'uland-isomorphic'
-import { page } from './client.js'
-
-export default () => {
-  return html`${page()}`
-}
-
-// ✅ preact pattern
-import { page } from './client.js'
-
-export default () => {
-  return page()
-}
-```
-
-### Component Naming Convention
+## Component Naming Convention
 
 **FunctionComponents should use capitalized function names** (class name style):
 ```js
@@ -673,22 +622,6 @@ ${tc(MyComponent, { prop: value, onSave: handler })}
 - Can cause hooks to reset unexpectedly
 - Break React DevTools component tree
 - Prevent optimizations like memoization
-
-## Component Conversion Checklist
-
-When converting components from uland to preact:
-
-1. **Update imports**: `uland-isomorphic` → `htm/preact` + `preact/hooks`
-2. **Remove Component wrappers**: `Component(() => {...})` → `() => {...}`
-3. **Add proper typing**: Use `@import` statements and specific types
-4. **Fix string children**: Use `dangerouslySetInnerHTML` for single elements or `render()` + string concatenation for fragments
-5. **Fix component syntax**: **NEVER use direct function calls** - use HTM component syntax: `${MyComponent({ prop: value })}` → `<${MyComponent} prop=${value} />` or `tc` helper
-6. **Add DOM headers**: For client-side code, include `/// <reference lib="dom" />` and `/* eslint-env browser */`
-7. **Use schema types**: Import from schema files instead of redefining
-8. **Check diagnostics**: Fix all TypeScript errors before considering complete
-9. **Avoid any types**: Always use specific types that describe actual data
-10. **Handle optional callbacks**: Check existence before calling: `if (onSave) await onSave(...)`
-11. **Type-cast errors**: Use `/** @type {Error} */(err)` in catch blocks
 
 ## Package.json Scripts
 
