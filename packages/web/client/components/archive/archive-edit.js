@@ -84,7 +84,7 @@ export const ArchiveEdit = ({
   return html`
     <div class='bc-archive-edit'>
       <form ref="${formRef}" class="add-archive-form" id="add-archive-form" onsubmit=${handleSave}>
-        <fieldset ?disabled=${disabled || initializing}>
+        <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-archive-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>

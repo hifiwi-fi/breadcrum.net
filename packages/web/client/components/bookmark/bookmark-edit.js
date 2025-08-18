@@ -291,7 +291,7 @@ export const BookmarkEdit = ({
   return html`
     <div class='bc-bookmark-edit'>
       <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
-      <fieldset class='bc-bookmark-edit-fieldset' ?disabled=${disabled || initializing}>
+      <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
 
         <!-- Bookmark URL -->
@@ -336,15 +336,15 @@ export const BookmarkEdit = ({
         <!-- Bookmark Options -->
         <div>
           <label>
-            <input type="checkbox" name="toread" ?checked="${b?.toread}" />
+            <input type="checkbox" name="toread" checked="${b?.toread}" />
             to read
           </label>
           <label>
-            <input type="checkbox" name="starred" ?checked="${b?.starred}" />
+            <input type="checkbox" name="starred" checked="${b?.starred}" />
             starred
           </label>
           <label>
-            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}" />
+            <input type="checkbox" name="sensitive" checked="${b?.sensitive}" />
             sensitive
           </label>
         </div>
@@ -450,7 +450,7 @@ export const BookmarkEdit = ({
                 type="radio"
                 name="episodeMedium"
                 value="video"
-                ?checked="${true}"
+                checked="${true}"
                 onChange="${handleEpisodeMediumSelect}"
               />
               <span>video</span>

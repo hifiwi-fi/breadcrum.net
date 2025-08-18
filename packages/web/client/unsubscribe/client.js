@@ -72,7 +72,7 @@ export const Page = () => {
         : html`
           <div class="bc-unsubscribe">
             <form ref=${formRef} class="bc-unsubscribe-form" id="bc-unsubscribe-form" onsubmit=${handleUnsubscribe}>
-            <fieldset ?disabled=${unsubscribing}>
+            <fieldset disabled=${unsubscribing}>
               <legend>Unsubscribe</legend>
               <div>
                 <div class="bc-help-text">
@@ -84,7 +84,7 @@ export const Page = () => {
                 </label>
               </div>
               <div class="button-cluster">
-                <input name="submit-button" type="submit">
+                <input name="submit-button" type="submit" />
               </div>
             </fieldset>
           </form>

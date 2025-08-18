@@ -75,42 +75,41 @@ export const Page = () => {
     ${!user
       ? html`
         <div class="bc-login">
-          <form class="login-form" id="login-form" onsubmit=${login}>
-          <fieldset ?disabled=${loggingIn}>
-            <legend>Log in:</legend>
-            <div>
-              <label class="block">
-                Email or Username:
-                <input
-                  class="block"
-                  minlength="1"
-                  maxlength="200"
-                  type="text"
-                  name="user"
-                  autocorrect="off"
-                  autocapitalize="off"
-                  spellcheck="false"
-                  autocomplete="username"
-                />
-              </label>
-            </div>
-            <div>
-              <label class="block">
-                Password:
-                <input
-                  class="block"
-                  type="password"
-                  minlength="8"
-                  maxlength="255"
-                  name="password"
-                  autocomplete="current-password"
-                />
-              </label>
-            </div>
-            <div class="button-cluster">
-              <input name="submit-button" type="submit">
-            </div>
-            <div class="error-box"></div>
+          <form class="login-form" id="login-form" onSubmit=${login}>
+            <fieldset disabled=${loggingIn}>
+              <legend>Log in:</legend>
+              <div>
+                <label class="block">
+                  Email or Username:
+                  <input
+                    class="block"
+                    minlength="1"
+                    maxlength="200"
+                    type="text"
+                    name="user"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    autocomplete="username"
+                  />
+                </label>
+              </div>
+              <div>
+                <label class="block">
+                  Password:
+                  <input
+                    class="block"
+                    type="password"
+                    minlength="8"
+                    maxlength="255"
+                    name="password"
+                    autocomplete="current-password"
+                  />
+                </label>
+              </div>
+              <div class="button-cluster">
+                <input name="submit-button" type="submit" />
+              </div>
           </fieldset>
         </form>
         <div class="bc-login-password-reset-link">

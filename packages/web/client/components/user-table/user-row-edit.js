@@ -115,38 +115,38 @@ export const UserRowEdit = ({
             ? deleteConfirm
               ? html`
                 <button onClick=${handleCancelDelete}>Cancel</button>
-                <button ?disabled="${disabled}" onClick=${handleDelete}>Destroy</button>`
+                <button disabled="${disabled}" onClick=${handleDelete}>Destroy</button>`
               : html`<button onClick=${handleInitiateDelete}>Delete</button>`
             : null
           }
         </td>
         <td>${u.id}</td>
         <td>
-          <input ?disabled="${disabled}" type="text" name="username" value="${u.username}" />
+          <input disabled="${disabled}" type="text" name="username" value="${u.username}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="email" name="email" value="${u.email}" />
+          <input disabled="${disabled}" type="email" name="email" value="${u.email}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="email_confirmed" ?checked="${u.email_confirmed}" />
+          <input disabled="${disabled}" type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="email" name="pending_email_update" value="${u.pending_email_update}" />
+          <input disabled="${disabled}" type="email" name="pending_email_update" value="${u.pending_email_update}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="newsletter_subscription" ?checked="${u.newsletter_subscription}" />
+          <input disabled="${disabled}" type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="disabled_email" ?checked="${u.disabled_email}" />
+          <input disabled="${disabled}" type="checkbox" name="disabled_email" checked="${u.disabled_email}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="disabled" ?checked="${u.disabled}" />
+          <input disabled="${disabled}" type="checkbox" name="disabled" checked="${u.disabled}" />
         </td>
         <td>
-          <textarea ?disabled="${disabled}" rows="2" name="disabled_reason">${u.disabled_reason}</textarea>
+          <textarea disabled="${disabled}" rows="2" name="disabled_reason">${u.disabled_reason}</textarea>
         </td>
         <td>
-          <textarea ?disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
+          <textarea disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
         </td>
         <td>
           <time datetime="${u.created_at}">

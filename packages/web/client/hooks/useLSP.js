@@ -4,23 +4,23 @@
  */
 
 /* eslint-env browser */
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect } from 'preact/hooks'
 import { state } from './state.js'
+import { useReload } from './useReload.js'
 
 /**
  * @returns {StateType}
  */
 export function useLSP () {
-  const [lsp, setLSP] = useState(state)
+  const { reload } = useReload()
   useEffect(() => {
     /** @param {Event} _ev */
-    const listener = (_ev) => { setLSP(state) }
+    const listener = (_ev) => { reload() }
     state.addEventListener('update', listener)
-
     return () => {
       state.removeEventListener('update', listener)
     }
   }, [state])
 
-  return lsp
+  return state
 }

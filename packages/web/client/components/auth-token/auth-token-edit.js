@@ -89,7 +89,7 @@ export const AuthTokenEdit = ({
   return html`
     <div class='bc-auth-token-edit'>
       <form ref="${formRef}" class="edit-auth-token-form" id="edit-auth-token-form" onsubmit=${handleSave}>
-        <fieldset ?disabled=${disabled}>
+        <fieldset disabled=${disabled}>
           ${legend
 ? html`<legend class="bc-auth-token-legend">${
             typeof legend === 'string'
@@ -109,7 +109,7 @@ export const AuthTokenEdit = ({
           <div>
             <label>
               protect:
-              <input type="checkbox" name="protect" ?checked="${t?.protect}" />
+              <input type="checkbox" name="protect" checked="${t?.protect}" />
             </label>
             <span class="bc-help-text">
               Protected tokens will not be deleted in bulk cleanup operations.
@@ -127,7 +127,7 @@ export const AuthTokenEdit = ({
                       <button onClick="${handleCancelDelete}">Cancel</button>
                       <button onClick="${handleDeleteAuthToken}">Destroy</button>`
                   : html`
-                    <button ?disabled="${t?.is_current}" onClick="${handleInitiateDelete}">Delete</button>`}
+                    <button disabled="${t?.is_current}" onClick="${handleInitiateDelete}">Delete</button>`}
                 </div>`
               : null
             }

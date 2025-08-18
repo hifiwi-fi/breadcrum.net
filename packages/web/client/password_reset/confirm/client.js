@@ -82,16 +82,16 @@ export const Page = () => {
         : html`
           <div class="bc-password-set">
             <form class="password-set-form" id="password-set-form" onsubmit=${resetPassword}>
-            <fieldset ?disabled=${resetting}>
+            <fieldset disabled=${resetting}>
               <legend>Set new password</legend>
               <div>
                 <label class="block">
                   Password:
-                  <input class="block" type="password" name="password">
+                  <input class="block" type="password" name="password" />
                 </label>
               </div>
               <div class="button-cluster">
-                <input name="submit-button" type="submit">
+                <input name="submit-button" type="submit" />
               </div>
               ${errorMessage || userError
                   ? html`<div class="error-box">${errorMessage} ${userError}</div>`

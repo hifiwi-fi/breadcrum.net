@@ -68,7 +68,7 @@ export const Page = () => {
         : html`
           <div class="bc-password-reset">
             <form class="password-reset-form" id="password-reset-form" onsubmit=${resetPassword}>
-            <fieldset ?disabled=${resetting}>
+            <fieldset disabled=${resetting}>
               <legend>Reset Password</legend>
               <div class="bc-help-text">
                   ℹ️ Reset your password by submitting your email address below. If an account exists with that email address, a password email will be sent.
@@ -80,7 +80,7 @@ export const Page = () => {
                 </label>
               </div>
               <div class="button-cluster">
-                <input name="submit-button" type="submit">
+                <input name="submit-button" type="submit" />
               </div>
               ${errorMessage || userError
                   ? html`<div class="error-box">${errorMessage} ${userError}</div>`

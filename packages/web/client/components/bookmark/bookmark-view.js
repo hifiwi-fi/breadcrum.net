@@ -70,28 +70,29 @@ export const BookmarkView = ({
         </a>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url.replace(/^https?:\/\//, '')}</a></div>
-      ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
-      ${b.summary
-        ? html`<div class='bc-bookmark-summary-display'>
-            <${ExpandText} children=${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)} />
-          </div>`
-        : null}
+        ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
+        ${b.summary
+          ? html`<div class='bc-bookmark-summary-display'>
+              <${ExpandText} children=${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)} />
+            </div>`
+          : null}
       <div>
-      ${b.tags?.length > 0
-        ? html`
-          <div class="bc-tags-display">
-            🏷
-            ${b.tags.map(tag => html` <a onClick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
-          </div>`
-        : null
-      }
+        ${b.tags?.length > 0
+          ? html`
+            <div class="bc-tags-display">
+              🏷
+              ${b.tags.map(tag => html` <a onClick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
+            </div>`
+          : null
+        }
+      </div>
       <div class='bc-bookmark-entity-enumeration'>
         ${b.archives?.length > 0 && b.archives.some(a => a.ready)
-          ? html`<div class='bc-bookmark-entity bc-archive-entity'>🗄️ <a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">${b.archives?.length} archive${b.archives?.length > 1 ? 's' : ''}</a><div>`
+          ? html`<div class='bc-bookmark-entity bc-archive-entity'>🗄️ <a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">${b.archives?.length} archive${b.archives?.length > 1 ? 's' : ''}</a></div>`
           : null
         }
         ${b.episodes?.length > 0 && b.episodes.some(e => e.ready)
-          ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">${b.episodes?.length} episode${b.episodes?.length > 1 ? 's' : ''}</a><div>`
+          ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">${b.episodes?.length} episode${b.episodes?.length > 1 ? 's' : ''}</a></div>`
           : null
         }
       </div>
@@ -112,5 +113,6 @@ export const BookmarkView = ({
       <div>
         <button onClick=${onEdit}>Edit</button>
       </div>
-    </div>`
+    </div>
+    `
 }

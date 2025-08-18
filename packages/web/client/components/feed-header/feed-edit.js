@@ -93,7 +93,7 @@ export const FeedEdit = ({
   return html`
     <div class='bc-feed-edit'>
       <form ref="${formRef}" class="add-feed-form" id="add-feed-form" onsubmit=${handleSave}>
-        <fieldset ?disabled=${disabled || initializing}>
+        <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-feed-legend">${legend}</legend>` : null}
 
           <div>
@@ -126,7 +126,7 @@ export const FeedEdit = ({
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" ?checked="${f?.explicit}" />
+              <input type="checkbox" name="explicit" checked="${f?.explicit}" />
             </label>
           </div>
 

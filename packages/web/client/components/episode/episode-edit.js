@@ -90,7 +90,7 @@ export const EpisodeEdit = ({
   return html`
     <div class='bc-episode-edit'>
       <form ref="${formRef}" class="add-episode-form" id="add-episode-form" onsubmit=${handleSave}>
-        <fieldset ?disabled=${disabled || initializing}>
+        <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-episode-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>
@@ -107,7 +107,7 @@ export const EpisodeEdit = ({
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" ?checked="${e?.explicit}" />
+              <input type="checkbox" name="explicit" checked="${e?.explicit}" />
             </label>
           </div>
 
