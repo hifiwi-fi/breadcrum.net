@@ -56,9 +56,9 @@ export const BookmarkView = ({
   return html`
     <div class="bc-bookmark-view">
       <div class="bc-bookmark-title-line">
-        <${ToRead} toread=${b.toread} onclick=${onToggleToread} />
-        <${Star} starred=${b.starred} onclick=${onToggleStarred} />
-        <${Sensitive} sensitive=${b.sensitive} onclick=${onToggleSensitive} />
+        <${ToRead} toread=${b.toread} onToggleRead=${onToggleToread} />
+        <${Star} starred=${b.starred} onToggleStar=${onToggleStarred} />
+        <${Sensitive} sensitive=${b.sensitive} onToggleSensitive=${onToggleSensitive} />
         <a class="${cn({
           'bc-bookmark-title': true,
           'bc-bookmark-title-toread': b.toread,
