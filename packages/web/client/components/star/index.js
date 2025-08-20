@@ -17,10 +17,10 @@ export const Star = ({
   onToggleStar = () => {},
 }) => {
   return html`
-    <span class="${cn({ 'bc-starred': starred, 'bc-unstarred': !starred, 'bc-star': true })}" onClick=${onToggleStar}>
+    <div class="${cn({ 'bc-starred': starred, 'bc-unstarred': !starred, 'bc-star': true })}" onClick=${onToggleStar}>
       ${starred
         ? '★'
         : '☆'
         }
-    </span>`
+    </div>`
 }

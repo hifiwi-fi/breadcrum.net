@@ -15,6 +15,11 @@
   font-weight: bold;
 }
 
+.bc-bookmark-title-line {
+  display: flex;
+  gap: 0.2em;
+}
+
 .bc-bookmark-title,
 .bc-bookmark-note-display,
 .bc-bookmark-summary-display {
