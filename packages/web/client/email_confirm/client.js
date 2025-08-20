@@ -15,18 +15,11 @@ import { useWindow } from '../hooks/useWindow.js'
 export const Page = () => {
   const state = useLSP()
   const { query } = useQuery()
-  const { user, loading, error: userError } = useUser()
+  const { user, error: userError } = useUser()
   const window = useWindow()
   const [confirming, setConfirming] = useState(false)
   const [confirmed, setConfirmed] = useState(false)
   const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))
-
-  useEffect(() => {
-    if (!user && !loading && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user])
 
   useEffect(() => {
     async function confirmEmail () {

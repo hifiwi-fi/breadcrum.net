@@ -6,25 +6,31 @@
  * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
  */
 
+/**
+ * @typedef {Object} UseUserParams
+ * @property {boolean} [required=true] - When true, redirects to login page if no user is authenticated
+ */
+
 import { useEffect, useState } from 'preact/hooks'
 import { useLSP } from './useLSP.js'
+import { useReload } from './useReload.js'
 
 /** @type {Promise<Response> | null} */
 let userRequest = null
 
 /**
- * @param {{
- *   reload?: number
- * }} [params]
+ * Hook for managing user authentication state
+ * @param {UseUserParams} [params]
  */
 export function useUser ({
-  reload,
-} = {}) {
+  required
+} = {
+  required: true
+}) {
   const state = useLSP()
-
+  const { reload: reloadUser, signal: reloadUserSignal } = useReload()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(/** @type{Error | null} */(null))
-  const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {
     // TODO: set cache header correctly for authenticated pages and remove this
@@ -34,7 +40,7 @@ export function useUser ({
     function pageNavHandler (event) {
       if (event.persisted) {
         console.log('refreshing state')
-        setRefresh(refresh + 1)
+        reloadUser()
       }
     }
     window.addEventListener('pageshow', pageNavHandler)
@@ -89,10 +95,19 @@ export function useUser ({
       setLoading(false)
       if (requestor) userRequest = null
     })
-  }, [state.apiUrl, reload, refresh])
+  }, [state.apiUrl, reloadUserSignal])
+
+  useEffect(() => {
+    if ((!state.user && !loading) && window && required) {
+      const redirectTarget = `${window.location.pathname}${window.location.search}`
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
+    }
+  }, [state.user?.id, loading, required])
 
   return {
     user: state.user,
+    reloadUser,
+    reloadUserSignal,
     loading,
     error,
   }

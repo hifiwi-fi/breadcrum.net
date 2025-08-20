@@ -16,14 +16,7 @@ const defaultFlags = { ...defaultFrontendFlags, ...defaultBackendFlags }
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
-
-  useEffect(() => {
-    if (!user && !loading) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user])
+  const { user } = useUser()
 
   const [serverFlags, setServerFlags] = useState()
   const [serverFlagsLoading, setServerFlagsLoading] = useState(false)

@@ -12,7 +12,7 @@ import { useLSP } from '../hooks/useLSP.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading, error: userError } = useUser()
+  const { user, loading, error: userError } = useUser({ required: false })
   const [resetting, setResetting] = useState(false)
   const [reset, setReset] = useState(false)
   const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))

@@ -13,30 +13,18 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { ArchiveList } from '../../components/archive/archive-list.js'
 import { Search } from '../../components/search/index.js'
+import { useReload } from '../../hooks/useReload.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
 
   const [archive, setArchive] = useState(/** @type {TypeArchiveReadClient | null} */(null))
   const [archiveLoading, setArchiveLoading] = useState(false)
   const [archiveError, setArchiveError] = useState(/** @type {Error | null} */(null))
-
-  const [archiveReload, setArchiveReload] = useState(0)
-
-  useEffect(() => {
-    if ((!user && !loading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading, window])
-
-  const reloadArchive = useCallback(() => {
-    console.log(archiveReload)
-    setArchiveReload(archiveReload + 1)
-  }, [archiveReload, setArchiveReload])
+  const { reload: reloadArchive, signal: archiveReload } = useReload()
 
   const handleDelete = useCallback(() => {
     if (window && archive?.bookmark?.id) {
@@ -98,7 +86,7 @@ export const Page = () => {
         })
         .finally(() => { setArchiveLoading(false) })
     }
-  }, [archiveReload, state.apiUrl, state.sensitive, user, window])
+  }, [archiveReload, state.apiUrl, state.sensitive, user?.id])
 
   const title = archive?.title ? ['🗄️', archive?.title] : []
   useTitle(...title)

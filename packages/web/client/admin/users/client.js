@@ -16,7 +16,7 @@ import { UserTable } from '../../components/user-table/user-table.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
 
@@ -31,14 +31,6 @@ export const Page = () => {
   const reload = useCallback(() => {
     setDataReload(dataReload + 1)
   }, [dataReload, setDataReload])
-
-  // Require a user
-  useEffect(() => {
-    if ((!user && !loading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading, window])
 
   // Load users
   useEffect(() => {

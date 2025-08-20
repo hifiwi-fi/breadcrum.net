@@ -16,19 +16,12 @@ import { UserTable } from '../../../components/user-table/user-table.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user: activeUser, loading: activeUserLoading } = useUser()
+  const { user: activeUser } = useUser()
   const window = useWindow()
   const [user, setUser] = useState(/** @type {TypeAdminUserRead | null} */(null))
   const [userLoading, setUserLoading] = useState(false)
   const [userError, setUserError] = useState(/** @type {Error | null} */(null))
   const [dataReload, setDataReload] = useState(0)
-
-  useEffect(() => {
-    if ((!activeUser && !activeUserLoading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [activeUser, activeUserLoading, window])
 
   const reload = useCallback(() => {
     console.log(dataReload)

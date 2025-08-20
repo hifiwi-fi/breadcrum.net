@@ -16,13 +16,16 @@ import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { FeedHeader } from '../components/feed-header/feed-header.js'
 import { Search } from '../components/search/index.js'
+import { useReload } from '../hooks/useReload.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
+  const { reload: reloadEpisodes, signal: episodesReload } = useReload()
+  const { reload: reloadFeed, signal: feedReload } = useReload()
 
   const [episodes, setEpisodes] = useState(/** @type {TypeEpisodeReadClient[] | undefined} */(undefined))
   const [episodesLoading, setEpisodesLoading] = useState(false)
@@ -34,26 +37,6 @@ export const Page = () => {
 
   const [before, setBefore] = useState(/** @type {Date | undefined} */(undefined))
   const [after, setAfter] = useState(/** @type {Date | undefined} */(undefined))
-
-  // Need a better way to trigger reloads
-  const [episodesReload, setEpisodesReload] = useState(0)
-  const reloadEpisodes = useCallback(() => {
-    setEpisodesReload(episodesReload + 1)
-  }, [episodesReload, setEpisodesReload])
-
-  // Need a better way to trigger reloads
-  const [feedReload, setFeedReload] = useState(0)
-  const reloadFeed = useCallback(() => {
-    setFeedReload(feedReload + 1)
-  }, [feedReload, setFeedReload])
-
-  // Require a user
-  useEffect(() => {
-    if (!user && !loading && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
 
   // Load episodes
   useEffect(() => {

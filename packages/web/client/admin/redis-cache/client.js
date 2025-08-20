@@ -5,23 +5,14 @@
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
-import { useEffect, useState, useCallback } from 'preact/hooks'
+import { useState, useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useWindow } from '../../hooks/useWindow.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
-  const window = useWindow()
-
-  useEffect(() => {
-    if ((!user && !loading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading, window])
+  useUser()
 
   const [status, setStatus] = useState(/** @type {string | null} */(null))
   const [error, setError] = useState(/** @type {Error | null} */(null))

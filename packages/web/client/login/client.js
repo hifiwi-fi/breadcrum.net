@@ -13,7 +13,7 @@ import { useQuery } from '../hooks/useQuery.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading, error: userError } = useUser()
+  const { user, loading, error: userError } = useUser({ required: false })
   const [loggingIn, setLoggingIn] = useState(false)
   const [loginError, setLoginError] = useState(/** @type {Error | null} */(null))
   const { query } = useQuery()

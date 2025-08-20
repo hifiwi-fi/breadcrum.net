@@ -12,7 +12,7 @@ import { useLSP } from '../hooks/useLSP.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user } = useUser()
+  const { user } = useUser({ required: false })
 
   useEffect(() => {
     const logout = async () => {

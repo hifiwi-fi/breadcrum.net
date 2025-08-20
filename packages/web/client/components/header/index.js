@@ -18,7 +18,7 @@ import { LoginButtons } from './login-buttons.js'
 
 /** @type{FunctionComponent<{}>} */
 export const Header = () => {
-  const { user } = useUser()
+  const { user } = useUser({ required: false })
   const window = useWindow()
   const state = useLSP()
   const { pushState } = useQuery()

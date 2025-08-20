@@ -14,28 +14,17 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { BookmarkList } from '../../components/bookmark/bookmark-list.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
+import { useReload } from '../../hooks/useReload.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
   const [bookmark, setBookmark] = useState(/** @type {TypeBookmarkReadClient | null} */(null))
   const [bookmarkLoading, setBookmarkLoading] = useState(false)
   const [bookmarkError, setBookmarkError] = useState(/** @type {Error | null} */(null))
-  const [dataReload, setDataReload] = useState(0)
-
-  useEffect(() => {
-    if (!user && !loading && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
-
-  const reload = useCallback(() => {
-    console.log(dataReload)
-    setDataReload(dataReload + 1)
-  }, [dataReload, setDataReload])
+  const { reload, signal } = useReload()
 
   const handleDelete = useCallback(() => {
     if (bookmark && window) {
@@ -90,7 +79,7 @@ export const Page = () => {
         })
         .finally(() => { setBookmarkLoading(false) })
     }
-  }, [dataReload, state.apiUrl, state.sensitive])
+  }, [signal, state.apiUrl, state.sensitive, user?.id])
 
   const title = bookmark?.title ? ['🔖', bookmark?.title] : []
   useTitle(...title)

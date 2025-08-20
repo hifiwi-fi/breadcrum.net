@@ -18,19 +18,12 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  useUser()
   const { query } = useQuery()
   const [bookmark, setBookmark] = useState(/** @type {Partial<TypeBookmarkReadClient> | null} */(null))
   const [newlyCreated, setNewlyCreated] = useState(false)
   const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)
   const [bookmarkletVersion, setBookmarkletVersion] = useState(/** @type {string | undefined} */(undefined))
-
-  useEffect(() => {
-    if (!user && !loading) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
 
   useEffect(() => {
     if (!query) return

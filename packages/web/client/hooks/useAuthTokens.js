@@ -12,7 +12,7 @@ import { useLSP } from './useLSP.js'
 import { useReload } from './useReload.js'
 
 export function useAuthTokens () {
-  const { user } = useUser()
+  const { user } = useUser({ required: false })
   const state = useLSP()
   const { query } = useQuery()
 

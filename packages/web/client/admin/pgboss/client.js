@@ -9,20 +9,11 @@ import { render } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useWindow } from '../../hooks/useWindow.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
-  const window = useWindow()
-
-  useEffect(() => {
-    if ((!user && !loading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading, window])
+  const { user } = useUser()
 
   const [dashboardData, setDashboardData] = useState(/** @type {TypeDashboardDataRead | undefined} */(undefined))
   const [dashboardLoading, setDashboardLoading] = useState(false)

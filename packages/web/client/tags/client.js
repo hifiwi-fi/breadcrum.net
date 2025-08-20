@@ -13,17 +13,11 @@ import { useLSP } from '../hooks/useLSP.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
   const [tags, setTags] = useState(/** @type {Array<{name: string, count: number}> | undefined} */(undefined))
   const [tagsLoading, setTagsLoading] = useState(false)
   const [tagsError, setTagsError] = useState(/** @type {Error | null} */(null))
-
-  useEffect(() => {
-    if (!user && !loading && window) {
-      window.location.replace('/login')
-    }
-  }, [user, loading])
 
   useEffect(() => {
     async function getTags () {

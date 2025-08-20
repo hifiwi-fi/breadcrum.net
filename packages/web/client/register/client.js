@@ -12,7 +12,7 @@ import { useFlags } from '../hooks/useFlags.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
-  const { user, loading, error: userError } = useUser()
+  const { user, loading, error: userError } = useUser({ required: false })
   const state = useLSP()
   const [submitting, setSubmitting] = useState(false)
   const { flags, loading: flagsLoading } = useFlags()

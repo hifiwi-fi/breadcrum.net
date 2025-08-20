@@ -18,7 +18,7 @@ import { Search } from '../../components/search/index.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  const { user } = useUser()
   const window = useWindow()
 
   const [episode, setEpisode] = useState(/** @type {TypeEpisodeReadClient | undefined} */(undefined))
@@ -26,13 +26,6 @@ export const Page = () => {
   const [episodeError, setEpisodeError] = useState(/** @type {Error | null} */(null))
 
   const [episodeReload, setEpisodeReload] = useState(0)
-
-  useEffect(() => {
-    if (!user && !loading && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
 
   const reloadEpisode = useCallback(() => {
     console.log(episodeReload)

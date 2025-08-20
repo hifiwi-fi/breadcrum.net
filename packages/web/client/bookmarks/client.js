@@ -16,7 +16,7 @@ import { useBookmarks } from '../hooks/useBookmarks.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
-  const { user, loading } = useUser()
+  useUser()
   const window = useWindow()
   const { query, pushState } = useQuery()
 
@@ -30,14 +30,6 @@ export const Page = () => {
     beforeParams,
     afterParams
   } = useBookmarks()
-
-  // Require a user
-  useEffect(() => {
-    if (!user && !loading && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
 
   const onPageNav = useCallback((/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
