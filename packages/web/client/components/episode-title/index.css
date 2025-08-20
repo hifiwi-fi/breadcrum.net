@@ -4,7 +4,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -13,7 +13,6 @@
 }
 
 .bc-episode-title-container-small {
-  -webkit-line-clamp: 1;
+  line-clamp: 1;
   font-size: 0.8em;
 }
-
