@@ -10,6 +10,10 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { authTokenEdit } from './auth-token-edit.js'
 
 /**
+ * @typedef {'creating' | 'cleaning' | null } EditMode
+ */
+
+/**
  * @typedef {({
  *  reload,
  * }: {
@@ -22,24 +26,30 @@ import { authTokenEdit } from './auth-token-edit.js'
  */
 export const newAuthTokenField = Component(/** @type{AuthTokenCreateField} */({ reload }) => {
   const state = useLSP()
-  /** @type {[boolean, (confirm: boolean) => void]} */
-  const [editing, setEditing] = useState(false)
+  /** @type {[EditMode, (mode: EditMode) => void]} */
+  const [editMode, setEditMode] = useState(false)
   /** @type {[TypeAuthTokenCreateResponseClient | null, (newToken: TypeAuthTokenCreateResponseClient | null) => void]} */
   const [newToken, setNewToken] = useState(null)
   const copyButton = useRef()
-  const handleEdit = useCallback(() => {
-    setEditing(true)
-  }, [setEditing])
 
-  const handleCancelEdit = useCallback(() => {
-    setEditing(false)
-  }, [setEditing])
+  const handleCreateMode = useCallback(() => {
+    setEditMode('creating')
+  }, [setEditMode])
+
+  const handleCleanMode = useCallback(() => {
+    setEditMode('cleaning')
+  }, [setEditMode])
+
+  const handleCancelEditMode = useCallback(() => {
+    setEditMode(null)
+  }, [setEditMode])
 
   const handleHideNewToken = useCallback(() => {
     setNewToken(null)
+    setEditMode(null)
   }, [setNewToken])
 
-  const handleSave = useCallback(async (/** @type {{ note: string, protect: boolean  }} */{ note, protect }) => {
+  const handleCreateSave = useCallback(async (/** @type {{ note: string, protect: boolean  }} */{ note, protect }) => {
     const endpoint = `${state.apiUrl}/user/auth-tokens`
     const response = await fetch(endpoint, {
       method: 'post',
@@ -52,18 +62,17 @@ export const newAuthTokenField = Component(/** @type{AuthTokenCreateField} */({ 
     if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
       const data = await response.json()
       setNewToken(data)
-      setEditing(false)
       reload()
     } else {
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     }
-  }, [state.apiUrl, setEditing, setNewToken, reload])
+  }, [state.apiUrl, setEditMode, setNewToken, reload])
 
-  const handleSelect = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */ev) => {
+  const handleNewTokenSelect = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget?.select()
   })
 
-  const handleCopy = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */_ev) => {
+  const handleNewTokenCopy = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */_ev) => {
     const token = newToken?.token
     try {
       if (token) {
@@ -80,28 +89,34 @@ export const newAuthTokenField = Component(/** @type{AuthTokenCreateField} */({ 
   }, [copyButton.current, newToken?.token])
 
   return html`
-  ${editing
-  ? html`${authTokenEdit({ // Important this stays wrapped in html
-    onSave: handleSave,
-    onCancelEdit: handleCancelEdit,
-    legend: 'Create Auth Token'
-  })}`
-  : newToken
+  ${editMode === 'creating'
+    ? newToken
       ? html`<div class="bc-token-create-copy-line">
         <input
           class="bc-token-create-copy-line-select"
           type="text"
           readonly
-          onclick=${handleSelect}
+          onclick=${handleNewTokenSelect}
           value="${newToken.token}"
         >
-        <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
+        <button ref=${copyButton} onclick=${handleNewTokenCopy}>Copy</button>
         <button onclick="${handleHideNewToken}">Hide</button>
       </div>
       <div class="bc-help-text bc-token-create-copy-help-text">
         ℹ️ New auth token created. Save it in a safe place as it will never be shown again.
       </div>
       `
-      : html`<button onclick="${handleEdit}">Create Auth Token +</button>`
+      : html`
+          ${authTokenEdit({ // Important this stays wrapped in html
+              onSave: handleCreateSave,
+              onCancelEdit: handleCancelEditMode,
+              legend: 'Create Auth Token'
+          })}`
+  : editMode === 'cleaning'
+    ? html``
+    : html`
+        <button onclick="${handleCreateMode}">Create auth token</button>
+        <button onclick="${handleCleanMode}">Cleanup old tokens</button>
+      `
   }`
 })
