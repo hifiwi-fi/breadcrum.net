@@ -7,23 +7,26 @@
 import SQL from '@nearform/sql'
 
 /**
+ * @typedef {object} GetBookmarksQueryParams
+ * @property {string} ownerId - ID of the owner (required).
+ * @property {string} [tag] - Tag associated with the bookmarks.
+ * @property {string} [bookmarkId] - Specific ID of the bookmark.
+ * @property {string} [before] - Date string to get bookmarks before this date.
+ * @property {string} [after] - Date string to get bookmarks after this date.
+ * @property {string} [url] - URL of the bookmark.
+ * @property {boolean} [sensitive=false] - If true, includes sensitive bookmarks.
+ * @property {boolean} [starred] - If true, includes only starred bookmarks.
+ * @property {boolean} [toread] - If true, includes only 'to read' bookmarks.
+ * @property {number} [perPage] - Limits the number of returned rows.
+ * @property {boolean} [fullArchives=false] - If true, includes full archive content in the result.
+ */
+
+/**
  * @typedef {GetBookmarksQueryParams & {
  *   fastify: FastifyInstance,
  *   pg?: PgClient
  * }} GetBookmarksParams
  */
-
-/**
- * Retrieves a single bookmark based on the provided query parameters.
- *
- * @function getBookmark
- * @param {GetBookmarksParams} getBookmarksParams - Parameters to shape the query.
- * @returns {Promise<TypeBookmarkRead | undefined >} A bookmark object or null if not found.
- */
-export async function getBookmark (getBookmarksParams) {
-  const bookmark = (await getBookmarks(getBookmarksParams))[0]
-  return bookmark
-}
 
 /**
  * Retrieves bookmarks based on the provided query parameters.
@@ -44,19 +47,16 @@ export async function getBookmarks (getBookmarksParams) {
 }
 
 /**
- * @typedef {object} GetBookmarksQueryParams
- * @property {string} ownerId - ID of the owner (required).
- * @property {string} [tag] - Tag associated with the bookmarks.
- * @property {string} [bookmarkId] - Specific ID of the bookmark.
- * @property {string} [before] - Date string to get bookmarks before this date.
- * @property {string} [after] - Date string to get bookmarks after this date.
- * @property {string} [url] - URL of the bookmark.
- * @property {boolean} [sensitive=false] - If true, includes sensitive bookmarks.
- * @property {boolean} [starred] - If true, includes only starred bookmarks.
- * @property {boolean} [toread] - If true, includes only 'to read' bookmarks.
- * @property {number} [perPage] - Limits the number of returned rows.
- * @property {boolean} [fullArchives=false] - If true, includes full archive content in the result.
+ * Retrieves a single bookmark based on the provided query parameters.
+ *
+ * @function getBookmark
+ * @param {GetBookmarksParams} getBookmarksParams - Parameters to shape the query.
+ * @returns {Promise<TypeBookmarkRead | undefined >} A bookmark object or null if not found.
  */
+export async function getBookmark (getBookmarksParams) {
+  const bookmark = (await getBookmarks(getBookmarksParams))[0]
+  return bookmark
+}
 
 /**
  * Generates an SQL query to retrieve bookmarks based on the provided criteria.

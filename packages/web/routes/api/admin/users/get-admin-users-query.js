@@ -1,15 +1,82 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
+ * @import { QueryResult } from 'pg'
+ * @import { SqlStatement } from '@nearform/sql'
+ */
+
 import SQL from '@nearform/sql'
+
+/**
+ * @typedef {object} GetAdminUsersQueryParams
+ * @property {string} [userId] - The unique identifier of the user to filter by. Optional.
+ * @property {string | undefined} [username] - The username of the user to filter by. Optional.
+ * @property {Date|string|undefined} [before] - Filters users created before this date. Optional.
+ * @property {Date|string|undefined} [after] - Filters users created after this date. Optional.
+ * @property {number} [perPage] - The number of users to fetch per page. If not provided, fetches all users. Optional.
+ */
+
+/**
+ * @typedef {GetAdminUsersQueryParams & {
+ *   fastify: FastifyInstance,
+ *   pg?: PgClient
+ * }} GetAdminUsersParams
+ */
+
+/**
+ * Retrieves a single admin user based on the provided query parameters.
+ *
+ * @function getAdminUser
+ * @param {GetAdminUsersParams} getAdminUsersParams - Parameters to shape the query.
+ * @returns {Promise<AdminUsersQueryRead | undefined>} An admin user object or undefined if not found.
+ */
+export async function getAdminUser (getAdminUsersParams) {
+  const user = (await getAdminUsers(getAdminUsersParams))[0]
+  return user
+}
+
+/**
+ * Retrieves admin users based on the provided query parameters.
+ *
+ * @function getAdminUsers
+ * @param {GetAdminUsersParams} getAdminUsersParams - Parameters to shape the query.
+ * @returns {Promise<AdminUsersQueryRead[]>} An array of admin user objects.
+ */
+export async function getAdminUsers (getAdminUsersParams) {
+  const { fastify, pg, ...getAdminUsersQueryParams } = getAdminUsersParams
+  const client = pg ?? fastify.pg
+  const query = getAdminUsersQuery(getAdminUsersQueryParams)
+
+  /** @type {QueryResult<AdminUsersQueryRead>} */
+  const results = await client.query(query)
+
+  /** @type {AdminUsersQueryRead[]} */
+  const users = results.rows
+  return users
+}
+
+/**
+ * @typedef {object} AdminUsersQueryRead
+ * @property {string} id
+ * @property {string} email
+ * @property {string} username
+ * @property {boolean} email_confirmed
+ * @property {Date} created_at
+ * @property {Date} updated_at
+ * @property {string | null} pending_email_update
+ * @property {boolean} newsletter_subscription
+ * @property {boolean} disabled
+ * @property {string | null} disabled_reason
+ * @property {string | null} internal_note
+ * @property {boolean} admin
+ * @property {boolean} disabled_email
+ */
 
 /**
  * Constructs a SQL query to fetch details of all user types for administrative purposes.
  *
- * @param {Object} options - Options for the query.
- * @param {number} [options.userId] - The unique identifier of the user to filter by. Optional.
- * @param {string} [options.username] - The username of the user to filter by. Optional.
- * @param {Date|string} [options.before] - Filters users created before this date. Optional.
- * @param {Date|string} [options.after] - Filters users created after this date. Optional.
- * @param {number} [options.perPage] - The number of users to fetch per page. If not provided, fetches all users. Optional.
- * @returns {Object} The SQL query tailored for administrative usage to fetch details of users.
+ * @param {GetAdminUsersQueryParams} params - Parameters to shape the query.
+ * @returns {SqlStatement} SQL template literal representing the admin users query.
  *
  * @example
  * // Fetch all users for admin
@@ -44,6 +111,7 @@ export const getAdminUsersQuery = ({
           u.disabled,
           u.disabled_reason,
           u.internal_note,
+          u.admin,
           coalesce(bh.disabled, false) as disabled_email
         from users u
         left join email_blackhole bh

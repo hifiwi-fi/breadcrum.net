@@ -1,6 +1,13 @@
 import SQL from '@nearform/sql'
 
-export async function deleteAdminUser (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ */
+export async function deleteAdminUser (fastify, _opts) {
   fastify.delete(
     '/',
     {

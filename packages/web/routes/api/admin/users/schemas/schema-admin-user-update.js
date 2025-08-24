@@ -1,26 +1,9 @@
-import { fullSerializedUserProps, userEditableUserProps } from '../../user/schemas/user-base.js'
-
 /**
  * @import { JSONSchema } from 'json-schema-to-ts'
  */
 
-const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
-  type: 'object',
-  properties: {
-    internal_note: {
-      type: 'string',
-      description: 'Any notes related to a user account. This value is private to the moderation of the website and should not be sent to users.',
-    },
-  }
-})
-
-export const fullSerializedAdminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
-  type: 'object',
-  properties: {
-    ...fullSerializedUserProps.properties,
-    ...adminUserProps.properties,
-  }
-})
+import { fullSerializedUserProps, userEditableUserProps } from '../../../user/schemas/user-base.js'
+import { adminUserProps } from './schema-admin-user-read.js'
 
 export const adminEditableUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',

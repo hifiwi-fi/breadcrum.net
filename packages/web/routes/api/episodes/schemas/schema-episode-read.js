@@ -15,7 +15,7 @@ export const schemaEpisodeRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:episode:read',
   additionalProperties: false,
-  required: ['bookmark'],
+  required: ['updated_at', 'bookmark'],
   properties: {
     ...episodeReadProps.properties,
     ...episodeProps.properties,

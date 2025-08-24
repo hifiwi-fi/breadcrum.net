@@ -51,7 +51,8 @@ Avoid inline type imports and prefer the newer @import syntax placed near the to
 Instead of this:
 
 ```javascript
-/** @type {import('pg').QueryResult<TypeUserRead>} */
+/** @import {QueryResult} from 'pg' */
+/** @type {QueryResult<TypeUserRead>} */
 const results = await client.query(query)
 ```
 
