@@ -74,20 +74,21 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => 
 
   return html`
   ${newToken
-      ? html`<div class="bc-token-create-copy-line">
-        <input
-          class="bc-token-create-copy-line-select"
-          type="text"
-          readonly
-          onClick=${handleNewTokenSelect}
-          value="${newToken.token}"
-        >
-        <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
-        <button type="button" onClick="${handleHideNewToken}">Hide</button>
-      </div>
-      <div class="bc-help-text bc-token-create-copy-help-text">
-        ℹ️ New auth token created. Save it in a safe place as it will never be shown again.
-      </div>
+      ? html`
+        <div class="bc-token-create-copy-line">
+          <input
+            class="bc-token-create-copy-line-select"
+            type="text"
+            readonly
+            onClick=${handleNewTokenSelect}
+            value="${newToken.token}"
+          />
+          <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
+          <button type="button" onClick="${handleHideNewToken}">Hide</button>
+        </div>
+        <div class="bc-help-text bc-token-create-copy-help-text">
+          ℹ️ New auth token created. Save it in a safe place as it will never be shown again.
+        </div>
       `
     : null
   }

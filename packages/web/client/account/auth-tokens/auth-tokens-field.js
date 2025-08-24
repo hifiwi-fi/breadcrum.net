@@ -9,7 +9,7 @@ import { useAuthTokens } from '../../hooks/useAuthTokens.js'
 import { authTokenList } from '../../components/auth-token/auth-token-list.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { useWindow } from '../../hooks/useWindow.js'
-import { manageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
+import { ManageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
 
 /**
  * @typedef {{}} AuthTokensProps
@@ -43,9 +43,11 @@ export const AuthTokens = () => {
     <dt>Auth Tokens</dt>
     <dd>
       <div class="bc-help-text">
-        ℹ️ Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
+        Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
       </div>
-      <div><${manageAuthTokenField} reload=${reloadAuthTokens} /></div>
+
+      <${ManageAuthTokenField} reload=${reloadAuthTokens} />
+
       <div>
         ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
         ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}

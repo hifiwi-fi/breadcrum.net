@@ -1,4 +1,11 @@
 @import './auth-token-edit.css';
+@import './auth-token-manage-create.css';
+
+.auth-token-manage {
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--accent-background);
+}
 
 .bc-token-create-copy-line {
   display: flex;
@@ -18,4 +25,9 @@
 .bc-feed-header-help-text {
   margin-top: 0.5em;
   margin-bottom: 10px;
+}
+
+.button-gap {
+  display: inline-flex;
+  gap: 0.4em;
 }

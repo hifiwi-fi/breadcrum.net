@@ -61,8 +61,8 @@ export const NewsletterField = ({ user, reload }) => {
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${disabled} indeterminate=${disabled} checked=${user?.newsletter_subscription} />
-      Subscribed
+      <input class="newsletter-label" onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${disabled} indeterminate=${disabled} checked=${user?.newsletter_subscription} />
+      <span>Subscribed</span>
     </label>
     ${error ? html`<div class="error-box">${error.message}</div>` : null}
   </dd>

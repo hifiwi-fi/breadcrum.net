@@ -112,9 +112,11 @@ export const EmailView = ({ user, onEdit, reload }) => {
 
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
-    <dd>
-      ${user?.email}
-      ${!user?.pending_email_update ? html`<button onClick=${onEdit}>Edit</button>` : null}
+    <dd class='email-view-buttons'>
+      <div class='email-view-edit-line'>
+        <span>${user?.email}</span>
+        ${!user?.pending_email_update ? html`<span><button onClick=${onEdit}>Edit</button></span>` : null}
+      </div>
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
           onClick="${handleEmailConfirmRequest}"
@@ -132,20 +134,20 @@ export const EmailView = ({ user, onEdit, reload }) => {
       ? html`
       <div>
         ${user?.pending_email_update} (update pending verification)
-        <div>
-        <button
-          onClick="${handleEmailUpdateConfirmRequest}"
-          disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
-            emailUpdateVerificationRequested
-              ? 'Email update verification resent'
-              : 'Resend email update confirmation'
-          }</button>
-        <button
-          onClick="${handleCancelEmailUpdate}"
-          disabled="${cancellingEmailUpdate}"
-        >
-          ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}
-        </button>
+        <div class="reset-buttons-state">
+          <button
+            onClick="${handleEmailUpdateConfirmRequest}"
+            disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
+              emailUpdateVerificationRequested
+                ? 'Email update verification resent'
+                : 'Resend email update confirmation'
+            }</button>
+          <button
+            onClick="${handleCancelEmailUpdate}"
+            disabled="${cancellingEmailUpdate}"
+          >
+            ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}
+          </button>
         </div>
       </div>
       `

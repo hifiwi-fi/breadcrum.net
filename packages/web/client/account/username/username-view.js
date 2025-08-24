@@ -19,9 +19,9 @@ import { html } from 'htm/preact'
 export const UsernameView = ({ user, onEdit }) => {
   return html`
     <dt>username</dt>
-    <dd>
-      ${user?.username}
-      <button onClick=${onEdit}>Edit</button>
+    <dd class="username-view">
+      <span>${user?.username}</span>
+      <span><button onClick=${onEdit}>Edit</button></span>
     </dd>
   `
 }

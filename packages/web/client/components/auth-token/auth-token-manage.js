@@ -11,6 +11,7 @@ import { tc } from '../../lib/typed-component.js'
 import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**
+ * Cleaning is a TODO
  * @typedef {'creating' | 'cleaning' | null } EditMode
  */
 
@@ -22,7 +23,7 @@ import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 /**
  * @type {FunctionComponent<AuthTokenManageFieldProps>}
  */
-export const manageAuthTokenField = ({ reload }) => {
+export const ManageAuthTokenField = ({ reload }) => {
   const [editMode, setEditMode] = useState(/** @type {EditMode} */(null))
 
   const handleCreateMode = useCallback(() => {
@@ -38,27 +39,24 @@ export const manageAuthTokenField = ({ reload }) => {
   }, [setEditMode])
 
   return html`
-  <div>
-  ${editMode === 'cleaning'
-    ? html`<div>Hello world</div>`
-    : null
-  }
+  <div class='auth-token-manage'>
+    ${editMode === 'creating'
+      ? tc(ManageAuthTokenCreateField, {
+          handleCancelEditMode,
+          reload
+        })
+      : null
+    }
 
-  ${editMode === 'creating'
-    ? tc(ManageAuthTokenCreateField, {
-        handleCancelEditMode,
-        reload
-      })
-    : null
-  }
-
-  ${!editMode
-    ? html`
-      <button type="button" onClick="${handleCreateMode}">Create auth token</button>
-      <button type="button" onClick="${handleCleanMode}">Cleanup old tokens</button>
-    `
-    : null
-  }
+    ${!editMode
+      ? html`
+        <div class='button-gap'>
+          <button type="button" onClick="${handleCreateMode}">Create auth token</button>
+          <!-- <button type="button" onClick="${handleCleanMode}">Cleanup old tokens</button> -->
+        </div>
+      `
+      : null
+    }
   </div>
   `
 }

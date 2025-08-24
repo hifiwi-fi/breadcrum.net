@@ -19,9 +19,9 @@ import { html } from 'htm/preact'
 export const PasswordView = ({ onEdit }) => {
   return html`
     <dt>password</dt>
-    <dd>
-      **************
-      <button onClick=${onEdit}>Edit</button>
+    <dd class="password-view">
+      <span>**************</span>
+      <span><button onClick=${onEdit}>Edit</button></span>
     </dd>
   `
 }
