@@ -1,12 +1,16 @@
 /**
- * @import { JSONSchema } from 'json-schema-to-ts'
+ * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
+ * @typedef {typeof schemaAdminUserUpdate} SchemaAdminUserUpdate
+ * @typedef {FromSchema<SchemaAdminUserUpdate>} SchemaTypeAdminUserUpdateClient
  */
 
 import { fullSerializedUserProps, userEditableUserProps } from '../../../user/schemas/user-base.js'
 import { adminUserProps } from './schema-admin-user-read.js'
 
-export const adminEditableUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
+export const schemaAdminUserUpdate = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
+  additionalProperties: false,
+  minProperties: 1,
   properties: {
     username: userEditableUserProps.properties.username,
     email: userEditableUserProps.properties.email,

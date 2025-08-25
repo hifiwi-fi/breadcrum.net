@@ -3,7 +3,7 @@
  */
 import SQL from '@nearform/sql'
 // import { fullSerializedUserProps } from '../../../../user/user-props.js'
-import { adminEditableUserProps } from '../schemas/schema-admin-user-update.js'
+import { schemaAdminUserUpdate } from '../schemas/schema-admin-user-update.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs}
@@ -21,14 +21,7 @@ export async function putAdminUser (fastify, _opts) {
       }),
       schema: {
         hide: true,
-        body: {
-          type: 'object',
-          additionalProperties: false,
-          minProperties: 1,
-          properties: {
-            ...adminEditableUserProps.properties,
-          },
-        },
+        body: schemaAdminUserUpdate,
         params: {
           type: 'object',
           properties: {

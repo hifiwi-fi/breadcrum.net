@@ -2,90 +2,43 @@
 /* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeAdminUserRead } from '../../../../routes/api/admin/users/schema-admin-user-read.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
-import { useEffect, useState, useCallback } from 'preact/hooks'
-import { useUser } from '../../../hooks/useUser.js'
-import { useLSP } from '../../../hooks/useLSP.js'
+import { useEffect, useState } from 'preact/hooks'
 import { useWindow } from '../../../hooks/useWindow.js'
 import { useTitle } from '../../../hooks/useTitle.js'
 import { UserTable } from '../../../components/user-table/user-table.js'
+import { useAdminUser } from '../../../hooks/use-admin-user.js'
+import { tc } from '../../../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
-  const state = useLSP()
-  const { user: activeUser } = useUser()
   const window = useWindow()
-  const [user, setUser] = useState(/** @type {TypeAdminUserRead | null} */(null))
-  const [userLoading, setUserLoading] = useState(false)
-  const [userError, setUserError] = useState(/** @type {Error | null} */(null))
-  const [dataReload, setDataReload] = useState(0)
+  const [userId, setUserId] = useState(/** @type {string | null} */(null))
 
-  const reload = useCallback(() => {
-    console.log(dataReload)
-    setDataReload(dataReload + 1)
-  }, [dataReload, setDataReload])
-
-  const handleDelete = useCallback(() => {
-    if (user && window) {
-      const beforeString = new Date(user.created_at).valueOf()
-      window.location.replace(`/admin/users/?after=${beforeString}`)
-    }
-  }, [user, window])
-
+  // Get user ID from URL params
   useEffect(() => {
-    async function getUser () {
-      if (!window) return
+    if (!window) return
 
-      setUserLoading(true)
-      setUserError(null)
+    const pageParams = new URLSearchParams(window.location.search)
+    const id = pageParams.get('id')
 
-      const pageParams = new URLSearchParams(window.location.search)
-
-      const id = pageParams.get('id')
-
-      if (!id) {
-        window.location.replace('/admin/users/')
-        return
-      }
-
-      const requestParams = new URLSearchParams()
-
-      try {
-        const response = await fetch(`${state.apiUrl}/admin/users/${id}?${requestParams.toString()}`, {
-          method: 'get',
-          headers: {
-            'accept-encoding': 'application/json',
-          },
-        })
-
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          const body = await response.json()
-          setUser(body)
-        } else {
-          setUser(null)
-          throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-        }
-      } catch (err) {
-        console.error(err)
-        setUserError(/** @type {Error} */(err))
-      } finally {
-        setUserLoading(false)
-      }
+    if (!id) {
+      window.location.replace('/admin/users/')
+      return
     }
 
-    if (activeUser) {
-      getUser()
-        .then(() => { console.log('user done') })
-        .catch(err => {
-          console.error(err)
-          setUserError(/** @type {Error} */(err))
-        })
-        .finally(() => { setUserLoading(false) })
-    }
-  }, [dataReload, state.apiUrl, activeUser, window])
+    setUserId(id)
+  }, [window])
+
+  const {
+    userLoading,
+    userError,
+    user,
+    reloadAdminUser,
+    handleDelete
+  } = useAdminUser(userId)
 
   const title = user?.username ? ['👨‍💻', user?.username] : []
   useTitle(...title)
@@ -94,7 +47,7 @@ export const Page = () => {
     <div>
       ${userLoading ? html`<div>...</div>` : null}
       ${userError ? html`<div>${userError.message}</div>` : null}
-      ${user ? html`<${UserTable} users=${[user]} reload=${reload} onDelete=${handleDelete} />` : null}
+      ${user ? tc(UserTable, { users: [user], reload: reloadAdminUser, onDelete: handleDelete }) : null}
     </div>
   `
 }

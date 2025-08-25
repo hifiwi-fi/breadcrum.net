@@ -3,14 +3,14 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeAdminUserRead } from '../../../routes/api/admin/users/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
  */
 
 import { html } from 'htm/preact'
 
 /**
  * @typedef {object} UserRowViewProps
- * @property {TypeAdminUserRead} user
+ * @property {SchemaTypeAdminUserReadClient} user
  * @property {() => void} [onEdit]
  */
 

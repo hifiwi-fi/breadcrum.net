@@ -10,6 +10,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { UserTable } from '../../components/user-table/user-table.js'
 import { useAdminUsers } from '../../hooks/use-admin-users.js'
+import { tc } from '../../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -43,7 +44,7 @@ export const Page = () => {
     ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
     ${usersError ? html`<div>${usersError.message}</div>` : null}
     ${Array.isArray(users)
-      ? html`<${UserTable} users=${users} reload=${reloadAdminUsers} onDelete=${reloadAdminUsers} />`
+      ? tc(UserTable, { users, reload: reloadAdminUsers, onDelete: reloadAdminUsers })
       : null
     }
 

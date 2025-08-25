@@ -3,7 +3,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeAdminUserRead } from '../../../routes/api/admin/users/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
  */
 
 import { html } from 'htm/preact'
@@ -11,7 +11,7 @@ import { UserRow } from './user-row.js'
 
 /**
  * @typedef {object} UserTableProps
- * @property {TypeAdminUserRead[]} users
+ * @property {SchemaTypeAdminUserReadClient[]} users
  * @property {() => void} reload
  * @property {() => void} onDelete
  */

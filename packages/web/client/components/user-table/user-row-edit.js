@@ -4,29 +4,17 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeAdminUserRead } from '../../../routes/api/admin/users/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserUpdateClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-update.js'
  */
 
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback } from 'preact/hooks'
 
 /**
- * @typedef {object} UserFormState
- * @property {string} username
- * @property {string} email
- * @property {boolean} email_confirmed
- * @property {string} pending_email_update
- * @property {boolean} newsletter_subscription
- * @property {boolean} disabled_email
- * @property {boolean} disabled
- * @property {string} disabled_reason
- * @property {string} internal_note
- */
-
-/**
  * @typedef {object} UserRowEditProps
- * @property {TypeAdminUserRead} user
- * @property {(formState: UserFormState) => Promise<void>} [onSave]
+ * @property {SchemaTypeAdminUserReadClient} user
+ * @property {(formState: SchemaTypeAdminUserUpdateClient) => Promise<void>} [onSave]
  * @property {() => Promise<void>} [onDelete]
  * @property {() => void} [onCancelEdit]
  */
@@ -79,12 +67,12 @@ export const UserRowEdit = ({
     const username = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="username"]'))?.value || ''
     const email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email"]'))?.value || ''
     const email_confirmed = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email_confirmed"]'))?.checked || false
-    const pending_email_update = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="pending_email_update"]'))?.value || ''
+    const pending_email_update = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="pending_email_update"]'))?.value || null
     const newsletter_subscription = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="newsletter_subscription"]'))?.checked || false
     const disabled_email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled_email"]'))?.checked || false
     const disabled = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled"]'))?.checked || false
-    const disabled_reason = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="disabled_reason"]'))?.value?.trim() || ''
-    const internal_note = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="internal_note"]'))?.value?.trim() || ''
+    const disabled_reason = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="disabled_reason"]'))?.value?.trim() || null
+    const internal_note = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="internal_note"]'))?.value?.trim() ?? null
 
     const formState = {
       username,
