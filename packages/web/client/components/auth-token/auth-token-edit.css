@@ -22,3 +22,13 @@
   display: flex;
   justify-content: space-between;
 }
+
+.button-cluster {
+  display: inline-flex;
+  gap: 0.4em;
+}
+
+.protect-checkbox {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}

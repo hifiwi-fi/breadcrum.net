@@ -1,11 +1,21 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render } from 'uland-isomorphic'
-export const page = Component(() => {
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+
+/** @type {FunctionComponent} */
+export const Page = () => {
   return html`
     <div>🔎 Search</div>
-`
-})
+  `
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

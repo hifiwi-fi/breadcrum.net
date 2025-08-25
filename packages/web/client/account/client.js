@@ -1,39 +1,32 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, render, useEffect } from 'uland-isomorphic'
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
 import { useUser } from '../hooks/useUser.js'
-import { useWindow } from '../hooks/useWindow.js'
-import { usernameField } from './username/username-field.js'
-import { passwordField } from './password/password-field.js'
-import { newsletterField } from './newsletter/newsletter-field.js'
-import { emailField } from './email/email-field.js'
-import { useReload } from '../hooks/useReload.js'
-import { disabledField } from './disabled/disabled-field.js'
-import { authTokens } from './auth-tokens/auth-tokens-field.js'
+import { UsernameField } from './username/username-field.js'
+import { PasswordField } from './password/password-field.js'
+import { NewsletterField } from './newsletter/newsletter-field.js'
+import { EmailField } from './email/email-field.js'
+import { DisabledField } from './disabled/disabled-field.js'
+import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 
-export const page = Component(() => {
-  const window = useWindow()
-
-  const { reload: reloadUser, signal: userReloadSignal } = useReload()
-  const { user, loading } = useUser({ reload: userReloadSignal })
-
-  useEffect(() => {
-    if ((!user && !loading) && window) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
+/** @type {FunctionComponent} */
+export const Page = () => {
+  const { user, reloadUser } = useUser()
 
   return html`
     <div>
       <dl>
-        ${disabledField({ user })}
-        ${usernameField({ user, reload: reloadUser })}
-        ${passwordField()}
-        ${emailField({ user, reload: reloadUser })}
-        ${newsletterField({ user, reload: reloadUser })}
+        <${DisabledField} user=${user} />
+        <${UsernameField} user=${user} reload=${reloadUser} />
+        <${PasswordField} />
+        <${EmailField} user=${user} reload=${reloadUser} />
+        <${NewsletterField} user=${user} reload=${reloadUser} />
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
@@ -47,12 +40,15 @@ export const page = Component(() => {
           `
           : null
         }
-        ${authTokens()}
+        <${AuthTokens} />
       </dl>
     </div>
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

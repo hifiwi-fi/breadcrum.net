@@ -1,12 +1,32 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js'
+ * @import { EpisodeUpdateData } from './episode-edit.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { diffEpisode } from './diff-episode.js'
+import { tc } from '../../lib/typed-component.js'
+import { diffUpdate } from '../../lib/diff-update.js'
+import { EpisodeEdit } from './episode-edit.js'
+import { EpisodeView } from './episode-view.js'
 
-import { episodeEdit } from './episode-edit.js'
-import { episodeView } from './episode-view.js'
+/**
+ * @typedef {object} EpisodeListProps
+ * @property {TypeEpisodeReadClient} episode
+ * @property {() => void} reload
+ * @property {() => void} onDelete
+ * @property {boolean | undefined} [clickForPreview]
+ */
 
-export const episodeList = Component(({ episode, reload, onDelete, clickForPreview }) => {
+/**
+ * @type {FunctionComponent<EpisodeListProps>}
+ */
+export const EpisodeList = ({ episode, reload, onDelete, clickForPreview }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -19,8 +39,8 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newEpisode) => {
-    const payload = diffEpisode(episode, newEpisode)
+  const handleSave = useCallback(async (/** @type {EpisodeUpdateData} */newEpisode) => {
+    const payload = diffUpdate(episode, newEpisode)
     const endpoint = `${state.apiUrl}/episodes/${episode.id}`
 
     await fetch(endpoint, {
@@ -35,7 +55,7 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
     setEditing(false)
   }, [episode, state.apiUrl, reload, setEditing])
 
-  const handleDeleteEpisode = useCallback(async (ev) => {
+  const handleDeleteEpisode = useCallback(async () => {
     await fetch(`${state.apiUrl}/episodes/${episode.id}`, {
       method: 'delete',
       headers: {
@@ -52,18 +72,18 @@ export const episodeList = Component(({ episode, reload, onDelete, clickForPrevi
     ${deleted
       ? null
       : editing
-        ? episodeEdit({
+        ? tc(EpisodeEdit, {
             episode,
             onSave: handleSave,
             onDeleteEpisode: handleDeleteEpisode,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${episode?.id}</code>`,
           })
-        : episodeView({
+        : tc(EpisodeView, {
             episode,
             onEdit: handleEdit,
             clickForPreview,
           })
     }
   </div>`
-})
+}

@@ -1,2 +1,25 @@
 /* account/style.css */
 @import './auth-tokens/auth-token-field.css';
+
+.bc-account-password-edit-submit-line .button-cluster,
+.password-view,
+.bc-account-username-edit .button-cluster,
+.username-view,
+.bc-account-email-edit-submit-line .button-cluster,
+.reset-buttons-state,
+.button-gap,
+.email-view-edit-line {
+  display: inline-flex;
+  gap: 0.4em;
+}
+
+
+.email-view-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.newsletter-label {
+  margin-right: 0.5em;
+}

@@ -1,42 +1,46 @@
-// @ts-check
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+/** @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
+// @ts-ignore - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
-import { bookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
-import { diffBookmark } from '../../lib/diff-bookmark.js'
+import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
+import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
+  useUser()
   const { query } = useQuery()
-  const [bookmark, setBookmark] = useState(null)
+  const [bookmark, setBookmark] = useState(/** @type {Partial<TypeBookmarkReadClient> | null} */(null))
   const [newlyCreated, setNewlyCreated] = useState(false)
   const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)
-  const [bookmarkletVersion, setBookmarkletVersion] = useState()
+  const [bookmarkletVersion, setBookmarkletVersion] = useState(/** @type {string | undefined} */(undefined))
 
   useEffect(() => {
-    if (!user && !loading) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user, loading])
+    if (!query) return
 
-  useEffect(() => {
     // PWAs send urls as the summary (text) and not the url, in most cases :(
-    const pwaTextAsUrl = Boolean(!query.get('url') && query.get('summary') && URL.canParse(query.get('summary')))
+    const summaryValue = query.get('summary')
+    const pwaTextAsUrl = Boolean(!query.get('url') && summaryValue && URL.canParse(summaryValue))
 
-    const workingUrl = pwaTextAsUrl ? query.get('summary') : query.get('url')
-    const workingSummary = pwaTextAsUrl ? undefined : query.get('summary')
+    const workingUrl = pwaTextAsUrl ? summaryValue : query.get('url')
+    const workingSummary = pwaTextAsUrl ? undefined : summaryValue
 
     const setFallbackBookmark = () => {
       setBookmark({
-        url: workingUrl,
-        title: query.get('title'),
-        note: query.get('note'),
-        summary: workingSummary,
+        url: workingUrl ?? '',
+        title: query.get('title') || '',
+        note: query.get('note') || '',
+        summary: workingSummary ?? '',
         tags: query.getAll('tags').filter(t => Boolean(t)),
       })
     }
@@ -44,7 +48,7 @@ export const page = Component(() => {
     const init = async () => {
       setNewlyCreated(false)
       const ver = query.get('ver')
-      setBookmarkletVersion(ver)
+      setBookmarkletVersion(ver || undefined)
       if (ver !== version || query.get('description')) setBookmarkletUpdateAvailable(true)
 
       if (!workingUrl) {
@@ -52,9 +56,11 @@ export const page = Component(() => {
         return
       }
 
-      const payload = { url: workingUrl }
-      if (query.get('title')) payload.title = query.get('title')
-      if (query.get('note')) payload.note = query.get('note')
+      const payload = /** @type {any} */ ({ url: workingUrl })
+      const titleValue = query.get('title')
+      const noteValue = query.get('note')
+      if (titleValue) payload.title = titleValue
+      if (noteValue) payload.note = noteValue
 
       if (workingSummary) payload.summary = workingSummary
       const queryTags = query.getAll('tags').filter(t => Boolean(t))
@@ -95,19 +101,23 @@ export const page = Component(() => {
 
   const existingBookmark = Boolean(bookmark?.id)
 
-  async function handleSaveBookmark (newBookmark) {
+  async function handleSaveBookmark (/** @type {TypeBookmarkReadClient} */ newBookmark) {
     // Clean request for updates
-    const payload = existingBookmark
-      ? diffBookmark(bookmark, newBookmark)
+    const payload = (existingBookmark && bookmark)
+      ? diffUpdate(bookmark, newBookmark, {
+        tags: arraySetEqual,
+        archive_urls: arraySetEqual,
+      })
       : newBookmark
 
-    if (Object.keys(payload).length === 0) {
+    if (payload && Object.keys(payload).length === 0) {
       // empty update
-      finish()
+      finish(undefined)
+      return
     }
 
     const endpoint = existingBookmark
-      ? `${state.apiUrl}/bookmarks/${bookmark.id}`
+      ? `${state.apiUrl}/bookmarks/${bookmark?.id}`
       : `${state.apiUrl}/bookmarks`
 
     const response = await fetch(endpoint, {
@@ -124,10 +134,11 @@ export const page = Component(() => {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
 
-    function finish (responseBody) {
+    function finish (/** @type {any} */ responseBody) {
       const { id } = responseBody?.data ?? {}
       const redirectTarget = id ? `/bookmarks/view/?id=${id}` : '/bookmarks'
-      if (query.get('jump') === 'close') {
+      const jumpValue = query?.get('jump')
+      if (jumpValue === 'close') {
         try {
           window.close()
         } catch (err) {
@@ -141,20 +152,23 @@ export const page = Component(() => {
   }
 
   return html`
-    ${bookmarkEdit({
-      bookmark,
-      bookmarkletUpdateAvailable,
-      bookmarkletVersion,
-      onSave: handleSaveBookmark,
-      legend: existingBookmark
+    <${BookmarkEdit}
+      bookmark=${bookmark}
+      bookmarkletUpdateAvailable=${bookmarkletUpdateAvailable}
+      bookmarkletVersion=${bookmarkletVersion}
+      onSave=${handleSaveBookmark}
+      legend=${existingBookmark
         ? newlyCreated
           ? html`created: <code>${bookmark?.id}</code>`
           : html`edit: <code>${bookmark?.id}</code>`
-        : 'New bookmark',
-    })}
+        : 'New bookmark'}
+    />
   `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

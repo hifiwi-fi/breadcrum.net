@@ -7,13 +7,14 @@ import { schemaBookmarkJoin } from '../../bookmarks/schemas/schema-bookmark-join
  * @typedef {FromSchema<SchemaArchiveRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeArchiveRead
+ * @typedef {FromSchema<SchemaArchiveRead>} TypeArchiveReadClient
  */
 
 export const schemaArchiveRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:archive:read',
   additionalProperties: false,
-  required: ['created_at', 'url', 'extraction_method'],
+  required: ['created_at', 'updated_at', 'url', 'extraction_method', 'bookmark'],
   properties: {
     ...archiveReadProps.properties,
     ...archiveProps.properties,

@@ -9,6 +9,10 @@ import lsp from 'local-storage-proxy'
 import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
 
 /**
+ * @typedef {typeof defaultFrontendFlags} FrontendFlags
+ */
+
+/**
  * @typedef {object} StateType
  * @property {TypeUserRead | null} user
  * @property {string} apiUrl
@@ -17,7 +21,7 @@ import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
  * @property {boolean} sensitive
  * @property {boolean} toread
  * @property {boolean} starred
- * @property {object} flags
+ * @property {FrontendFlags} flags
  */
 
 /** @type {StateType & EventTarget} */

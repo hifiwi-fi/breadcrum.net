@@ -1,15 +1,16 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
-// @ts-expect-error
-import { useCallback, createContext, useContext } from 'uland-isomorphic'
+import { useCallback } from 'preact/hooks'
+import { signal } from '@preact/signals'
 import { useWindow } from './useWindow.js'
 
-const QueryContext = createContext()
+const querySignal = signal(/** @type {URLSearchParams | null} */ (null))
 
 if (typeof window !== 'undefined') {
-  QueryContext.provide(new URLSearchParams(window.location.search))
+  querySignal.value = new URLSearchParams(window.location.search)
   window.addEventListener('popstate', /** @param {Event} _ev */ (_ev) => {
-    QueryContext.provide(new URLSearchParams(window.location.search))
+    querySignal.value = new URLSearchParams(window.location.search)
   })
 }
 
@@ -21,12 +22,12 @@ if (typeof window !== 'undefined') {
  */
 export function useQuery () {
   const window = useWindow()
-  /** @type {URLSearchParams | null} */
-  const query = useContext(QueryContext)
+
+  const query = querySignal.value
 
   const pushState = useCallback(/** @param {string} url */ (url) => {
     const searchParams = (new URL(url)).search
-    QueryContext.provide(new URLSearchParams(searchParams))
+    querySignal.value = new URLSearchParams(searchParams)
     window?.history.pushState({}, '', url)
   }, [window])
 

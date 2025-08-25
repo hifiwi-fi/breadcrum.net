@@ -1,15 +1,14 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { useEffect, useState } from 'uland-isomorphic'
+import { useEffect, useState } from 'preact/hooks'
 import { useLSP } from './useLSP.js'
 
 export function useFlags () {
   const state = useLSP()
 
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(true)
+  const [error, setError] = useState(/** @type{Error | null} */(null))
 
   useEffect(() => {
     setLoading(true)
@@ -46,6 +45,11 @@ export function useFlags () {
   return { flags: state.flags, loading, error }
 }
 
+/**
+ * @param {Record<string, any>} localFlags
+ * @param {Record<string, any>} serverFlags
+ * @returns {boolean}
+ */
 function localFlagsEqualServerFlags (localFlags, serverFlags) {
   for (const [k, v] of Object.entries(serverFlags)) {
     if (localFlags[k] !== v) return false

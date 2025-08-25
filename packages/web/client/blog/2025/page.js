@@ -1,6 +1,6 @@
-/**
- * @import { PageFunction } from '@domstack/static'
- */
+/** @import { PageFunction } from '@domstack/static' */
+/** @import { BlogIndexVars } from '../../layouts/blog-index/blog-index.layout.js' */
+/** @import { PageReturn } from '../../layouts/root/root.layout.js' */
 
 export const vars = {
   title: 'All 2025 Blog Posts',
@@ -8,12 +8,7 @@ export const vars = {
   noindex: true,
 }
 
-/**
- * @type {PageFunction<{
- *       title: string
- *       publishDate: string
- * }>}
- */
-export default async function blogIndex2025 () {
+/** @type {PageFunction<BlogIndexVars, PageReturn>} */
+export default function blogIndex2025 () {
   return ''
 }

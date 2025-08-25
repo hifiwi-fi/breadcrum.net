@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaMaintenanceRead } from './schemas/schema-maintenance-read.js'
 
 /**
  * @typedef {Object} VersionRow
@@ -14,7 +16,7 @@ import SQL from '@nearform/sql'
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *   }
  * }>}
  */
@@ -32,24 +34,12 @@ export async function getMaintenance (fastify, _opts) {
         hide: true,
         description: 'Get maintenance and monitoring status',
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              version: { type: ['integer'], nullable: true, description: 'pg-boss schema version' },
-              maintained_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Last maintenance run time' },
-              monitored_on: { type: ['string'], nullable: true, format: 'date-time', description: 'Last monitor run time' },
-              maintenance_interval_seconds: { type: 'integer', description: 'Maintenance interval in seconds' },
-              monitor_interval_seconds: { type: 'integer', description: 'Monitor interval in seconds' },
-              archive_completed_after_seconds: { type: 'integer', description: 'Archive completed jobs after seconds' },
-              archive_failed_after_seconds: { type: 'integer', description: 'Archive failed jobs after seconds' },
-              delete_after_days: { type: 'integer', description: 'Delete archived jobs after days' },
-              is_installed: { type: 'boolean', description: 'Whether pg-boss is properly installed' },
-            }
-          }
+          200: schemaMaintenanceRead
         }
       },
     },
-    async function getMaintenanceHandler (_request, _reply) {
+    async function getMaintenanceHandler (_request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Get version and last run times
         const versionQuery = SQL`
@@ -73,7 +63,8 @@ export async function getMaintenance (fastify, _opts) {
         // Check if pg-boss is installed
         const isInstalled = Boolean(await boss.isInstalled())
 
-        return {
+        /** @type {ReturnBody} */
+        const returnBody = {
           version: versionData?.version || null,
           maintained_on: versionData?.maintained_on || null,
           monitored_on: versionData?.monitored_on || null,
@@ -84,6 +75,8 @@ export async function getMaintenance (fastify, _opts) {
           delete_after_days: config.deleteAfterDays || (config.deleteAfterHours ? config.deleteAfterHours / 24 : 2),
           is_installed: isInstalled
         }
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get maintenance status')
         throw error

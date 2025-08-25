@@ -1,7 +1,7 @@
-import { state } from './state.js'
+import { StateType } from './state.js'
 
 declare global {
   interface Window {
-    state: state
+    state: StateType
   }
 }

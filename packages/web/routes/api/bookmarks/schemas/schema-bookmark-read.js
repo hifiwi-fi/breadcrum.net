@@ -9,6 +9,7 @@ import { schemaArchiveJoin } from '../../archives/schemas/schema-archive-join.js
  * @typedef {FromSchema<SchemaBookmarkRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeBookmarkRead
+ * @typedef {FromSchema<SchemaBookmarkRead>} TypeBookmarkReadClient
  */
 
 export const schemaBookmarkRead = /** @type {const} @satisfies {JSONSchema} */ ({

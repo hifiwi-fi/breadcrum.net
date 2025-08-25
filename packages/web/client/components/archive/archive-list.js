@@ -1,12 +1,28 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ * @import { ArchiveFormState } from './archive-edit.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { diffArchive } from './diff-archive.js'
+import { tc } from '../../lib/typed-component.js'
 
-import { archiveEdit } from './archive-edit.js'
-import { archiveView } from './archive-view.js'
+import { ArchiveEdit } from './archive-edit.js'
+import { ArchiveView } from './archive-view.js'
+import { diffUpdate } from '../../lib/diff-update.js'
 
-export const archiveList = Component(({ archive, reload, onDelete, fullView }) => {
+/** @type {FunctionComponent<{
+ * archive: TypeArchiveReadClient,
+ * reload: () => void,
+ * onDelete: () => void,
+ * fullView?: boolean
+}>} */
+export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -19,8 +35,8 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newArchive) => {
-    const payload = diffArchive(archive, newArchive)
+  const handleSave = useCallback(/** @param {ArchiveFormState} newArchive */ async (newArchive) => {
+    const payload = diffUpdate(archive, newArchive)
     const endpoint = `${state.apiUrl}/archives/${archive.id}`
 
     await fetch(endpoint, {
@@ -35,7 +51,7 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     setEditing(false)
   }, [archive, state.apiUrl, reload, setEditing])
 
-  const handleDeleteArchive = useCallback(async (ev) => {
+  const handleDeleteArchive = useCallback(async () => {
     await fetch(`${state.apiUrl}/archives/${archive.id}`, {
       method: 'delete',
       headers: {
@@ -52,18 +68,18 @@ export const archiveList = Component(({ archive, reload, onDelete, fullView }) =
     ${deleted
       ? null
       : editing
-        ? archiveEdit({
+        ? tc(ArchiveEdit, {
             archive,
             onSave: handleSave,
             onDeleteArchive: handleDeleteArchive,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${archive?.id}</code>`,
           })
-        : archiveView({
+        : tc(ArchiveView, {
             archive,
             onEdit: handleEdit,
-            fullView,
+            fullView: fullView || false
           })
     }
   </div>`
-})
+}

@@ -1,3 +1,37 @@
+/**
+ * Global variables type definitions
+ */
+
+/**
+ * @typedef {Object} ProvidersConfig
+ * @property {string} hostingProvider - Hosting service provider
+ * @property {string} storageProvider - Storage service provider
+ * @property {string} emailProvider - Email service provider
+ */
+
+/**
+ * @typedef {Object} GlobalVars
+ * @property {string} siteName - The name of the site
+ * @property {string} siteDescription - Site description for meta tags
+ * @property {string} [image] - Optional site image URL
+ * @property {string} siteTwitter - Twitter handle
+ * @property {string} siteTwitterUrl - Twitter profile URL
+ * @property {string} supportEmail - Support email address
+ * @property {string} jurisdiction - Legal jurisdiction
+ * @property {string} mastodonUrl - Mastodon profile URL
+ * @property {string} bskyUrl - Bluesky profile URL
+ * @property {string} discordUrl - Discord server URL
+ * @property {string} version - Application version
+ * @property {string} authorName - Author name
+ * @property {string} authorUrl - Author URL
+ * @property {string} authorImgUrl - Author image URL
+ * @property {string} authorImgAlt - Author image alt text
+ * @property {string} transport - Protocol (http/https)
+ * @property {string} host - Host and port
+ * @property {string} baseUrl - Full base URL
+ * @property {ProvidersConfig} providers - Service providers configuration
+ */
+
 import 'dotenv/config'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
@@ -11,15 +45,20 @@ const version = JSON.parse(
     'utf8')
 ).version
 
-const transport = process.env.TRANSPORT ?? 'https'
-const host = process.env.HOST ?? 'localhost:3000'
+/** @type {string} */
+const transport = process.env['TRANSPORT'] ?? 'https'
+/** @type {string} */
+const host = process.env['HOST'] ?? 'localhost:3000'
+/** @type {string} */
 const baseUrl = `${transport}://${host}`
 
+/** @type {Record<string, string>} */
 export const browser = {
   'process.env.TRANSPORT': transport,
   'process.env.HOST': host,
 }
 
+/** @type {() => Promise<GlobalVars>} */
 export default async () => {
   return {
     siteName: 'Breadcrum',

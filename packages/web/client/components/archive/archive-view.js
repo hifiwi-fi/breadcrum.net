@@ -1,18 +1,29 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html } from 'uland-isomorphic'
 
-import { archiveTitle } from '../archive-title/index.js'
-import { expandText } from '../expand-text/index.js'
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ */
 
-export const archiveView = Component(({
+import { html } from 'htm/preact'
+import { ArchiveTitle } from '../archive-title/index.js'
+import { ExpandText } from '../expand-text/index.js'
+
+/** @type {FunctionComponent<{
+ * archive: TypeArchiveReadClient,
+ * onEdit?: () => void, // TODO: Add when editing is supported
+ * fullView?: boolean
+}>} */
+export const ArchiveView = ({
   archive: ar,
-  onEdit = () => {},
+  onEdit = () => {}, // TODO: Add when editing is supported
   fullView,
-} = {}) => {
+}) => {
   return html`
     <div class="bc-archive-view">
 
-      ${archiveTitle({ archive: ar, big: fullView })}
+      <${ArchiveTitle} archive=${ar} big=${!!fullView} />
 
       <div class="bc-archive-url-display">
         ${fullView ? '🗄️ ' : ''}<a href="${ar.url}">${ar.site_name || ar.url.replace(/^https?:\/\//, '')}</a>${ar.byline ? ` · ${ar.byline}` : null}
@@ -29,10 +40,8 @@ export const archiveView = Component(({
         ar?.excerpt && !fullView
           ? html`
             <div class="bc-archive-excerpt">
-              ${expandText({
-                children: ar?.excerpt,
-              })}
-            </div?
+              <${ExpandText} children=${ar?.excerpt} />
+            </div>
           `
           : null
       }
@@ -44,6 +53,13 @@ export const archiveView = Component(({
           </time>
         </a>
       </div>
+
+      <!-- TODO: Add Edit button when editing is supported
+      <div>
+        <button onClick=${onEdit}>Edit</button>
+      </div>
+      -->
+
 
       ${ar.error
         ? html`
@@ -58,9 +74,7 @@ export const archiveView = Component(({
       ${
         ar?.html_content
         ? html`
-          <div class="bc-archive-html-content">
-            ${html([ar?.html_content])}
-          </div>
+          <div class="bc-archive-html-content" dangerouslySetInnerHTML="${{ __html: ar.html_content }}" />
         `
         : ar?.text_content // Watch your whitepsace here
           ? html`
@@ -70,4 +84,4 @@ export const archiveView = Component(({
       }
     </div>
   `
-})
+}
