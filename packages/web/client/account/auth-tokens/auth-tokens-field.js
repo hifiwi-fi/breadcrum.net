@@ -48,7 +48,7 @@ export const AuthTokens = () => {
 
       <${ManageAuthTokenField} reload=${reloadAuthTokens} />
 
-      <div>
+      <div class="pagination-buttons">
         ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
         ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
       </div>
@@ -60,7 +60,7 @@ export const AuthTokens = () => {
         ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} reload=${reloadAuthTokens} onDelete=${reloadAuthTokens} />`)
         : null}
 
-      <div>
+      <div class="pagination-buttons">
         ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
         ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
       </div>
