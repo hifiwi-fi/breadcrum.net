@@ -32,7 +32,7 @@ export const Page = () => {
       }
       window.location.replace(destination)
     }
-  }, [user])
+  }, [user?.id])
 
   async function login (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()

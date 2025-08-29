@@ -22,7 +22,7 @@ export const Page = () => {
     if ((user && !loading)) {
       window.location.replace('/docs/tutorial')
     }
-  }, [user])
+  }, [user?.id])
 
   async function onRegister (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()

@@ -21,7 +21,7 @@ export const Page = () => {
 
   useEffect(() => {
     if (user && !loading) window.location.replace('/account')
-  }, [user])
+  }, [user?.id])
 
   async function resetPassword (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()

@@ -57,7 +57,7 @@ export const UserRow = ({ user, reload, onDelete }) => {
     } else {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
-  }, [user, state.apiUrl, reload, setEditing])
+  }, [user?.id, state.apiUrl, reload, setEditing])
 
   const handleDelete = useCallback(async () => {
     const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {

@@ -78,7 +78,7 @@ export const Page = () => {
         })
         .finally(() => { setDashboardLoading(false) })
     }
-  }, [state.apiUrl, user])
+  }, [state.apiUrl, user?.id])
 
   if (!dashboardData && !dashboardLoading) {
     return html`

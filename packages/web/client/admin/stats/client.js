@@ -54,7 +54,7 @@ export const Page = () => {
         })
         .finally(() => { setStatsLoading(false) })
     }
-  }, [state.apiUrl, user])
+  }, [state.apiUrl, user?.id])
 
   return html`
     <div class="bc-admin-stats">
