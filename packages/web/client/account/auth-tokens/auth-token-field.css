@@ -1,8 +1,4 @@
 /* account/auth-tokens/auth-token-field.css */
 @import '../../components/auth-token/auth-token-list.css';
 @import '../../components/auth-token/auth-token-manage.css';
-
-.pagination-buttons {
-  display: inline-flex;
-  gap: 0.3em;
-}
+@import '../../components/pagination-buttons/index.css';

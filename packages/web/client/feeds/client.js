@@ -17,6 +17,7 @@ import { EpisodeList } from '../components/episode/episode-list.js'
 import { FeedHeader } from '../components/feed-header/feed-header.js'
 import { Search } from '../components/search/index.js'
 import { useReload } from '../hooks/useReload.js'
+import { PaginationButtons } from '../components/pagination-buttons/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -186,10 +187,7 @@ export const Page = () => {
       ${feedLoading ? html`<div>Loading feed...</div>` : null}
       ${feedError ? html`<div>${feedError.message}</div>` : null}
     </div>
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
     ${episodesError ? html`<div>${episodesError.message}</div>` : null}
     ${Array.isArray(episodes)
@@ -200,10 +198,7 @@ export const Page = () => {
           clickForPreview: true
         }, e.id))
       : null}
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

@@ -10,6 +10,7 @@ import { authTokenList } from '../../components/auth-token/auth-token-list.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { ManageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
+import { PaginationButtons } from '../../components/pagination-buttons/index.js'
 
 /**
  * @typedef {{}} AuthTokensProps
@@ -25,8 +26,6 @@ export const AuthTokens = () => {
     tokensLoading,
     tokens,
     reloadAuthTokens,
-    before,
-    after,
     beforeParams,
     afterParams
   } = useAuthTokens()
@@ -48,10 +47,7 @@ export const AuthTokens = () => {
 
       <${ManageAuthTokenField} reload=${reloadAuthTokens} />
 
-      <div class="pagination-buttons">
-        ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-      </div>
+      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
       ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
@@ -60,10 +56,7 @@ export const AuthTokens = () => {
         ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} reload=${reloadAuthTokens} onDelete=${reloadAuthTokens} />`)
         : null}
 
-      <div class="pagination-buttons">
-        ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-      </div>
+        <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     </dd>
   `
 }

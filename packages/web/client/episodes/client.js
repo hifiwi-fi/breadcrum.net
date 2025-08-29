@@ -14,6 +14,7 @@ import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { Search } from '../components/search/index.js'
+import { PaginationButtons } from '../components/pagination-buttons/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -136,10 +137,7 @@ export const Page = () => {
       placeholder="Search Episodes..."
       onSearch=${handleSearch}
     />
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
     ${episodesError ? html`<div>${episodesError.message}</div>` : null}
     ${Array.isArray(episodes)
@@ -150,10 +148,7 @@ export const Page = () => {
           clickForPreview: true
         }, e.id))
       : null}
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

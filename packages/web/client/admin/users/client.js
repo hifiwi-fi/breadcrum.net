@@ -11,6 +11,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { UserTable } from '../../components/user-table/user-table.js'
 import { useAdminUsers } from '../../hooks/use-admin-users.js'
 import { tc } from '../../lib/typed-component.js'
+import { PaginationButtons } from '../../components/pagination-buttons/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -21,8 +22,6 @@ export const Page = () => {
     usersError,
     users,
     reloadAdminUsers,
-    before,
-    after,
     beforeParams,
     afterParams
   } = useAdminUsers()
@@ -36,10 +35,7 @@ export const Page = () => {
   }, [pushState, window])
 
   return html`
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
     ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
     ${usersError ? html`<div>${usersError.message}</div>` : null}
@@ -48,10 +44,7 @@ export const Page = () => {
       : null
     }
 
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

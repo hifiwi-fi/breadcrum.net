@@ -13,6 +13,7 @@ import { useQuery } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
+import { PaginationButtons } from '../components/pagination-buttons/index.js'
 
 /**
  * @typedef {Object} ArchivesResponse
@@ -146,10 +147,7 @@ export const Page = () => {
       placeholder="Search Archives..."
       onSearch=${handleSearch}
     />
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
     ${archivesError ? html`<div>${archivesError.message}</div>` : null}
     ${Array.isArray(archives)
@@ -163,10 +161,7 @@ export const Page = () => {
             />
           `)
         : null}
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

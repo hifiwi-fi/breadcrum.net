@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
-import { useEffect, useCallback } from 'preact/hooks'
+import { useCallback } from 'preact/hooks'
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useQuery } from '../hooks/useQuery.js'
@@ -13,6 +13,7 @@ import { useWindow } from '../hooks/useWindow.js'
 import { BookmarkList } from '../components/bookmark/bookmark-list.js'
 import { Search } from '../components/search/index.js'
 import { useBookmarks } from '../hooks/useBookmarks.js'
+import { PaginationButtons } from '../components/pagination-buttons/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -25,8 +26,6 @@ export const Page = () => {
     bookmarksError,
     bookmarks,
     reloadBookmarks,
-    before,
-    after,
     beforeParams,
     afterParams
   } = useBookmarks()
@@ -54,10 +53,7 @@ export const Page = () => {
       placeholder="Search Bookmarks..."
       onSearch=${handleSearch}
     />
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
     <div>
       <span>🔖 <a href="./add">add +</a></span>
@@ -75,10 +71,7 @@ export const Page = () => {
         `)
       : null}
 
-    <div>
-      ${before ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${after ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
-    </div>
+      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 
