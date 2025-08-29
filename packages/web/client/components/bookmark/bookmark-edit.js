@@ -42,10 +42,11 @@ export const BookmarkEdit = ({
 }) => {
   const window = useWindow()
   const state = useLSP()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
+
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
   const [archiveURLs, setArchiveURLs] = useState(/** @type {(string | undefined)[]} */(b?.archive_urls?.length ? [...b.archive_urls] : [undefined]))
   const [createEpisodeChecked, setCreateEpisodeChecked] = useState(false)
   const [customEpisodeURLChecked, setCustomEpisodeURLChecked] = useState(false)
@@ -61,7 +62,7 @@ export const BookmarkEdit = ({
     if (b?.archive_urls?.length) {
       setArchiveURLs([...b.archive_urls])
     }
-  }, [b?.archive_urls])
+  }, [...(b?.archive_urls ?? [])])
 
   useEffect(() => {
     /** @param {KeyboardEvent} ev */
@@ -266,17 +267,16 @@ export const BookmarkEdit = ({
     }
   }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked])
 
-  const handleAddArchiveURL = useCallback(async (/** @type {Event} */ev) => {
+  const handleAddArchiveURL = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
-    archiveURLs.push(undefined)
-    setArchiveURLs(archiveURLs)
-  }, [archiveURLs])
+    setArchiveURLs([...archiveURLs, undefined])
+  }, [archiveURLs, setArchiveURLs])
 
-  const handleUndoAddArchiveURL = useCallback(async (/** @type {Event} */ev) => {
+  const handleUndoAddArchiveURL = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
     archiveURLs.pop()
-    setArchiveURLs(archiveURLs)
-  }, [archiveURLs])
+    setArchiveURLs([...archiveURLs])
+  }, [archiveURLs, setArchiveURLs])
 
   const handleNewWindowLink = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     if (window?.toolbar.visible) {
@@ -288,9 +288,11 @@ export const BookmarkEdit = ({
   // Parent can delay passing a bookmark to disable the form.
   const initializing = b == null
 
+  console.log('Render!')
+
   return html`
     <div class='bc-bookmark-edit'>
-      <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onSubmit=${handleSave}>
       <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
 
@@ -298,7 +300,7 @@ export const BookmarkEdit = ({
         <div>
           <label class='block'>
             url:
-            <input class='block bc-bookmark-url-edit' type="url" name="url" value="${b?.url}" oninput="${handleBookmarkURLInput}" />
+            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" onInput="${handleBookmarkURLInput}" />
           </label>
         </div>
 
@@ -306,7 +308,7 @@ export const BookmarkEdit = ({
         <div>
           <label class="block">
             title:
-            <input class="block" type="text" name="title" value="${b?.title}" />
+            <input class="block" type="text" name="title" defaultValue="${b?.title}" />
           </label>
         </div>
 
@@ -326,9 +328,9 @@ export const BookmarkEdit = ({
               class="block"
               type="text"
               name="tags"
-              autocapitalize="off"
-              autocorrect="off"
-              value="${b?.tags?.join(' ')}"
+              autoCapitalize="off"
+              autoCorrect="off"
+              defaultValue="${b?.tags?.join(' ')}"
             />
           </label>
         </div>
@@ -336,15 +338,15 @@ export const BookmarkEdit = ({
         <!-- Bookmark Options -->
         <div>
           <label>
-            <input type="checkbox" name="toread" checked="${b?.toread}" />
+            <input type="checkbox" name="toread" defaultChecked=${b?.toread} />
             to read
           </label>
           <label>
-            <input type="checkbox" name="starred" checked="${b?.starred}" />
+            <input type="checkbox" name="starred" defaultChecked=${b?.starred} />
             starred
           </label>
           <label>
-            <input type="checkbox" name="sensitive" checked="${b?.sensitive}" />
+            <input type="checkbox" name="sensitive" defaultChecked=${b?.sensitive} />
             sensitive
           </label>
         </div>
@@ -362,7 +364,7 @@ export const BookmarkEdit = ({
         </details>
 
          <!-- Bookmark Archive URLs -->
-        <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
+        <details class="bc-bookmark-archive-url-edit-details" open=${archiveURLs[0] !== undefined} >
             <summary>
               <label>archive URLs</label>
               <span class="bc-help-text">
@@ -380,7 +382,7 @@ export const BookmarkEdit = ({
 
             ${archiveURLs.length > 0
               ? html`${archiveURLs.map(
-                  (url, i) => html`<input class='bc-bookmark-archive-url-edit' placeholder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" value="${url}" />`
+                  (url, i) => html`<input key=${i} class='bc-bookmark-archive-url-edit' placeHolder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" defaultValue="${url}" />`
                 )
             }`
               : null
@@ -432,7 +434,7 @@ export const BookmarkEdit = ({
         <!-- Bookmark Create Episode -->
         <div>
           <label>
-            <input type="checkbox" onChange="${handleCreateEpisodeCheckbox}" name="createEpisode" />
+            <input type="checkbox" onChange=${handleCreateEpisodeCheckbox} name="createEpisode" />
             create new episode
           </label>
           <span class="bc-help-text">
@@ -450,7 +452,7 @@ export const BookmarkEdit = ({
                 type="radio"
                 name="episodeMedium"
                 value="video"
-                checked="${true}"
+                defaultChecked
                 onChange="${handleEpisodeMediumSelect}"
               />
               <span>video</span>
@@ -475,7 +477,7 @@ export const BookmarkEdit = ({
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
             'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked,
-          })}" type="url" name="createEpisodeURL" value="${b?.url}" />
+          })}" type="url" name="createEpisodeURL" defaultValue="${b?.url}" />
 
           ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}
           ${episodePreview

@@ -55,13 +55,13 @@ export const EmailEdit = ({ user, onSave, onCancelEdit }) => {
 
   return html`
     <div class='bc-account-email-edit'>
-      <form ref="${formRef}" class="bc-account-email-edit-form" id="bc-account-email-edit-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="bc-account-email-edit-form" id="bc-account-email-edit-form" onsubmit=${handleSave}>
       <fieldset disabled=${disabled}>
         <legend class="bc-account-email-edit-legend">Edit email</legend>
         <div>
           <label class='block'>
             email:
-            <input class='block' minLength="1" maxLength="200" type="email" name="email" value="${user?.email}"/>
+            <input class='block' minLength="1" maxLength="200" type="email" name="email" defaultValue="${user?.email}"/>
           </label>
         </div>
         <div class="bc-account-email-edit-submit-line">

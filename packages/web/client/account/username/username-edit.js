@@ -49,13 +49,13 @@ export const UsernameEdit = ({ user, onSave, onCancelEdit }) => {
 
   return html`
     <div class='bc-account-username-edit'>
-      <form ref="${formRef}" class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
       <fieldset disabled=${disabled}>
         <legend class="bc-account-username-edit-legend">Edit username</legend>
       <div>
           <label class='block'>
             username:
-            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minLength="1" maxLength="50" type="text" name="username" value="${user?.username}" autoCorrect="off" autoCapitalize="off" spellCheck="false"/>
+            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minLength="1" maxLength="50" type="text" name="username" defaultValue="${user?.username}" autoCorrect="off" autoCapitalize="off" spellCheck="false"/>
           </label>
         </div>
         <div class="bc-account-username-edit-submit-line">

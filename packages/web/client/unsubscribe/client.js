@@ -80,7 +80,7 @@ export const Page = () => {
                 </div>
                 <label class="block">
                   Email:
-                  <input class="block" type="email" name="email" value=${query?.get('email') || ''} />
+                  <input class="block" type="email" name="email" defaultValue=${query?.get('email') || ''} />
                 </label>
               </div>
               <div class="button-cluster">

@@ -80,7 +80,7 @@ export const FeedDisplay = ({
             type="text"
             readonly
             onClick=${handleSelect}
-            value="${f.feed_url}"
+            defaultValue="${f.feed_url}"
           />
           <button ref=${copyButtonRef} onClick=${handleCopy}>Copy</button>
         </div>

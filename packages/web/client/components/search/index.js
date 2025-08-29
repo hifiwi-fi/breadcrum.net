@@ -36,7 +36,7 @@ export const Search = ({
       <search role="search">
         <form onsubmit="${handleSearch}" class="search-form">
           <input
-            value="${value}"
+            defaultValue="${value}"
             class="search-bar"
             placeholder="${placeholder}"
             type="search"

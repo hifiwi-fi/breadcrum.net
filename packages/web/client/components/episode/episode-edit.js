@@ -89,19 +89,19 @@ export const EpisodeEdit = ({
 
   return html`
     <div class='bc-episode-edit'>
-      <form ref="${formRef}" class="add-episode-form" id="add-episode-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="add-episode-form" id="add-episode-form" onsubmit=${handleSave}>
         <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-episode-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>
               url:
-              <input disabled class='block bc-episode-url-edit' type="url" name="url" value="${e?.url}"/>
+              <input disabled class='block bc-episode-url-edit' type="url" name="url" defaultValue="${e?.url}"/>
             </label>
           </div>
           <div>
             <label class="block">
               title:
-              <input class="block" type="text" name="title" value="${e?.title}" />
+              <input class="block" type="text" name="title" defaultValue="${e?.title}" />
             </label>
           </div>
           <div>

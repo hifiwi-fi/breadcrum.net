@@ -88,7 +88,7 @@ export const AuthTokenEdit = ({
 
   return html`
     <div class='bc-auth-token-edit'>
-      <form ref="${formRef}" class="edit-auth-token-form" id="edit-auth-token-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="edit-auth-token-form" id="edit-auth-token-form" onsubmit=${handleSave}>
         <fieldset disabled=${disabled}>
           ${legend
 ? html`<legend class="bc-auth-token-legend">${
@@ -100,7 +100,7 @@ export const AuthTokenEdit = ({
           <div>
             <label class='block'>
               note:
-              <input class='block bc-auth-token-note-edit' type="text" name="note" value="${t?.note}"/>
+              <input class='block bc-auth-token-note-edit' type="text" name="note" defaultValue="${t?.note}"/>
             </label>
             <span class="bc-help-text">
               Auth token notes let you add a human readable label to remember where they are used.

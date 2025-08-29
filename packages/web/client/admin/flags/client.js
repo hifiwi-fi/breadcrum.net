@@ -182,7 +182,7 @@ const TypeMap = ({ type, disabled, flag, serverValue, defaultValue }) => {
       return html`<input disabled=${disabled} type='checkbox' name=${flag} checked=${serverValue ?? defaultValue} />`
     }
     default: {
-      return html`<input disabled=${disabled} name=${flag} value=${serverValue ?? defaultValue} />`
+      return html`<input disabled=${disabled} name=${flag} defaultValue=${serverValue ?? defaultValue} />`
     }
   }
 }

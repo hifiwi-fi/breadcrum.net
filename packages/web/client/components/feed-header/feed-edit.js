@@ -92,7 +92,7 @@ export const FeedEdit = ({
 
   return html`
     <div class='bc-feed-edit'>
-      <form ref="${formRef}" class="add-feed-form" id="add-feed-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="add-feed-form" id="add-feed-form" onsubmit=${handleSave}>
         <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-feed-legend">${legend}</legend>` : null}
 
@@ -105,7 +105,7 @@ export const FeedEdit = ({
                 name="title"
                 maxlength="255"
                 minlength="1"
-                value="${f?.title}"
+                defaultValue="${f?.title}"
               />
             </label>
           </div>

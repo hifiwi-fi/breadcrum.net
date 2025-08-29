@@ -56,7 +56,7 @@ export const PasswordEdit = ({ onSave, onCancelEdit }) => {
 
   return html`
     <div class='bc-account-password-edit'>
-      <form ref="${formRef}" class="bc-account-password-edit-form" id="bc-account-password-edit-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="bc-account-password-edit-form" id="bc-account-password-edit-form" onsubmit=${handleSave}>
       <fieldset disabled=${disabled}>
         <legend class="bc-account-password-edit-legend">Edit password</legend>
         <div>

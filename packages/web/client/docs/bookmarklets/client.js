@@ -42,7 +42,7 @@ const BookmarkletCopyLine = () => {
           type="text"
           readonly
           onClick=${handleSelect}
-          value="${bookmarklet}"
+          defaultValue="${bookmarklet}"
         />
         <button ref=${copyButton} onClick=${handleCopy}>Copy</button>
       </div>

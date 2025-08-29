@@ -83,19 +83,19 @@ export const ArchiveEdit = ({
 
   return html`
     <div class='bc-archive-edit'>
-      <form ref="${formRef}" class="add-archive-form" id="add-archive-form" onsubmit=${handleSave}>
+      <form ref=${formRef} class="add-archive-form" id="add-archive-form" onsubmit=${handleSave}>
         <fieldset disabled=${disabled || initializing}>
           ${legend ? html`<legend class="bc-archive-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>
               url:
-              <input disabled class='block bc-archive-url-edit' type="url" name="url" value="${ar?.url}"/>
+              <input disabled class='block bc-archive-url-edit' type="url" name="url" defaultValue="${ar?.url}"/>
             </label>
           </div>
           <div>
             <label class="block">
               title:
-              <input class="block" type="text" name="title" value="${ar?.title}" />
+              <input class="block" type="text" name="title" defaultValue="${ar?.title}" />
             </label>
           </div>
 

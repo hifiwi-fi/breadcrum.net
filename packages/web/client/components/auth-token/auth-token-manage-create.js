@@ -81,7 +81,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => 
             type="text"
             readonly
             onClick=${handleNewTokenSelect}
-            value="${newToken.token}"
+            defaultValue="${newToken.token}"
           />
           <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
           <button type="button" onClick="${handleHideNewToken}">Hide</button>

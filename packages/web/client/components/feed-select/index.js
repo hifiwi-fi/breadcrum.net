@@ -32,9 +32,9 @@ export const FeedSelect = ({
   return html`
     <form class="bc-feed-select-form">
       <label for="feed-select">Select Feed:</label>
-      <select id="feed-select" value="${selectedFeedId}" onChange="${handleChange}">
+      <select id="feed-select" defaultValue="${selectedFeedId}" onChange="${handleChange}">
         ${feeds.map(f => html`
-          <option key="${f.id}" value="${f.id}">${f.title}</option>
+          <option key="${f.id}" defaultValue="${f.id}">${f.title}</option>
         `)}
       </select>
     </form>

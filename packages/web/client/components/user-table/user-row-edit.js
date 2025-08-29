@@ -110,16 +110,16 @@ export const UserRowEdit = ({
         </td>
         <td>${u.id}</td>
         <td>
-          <input disabled="${disabled}" type="text" name="username" value="${u.username}" />
+          <input disabled="${disabled}" type="text" name="username" defaultValue="${u.username}" />
         </td>
         <td>
-          <input disabled="${disabled}" type="email" name="email" value="${u.email}" />
+          <input disabled="${disabled}" type="email" name="email" defaultValue="${u.email}" />
         </td>
         <td>
           <input disabled="${disabled}" type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
         </td>
         <td>
-          <input disabled="${disabled}" type="email" name="pending_email_update" value="${u.pending_email_update}" />
+          <input disabled="${disabled}" type="email" name="pending_email_update" defaultValue="${u.pending_email_update}" />
         </td>
         <td>
           <input disabled="${disabled}" type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
