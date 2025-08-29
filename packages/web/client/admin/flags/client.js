@@ -10,6 +10,7 @@ import { defaultFrontendFlags } from '../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../plugins/flags/backend-flags.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useReload } from '../../hooks/useReload.js'
 
 const defaultFlags = { ...defaultFrontendFlags, ...defaultBackendFlags }
 
@@ -17,6 +18,7 @@ const defaultFlags = { ...defaultFrontendFlags, ...defaultBackendFlags }
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
+  const { reload: reloadFlags, signal: flagsSignal } = useReload()
 
   const [serverFlags, setServerFlags] = useState()
   const [serverFlagsLoading, setServerFlagsLoading] = useState(false)
@@ -53,7 +55,7 @@ export const Page = () => {
         .catch(err => { console.error(err); setServerFlagsError(err) })
         .finally(() => { setServerFlagsLoading(false) })
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, flagsSignal])
 
   async function handleFlagSave (/** @type {Event} */ev) {
     ev.preventDefault()
@@ -101,6 +103,7 @@ export const Page = () => {
       setServerFlagsError(/** @type {Error} */(err))
     } finally {
       setServerFlagsLoading(false)
+      reloadFlags()
     }
   }
 
