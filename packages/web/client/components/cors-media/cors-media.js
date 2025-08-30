@@ -66,7 +66,7 @@ export const CorsMedia = ({
   <div>
     ${previewActive && ['video', 'audio'].includes(type)
       ? type === 'video'
-        ? html`<video onKeyDown="${handlePlayKeys}" ref="${ref}" class="bc-cors-video" onError="${onerror}" control src="${src}" preload="none" poster="${thumbnail}">
+        ? html`<video onKeyDown="${handlePlayKeys}" ref="${ref}" class="bc-cors-video" onError="${onerror}" controls src="${src}" preload="none" poster="${thumbnail}">
                   <a href="${src}">View video</a>
               </video>`
         : html`

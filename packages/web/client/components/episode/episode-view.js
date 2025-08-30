@@ -55,8 +55,11 @@ export const EpisodeView = ({
           <div class="bc-episode-details-display">
             <div>
               ${e.src_type === 'video' ? ' 📼' : e.src_type === 'audio' ? ' 💿' : null}
+              ${'\n'}
               ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
+              ${'\n'}
               ${e.duration_in_seconds ? ` (${format(e.duration_in_seconds * 1000)}) ` : null}
+              ${'\n'}
               <a href="${mediaLink}">${e.filename ? e.filename : null}</a>
             </div>
           </div>

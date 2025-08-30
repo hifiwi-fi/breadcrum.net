@@ -14,6 +14,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
 import { Search } from '../../components/search/index.js'
+import { useReload } from '../../hooks/useReload.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -24,13 +25,7 @@ export const Page = () => {
   const [episode, setEpisode] = useState(/** @type {TypeEpisodeReadClient | undefined} */(undefined))
   const [episodeLoading, setEpisodeLoading] = useState(false)
   const [episodeError, setEpisodeError] = useState(/** @type {Error | null} */(null))
-
-  const [episodeReload, setEpisodeReload] = useState(0)
-
-  const reloadEpisode = useCallback(() => {
-    console.log(episodeReload)
-    setEpisodeReload(episodeReload + 1)
-  }, [episodeReload, setEpisodeReload])
+  const { reload: reloadEpisode, signal: episodeLoadSignal } = useReload()
 
   const handleDelete = useCallback(() => {
     if (episode?.bookmark?.id && window) {
@@ -87,7 +82,7 @@ export const Page = () => {
         })
         .finally(() => { setEpisodeLoading(false) })
     }
-  }, [episodeReload, state.apiUrl, state.sensitive])
+  }, [episodeLoadSignal, state.apiUrl, state.sensitive])
 
   const title = episode?.display_title ? ['📼', episode?.display_title] : []
   useTitle(...title)
@@ -104,8 +99,6 @@ export const Page = () => {
         placeholder="Search Episodes..."
         onSearch=${handleSearch}
       />
-      ${episodeLoading ? html`<div>...</div>` : null}
-      ${episodeError ? html`<div>${episodeError.message}</div>` : null}
       ${episode
         ? tc(EpisodeList, {
             episode,
@@ -114,6 +107,8 @@ export const Page = () => {
             clickForPreview: false
           })
         : null}
+      ${episodeLoading ? html`<div>...</div>` : null}
+      ${episodeError ? html`<div>${episodeError.message}</div>` : null}
     </div>
   `
 }
