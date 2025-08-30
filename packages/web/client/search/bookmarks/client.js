@@ -149,10 +149,15 @@ export const Page = () => {
 
     <div>
       ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+      ${'\n'}
       ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      ${'\n'}
       🔎
+      ${'\n'}
       🔖 <a href="${`../bookmarks?query=${pageParams.get('query') || ''}`}">bookmarks</a>
+      ${'\n'}
       🗄️ <a href="${`../archives?query=${pageParams.get('query') || ''}`}">archives</a>
+      ${'\n'}
       📼 <a href="${`../episodes?query=${pageParams.get('query') || ''}`}">episodes</a>
     </div>
 
