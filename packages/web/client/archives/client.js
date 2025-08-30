@@ -14,6 +14,7 @@ import { useLSP } from '../hooks/useLSP.js'
 import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
+import { useReload } from '../hooks/useReload.js'
 
 /**
  * @typedef {Object} ArchivesResponse
@@ -39,11 +40,8 @@ export const Page = () => {
   const [before, setBefore] = useState(/** @type {Date | null} */(null))
   const [after, setAfter] = useState(/** @type {Date | null} */(null))
 
-  // Need a better way to trigger reloads
-  const [archiveReload, setArchiveReload] = useState(0)
-  const reloadArchives = useCallback(() => {
-    setArchiveReload(archiveReload + 1)
-  }, [archiveReload, setArchiveReload])
+  const { reload: reloadArchives, signal: archivesReloadSignal } = useReload()
+
   // Load archives
   useEffect(() => {
     async function getArchives () {
@@ -111,7 +109,7 @@ export const Page = () => {
         })
         .finally(() => { setArchivesLoading(false) })
     }
-  }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archiveReload, user, window])
+  }, [query, state.apiUrl, state.sensitive, state.toread, state.starred, archivesReloadSignal, user?.id, window])
 
   const onPageNav = useCallback((/** @type {Event} */ ev) => {
     ev.preventDefault()

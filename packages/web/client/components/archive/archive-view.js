@@ -31,6 +31,7 @@ export const ArchiveView = ({
 
       <div class="bc-archive-bookmark-title">
         🔖
+        ${'\n'}
         <a class="bc-archive-bookmark-title-text" href="${`/bookmarks/view/?id=${ar.bookmark.id}`}">
           ${ar.bookmark.title}
         </a>

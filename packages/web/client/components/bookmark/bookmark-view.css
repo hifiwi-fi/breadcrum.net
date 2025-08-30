@@ -46,12 +46,14 @@
   text-overflow: ellipsis;
   display: -webkit-box;
   line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
 /* Don't need 2nd lines for archive links */
 .bc-bookmark-archive-url-display {
   line-clamp: 1;
+  -webkit-line-clamp: 1;
 }
 
 .bc-tags-display,
