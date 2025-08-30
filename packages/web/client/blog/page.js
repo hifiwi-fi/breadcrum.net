@@ -52,7 +52,7 @@ export default function blogIndex2023 ({
             <a href="/${p.pageInfo.path}/">${basename(p.pageInfo.path)}</a>
           </li>`
         })}
-      <ul>
+      </ul>
     </footer>
     `
 }
