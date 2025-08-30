@@ -1,26 +1,28 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect, useState, useRef } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect, useState, useRef } from 'preact/hooks'
 import { defaultFrontendFlags } from '../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../plugins/flags/backend-flags.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useReload } from '../../hooks/useReload.js'
 
 const defaultFlags = { ...defaultFrontendFlags, ...defaultBackendFlags }
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
-  const { user, loading } = useUser()
-
-  useEffect(() => {
-    if (!user && !loading) {
-      const redirectTarget = `${window.location.pathname}${window.location.search}`
-      window.location.replace(`/login?redirect=${encodeURIComponent(redirectTarget)}`)
-    }
-  }, [user])
+  const { user } = useUser()
+  const { reload: reloadFlags, signal: flagsSignal } = useReload()
 
   const [serverFlags, setServerFlags] = useState()
   const [serverFlagsLoading, setServerFlagsLoading] = useState(false)
-  const [serverFlagsError, setServerFlagsError] = useState(false)
+  const [serverFlagsError, setServerFlagsError] = useState(/** @type {Error | null} */(null))
 
   const formRef = useRef()
 
@@ -53,24 +55,30 @@ export const page = Component(() => {
         .catch(err => { console.error(err); setServerFlagsError(err) })
         .finally(() => { setServerFlagsLoading(false) })
     }
-  }, [state.apiUrl])
+  }, [state.apiUrl, flagsSignal])
 
-  async function handleFlagSave (ev) {
+  async function handleFlagSave (/** @type {Event} */ev) {
     ev.preventDefault()
     setServerFlagsLoading(true)
     setServerFlagsError(null)
 
     try {
-      const form = formRef.current
+      const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+      if (!form) return
+
+      /** @type {Record<string, any>} */
       const payload = {}
       for (const [flag, flagMeta] of Object.entries(defaultFlags)) {
+        const formElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem(flag))
+        if (!formElement) continue
+
         if (flagMeta.type === 'boolean') {
-          if (form[flag].checked !== defaultFlags[flag].default) {
-            payload[flag] = form[flag].checked
+          if (formElement.checked !== flagMeta.default) {
+            payload[flag] = formElement.checked
           }
         } else {
-          if (form[flag].value !== defaultFlags[flag].default) {
-            payload[flag] = form[flag].value
+          if (formElement.value !== flagMeta.default) {
+            payload[flag] = formElement.value
           }
         }
       }
@@ -92,65 +100,96 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.error(err)
-      setServerFlagsError(err)
+      setServerFlagsError(/** @type {Error} */(err))
     } finally {
       setServerFlagsLoading(false)
+      reloadFlags()
     }
   }
 
   return html`
     <div class="bc-admin-flags">
       ${serverFlagsLoading ? html`<p>loading...</p>` : null}
-      <form ref='${formRef}' ?disabled='${serverFlagsLoading}' onsubmit=${handleFlagSave}>
-        <fieldset ?disabled=${serverFlagsLoading}>
+      <form ref=${formRef} disabled=${serverFlagsLoading} onsubmit=${handleFlagSave}>
+        <fieldset disabled=${serverFlagsLoading}>
           <legend class="bc-admin-flags-legend">Admin flags</legend>
           ${Object.entries(defaultFlags).map(([flag, flagMeta]) => {
-              return html.for(flagMeta, flag)`${flagEntry({
-                flag,
-                flagMeta,
-                serverValue: serverFlags?.[flag],
-                disabled: serverFlagsLoading,
-              })}`
+              return html`<${FlagEntry}
+                key=${flag}
+                flag=${flag}
+                flagMeta=${flagMeta}
+                serverValue=${serverFlags?.[flag]}
+                disabled=${serverFlagsLoading}
+              />`
             })
           }
         <div class="button-cluster">
-            ${handleFlagSave ? html`<input name="submit-button" type="submit">` : null}
+            <input name="submit-button" type="submit" />
         </div>
-        ${serverFlagsError ? html`<p>${serverFlagsError.message}</p>` : null}
+        ${serverFlagsError ? html`<p>${/** @type {Error} */(serverFlagsError).message}</p>` : null}
       </fieldset>
     </form>
-  </div>
-`
-})
-
-if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
-}
-
-function flagEntry ({
-  flag,
-  flagMeta,
-  serverValue,
-  disabled,
-}) {
-  return html`
-  <div>
-    <label class='block'>
-      ${flag}
-      ${typeMap({ type: flagMeta.type, disabled, serverValue, defaultValue: flagMeta.default, flag })}
-    </label>
-    <p>${flagMeta.description}</p>
-  </div>
+    </div>
   `
 }
 
-function typeMap ({ type, disabled, flag, serverValue, defaultValue }) {
+/**
+ * @typedef {{
+ *   flag: string,
+ *   flagMeta: { type: string, description: string, default: any },
+ *   serverValue?: any,
+ *   disabled: boolean
+ * }} FlagEntryProps
+ */
+
+/**
+ * @type {FunctionComponent<FlagEntryProps>}
+ */
+const FlagEntry = ({ flag, flagMeta, serverValue, disabled }) => {
+  return html`
+    <div>
+      <label class='block'>
+        ${flag}
+        <${TypeMap}
+          type=${flagMeta.type}
+          disabled=${disabled}
+          serverValue=${serverValue}
+          defaultValue=${flagMeta.default}
+          flag=${flag}
+        />
+      </label>
+      <p>${flagMeta.description}</p>
+    </div>
+  `
+}
+
+/**
+ * @typedef {{
+ *   type: string,
+ *   disabled: boolean,
+ *   flag: string,
+ *   serverValue?: any,
+ *   defaultValue: any
+ * }} TypeMapProps
+ */
+
+/**
+ * @type {FunctionComponent<TypeMapProps>}
+ */
+const TypeMap = ({ type, disabled, flag, serverValue, defaultValue }) => {
   switch (type) {
     case 'boolean': {
-      return html`<input ?disabled='${disabled}' type='checkbox' name='${flag}' ?checked=${serverValue ?? defaultValue}></input>`
+      return html`<input disabled=${disabled} type='checkbox' name=${flag} checked=${serverValue ?? defaultValue} />`
     }
     default: {
-      return html`<input ?disabled='${disabled}' name=${flag} value=${serverValue ?? defaultValue}></input>`
+      return html`<input disabled=${disabled} name=${flag} defaultValue=${serverValue ?? defaultValue} />`
     }
+  }
+}
+
+if (typeof window !== 'undefined') {
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
   }
 }

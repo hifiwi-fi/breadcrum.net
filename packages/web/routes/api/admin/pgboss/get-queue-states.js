@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaQueueStatesRead } from './schemas/schema-queue-states-read.js'
 
 /**
  * @typedef {Object} StateCountRow
@@ -27,7 +29,11 @@ import SQL from '@nearform/sql'
  */
 
 /**
- * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
+ *   }
+ * }>}
  */
 export async function getQueueStates (fastify, _opts) {
   fastify.get(
@@ -43,38 +49,12 @@ export async function getQueueStates (fastify, _opts) {
         hide: true,
         description: 'Get current queue states and job counts',
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              created: { type: 'number', description: 'Jobs waiting to be processed' },
-              retry: { type: 'number', description: 'Jobs scheduled for retry' },
-              active: { type: 'number', description: 'Jobs currently being processed' },
-              completed: { type: 'number', description: 'Jobs successfully completed' },
-              cancelled: { type: 'number', description: 'Jobs that were cancelled' },
-              failed: { type: 'number', description: 'Jobs that failed processing' },
-              all: { type: 'number', description: 'Total number of jobs' },
-              queues: {
-                type: 'object',
-                description: 'Per-queue state breakdowns',
-                additionalProperties: {
-                  type: 'object',
-                  properties: {
-                    created: { type: 'number' },
-                    retry: { type: 'number' },
-                    active: { type: 'number' },
-                    completed: { type: 'number' },
-                    cancelled: { type: 'number' },
-                    failed: { type: 'number' },
-                    all: { type: 'number' },
-                  }
-                }
-              }
-            }
-          }
+          200: schemaQueueStatesRead
         }
       },
     },
-    async function getQueueStatesHandler (_request, _reply) {
+    async function getQueueStatesHandler (_request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Query to get job counts by state
         const stateCountsQuery = SQL`
@@ -179,7 +159,10 @@ export async function getQueueStates (fastify, _opts) {
           return ['created', 'retry', 'active', 'completed', 'cancelled', 'failed'].includes(state)
         }
 
-        return states
+        /** @type {ReturnBody} */
+        const returnBody = states
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get queue states')
         throw error

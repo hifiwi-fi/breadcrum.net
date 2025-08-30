@@ -1,9 +1,16 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
-// @ts-expect-error
-import { useRef, useReducer, useCallback, useEffect } from 'uland-isomorphic'
+/** @import { Ref } from 'preact' */
+import { useRef, useReducer, useCallback, useEffect } from 'preact/hooks'
 
+/**
+ * @param {string} url
+ * @param {RequestInit} [options]
+ * @returns {{ error: Error | undefined, data: any | undefined }}
+ */
 export function useFetch (url, options) {
+  /** @type {Ref<Record<string, any>>} */
   const cacheRef = useRef({})
   const ignoreRef = useRef(false)
 
@@ -12,6 +19,10 @@ export function useFetch (url, options) {
     data: undefined,
   }
 
+  /**
+   * @param {{ error: Error | undefined, data: any | undefined }} state
+   * @param {{ type: string, payload?: any }} action
+   */
   const reducer = (state, action) => {
     switch (action.type) {
       case 'loading':
@@ -36,7 +47,7 @@ export function useFetch (url, options) {
 
     const fetchData = async () => {
       dispatch({ type: 'loading' })
-      const cachedResponse = cacheRef.current[url]
+      const cachedResponse = cacheRef.current?.[url]
 
       if (cachedResponse) {
         dispatch({ type: 'fetched', payload: cachedResponse })
@@ -51,7 +62,9 @@ export function useFetch (url, options) {
         }
 
         const json = await res.json()
-        cacheRef.current[url] = json
+        if (cacheRef.current) {
+          cacheRef.current[url] = json
+        }
 
         if (ignoreRef.current === false) {
           dispatch({ type: 'fetched', payload: json })

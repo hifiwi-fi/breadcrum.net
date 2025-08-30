@@ -2,12 +2,16 @@ import builder from 'xmlbuilder'
 
 /**
  * @import { TemplateFunction } from '@domstack/static'
+ * @import { GlobalVars } from './globals/global.vars.js'
  */
 
-/** @type {TemplateFunction<{
- *  baseUrl: string,
- *  noindex?: boolean
- * }>} */
+/**
+ * @typedef {GlobalVars & {
+ *   noindex?: boolean
+ * }} SitemapTemplateVars
+ */
+
+/** @type {TemplateFunction<SitemapTemplateVars>} */
 export default async ({
   vars: {
     baseUrl,

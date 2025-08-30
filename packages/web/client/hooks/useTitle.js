@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
-// @ts-expect-error
-import { useEffect } from 'uland-isomorphic'
+import { useEffect } from 'preact/hooks'
 import { useWindow } from './useWindow.js'
 
 const sep = ' | '
@@ -14,7 +14,7 @@ export function useTitle (...parts) {
   const window = useWindow()
 
   useEffect(() => {
-    if (parts.length > 0) {
+    if (parts.length > 0 && window) {
       window.document.title = [parts.join(' '), window.document.title.split(sep)[1]].join(sep)
     }
   }, [...parts])

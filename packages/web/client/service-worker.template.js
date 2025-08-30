@@ -1,13 +1,11 @@
 /**
  * @import {TemplateAsyncIterator} from '@domstack/static'
+ * @import { GlobalVars } from './globals/global.vars.js'
  */
 
 import { stripIndent as js } from 'common-tags'
 
-/** @type {TemplateAsyncIterator<{
- * siteName: string
- * siteDescription: string
- * }>} */
+/** @type {TemplateAsyncIterator<GlobalVars>} */
 export default async function * serviceWorkerTemplate ({
   vars: {
     siteName,

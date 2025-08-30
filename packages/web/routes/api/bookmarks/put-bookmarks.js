@@ -143,7 +143,7 @@ export async function putBookmarks (fastify, _opts) {
         }
 
         // Title will fallback to just being the URL on create
-        const workingTitle = submittedTitle ?? workingUrl.toString()
+        const workingTitle = submittedTitle || workingUrl.toString()
 
         const bookmark = await createBookmark({
           fastify,

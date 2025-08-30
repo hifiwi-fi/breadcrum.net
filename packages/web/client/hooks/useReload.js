@@ -1,8 +1,7 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { useState, useCallback } from 'uland-isomorphic'
+import { useState, useCallback } from 'preact/hooks'
 
 /**
  * @typedef {object} UseReloadReturn
@@ -15,7 +14,6 @@ import { useState, useCallback } from 'uland-isomorphic'
  * @returns {UseReloadReturn}
  */
 export function useReload () {
-  /** @type {[number, (value: number | ((prevState: number) => number)) => void]} */
   const [signal, setSignal] = useState(0)
 
   /** @type {() => void} */

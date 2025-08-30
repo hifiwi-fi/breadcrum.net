@@ -1,31 +1,27 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
 
 /**
- * @typedef {({
- *  user,
- *  onEdit,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
- * }) => any} UsernameView
+ * }} UsernameViewProps
  */
 
 /**
- * @type {UsernameView}
+ * @type {FunctionComponent<UsernameViewProps>}
  */
-export const usernameView = Component(/** @type{UsernameView} */({ user, onEdit }) => {
+export const UsernameView = ({ user, onEdit }) => {
   return html`
     <dt>username</dt>
-    <dd>
-      ${user?.username}
-      <button onClick=${onEdit}>Edit</button>
+    <dd class="username-view">
+      <span>${user?.username}</span>
+      <span><button onClick=${onEdit}>Edit</button></span>
     </dd>
   `
-})
+}

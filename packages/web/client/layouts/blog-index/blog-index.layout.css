@@ -8,7 +8,7 @@
     display: inline-flex;
     justify-content: space-between;
   }
-  & .blog-entry-link {}
+  /* & .blog-entry-link {} */
   & .blog-entry-date {
     color: var(--accent-foreground);
     font-family: var(--font-code);

@@ -4,14 +4,55 @@ This is a TypeScript-in-JavaScript type checked codebase. All code uses JSDoc co
 
 ## JSDoc Typing Patterns
 
-### Use newer @import syntax in jsdoc/ts-in-js
+### Avoid any types
 
-Avoid inline imports as much as possible and prefer the newer @import syntax placed near the top level imports.
+Never use `any` types - always use specific types that describe the actual data structure. Instead of:
+
+```javascript
+// ❌ Avoid
+const data: any = {...}
+
+// ❌ Avoid
+function process(item: any) {...}
+```
+
+Use specific types:
+
+```javascript
+// ✅ Good
+const data: { id: number, name: string } = {...}
+
+// ✅ Good
+function process(item: { id: number, name: string }) {...}
+```
+
+### Use @ts-expect-error over @ts-ignore
+
+Always use `@ts-expect-error` instead of `@ts-ignore` for TypeScript error suppression:
+
+```javascript
+// ✅ Good - will fail if error is fixed, alerting us to remove the comment
+// @ts-expect-error - No type definitions available for @breadcrum/bookmarklet
+import getBookmarklet from '@breadcrum/bookmarklet'
+
+// ❌ Avoid - continues to suppress even when unnecessary
+// @ts-ignore - No type definitions available for @breadcrum/bookmarklet
+import getBookmarklet from '@breadcrum/bookmarklet'
+```
+
+This ensures error suppressions are removed when they become obsolete.
+
+### Use newer @import syntax in jsdoc/ts-in-js for types only
+
+The @import syntax is for TYPE IMPORTS ONLY. Regular imports (functions, classes, values) still use standard ES module import syntax.
+
+Avoid inline type imports and prefer the newer @import syntax placed near the top level imports.
 
 Instead of this:
 
 ```javascript
-/** @type {import('pg').QueryResult<TypeUserRead>} */
+/** @import {QueryResult} from 'pg' */
+/** @type {QueryResult<TypeUserRead>} */
 const results = await client.query(query)
 ```
 
@@ -24,6 +65,115 @@ Do this
 
 /** @type {QueryResult<TypeUserRead>} */
 const results = await client.query(query)
+```
+
+Note: Only use @import for types. Regular imports use standard syntax:
+
+```javascript
+/** @import {QueryResult} from 'pg' */  // Type import
+import { Pool } from 'pg'  // Regular import for the actual Pool class
+```
+
+### Import Consolidation
+
+**Consolidate type imports from the same module** - combine multiple type imports from the same module into a single @import statement:
+
+```javascript
+// ❌ Avoid separate type imports from same module
+/** @import { FunctionComponent } from 'preact' */
+/** @import { ComponentChild } from 'preact' */
+/** @import { QueryResult } from 'pg' */
+/** @import { Pool } from 'pg' */
+
+// ✅ Consolidate type imports from same module
+/** @import { FunctionComponent, ComponentChild } from 'preact' */
+/** @import { QueryResult, Pool } from 'pg' */
+```
+
+Remember: @import is for types only. Regular imports still use standard ES module syntax and should be consolidated using standard import syntax:
+
+```javascript
+// ✅ Regular imports consolidated normally
+import { render, hydrate } from 'preact'
+import { Pool, Client } from 'pg'
+```
+
+### Preact Component Type Import Syntax
+
+For preact component types, always use the @import syntax at the top of the file:
+
+```javascript
+/**
+ * @import { FunctionComponent, ComponentChild, JSX } from 'preact'
+ */
+```
+
+Never use inline import syntax like `import('preact').ComponentChild` - always use the @import syntax for types:
+
+```javascript
+// ❌ Avoid inline type imports
+legend?: string | import('preact').ComponentChild
+
+// ✅ Use @import syntax for types
+/** @import { ComponentChild } from 'preact' */
+legend?: string | ComponentChild
+```
+
+For actual preact functions/components, use regular imports:
+
+```javascript
+/** @import { FunctionComponent } from 'preact' */  // Type import
+import { render } from 'preact'  // Regular import
+import { html } from 'htm/preact'  // Regular import
+```
+
+### Prefer Schema-Based Types
+
+Always import types from schema files instead of redefining them manually:
+
+```javascript
+// ✅ Good - import from schema
+/** @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js' */
+
+archive: TypeArchiveReadClient
+
+// ❌ Avoid - manual type definition
+archive: {
+  id: string,
+  title: string,
+  url: string,
+  // ... many more fields
+}
+```
+
+This ensures:
+- Single source of truth for types
+- Automatic updates when schemas change
+- Consistency across components
+
+### Form Element Access Pattern
+
+When accessing form elements through refs, use proper type casting with null checks:
+
+```javascript
+const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+if (!form) return
+
+const titleElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('title'))
+if (!titleElement) return
+const title = titleElement.value
+```
+
+### Error Handling in Components
+
+Always type-cast errors and check for optional callbacks:
+
+```javascript
+try {
+  if (onSave) await onSave(formState)
+} catch (err) {
+  setError(/** @type {Error} */(err))
+}
 ```
 
 ### Typing Database Query Results
@@ -49,6 +199,209 @@ This is preferable to casting the return value:
 const results = await client.query(query)
 return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 ```
+
+### API Route Typing Patterns
+
+When working with Fastify routes, use proper schema validation and type extraction:
+
+#### Schema-Based Route Definitions
+
+Always import and use predefined schemas instead of inline definitions:
+
+```javascript
+// ✅ Good - use imported schemas
+import { schemaUserRead } from './schemas/schema-user-read.js'
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   }
+ * }>}
+ */
+export async function getUser (fastify, _opts) {
+  fastify.get('/', {
+    schema: {
+      response: {
+        200: schemaUserRead
+      }
+    }
+  }, async function getUserHandler (request, reply) {
+    // handler implementation
+  })
+}
+```
+
+#### Date Deserialization
+
+Use the `SerializerSchemaOptions.deserialize` option to automatically convert date-time strings to Date objects on the server side:
+
+```javascript
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
+ *   }
+ * }>}
+ */
+```
+
+This ensures that date-time fields in responses are properly typed as `Date | null` objects for nullable fields, or `Date` for non-nullable fields. Use `Date | null` in the output type to handle nullable date fields properly.
+
+#### Response Type Extraction
+
+Extract response types using `ExtractResponseType` with the specific status code:
+
+```javascript
+/**
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ */
+
+async function handler (request, reply) {
+  /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+
+  /** @type {ReturnBody} */
+  const returnBody = {
+    // properly typed response data
+  }
+
+  return reply.code(200).send(returnBody)
+}
+```
+
+#### Return Value Pattern
+
+Always use `reply.code().send()` for explicit status codes and proper type narrowing:
+
+```javascript
+// ✅ Good - explicit status code with send
+return reply.code(201).send({
+  token,
+  auth_token: authToken,
+})
+
+// ❌ Avoid - implicit return without status code
+return {
+  token,
+  auth_token: authToken,
+}
+```
+
+This pattern ensures:
+- Explicit HTTP status codes
+- Proper type extraction with `ExtractResponseType`
+- Type safety for response bodies
+- Consistent error handling
+
+#### Nullable Fields in Schemas
+
+For nullable fields in JSON schemas, use the `nullable: true` property instead of type arrays:
+
+```javascript
+// ✅ Good - use nullable property
+{
+  type: 'string',
+  nullable: true,
+  format: 'date-time',
+  description: 'Optional date field'
+}
+
+// ❌ Avoid - type arrays for nullable
+{
+  type: ['string', 'null'],
+  format: 'date-time',
+  description: 'Optional date field'
+}
+```
+
+This ensures proper JSON Schema validation and TypeScript type generation.
+
+#### Required Nullable Fields vs Optional Fields
+
+Prefer required nullable fields over optional fields in schemas for consistency and clarity:
+
+```javascript
+// ✅ Good - required nullable field
+{
+  type: 'object',
+  required: ['id', 'name', 'updated_at'],
+  properties: {
+    id: { type: 'string' },
+    name: { type: 'string' },
+    updated_at: {
+      type: 'string',
+      nullable: true,
+      format: 'date-time'
+    }
+  }
+}
+
+// ❌ Avoid - optional field
+{
+  type: 'object',
+  required: ['id', 'name'],
+  properties: {
+    id: { type: 'string' },
+    name: { type: 'string' },
+    updated_at: {
+      type: 'string',
+      format: 'date-time'
+    }
+  }
+}
+```
+
+This pattern ensures:
+- Consistent handling of null vs undefined
+- Better alignment with database query results
+- Clearer API contracts
+
+#### Schema Type Exports
+
+Where you define schemas, always export a `FromSchema` type without deserialization options for use in other parts of the application:
+
+```javascript
+/**
+ * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
+ * @typedef {typeof schemaUserRead} SchemaUserRead
+ * @typedef {FromSchema<SchemaUserRead>} TypeUserRead
+ */
+
+export const schemaUserRead = /** @type {const} @satisfies {JSONSchema} */ ({
+  type: 'object',
+  // ... schema definition
+})
+```
+
+This provides a base type that can be imported and used throughout the application without route-specific deserialization transformations.
+
+#### Database Query Types
+
+Define query result types next to your queries, separate from schemas, to ensure query types align with schema types:
+
+```javascript
+/**
+ * @typedef {Object} UserRow
+ * @property {string} id - User UUID
+ * @property {string} name - User name
+ * @property {Date|null} updated_at - Last update time
+ * @property {string} email - User email
+ */
+
+const getUserQuery = SQL`
+  SELECT id, name, updated_at, email
+  FROM users
+  WHERE id = ${userId}
+`
+
+/** @type {QueryResult<UserRow>} */
+const result = await fastify.pg.query(getUserQuery)
+```
+
+This pattern ensures:
+- Query types are maintained alongside query definitions
+- Easy verification that database types match schema expectations
+- Clear documentation of what the database returns
 
 ## SQL
 
@@ -90,9 +443,13 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
 /* eslint-env browser */
 ```
 
-## uhtml Template Constraints
+## Preact/HTM Template Constraints
 
-- **Single interpolation per attribute**: uhtml only supports one tagged template interpolation per HTML attribute
+HTM is JSX-like syntax in plain JavaScript with no transpiler necessary. It uses standard JavaScript Tagged Templates.
+
+### HTM Syntax Features
+
+- **Single interpolation per attribute**: htm only supports one tagged template interpolation per HTML attribute
   ```javascript
   // ❌ Won't work - multiple interpolations
   class="${someClass} ${anotherClass}"
@@ -114,36 +471,65 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
   })}"
   ```
 
-- **DOM attributes, not React conventions**: uhtml uses actual DOM attribute names
-  ```javascript
-  // ❌ Wrong - React style
-  <div className="my-class" />
+- **Spread props**: `<div ...${props}>` (note the three dots inside the interpolation)
 
-  // ✅ Correct - DOM attributes
-  <div class="my-class" />
-  ```
+- **Self-closing tags**: `<div />`
 
-- **Special attribute prefixes**:
-  - `?attribute=${value}` - Boolean attributes (added when truthy, removed when falsy)
-    ```javascript
-    <button ?disabled=${isLoading}>Submit</button>
-    ```
-  - `.property=${value}` - Direct property setter
-    ```javascript
-    <input .value=${inputValue} />
-    ```
-  - `@event=${handler}` or `onevent=${handler}` - Event listeners
-    ```javascript
-    <button @click=${handleClick}>Click me</button>
-    <button onclick=${handleClick}>Click me</button>
-    ```
-  - `ref=${object}` - Element references (object.current or callback)
-  - `aria=${object}` - Aria attributes object
-  - `.dataset=${object}` - Data attributes object
+- **Components**: `<${Foo}>` where `Foo` is a component reference
 
-### uhtml Template Guidelines
+- **Boolean attributes**: `<div draggable />` (no value needed)
 
-- **Single interpolation per attribute**: uhtml only supports one template interpolation per HTML attribute
+- **HTML's optional quotes**: `<div class=foo>` (quotes optional for simple values)
+
+- **Component end-tags**: `<${Footer}>footer content<//>` or `<${Footer}>footer content<//>`
+
+  **Note**: Use `<//>` as the preferred closing tag syntax for HTM components. While `<//` works, `<//>` is more consistent with JSX conventions.
+
+- **Multiple root elements** (fragments): `<div /><div />`
+
+- **HTML-style comments**: `<div><!-- comment --></div>`
+
+- **Standard JSX event handlers**: `<button onClick=${handleClick}>Click me</button>`
+
+### Handling String Content in Layouts
+
+When working with string HTML content in layouts, there are two main approaches depending on the context:
+
+#### For Single Element Containers
+Use `dangerouslySetInnerHTML` when rendering into a single element:
+
+```js
+${typeof children === 'string'
+  ? html`<section class="content" dangerouslySetInnerHTML="${{ __html: children }}" />`
+  : html`<section class="content">${children}</section>`
+}
+```
+
+#### For Multi-Child Fragments or String Concatenation
+When you need to mix string content with other components in a fragment, use `preact-render-to-string` for string concatenation:
+
+```js
+import { render } from 'preact-render-to-string'
+
+// Render components to strings and concatenate
+const headerContent = html`
+  <h1>${args.vars.title}</h1>
+  <nav>Navigation here</nav>
+`
+
+const wrappedChildren = typeof children === 'string'
+  ? render(headerContent) + children  // String concatenation
+  : html`
+      ${headerContent}
+      ${children}
+    `
+```
+
+This technique is necessary because the `html` tagged template function expects proper template syntax, not arbitrary string interpolation. String rendering and concatenation is the correct approach when you need to combine rendered components with string HTML content.
+
+### HTM Template Guidelines
+
+- **Single interpolation per attribute**: htm only supports one template interpolation per HTML attribute
   ```js
   // ❌ Wrong - multiple interpolations
   class="${someClass} ${anotherClass}"
@@ -153,7 +539,90 @@ return /** @type {TypeUserRead | undefined} */ (results.rows[0])
   ```
 - **Use classnames for class toggles**: Always import and use `classnames` as `cn` for conditional classes
   ```js
-  import cn
+  import cn from 'classnames'
+  ```
+- **HTML comments**: Use HTML-style comments for TODO items or disabled functionality
+  ```js
+  <!-- TODO: Add Edit button when editing is supported -->
+  ```
+
+## Component Naming Convention
+
+**FunctionComponents should use capitalized function names** (class name style):
+```js
+// ✅ Good - capitalized component names
+export const ArticleHeader = ({ title, publishDate }) => { ... }
+export const Breadcrumb = ({ pathSegments }) => { ... }
+
+// ❌ Avoid - lowercase function names
+export const articleHeader = ({ title, publishDate }) => { ... }
+export const breadcrumb = ({ pathSegments }) => { ... }
+```
+
+This follows React/Preact conventions and makes it clear these are components, not regular functions.
+
+### Component Syntax
+
+**🚨 CRITICAL: NEVER call Preact function components directly** - they break component identity and reconciliation:
+```js
+// ❌ DANGEROUS - breaks React/Preact reconciliation and hooks
+${MyComponent({ prop: value })}
+
+// ❌ DANGEROUS - direct function calls break everything
+MyComponent()
+
+// ❌ DANGEROUS - even in tests and page wrappers
+export default () => {
+  return Page()  // This breaks hooks!
+}
+```
+
+**⚠️ This applies EVERYWHERE**: Tests, page wrappers, component composition - components must ALWAYS be called through HTM syntax, never as direct function calls.
+
+**✅ Use HTM component syntax** for proper component mounting:
+```js
+// ✅ Correct - proper component identity
+<${MyComponent} prop=${value} />
+```
+
+**✅ For type safety, use a typed component helper**:
+```js
+/**
+ * Typed component helper for better type checking with HTM
+ * @template T
+ * @param {FunctionComponent<T>} component
+ * @param {T} props
+ */
+export const tc = (component, props) =>
+  html`<${component} ...${props} />`
+
+// Usage with full type checking:
+${tc(MyComponent, { prop: value, onSave: handler })}
+```
+
+**When to use each approach:**
+- **HTM component syntax**: Use for simple props (better performance)
+  ```js
+  <${Header} />
+  <${Breadcrumb} pathSegments=${pathSegments} />
+  ```
+- **tc**: Use for complex props (better type checking)
+  ```js
+  ${tc(ArticleHeader, {
+    title: vars.title,
+    authorImgUrl: null,
+    authorImgAlt: null,
+    publishDate: vars.publishDate,
+    updatedDate: vars.updatedDate
+  })}
+  ```
+
+**Why direct function calls are dangerous:**
+- Break component identity (React/Preact can't track components properly)
+- Prevent proper reconciliation and diffing
+- Can cause hooks to reset unexpectedly
+- Break React DevTools component tree
+- Prevent optimizations like memoization
 
 ## Package.json Scripts
 

@@ -1,18 +1,9 @@
 /**
  * @import { TemplateFunction } from '@domstack/static'
+ * @import { GlobalVars } from './globals/global.vars.js'
  */
 
-/** @type {TemplateFunction<{
- *  siteName: string,
- *  description: string,
- *  siteUrl: string,
- *  authorName: string,
- *  authorUrl: string,
- *  authorImgUrl: string
- *  layout: string,
- *  publishDate: string
- *  title: string
- * }>} */
+/** @type {TemplateFunction<GlobalVars>} */
 export default async ({
   vars: {
     baseUrl,

@@ -1,13 +1,14 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
-import { page } from './client.js'
-import { render } from 'uland-isomorphic'
+import { Page } from './client.js'
+import { html } from 'htm/preact'
+import { render } from 'preact-render-to-string'
 
 suite('Bookmarks Page Tests', () => {
   test('Bookmarks listing page renders without errors', async () => {
     let rendered
     assert.doesNotThrow(() => {
-      rendered = render(String, page)
+      rendered = render(html`<${Page}/>`)
     }, 'page renders without error')
     assert.strictEqual(typeof rendered, 'string', 'page renders to string')
   })

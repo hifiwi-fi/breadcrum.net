@@ -1,29 +1,26 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
-import { usernameEdit } from './username-edit.js'
-import { usernameView } from './username-view.js'
+import { UsernameEdit } from './username-edit.js'
+import { UsernameView } from './username-view.js'
 
 /**
- * @typedef {({
- *  user,
- *  reload,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  reload: () => void,
- * }) => any} UsernameField
+ * }} UsernameFieldProps
  */
 
 /**
- * @type {UsernameField}
+ * @type {FunctionComponent<UsernameFieldProps>}
  */
-export const usernameField = Component(/** @type{UsernameField} */({ user, reload }) => {
+export const UsernameField = ({ user, reload }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
@@ -57,15 +54,15 @@ export const usernameField = Component(/** @type{UsernameField} */({ user, reloa
   return html`
   ${
     editing
-    ? usernameEdit({
-      user,
-      onSave: handleSave,
-      onCancelEdit: handleCancelEdit,
-    })
-    : usernameView({
-      user,
-      onEdit: handleEdit,
-    })
+    ? html`<${UsernameEdit}
+        user=${user}
+        onSave=${handleSave}
+        onCancelEdit=${handleCancelEdit}
+      />`
+    : html`<${UsernameView}
+        user=${user}
+        onEdit=${handleEdit}
+      />`
   }
   `
-})
+}

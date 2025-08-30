@@ -1,29 +1,25 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
 
 /**
- * @typedef {({
- *  user,
- *  onSave,
- *  onCancelEdit,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
  *  onSave?: (formState: { username: string }) => Promise<void> | void,
  *  onCancelEdit?: () => void,
- * }) => any} UsernameEdit
+ * }} UsernameEditProps
  */
 
 /**
- * @type {UsernameEdit}
+ * @type {FunctionComponent<UsernameEditProps>}
  */
-export const usernameEdit = Component(/** @type{UsernameEdit} */({ user, onSave, onCancelEdit }) => {
-  const [error, setError] = useState(null)
+export const UsernameEdit = ({ user, onSave, onCancelEdit }) => {
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
 
@@ -32,36 +28,39 @@ export const usernameEdit = Component(/** @type{UsernameEdit} */({ user, onSave,
     setDisabled(true)
     setError(null)
 
-    const form = formRef.current
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
 
-    const username = form.username.value
+    const usernameElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('username'))
+    if (!usernameElement) return
+    const username = usernameElement.value
 
     const formState = {
       username,
     }
 
     try {
-      await onSave?.(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave])
+  }, [setDisabled, setError, onSave])
 
   return html`
     <div class='bc-account-username-edit'>
-      <form ref="${formRef}" class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
-      <fieldset ?disabled=${disabled}>
+      <form ref=${formRef} class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
+      <fieldset disabled=${disabled}>
         <legend class="bc-account-username-edit-legend">Edit username</legend>
       <div>
           <label class='block'>
             username:
-            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minlength="1" maxlength="50" type="text" name="username" value="${user?.username}" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+            <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minLength="1" maxLength="50" type="text" name="username" defaultValue="${user?.username}" autoCorrect="off" autoCapitalize="off" spellCheck="false"/>
           </label>
         </div>
         <div class="bc-account-username-edit-submit-line">
           <div class="button-cluster">
-            ${onSave ? html`<input name="submit-button" type="submit">` : null}
+            ${onSave ? html`<input name="submit-button" type="submit" />` : null}
             ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           </div>
         </div>
@@ -70,4 +69,4 @@ export const usernameEdit = Component(/** @type{UsernameEdit} */({ user, onSave,
     </form>
     </div>
   `
-})
+}

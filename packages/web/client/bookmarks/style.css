@@ -1,5 +1,6 @@
 @import '../components/bookmark/bookmark-list.css';
 @import '../components/search/index.css';
+@import '../components/pagination-buttons/index.css';
 
 .bc-tag-filter-remove {
   color: var(--bc-tags-color);
@@ -13,4 +14,3 @@
 .bc-tag-filter-remove a:hover {
   color: red;
 }
-
