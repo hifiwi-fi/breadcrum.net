@@ -71,3 +71,9 @@ Here are my key takeways after this whole experience:
 - Writing your entire application in a functional-reactive templating language is a ton of work, and I still haven't shipped an offiline mode. Will I ever? This pattern hasn't paid off the long term goal I intended for it yet, so maybe I will change course more on the frontend further.
 - Breadcrum would have been a great fit for something like [HTMX]()/hypermedia with just a sprinking of functional-reactive templating around the more advanced form interactions. It would have cut down on total lines of code, and offline mode might have still been possible.
 - React is here to stay, no matter the amount of hate it gets. Preact is a really nice version of React, and htm works really really well along similar lines as uhtml, while still keeping in line with React's stability.
+- Software development is chaotic. A turn at the beginning can permanently alter the trajectory of the project.
+
+This is the single largest single change I've made to the project so far, and sadly, one of the lamest.
+I fixed a few bugs (and maybe introduced a few), but it's mostly the same.
+A costly fix!
+I'm still committed to the project and will see that more progress is made on a regular basis, and getting this issue out of the way will help with this.
