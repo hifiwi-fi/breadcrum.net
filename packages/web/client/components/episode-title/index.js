@@ -49,6 +49,7 @@ export const EpisodeTitle = ({
             ? '✅'
             : '⏱️'
       }
+      ${'\n'}
       ${
         type === 'redirect'
         ? '☁️'
@@ -58,6 +59,7 @@ export const EpisodeTitle = ({
             ? '🗄'
             : null
       }
+      ${'\n'}
       ${
         medium === 'video'
           ? '📼'
@@ -65,7 +67,7 @@ export const EpisodeTitle = ({
             ? '💿'
             : null
       }
-
+      ${'\n'}
       <a href="${href}" target="${small ? null : '_blank'}">
         ${display_title}
       </a>

@@ -14,7 +14,7 @@ export const ToRead = ({
   onToggleRead = () => {},
 }) => {
   return html`
-    <div class="${cn({ 'bc-unread': toread, 'bc-read': !toread, 'bc-toread': true })}" onClick=${onToggleRead}>
+    <span class="${cn({ 'bc-unread': toread, 'bc-read': !toread, 'bc-toread': true })}" onClick=${onToggleRead}>
       ${toread
         ? html`
           <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -26,5 +26,5 @@ export const ToRead = ({
             <circle cx="10.5" cy="10.5" fill="none" r="8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>`
         }
-    </div>`
+    </span>`
 }

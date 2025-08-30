@@ -57,9 +57,12 @@ export const BookmarkView = ({
     <div class="bc-bookmark-view">
       <div class="bc-bookmark-title-line">
         <${ToRead} toread=${b.toread} onToggleRead=${onToggleToread} />
+        ${'\n'}
         <${Star} starred=${b.starred} onToggleStar=${onToggleStarred} />
+        ${'\n'}
         <${Sensitive} sensitive=${b.sensitive} onToggleSensitive=${onToggleSensitive} />
-        <div>
+        ${'\n'}
+        <span>
           <a class="${cn({
             'bc-bookmark-title': true,
             'bc-bookmark-title-toread': b.toread,
@@ -69,7 +72,7 @@ export const BookmarkView = ({
           >
             ${b.title}
           </a>
-        </div>
+        </span>
       </div>
       <div class="bc-bookmark-url-display"><a href="${b.url}">${b.url.replace(/^https?:\/\//, '')}</a></div>
         ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}

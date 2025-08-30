@@ -76,3 +76,12 @@
   overflow-x: auto;
   white-space: pre-wrap;
 }
+
+.bc-help-text {
+  margin-left: 0.4em;
+}
+
+.button-spacing {
+  display: flex;
+  gap: 0.3em;
+}

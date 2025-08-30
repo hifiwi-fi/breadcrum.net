@@ -16,10 +16,10 @@ export const Sensitive = ({
   onToggleSensitive = () => {},
 }) => {
   return html`
-    <div class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${onToggleSensitive}>
+    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${onToggleSensitive}>
       ${sensitive
         ? '🤫'
         : '🫥'
         }
-    </div>`
+    </span>`
 }

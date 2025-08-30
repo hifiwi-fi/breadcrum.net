@@ -14,6 +14,8 @@ export const schemaBookmarkCreate = /** @type {const} @satisfies {JSONSchema} */
   required: ['url'],
   properties: {
     ...bookmarkProps.properties,
+    // Override minimum length on create
+    title: { type: 'string', minLength: 0, maxLength: 255 },
     tags: {
       type: 'array',
       items: tagProps
