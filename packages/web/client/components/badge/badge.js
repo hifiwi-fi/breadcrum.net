@@ -1,7 +1,13 @@
-import { html } from 'uland-isomorphic'
+/** @import { FunctionComponent, ComponentChild } from 'preact' */
 
-export function badge (text) {
+import { html } from 'htm/preact'
+
+/**
+ * Badge component for displaying small status or label text
+ * @type {FunctionComponent<{ children: ComponentChild }>}
+ */
+export const Badge = ({ children }) => {
   return html`
-  <div class="bc-badge">${text}</div>
+    <div class="bc-badge">${children}</div>
   `
 }

@@ -1,17 +1,42 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html } from 'uland-isomorphic'
 
-export const feedSelect = Component(({
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeFeedRead } from '../../../routes/api/feeds/schemas/schema-feed-read.js'
+ */
+
+import { html } from 'htm/preact'
+
+/**
+ * @typedef {object} FeedSelectProps
+ * @property {TypeFeedRead[]} feeds
+ * @property {string} [selectedFeedId]
+ * @property {(feedId: string) => void} [onFeedChange]
+ */
+
+/**
+ * @type {FunctionComponent<FeedSelectProps>}
+ */
+export const FeedSelect = ({
   feeds,
+  selectedFeedId,
+  onFeedChange,
 }) => {
+  const handleChange = (/** @type {Event & {currentTarget: HTMLSelectElement}} */ev) => {
+    if (onFeedChange) {
+      onFeedChange(ev.currentTarget.value)
+    }
+  }
+
   return html`
-  <form class="bc-feed-select-form">
-        <label for="feed-select">Select Feed:</label>
-        <select id="feed-select">
-          ${feeds.map(f => html.for(f, f.id)`
-            <option value="${f.id}">${f.title}</option>
-          `)}
-        </select>
-      </form>
+    <form class="bc-feed-select-form">
+      <label for="feed-select">Select Feed:</label>
+      <select id="feed-select" defaultValue="${selectedFeedId}" onChange="${handleChange}">
+        ${feeds.map(f => html`
+          <option key="${f.id}" defaultValue="${f.id}">${f.title}</option>
+        `)}
+      </select>
+    </form>
   `
-})
+}

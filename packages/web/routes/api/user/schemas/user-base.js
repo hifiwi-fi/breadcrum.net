@@ -39,6 +39,7 @@ const commonSerlializedUserProps = /** @type {const} @satisfies {JSONSchema} */ 
     pending_email_update: {
       type: 'string',
       format: 'email',
+      nullable: true,
       pattern: emailPattern,
     },
     newsletter_subscription: userEditableUserProps.properties.newsletter_subscription,
@@ -53,6 +54,7 @@ const commonSerlializedUserProps = /** @type {const} @satisfies {JSONSchema} */ 
     },
     disabled_reason: {
       type: 'string',
+      nullable: true,
       description: 'A note presented to the user regarding their account disabled status.',
     },
   }

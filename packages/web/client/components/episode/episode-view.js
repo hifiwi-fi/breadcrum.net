@@ -1,30 +1,53 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js'
+ */
+
+import { html } from 'htm/preact'
 import format from 'format-duration'
+import { TextIcon } from '../text-icon/index.js'
+import { EpisodeTitle } from '../episode-title/index.js'
+import { CorsMedia } from '../cors-media/cors-media.js'
+import { ExpandText } from '../expand-text/index.js'
+import { tc } from '../../lib/typed-component.js'
 
-import { textIcon } from '../text-icon/index.js'
-import { episodeTitle } from '../episode-title/index.js'
-import { corsMedia } from '../cors-media/cors-media.js'
-import { expandText } from '../expand-text/index.js'
+/**
+ * @typedef {object} EpisodeViewProps
+ * @property {TypeEpisodeReadClient} episode
+ * @property {boolean | undefined} [clickForPreview]
+ * @property {() => void} [onEdit]
+ */
 
-export const episodeView = Component(({
+/**
+ * @type {FunctionComponent<EpisodeViewProps>}
+ */
+export const EpisodeView = ({
   episode: e,
   clickForPreview,
   onEdit = () => {},
-} = {}) => {
+}) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
 
   return html`
     <div class="bc-episode-view">
 
-      ${episodeTitle({ episode: e })}
+      <${EpisodeTitle} episode=${e} />
 
       <div class="bc-episode-url-display">
         <a href="${e.url}">${e.url}</a>
       </div>
 
-
-      ${corsMedia({ id: e?.id, src: mediaLink, type: e?.src_type, clickForPreview, thumbnail: e?.thumbnail })}
+      ${mediaLink && e?.src_type
+        ? tc(CorsMedia, {
+                src: mediaLink,
+                type: e.src_type,
+                ...(clickForPreview !== undefined && { clickForPreview }),
+                ...(e?.thumbnail && { thumbnail: e.thumbnail })
+              })
+        : null}
 
       ${
         e?.ready
@@ -32,8 +55,11 @@ export const episodeView = Component(({
           <div class="bc-episode-details-display">
             <div>
               ${e.src_type === 'video' ? ' 📼' : e.src_type === 'audio' ? ' 💿' : null}
+              ${'\n'}
               ${e.src_type && e.ext ? html`<code>${e.src_type}/${e.ext}</code>` : null}
+              ${'\n'}
               ${e.duration_in_seconds ? ` (${format(e.duration_in_seconds * 1000)}) ` : null}
+              ${'\n'}
               <a href="${mediaLink}">${e.filename ? e.filename : null}</a>
             </div>
           </div>
@@ -63,17 +89,14 @@ export const episodeView = Component(({
       }
 
       ${e.explicit
-        ? html`<div>${textIcon({ value: 'Explicit' })}</div>`
+        ? html`<div><${TextIcon} value="Explicit" /></div>`
         : null
       }
 
       ${
-        e?.text_content // Watch your whitepsace here
+        e?.text_content // Watch your whitespace here
           ? html`
-            ${expandText({
-              children: e?.text_content,
-              pre: true,
-            })}
+            <${ExpandText} children=${e?.text_content} pre=${true} />
           `
           : null
       }
@@ -81,7 +104,7 @@ export const episodeView = Component(({
       <div class="bc-date">
         <a href="${`/episodes/view/?id=${e.id}`}">
           <time datetime="${e.created_at}">
-            ${(new Date(e.created_at)).toLocaleString()}
+            ${e.created_at ? (new Date(e.created_at)).toLocaleString() : ''}
           </time>
         </a>
       </div>
@@ -101,4 +124,4 @@ export const episodeView = Component(({
       </div>
     </div>
   `
-})
+}

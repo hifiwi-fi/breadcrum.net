@@ -1,9 +1,12 @@
-import { html } from 'uland-isomorphic'
+/** @import { AsyncPageFunction } from '@domstack/static' */
+/** @import { RootLayoutVars, PageReturn } from '../../layouts/root/root.layout.js' */
+import { html } from 'htm/preact'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 
 const execPromise = promisify(exec)
 
+/** @type {AsyncPageFunction<RootLayoutVars, PageReturn>} */
 export default async () => {
   const ls = await npmList()
   return html`<div>
@@ -14,6 +17,9 @@ export default async () => {
   </div>`
 }
 
+/**
+ * @returns {Promise<string>}
+ */
 async function npmList () {
   try {
     const { stdout, stderr } = await execPromise('npm ls')
@@ -25,6 +31,6 @@ async function npmList () {
     return stdout
   } catch (error) {
     console.error(`Execution error: ${error}`)
-    return error.message
+    return /** @type {Error} */(error).message
   }
 }

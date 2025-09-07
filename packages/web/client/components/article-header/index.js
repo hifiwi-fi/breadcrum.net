@@ -1,6 +1,27 @@
-import { Component, html } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
 
-export const articleHeader = Component(({
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
+
+/**
+ * @typedef {object} ArticleHeaderProps
+ * @property {string} title
+ * @property {string | null | undefined} [authorImgUrl]
+ * @property {string | null | undefined} [authorImgAlt]
+ * @property {string | null | undefined} [authorName]
+ * @property {string | null | undefined} [authorUrl]
+ * @property {string} publishDate
+ * @property {string} updatedDate
+ */
+
+/**
+ * @type {FunctionComponent<ArticleHeaderProps>}
+ */
+export const ArticleHeader = ({
   title,
   authorImgUrl,
   authorImgAlt,
@@ -17,7 +38,7 @@ export const articleHeader = Component(({
               ? html`
                   <address class="author-info p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
                     ${authorImgUrl
-                    ? html`<img height="40" width="40"  src="${authorImgUrl}" alt="${authorImgAlt}" class="u-photo" itemprop="image">`
+                    ? html`<img height="40" width="40"  src="${authorImgUrl}" alt="${authorImgAlt}" class="u-photo" itemprop="image" />`
                       : null
                     }
                     ${authorName && authorUrl
@@ -47,4 +68,4 @@ export const articleHeader = Component(({
         </div>
       </header>
   `
-})
+}

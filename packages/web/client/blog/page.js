@@ -1,9 +1,8 @@
-import { html } from 'uland-isomorphic'
+/** @import { PageFunction } from '@domstack/static' */
+/** @import { BlogIndexVars } from '../layouts/blog-index/blog-index.layout.js' */
+/** @import { PageReturn } from '../layouts/root/root.layout.js' */
+import { html } from 'htm/preact'
 import { dirname, basename } from 'node:path'
-
-/**
- * @import { PageFunction } from '@domstack/static'
- */
 
 export const vars = {
   title: 'Breadcrum.net Blog',
@@ -11,25 +10,13 @@ export const vars = {
   noindex: true,
 }
 
-/**
- * @type {PageFunction<{
- *  siteName: string,
- *  siteDescription: string,
- *  siteUrl: string,
- *  authorName: string,
- *  authorUrl: string,
- *  authorImgUrl: string
- *  layout: string,
- *  publishDate: string
- *  title: string
- * }>}
- */
-export default async function blogIndex2023 ({
+/** @type {PageFunction<BlogIndexVars, PageReturn>} */
+export default function blogIndex2023 ({
   pages,
   page,
 }) {
   const blogPosts = pages
-    .filter(page => page.vars.layout === 'article')
+    .filter(page => /** @type {any} */(page.vars).layout === 'article')
     // @ts-ignore
     .sort((a, b) => new Date(b.vars.publishDate) - new Date(a.vars.publishDate))
     .slice(0, 50)
@@ -65,7 +52,7 @@ export default async function blogIndex2023 ({
             <a href="/${p.pageInfo.path}/">${basename(p.pageInfo.path)}</a>
           </li>`
         })}
-      <ul>
+      </ul>
     </footer>
     `
 }

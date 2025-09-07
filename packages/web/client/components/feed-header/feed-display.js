@@ -1,36 +1,58 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useRef, useCallback } from 'uland-isomorphic'
-import { textIcon } from '../text-icon/index.js'
 
-export const feedDisplay = Component(({
-  loading,
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeFeedRead } from '../../../routes/api/feeds/schemas/schema-feed-read.js'
+ */
+
+import { html } from 'htm/preact'
+import { useRef, useCallback } from 'preact/hooks'
+import { TextIcon } from '../text-icon/index.js'
+
+/**
+ * @typedef {object} FeedDisplayProps
+ * @property {TypeFeedRead} [feed]
+ * @property {() => void} [onEdit]
+ */
+
+/**
+ * @type {FunctionComponent<FeedDisplayProps>}
+ */
+export const FeedDisplay = ({
   feed: f = {},
-  feeds = [],
   onEdit = () => {},
-} = {}) => {
-  const copyButton = useRef()
+}) => {
+  const copyButtonRef = useRef(/** @type {HTMLButtonElement | null} */(null))
 
-  const handleCopy = useCallback(async (ev) => {
+  const handleCopy = useCallback(async () => {
     const feedUrl = f.feed_url
+    if (!feedUrl) return
     try {
       await navigator.clipboard.writeText(feedUrl)
-      copyButton.current.innerText = 'Copied'
+      const copyButton = copyButtonRef.current
+      if (copyButton) {
+        copyButton.innerText = 'Copied'
+      }
       console.log('copied feed to clipboard')
     } catch (e) {
       console.error(e)
-      copyButton.current.innerText = 'Error'
+      const copyButton = copyButtonRef.current
+      if (copyButton) {
+        copyButton.innerText = 'Error'
+      }
     }
-  }, [copyButton.current, f.feed_url])
+  }, [copyButtonRef.current, f.feed_url])
 
-  const handleSelect = useCallback(async ev => {
+  const handleSelect = useCallback(async (/** @type {Event & {target: HTMLInputElement}} */ev) => {
     ev.target.select()
-  })
+  }, [])
 
   return html`
     <div class="bc-feed-display">
       <div class="bc-feed-info">
         <div class="bc-feed-image">
-          <img width="100" height="100" src="${f.image_url ?? '/static/bread.png'}">
+          <img width="100" height="100" src="${f.image_url ?? '/static/bread.png'}" />
         </div>
 
         <h1 class="bc-feed-title">
@@ -39,10 +61,10 @@ export const feedDisplay = Component(({
 
         <div class="bc-feed-icon-button-line">
           ${f.default_feed
-            ? html`${textIcon({ value: 'Default' })}`
+            ? html`<${TextIcon} value="Default" />`
             : null}
           ${f.explicit
-            ? html`${textIcon({ value: 'Explicit' })}`
+            ? html`<${TextIcon} value="Explicit" />`
             : null}
           <button onClick=${onEdit}>Edit</button>
         </div>
@@ -52,15 +74,15 @@ export const feedDisplay = Component(({
         </div>
 
         <div class="bc-feed-feed-url-line">
-          <a href=${`/api/feeds/${f.id}?format=json`}><img width="32" src="/static/atom.svg"></a>
+          <a href=${`/api/feeds/${f.id}?format=json`}><img width="32" src="/static/atom.svg" /></a>
           <input
             class="bc-feed-header-select"
             type="text"
             readonly
-            onclick=${handleSelect}
-            value="${f.feed_url}"
-          >
-          <button ref=${copyButton} onclick=${handleCopy}>Copy</button>
+            onClick=${handleSelect}
+            defaultValue="${f.feed_url}"
+          />
+          <button ref=${copyButtonRef} onClick=${handleCopy}>Copy</button>
         </div>
         <div class="bc-help-text bc-feed-header-help-text">
           ℹ️ Subscribe to this RSS feed in your favorite podcast client that supports video podcasts. Episodes created with bookmarks end up in this feed.
@@ -68,4 +90,4 @@ export const feedDisplay = Component(({
       </div>
     </div>
   `
-})
+}

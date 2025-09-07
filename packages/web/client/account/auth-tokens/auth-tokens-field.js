@@ -1,30 +1,31 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-// @ts-expect-error
-import { Component, html, useCallback } from 'uland-isomorphic'
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { useCallback } from 'preact/hooks'
 import { useAuthTokens } from '../../hooks/useAuthTokens.js'
 import { authTokenList } from '../../components/auth-token/auth-token-list.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { useWindow } from '../../hooks/useWindow.js'
-import { newAuthTokenField } from '../../components/auth-token/auth-token-create.js'
+import { ManageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
+import { PaginationButtons } from '../../components/pagination-buttons/index.js'
 
 /**
- * @typedef {() => any} AuthTokensField
+ * @typedef {{}} AuthTokensProps
  */
 
 /**
- * @type {AuthTokensField}
+ * @type {FunctionComponent<AuthTokensProps>}
  */
-export const authTokens = Component(/** @type{AuthTokensField} */() => {
+export const AuthTokens = () => {
   const window = useWindow()
   const {
     tokensError,
     tokensLoading,
     tokens,
     reloadAuthTokens,
-    before,
-    after,
     beforeParams,
     afterParams
   } = useAuthTokens()
@@ -41,25 +42,21 @@ export const authTokens = Component(/** @type{AuthTokensField} */() => {
     <dt>Auth Tokens</dt>
     <dd>
       <div class="bc-help-text">
-        ℹ️ Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
+        Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
       </div>
-      <div>${newAuthTokenField({ reload: reloadAuthTokens })}</div>
-      <div>
-        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-      </div>
+
+      <${ManageAuthTokenField} reload=${reloadAuthTokens} />
+
+      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
       ${tokensLoading && !Array.isArray(tokens) ? html`<div>...</div>` : null}
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
 
       ${Array.isArray(tokens)
-        ? tokens.map(t => html.for(t, t.jti)`${authTokenList({ authToken: t, reload: reloadAuthTokens, onDelete: reloadAuthTokens })}`)
+        ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} reload=${reloadAuthTokens} onDelete=${reloadAuthTokens} />`)
         : null}
 
-      <div>
-        ${before ? html`<a onclick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-        ${after ? html`<a onclick=${onPageNav} href=${'./?' + afterParams}>later</span>` : null}
-      </div>
+        <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     </dd>
   `
-})
+}

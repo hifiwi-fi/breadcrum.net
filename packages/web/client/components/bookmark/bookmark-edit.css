@@ -68,6 +68,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
+  line-clamp: 1;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
@@ -75,4 +76,13 @@
 .bc-bookmark-edit-episode-error {
   overflow-x: auto;
   white-space: pre-wrap;
+}
+
+.bc-help-text {
+  margin-left: 0.4em;
+}
+
+.button-spacing {
+  display: flex;
+  gap: 0.3em;
 }

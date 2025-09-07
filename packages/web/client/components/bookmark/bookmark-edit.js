@@ -1,14 +1,38 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 /* eslint-disable camelcase */
-import { Component, html, useState, useRef, useCallback, useEffect } from 'uland-isomorphic'
+
+/**
+ * @import { FunctionComponent, ComponentChild } from 'preact'
+ * @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js'
+ * @import { TypeEpisodePreview } from '../../../routes/api/episodes/schemas/episode-preview.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
 import cn from 'classnames'
 import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
-import { episodeTitle } from '../episode-title/index.js'
+import { EpisodeTitle } from '../episode-title/index.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { archiveTitle } from '../archive-title/index.js'
+import { ArchiveTitle } from '../archive-title/index.js'
+import { useReload } from '../../hooks/useReload.js'
 
-export const bookmarkEdit = Component(({
+/**
+ * @typedef {object} BookmarkEditProps
+ * @property {TypeBookmarkReadClient} [bookmark]
+ * @property {boolean} [bookmarkletUpdateAvailable]
+ * @property {string} [bookmarkletVersion]
+ * @property {(formState: any) => Promise<void>} [onSave]
+ * @property {() => Promise<void>} [onDeleteBookmark]
+ * @property {() => void} [onCancelEdit]
+ * @property {string | ComponentChild} [legend]
+ */
+
+/**
+ * @type {FunctionComponent<BookmarkEditProps>}
+ */
+export const BookmarkEdit = ({
   bookmark: b,
   bookmarkletUpdateAvailable,
   bookmarkletVersion,
@@ -16,38 +40,42 @@ export const bookmarkEdit = Component(({
   onDeleteBookmark,
   onCancelEdit,
   legend,
-} = {}) => {
+}) => {
   const window = useWindow()
   const state = useLSP()
-  const [error, setError] = useState(null)
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
+
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef()
-  const [archiveURLs, setArchiveURLs] = useState(b?.archive_urls?.length > 0 ? [...b.archive_urls] : [undefined])
+  const [archiveURLs, setArchiveURLs] = useState(/** @type {(string | undefined)[]} */(b?.archive_urls?.length ? [...b.archive_urls] : [undefined]))
   const [createEpisodeChecked, setCreateEpisodeChecked] = useState(false)
   const [customEpisodeURLChecked, setCustomEpisodeURLChecked] = useState(false)
-  const [episodeMediumSelect, setEpisodeMediumSelect] = useState(false)
+  const [episodeMediumSelect, setEpisodeMediumSelect] = useState(/** @type {string | null} */(null))
   const [episodePreviewLoading, setEpisodePreviewLoading] = useState(false)
-  const [episodePreview, setEpisodePreview] = useState()
-  const [episodePreviewError, setEpisodePreviewError] = useState()
-  const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(formRef?.current?.url?.value)
-  const [previewRefresh, setPreviewRefresh] = useState(0)
+  const [episodePreview, setEpisodePreview] = useState(/** @type {TypeEpisodePreview | null} */(null))
+  const [episodePreviewError, setEpisodePreviewError] = useState(/** @type {Error | null} */(null))
+  const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(/** @type {string | undefined} */(b?.url))
+  const { signal: previewSignal, reload: previewReload } = useReload()
 
   useEffect(() => {
     // Set bookmark archiveURL state when we get new ones in
-    if (b?.archive_urls?.length > 0) {
-      setArchiveURLs([...b?.archive_urls])
+    if (b?.archive_urls?.length) {
+      setArchiveURLs([...b.archive_urls])
     }
-  }, [b?.archive_urls])
+  }, [...(b?.archive_urls ?? [])])
 
   useEffect(() => {
-    /** * @param {KeyboardEvent} ev */
+    // Keyboard handler for ctl-enter saving
+
+    /** @param {KeyboardEvent} ev */
     const handleKeyDown = (ev) => {
       if ((ev.metaKey || ev.ctrlKey) && ev.key === 'Enter') {
         ev.preventDefault()
-        if (formRef.current) {
+        const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+        if (form) {
           // Dispatch a native submit event to trigger the form submission
-          formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
         }
       }
     }
@@ -59,16 +87,17 @@ export const bookmarkEdit = Component(({
   }, [formRef])
 
   useEffect(() => {
+    // Episode preview trigger
     const controller = new AbortController()
     const getPreview = async () => {
       setEpisodePreviewLoading(true)
       setEpisodePreview(null)
       setEpisodePreviewError(null)
       try {
-        const form = formRef.current
+        const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
         const searchParams = new URLSearchParams()
-        searchParams.set('url', form.createEpisodeURL.value)
-        searchParams.set('medium', form.episodeMedium.value)
+        searchParams.set('url', form?.['createEpisodeURL'].value)
+        searchParams.set('medium', form?.['episodeMedium'].value)
         const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
           headers: {
             'content-type': 'application/json',
@@ -77,6 +106,7 @@ export const bookmarkEdit = Component(({
         })
 
         if (response.ok) {
+          /** @type {TypeEpisodePreview} */
           const body = await response.json()
           setEpisodePreview(body)
         } else {
@@ -84,9 +114,10 @@ export const bookmarkEdit = Component(({
           setEpisodePreviewError(new Error(`${err.message}`))
         }
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error(err)
-          setEpisodePreviewError(err)
+        const error = /** @type {Error} */(err)
+        if (error.name !== 'AbortError') {
+          console.error(error)
+          setEpisodePreviewError(error)
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -101,93 +132,106 @@ export const bookmarkEdit = Component(({
     return () => {
       controller.abort()
     }
-  }, [createEpisodeChecked, episodeMediumSelect, previewRefresh])
+  }, [createEpisodeChecked, episodeMediumSelect, previewSignal])
 
-  const handleInitiateDelete = useCallback((ev) => {
+  const handleInitiateDelete = useCallback(() => {
+    // Enter delete modal
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const handleCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback(() => {
+    // Leave delete modal
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  const handleDeleteBookmark = useCallback(async (ev) => {
+  const handleDeleteBookmark = useCallback(async (/** @type {Event} */ev) => {
+    // Actually delete the bookmark
     ev.preventDefault()
     setDisabled(true)
     setError(null)
     try {
-      await onDeleteBookmark()
+      if (onDeleteBookmark) await onDeleteBookmark()
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, onDeleteBookmark])
 
-  const handleCreateEpisodeCheckbox = useCallback(async (ev) => {
+  const handleCreateEpisodeCheckbox = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    // Create episode checkbox clicked
     const checked = ev.currentTarget.checked
     setCreateEpisodeChecked(checked)
   }, [setCreateEpisodeChecked])
 
-  const handleEpisodeMediumSelect = useCallback(async (ev) => {
-    setEpisodeMediumSelect(formRef.current.episodeMedium.value)
+  const handleEpisodeMediumSelect = useCallback(async () => {
+    // Episode medium selected
+    setEpisodeMediumSelect(formRef?.current?.['episodeMedium'].value)
   }, [setEpisodeMediumSelect, formRef])
 
-  const handleCustomEpisodeURLCheckboxChange = useCallback(async (ev) => {
+  const handleCustomEpisodeURLCheckboxChange = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    // Custom episode selected
     const checked = ev.currentTarget.checked
     setCustomEpisodeURLChecked(checked)
     const form = formRef.current
-
-    if (!checked) {
-      if (form.createEpisodeURL.value !== form.url.value) {
-        form.createEpisodeURL.value = form.url.value
-        setPreviewRefresh(previewRefresh + 1)
+    const createEpisodeURLNode = form?.['createEpisodeURL']
+    if (!checked && createEpisodeURLNode) {
+      if (createEpisodeURLNode.value !== form?.['url'].value) {
+        createEpisodeURLNode.value = form?.['url'].value
+        previewReload()
       }
     }
-  }, [formRef, setCustomEpisodeURLChecked])
+  }, [formRef, setCustomEpisodeURLChecked, previewReload])
 
-  const handleBookmarkURLInput = useCallback(async (ev) => {
+  const handleBookmarkURLInput = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    // Bookmark episode default custom URL sync
     const form = formRef.current
-    if (!form['custom-episode-url'].checked || form.createEpisodeURL.value === prevBookmarkURLValue) {
-      form.createEpisodeURL.value = ev.currentTarget.value
+    const createEpisodeNode = form?.['createEpisodeURL']
+    if (!createEpisodeNode.checked || createEpisodeNode.value === prevBookmarkURLValue) {
+      createEpisodeNode.value = ev.currentTarget.value
     }
     setPrevBookmarkURLValue(ev.currentTarget.value)
   }, [formRef, prevBookmarkURLValue])
 
   useEffect(() => {
+    // Initial bookmark URL set
     setPrevBookmarkURLValue(b?.url)
   }, [b?.url])
 
-  const handlePreviewRefresh = useCallback(async (ev) => {
+  const handlePreviewRefresh = useCallback(async (/** @type {Event} */ev) => {
+    // Preview refresh event handler
     ev.preventDefault()
-    setPreviewRefresh(previewRefresh + 1)
-  })
+    previewReload()
+  }, [])
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {SubmitEvent} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
     const form = formRef.current
+    if (!form) return
 
-    let url = form.url.value
+    /** @type {string} */
+    let url = form['url'].value
     try {
-      url = (new URL(form.url.value)).toString()
+      url = (new URL(url)).toString()
     } catch (err) {
       console.warn(new Error(`Error sanitizing URL: ${url}`, { cause: err }))
     }
-    const title = form.title.value
-    const note = form.note.value
-    const summary = form.summary.value
-    const rawTags = form.tags.value
+    // @ts-expect-error title is a shadowed property
+    const title = /** @type{string} */ (form['title'].value)
+    const note = /** @type{string} */ (form['note'].value)
+    const summary = /** @type{string} */ (form['summary'].value)
+    const rawTags = /** @type{string} */ (form['tags'].value)
     const tags = Array.from(new Set(rawTags.split(' ').map(t => t.trim()).filter(t => Boolean(t))))
-    const toread = form.toread.checked
-    const starred = form.starred.checked
-    const sensitive = form.sensitive.checked
-    const createArchive = form.createArchive.checked
-    const episodeMedium = form.episodeMedium.value
-    let episodeURL = customEpisodeURLChecked ? form.createEpisodeURL.value : url
+    const toread = /** @type{boolean} */(form['toread'].checked)
+    const starred = /** @type{boolean} */(form['starred'].checked)
+    const sensitive = /** @type{boolean} */(form['sensitive'].checked)
+    const createArchive = /** @type{boolean} */(form['createArchive'].checked)
+    const episodeMedium = /** @type{string} */(form['episodeMedium'].value)
+    let episodeURL = customEpisodeURLChecked ? /** @type{string} */(form['createEpisodeURL'].value) : url
     try {
-      episodeURL = (new URL(form.createEpisodeURL.value)).toString()
+      episodeURL = (new URL(form['createEpisodeURL'].value)).toString()
     } catch (err) {
       console.error(new Error(`Error sanitizing episode URL: ${episodeURL}`, { cause: err }))
     }
@@ -195,13 +239,15 @@ export const bookmarkEdit = Component(({
     let archive_urls = []
 
     for (const i of Object.keys(archiveURLs)) {
-      let archiveURL = form[`archive-url-${i}`].value
-      try {
-        archiveURL = (new URL(archiveURL)).toString()
-      } catch (err) {
-        console.error(new Error(`Error sanitizing archive URL: ${archiveURL}`, { cause: err }))
+      let archiveURL = /** @type{string} */(form[`archive-url-${i}`].value)
+      if (archiveURL) {
+        try {
+          archiveURL = (new URL(archiveURL)).toString()
+        } catch (err) {
+          console.error(new Error(`Error sanitizing archive URL: ${archiveURL}`, { cause: err }))
+        }
+        archive_urls.push(archiveURL)
       }
-      archive_urls.push(archiveURL)
     }
 
     archive_urls = archive_urls.filter(v => !!v && validateURL(v)).map(url => url.trim())
@@ -229,46 +275,48 @@ export const bookmarkEdit = Component(({
     }
 
     try {
-      await onSave(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked])
+  }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked, archiveURLs])
 
-  const handleAddArchiveURL = useCallback(async (ev) => {
+  const handleAddArchiveURL = useCallback((/** @type {Event} */ev) => {
+    // Adding a new archive URL row
     ev.preventDefault()
-    archiveURLs.push(undefined)
-    setArchiveURLs(archiveURLs)
-  }, [archiveURLs])
+    setArchiveURLs([...archiveURLs, undefined])
+  }, [archiveURLs, setArchiveURLs])
 
-  const handleUndoAddArchiveURL = useCallback(async (ev) => {
+  const handleUndoAddArchiveURL = useCallback((/** @type {Event} */ev) => {
+    // Removing an archive URL row
     ev.preventDefault()
     archiveURLs.pop()
-    setArchiveURLs(archiveURLs)
-  }, [archiveURLs])
+    setArchiveURLs([...archiveURLs])
+  }, [archiveURLs, setArchiveURLs])
 
-  const handleNewWindowLink = useCallback((ev) => {
-    if (window.toolbar.visible) {
+  const handleNewWindowLink = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
+    // Open a link in a new window
+    if (window?.toolbar.visible) {
       ev.preventDefault()
       window.open(ev.currentTarget.href)
     }
   }, [window])
 
   // Parent can delay passing a bookmark to disable the form.
-  const initializing = b == null
+  const initializing = b === null
 
   return html`
     <div class='bc-bookmark-edit'>
-      <form ref="${formRef}" class="add-bookmark-form" id="add-bookmark-form" onsubmit=${handleSave}>
-      <fieldset class='bc-bookmark-edit-fieldset' ?disabled=${disabled || initializing}>
+      <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onSubmit=${handleSave}>
+      <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
 
         <!-- Bookmark URL -->
         <div>
           <label class='block'>
             url:
-            <input class='block bc-bookmark-url-edit' type="url" name="url" value="${b?.url}" oninput="${handleBookmarkURLInput}">
+            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" onInput="${handleBookmarkURLInput}" />
           </label>
         </div>
 
@@ -276,7 +324,7 @@ export const bookmarkEdit = Component(({
         <div>
           <label class="block">
             title:
-            <input class="block" type="text" name="title" value="${b?.title}">
+            <input class="block" type="text" name="title" defaultValue="${b?.title}" />
           </label>
         </div>
 
@@ -296,25 +344,30 @@ export const bookmarkEdit = Component(({
               class="block"
               type="text"
               name="tags"
-              autocapitalize="off"
-              autocorrect="off"
-              value="${b?.tags?.join(' ')}"
-            >
+              autoCapitalize="off"
+              autoCorrect="off"
+              defaultValue="${b?.tags?.join(' ')}"
+            />
           </label>
         </div>
 
         <!-- Bookmark Options -->
         <div>
           <label>
-            <input type="checkbox" name="toread" ?checked="${b?.toread}">
+            <input type="checkbox" name="toread" defaultChecked=${b?.toread} />
+            ${'\n'}
             to read
           </label>
+          ${'\n'}
           <label>
-            <input type="checkbox" name="starred" ?checked="${b?.starred}">
+            <input type="checkbox" name="starred" defaultChecked=${b?.starred} />
+            ${'\n'}
             starred
           </label>
+          ${'\n'}
           <label>
-            <input type="checkbox" name="sensitive" ?checked="${b?.sensitive}">
+            <input type="checkbox" name="sensitive" defaultChecked=${b?.sensitive} />
+            ${'\n'}
             sensitive
           </label>
         </div>
@@ -332,7 +385,7 @@ export const bookmarkEdit = Component(({
         </details>
 
          <!-- Bookmark Archive URLs -->
-        <details class="bc-bookmark-archive-url-edit-details" ?open=${archiveURLs[0] !== undefined} >
+        <details class="bc-bookmark-archive-url-edit-details" open=${archiveURLs[0] !== undefined} >
             <summary>
               <label>archive URLs</label>
               <span class="bc-help-text">
@@ -342,46 +395,50 @@ export const bookmarkEdit = Component(({
 
             <div class="bc-help-text">
               ↬:
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://archive.today/?run=1&url=${encodeURIComponent(b?.url)}`}">archive.today</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://ghostarchive.org/search?term=${encodeURIComponent(b?.url)}`}">ghostarchive.org</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url)}`}">web.archive.org</a>,
-              <a onclick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url)}`}">threadreaderapp.com</a>
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://archive.today/?run=1&url=${encodeURIComponent(b?.url ?? '')}`}">archive.today</a>,
+              ${'\n'}
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://ghostarchive.org/search?term=${encodeURIComponent(b?.url ?? '')}`}">ghostarchive.org</a>,
+              ${'\n'}
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://web.archive.org/${encodeURIComponent(b?.url ?? '')}`}">web.archive.org</a>,
+              ${'\n'}
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://threadreaderapp.com/search?q=${encodeURIComponent(b?.url ?? '')}`}">threadreaderapp.com</a>
+              ${'\n'}
             </div>
 
             ${archiveURLs.length > 0
               ? html`${archiveURLs.map(
-                  (url, i) => html`<input class='bc-bookmark-archive-url-edit' placeholder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" value="${url}">`
+                  (url, i) => html`<input key=${i} class='bc-bookmark-archive-url-edit' placeHolder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" defaultValue="${url}" />`
                 )
             }`
               : null
             }
 
-            <div>
-              <button onclick=${handleAddArchiveURL}>add</button>
-              ${archiveURLs.length > 1 ? html`<button onclick=${handleUndoAddArchiveURL}>remove</button>` : null}
+            <div class="button-spacing">
+              <button type="button" onClick=${handleAddArchiveURL}>add</button>
+              ${archiveURLs.length > 1 ? html`<button type="button" onClick=${handleUndoAddArchiveURL}>remove</button>` : null}
             </div>
 
         </details>
 
-        ${b?.archives?.length > 0
+        ${b?.archives?.length
             ? html`
             <label class="block">
               archives:
             </label>
             ${b.archives.map(
-                ar => html.for(ar, ar.id)`${archiveTitle({ archive: ar, small: true })}`
+                ar => html`<${ArchiveTitle} key=${ar.id} archive=${ar} small=${true} />`
               )
           }`
             : null
         }
 
-        ${b?.episodes?.length > 0
+        ${b?.episodes?.length
             ? html`
             <label class="block">
               episodes:
             </label>
             ${b.episodes.map(
-                ep => html.for(ep, ep.id)`${episodeTitle({ episode: ep, small: true })}`
+                ep => html`<${EpisodeTitle} key=${ep.id} episode=${ep} small=${true} />`
               )
           }`
             : null
@@ -391,7 +448,8 @@ export const bookmarkEdit = Component(({
         <!-- Readability Archive Options -->
         <div>
           <label>
-            <input type="checkbox" name="createArchive">
+            <input type="checkbox" name="createArchive" />
+            ${'\n'}
             create new archive
           </label>
           <span class="bc-help-text">
@@ -402,7 +460,8 @@ export const bookmarkEdit = Component(({
         <!-- Bookmark Create Episode -->
         <div>
           <label>
-            <input type="checkbox" onchange="${handleCreateEpisodeCheckbox}" name="createEpisode">
+            <input type="checkbox" onChange=${handleCreateEpisodeCheckbox} name="createEpisode" />
+            ${'\n'}
             create new episode
           </label>
           <span class="bc-help-text">
@@ -420,41 +479,48 @@ export const bookmarkEdit = Component(({
                 type="radio"
                 name="episodeMedium"
                 value="video"
-                ?checked="${true}"
-                onchange="${handleEpisodeMediumSelect}"
-              >
+                defaultChecked
+                onChange="${handleEpisodeMediumSelect}"
+              />
+              ${'\n'}
               <span>video</span>
             </label>
-
+            ${'\n'}
             <label>
               <input
                 type="radio"
                 name="episodeMedium"
                 value="audio"
-                onchange=${handleEpisodeMediumSelect}
-              >
+                onChange=${handleEpisodeMediumSelect}
+              />
+              ${'\n'}
               <span>audio</span>
             </label>
-          <label>
-            <input type="checkbox" name="custom-episode-url" onchange="${handleCustomEpisodeURLCheckboxChange}">
-            custom url
-          </label>
-          <button onclick="${handlePreviewRefresh}">refresh preview</button>
+            ${'\n'}
+            <label>
+              <input type="checkbox" name="custom-episode-url" onChange="${handleCustomEpisodeURLCheckboxChange}" />
+              ${'\n'}
+              custom url
+            </label>
+            ${'\n'}
+            <button type="button" onClick="${handlePreviewRefresh}">refresh preview</button>
           </div>
 
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
             'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked,
-          })}" type="url" name="createEpisodeURL" value="${b?.url}">
+          })}" type="url" name="createEpisodeURL" defaultValue="${b?.url}" />
 
           ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}
           ${episodePreview
             ? html`
             <span class="bc-help-text bc-episode-preview-title">
-              <span>${episodePreview.src_type === 'video' ? '📼' : episodePreview.src_type === 'audio' ? '💿' : null}</span>
-              <a onclick=${handleNewWindowLink} target="_blank" href="${episodePreview.url}">${`${episodePreview.title}.${episodePreview.ext}`}</a>
-              <span>(${format(episodePreview.duration * 1000)})</span>
-            <span>
+              <span>${episodePreview?.src_type === 'video' ? '📼' : episodePreview?.src_type === 'audio' ? '💿' : null}</span>
+              ${'\n'}
+              <a onClick=${handleNewWindowLink} target="_blank" href="${episodePreview?.url}">${`${episodePreview?.title}.${episodePreview?.ext}`}</a>
+              ${'\n'}
+              <span>(${format((episodePreview?.duration || 0) * 1000)})</span>
+            </span>
             `
             : null
           }
@@ -466,17 +532,17 @@ export const bookmarkEdit = Component(({
 
         <!-- Bookmark Submission Line -->
         <div class="bc-bookmark-edit-submit-line">
-          <div class="button-cluster">
-            ${onSave ? html`<input name="submit-button" type="submit">` : null}
-            ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
+          <div class="button-cluster button-spacing">
+            ${onSave ? html`<span><input name="submit-button" type="submit" /></span>` : null}
+            ${onCancelEdit ? html`<span><button type="button" onClick=${onCancelEdit}>Cancel</button></span>` : null}
           </div>
-          <div>
+          <div class="button-spacing">
             ${onDeleteBookmark
               ? deleteConfirm
                 ? html`
-                  <button onClick=${handleCancelDelete}>Cancel</button>
-                  <button onClick=${handleDeleteBookmark}>Destroy</button>`
-                : html`<button onClick=${handleInitiateDelete}>Delete</button>`
+                  <span><button type="button" onClick=${handleCancelDelete}>Cancel</button></span>
+                  <span><button type="button" onClick=${handleDeleteBookmark}>Destroy</button></span>`
+                : html`<span><button type="button" onClick=${handleInitiateDelete}>Delete</button></span>`
               : null
             }
           </div>
@@ -488,7 +554,7 @@ export const bookmarkEdit = Component(({
             <div class="bc-help-text">
               Version ${bookmarkletVersion}
               ${bookmarkletUpdateAvailable
-                ? html`<a onclick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
+                ? html`<a onClick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
               : null}
             </div>
             `
@@ -499,14 +565,8 @@ export const bookmarkEdit = Component(({
       </fieldset>
     </form>
     </div>`
-})
+}
 
-function validateURL (maybeURL) {
-  try {
-    const url = new URL(maybeURL) // eslint-disable-line no-unused-vars
-    // TODO: block more bad URL stuff here
-    return true
-  } catch (err) {
-    return false
-  }
+function validateURL (/** @type {string} */maybeURL) {
+  return URL.canParse(maybeURL)
 }

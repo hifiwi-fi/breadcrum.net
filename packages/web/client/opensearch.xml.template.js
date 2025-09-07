@@ -1,4 +1,10 @@
-export default ({
+/**
+ * @import { TemplateFunction } from '@domstack/static'
+ * @import { GlobalVars } from './globals/global.vars.js'
+ */
+
+/** @type {TemplateFunction<GlobalVars>} */
+export default async ({
   vars: {
     transport,
     host,

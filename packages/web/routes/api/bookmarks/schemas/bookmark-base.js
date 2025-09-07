@@ -29,6 +29,7 @@ export const bookmarkReadProps = /** @type {const} @satisfies {JSONSchema} */ ({
     'id',
     'url',
     'created_at',
+    'updated_at',
     'starred',
     'toread',
     'sensitive',

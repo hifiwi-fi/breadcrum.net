@@ -1,11 +1,18 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useEffect } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
-  const { user } = useUser()
+  const { user } = useUser({ required: false })
 
   useEffect(() => {
     const logout = async () => {
@@ -38,8 +45,11 @@ export const page = Component(() => {
       `
     }
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

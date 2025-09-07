@@ -1,15 +1,26 @@
-import { Component, html } from 'uland-isomorphic'
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @import { FunctionComponent } from 'preact'
+ */
+
+import { html } from 'htm/preact'
 import cn from 'classnames'
 
-export const star = Component(({
+/** @type{FunctionComponent<{
+ * starred: boolean,
+ * onToggleStar: (ev: MouseEvent) => void
+}>} */
+export const Star = ({
   starred = false,
-  onclick = () => {},
+  onToggleStar = () => {},
 }) => {
   return html`
-    <span class="${cn({ 'bc-starred': starred, 'bc-unstarred': !starred, 'bc-star': true })}" onclick=${onclick}>
+    <span class="${cn({ 'bc-starred': starred, 'bc-unstarred': !starred, 'bc-star': true })}" onClick=${onToggleStar}>
       ${starred
         ? '★'
         : '☆'
         }
     </span>`
-})
+}

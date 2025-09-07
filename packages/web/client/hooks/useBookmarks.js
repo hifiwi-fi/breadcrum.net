@@ -1,31 +1,26 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
 /**
- * @import { TypeBookmarkRead } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
+ * @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
  */
 
-// @ts-expect-error
-import { useEffect, useState } from 'uland-isomorphic'
+import { useEffect, useState } from 'preact/hooks'
 import { useUser } from './useUser.js'
 import { useQuery } from './useQuery.js'
 import { useLSP } from './useLSP.js'
 import { useReload } from './useReload.js'
 
 export function useBookmarks () {
-  const { user } = useUser()
+  const { user } = useUser({ required: false })
   const state = useLSP()
   const { query } = useQuery()
-  /** @type {[TypeBookmarkRead[] | null, (bookmarks: TypeBookmarkRead[] | null) => void]} */
-  const [bookmarks, setBookmarks] = useState()
-  /** @type {[boolean, (loading: boolean) => void]} */
-  const [bookmarksLoading, setBookmarksLoading] = useState(false)
-  /** @type {[Error | null, (err: Error | null) => void]} */
-  const [bookmarksError, setBookmarksError] = useState(null)
 
-  /** @type {[Date | null, (before: Date | null) => void]} */
-  const [before, setBefore] = useState()
-  /** @type {[Date | null, (after: Date | null) => void]} */
-  const [after, setAfter] = useState()
+  const [bookmarks, setBookmarks] = useState(/** @type {TypeBookmarkReadClient[] | null} */(null))
+  const [bookmarksLoading, setBookmarksLoading] = useState(false)
+  const [bookmarksError, setBookmarksError] = useState(/** @type {Error | null} */(null))
+  const [before, setBefore] = useState(/** @type {Date | null} */(null))
+  const [after, setAfter] = useState(/** @type {Date | null} */(null))
 
   const { reload: reloadBookmarks, signal: bookmarksReloadSignal } = useReload()
 

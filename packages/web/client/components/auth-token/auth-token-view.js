@@ -2,29 +2,24 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
-*/
+ * @import { FunctionComponent } from 'preact'
+ * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
+ */
 
+import { html } from 'htm/preact'
 import { formatRelativeTime } from '../../lib/format-relative-time.js'
-
-// @ts-expect-error
-import { Component, html } from 'uland-isomorphic'
 import cn from 'classnames'
 
 /**
- * @typedef {({
- *  authToken,
- *  onEdit,
- * }: {
- *  authToken: TypeAuthTokenReadClient,
- *  onEdit?: () => void,
- * }) => any} AuthTokenView
+ * @typedef {object} AuthTokenViewProps
+ * @property {TypeAuthTokenReadClient} authToken
+ * @property {() => void} [onEdit]
  */
 
 /**
-  * @type {AuthTokenView}
-  */
-export const authTokenView = Component(/** @type{AuthTokenView} */({
+ * @type {FunctionComponent<AuthTokenViewProps>}
+ */
+export const AuthTokenView = ({
   authToken: t,
   onEdit = () => {},
 }) => {
@@ -88,7 +83,7 @@ export const authTokenView = Component(/** @type{AuthTokenView} */({
         </div>
       </div>
       <div>
-        <button onClick=${onEdit}>Edit</button>
+        <button type="button" onClick=${onEdit}>Edit</button>
       </div>
     </div>`
-})
+}

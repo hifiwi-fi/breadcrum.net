@@ -1,13 +1,22 @@
+/**
+ * @import { TemplateAsyncIterator } from '@domstack/static'
+ * @import { GlobalVars } from './globals/global.vars.js'
+ */
 import pMap from 'p-map'
+
+/** @type {(feed: any) => string} */
+// @ts-ignore - jsonfeed-to-atom has no type definitions
 import jsonfeedToAtom from 'jsonfeed-to-atom'
 
 /**
- * @import { TemplateFunction } from '@domstack/static'
+ * @typedef {GlobalVars & {
+ *   layout?: string,
+ *   title?: string,
+ *   publishDate?: string
+ * }} FeedTemplateVars
  */
 
-/**
- * @type {TemplateFunction}
- */
+/** @type {TemplateAsyncIterator<FeedTemplateVars>} */
 export default async function * feedsTemplate (args) {
   const {
     vars: {

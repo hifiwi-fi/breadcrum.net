@@ -1,24 +1,21 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
 
 /**
- * @typedef {({
- *  user,
- * }: {
+ * @typedef {{
  *  user: TypeUserRead | null,
- * }) => any} DisabledField
+ * }} DisabledFieldProps
  */
 
 /**
- * @type {DisabledField}
+ * @type {FunctionComponent<DisabledFieldProps>}
  */
-export const disabledField = Component(/** @type{DisabledField} */({ user }) => {
+export const DisabledField = ({ user }) => {
   return html`
     ${user?.disabled
       ? html`
@@ -35,4 +32,4 @@ export const disabledField = Component(/** @type{DisabledField} */({ user }) => 
       : null
     }
   `
-})
+}

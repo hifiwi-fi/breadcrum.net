@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaSummaryRead } from './schemas/schema-summary-read.js'
 
 /**
  * @typedef {Object} TotalsRow
@@ -41,7 +43,7 @@ import SQL from '@nearform/sql'
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *   }
  * }>}
  */
@@ -59,65 +61,12 @@ export async function getSummary (fastify, _opts) {
         hide: true,
         description: 'Get a summary overview of the pg-boss queue system',
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              healthy: { type: 'boolean', description: 'Overall health status' },
-              totals: {
-                type: 'object',
-                description: 'Total job counts across all queues',
-                properties: {
-                  jobs: { type: 'integer', description: 'Total number of jobs' },
-                  active: { type: 'integer', description: 'Currently processing jobs' },
-                  pending: { type: 'integer', description: 'Jobs waiting to be processed (created + retry)' },
-                  completed: { type: 'integer', description: 'Successfully completed jobs' },
-                  failed: { type: 'integer', description: 'Failed jobs' },
-                }
-              },
-              queues: {
-                type: 'array',
-                description: 'Summary for each queue',
-                items: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string', description: 'Queue name' },
-                    active: { type: 'integer', description: 'Active jobs in this queue' },
-                    pending: { type: 'integer', description: 'Pending jobs in this queue' },
-                    completed: { type: 'integer', description: 'Completed jobs in this queue' },
-                    failed: { type: 'integer', description: 'Failed jobs in this queue' },
-                    total: { type: 'integer', description: 'Total jobs in this queue' },
-                  }
-                }
-              },
-              recent_failures: {
-                type: 'array',
-                description: 'Recent failed jobs',
-                items: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'string', format: 'uuid', description: 'Job ID' },
-                    name: { type: 'string', description: 'Queue name' },
-                    created_on: { type: 'string', format: 'date-time', description: 'When job was created' },
-                    completed_on: { type: 'string', format: 'date-time', description: 'When job failed' },
-                    retry_count: { type: 'integer', description: 'Number of retry attempts' },
-                    output: { type: ['object'], nullable: true, additionalProperties: true, description: 'Error output' },
-                  }
-                }
-              },
-              maintenance: {
-                type: 'object',
-                description: 'Maintenance status',
-                properties: {
-                  last_run: { type: ['string'], nullable: true, format: 'date-time', description: 'Last maintenance run' },
-                  overdue: { type: 'boolean', description: 'Whether maintenance is overdue' },
-                }
-              }
-            }
-          }
+          200: schemaSummaryRead
         }
       },
     },
-    async function getSummaryHandler (_request, _reply) {
+    async function getSummaryHandler (_request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Get overall job counts
         const countsQuery = SQL`
@@ -198,7 +147,8 @@ export async function getSummary (fastify, _opts) {
                        !maintenanceOverdue &&
                        totals.pending < 1000
 
-        return {
+        /** @type {ReturnBody} */
+        const returnBody = {
           healthy,
           totals: {
             jobs: totals.total,
@@ -214,6 +164,8 @@ export async function getSummary (fastify, _opts) {
             overdue: maintenanceOverdue
           }
         }
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get queue summary')
         throw error

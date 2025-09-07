@@ -1,8 +1,10 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
+import { schemaQueuesRead } from './schemas/schema-queues-read.js'
 
 /**
  * @typedef {Object} QueueRow
@@ -21,7 +23,7 @@ import SQL from '@nearform/sql'
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *   }
  * }>}
  */
@@ -39,33 +41,12 @@ export async function getQueues (fastify, _opts) {
         hide: true,
         description: 'Get all queue configurations',
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              queues: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string', description: 'Queue name' },
-                    policy: { type: 'string', description: 'Queue policy' },
-                    retry_limit: { type: 'integer', description: 'Maximum retry attempts' },
-                    retry_delay: { type: 'integer', description: 'Delay between retries in seconds' },
-                    retry_backoff: { type: 'boolean', description: 'Use exponential backoff for retries' },
-                    expire_seconds: { type: 'integer', description: 'Job expiration time in seconds' },
-                    retention_minutes: { type: 'integer', description: 'How long to keep completed jobs in minutes' },
-                    dead_letter: { type: ['string'], nullable: true, description: 'Dead letter queue name' },
-                    created_on: { type: 'string', format: 'date-time', description: 'Queue creation time' },
-                    updated_on: { type: 'string', format: 'date-time', description: 'Last update time' },
-                  }
-                }
-              }
-            }
-          }
+          200: schemaQueuesRead
         }
       },
     },
-    async function getQueuesHandler (_request, _reply) {
+    async function getQueuesHandler (_request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         const query = SQL`
           SELECT
@@ -86,9 +67,12 @@ export async function getQueues (fastify, _opts) {
         /** @type {QueryResult<QueueRow>} */
         const result = await fastify.pg.query(query)
 
-        return {
+        /** @type {ReturnBody} */
+        const returnBody = {
           queues: result.rows
         }
+
+        return reply.code(200).send(returnBody)
       } catch (error) {
         fastify.log.error({ error }, 'Failed to get queues')
         throw error

@@ -6,7 +6,7 @@ declare module 'fastify' {
     getYTDLPMetadataWrapper: (params: {
       url: string;
       medium: MediumTypes;
-      attempt: number;
+      attempt?: number;
     }) => Promise<YTDLPMetadata>;
   }
 }

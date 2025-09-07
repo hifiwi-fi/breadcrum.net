@@ -8,12 +8,14 @@ import { schemaFeedJoin } from '../../feeds/schemas/schema-feed-join.js'
  * @typedef {FromSchema<SchemaEpisodeRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeEpisodeRead
+ * @typedef {FromSchema<SchemaEpisodeRead>} TypeEpisodeReadClient
  */
 
 export const schemaEpisodeRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:episode:read',
   additionalProperties: false,
+  required: ['updated_at', 'bookmark'],
   properties: {
     ...episodeReadProps.properties,
     ...episodeProps.properties,

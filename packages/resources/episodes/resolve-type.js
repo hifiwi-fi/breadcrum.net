@@ -2,7 +2,7 @@
  * @param {object} media
  * @param {string} [media.ext]
  * @param {string} [media._type]
- * @return {'audio' | 'video' | string | null | undefined }
+ * @return {'audio' | 'video' | string | undefined }
  */
 export function resolveType (media) {
   return (

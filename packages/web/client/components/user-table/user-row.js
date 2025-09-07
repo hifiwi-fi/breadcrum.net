@@ -1,11 +1,31 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, useState, useCallback } from 'uland-isomorphic'
-import { useLSP } from '../../hooks/useLSP.js'
-import { userRowEdit } from './user-row-edit.js'
-import { userRowView } from './user-row-view.js'
-import { diffUser } from '../../lib/diff-user.js'
 
-export const userRow = Component(({ user, reload, onDelete }) => {
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserUpdateClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-update.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useCallback } from 'preact/hooks'
+import { useLSP } from '../../hooks/useLSP.js'
+import { UserRowEdit } from './user-row-edit.js'
+import { UserRowView } from './user-row-view.js'
+import { diffUpdate } from '../../lib/diff-update.js'
+import { tc } from '../../lib/typed-component.js'
+
+/**
+ * @typedef {object} UserRowProps
+ * @property {SchemaTypeAdminUserReadClient} user
+ * @property {() => void} reload
+ * @property {() => void} onDelete
+ */
+
+/**
+ * @type {FunctionComponent<UserRowProps>}
+ */
+export const UserRow = ({ user, reload, onDelete }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -18,8 +38,8 @@ export const userRow = Component(({ user, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (newUser) => {
-    const payload = diffUser(user, newUser)
+  const handleSave = useCallback(async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
+    const payload = diffUpdate(user, newUser)
 
     const endpoint = `${state.apiUrl}/admin/users/${user.id}`
 
@@ -37,9 +57,9 @@ export const userRow = Component(({ user, reload, onDelete }) => {
     } else {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
-  }, [user, state.apiUrl, reload, setEditing])
+  }, [user?.id, state.apiUrl, reload, setEditing])
 
-  const handleDelete = useCallback(async (ev) => {
+  const handleDelete = useCallback(async () => {
     const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
       method: 'delete',
       headers: {
@@ -54,23 +74,23 @@ export const userRow = Component(({ user, reload, onDelete }) => {
 
     setDeleted(true)
     onDelete()
-  }, [state.apiUrl, user.id, setDeleted, reload])
+  }, [state.apiUrl, user.id, setDeleted, onDelete])
 
   return html`
     <!-- Row -->
     ${deleted
-    ? html`<!-- Deleted -->`
-    : editing
-      ? userRowEdit({
+      ? html`<!-- Deleted -->`
+      : editing
+        ? tc(UserRowEdit, {
             user,
             onSave: handleSave,
             onDelete: handleDelete,
             onCancelEdit: handleCancelEdit,
           })
-      : userRowView({
+        : tc(UserRowView, {
             user,
             onEdit: handleEdit,
-      })
+          })
     }
-    `
-})
+  `
+}

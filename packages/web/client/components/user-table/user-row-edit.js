@@ -1,60 +1,78 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
 /* eslint-disable camelcase */
-import { Component, html, useState, useRef, useCallback } from 'uland-isomorphic'
 
-export const userRowEdit = Component(({
+/**
+ * @import { FunctionComponent } from 'preact'
+ * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserUpdateClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-update.js'
+ */
+
+import { html } from 'htm/preact'
+import { useState, useRef, useCallback } from 'preact/hooks'
+
+/**
+ * @typedef {object} UserRowEditProps
+ * @property {SchemaTypeAdminUserReadClient} user
+ * @property {(formState: SchemaTypeAdminUserUpdateClient) => Promise<void>} [onSave]
+ * @property {() => Promise<void>} [onDelete]
+ * @property {() => void} [onCancelEdit]
+ */
+
+/**
+ * @type {FunctionComponent<UserRowEditProps>}
+ */
+export const UserRowEdit = ({
   user: u,
   onSave,
   onDelete,
   onCancelEdit,
 }) => {
-  const [error, setError] = useState(null)
-
+  const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
-
   const [disabled, setDisabled] = useState(false)
+  const rowRef = useRef(/** @type {HTMLTableRowElement | null} */(null))
 
-  const rowRef = useRef()
-
-  const handleInitiateDelete = useCallback((ev) => {
+  const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const handleCancelDelete = useCallback((ev) => {
+  const handleCancelDelete = useCallback(() => {
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  const handleDelete = useCallback(async (ev) => {
+  const handleDelete = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
     try {
-      await onDelete()
+      if (onDelete) await onDelete()
     } catch (err) {
       console.error(err)
       setDisabled(false)
       setDeleteConfirm(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, onDelete])
 
-  const handleSave = useCallback(async (ev) => {
+  const handleSave = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
 
     const row = rowRef.current
+    if (!row) return
 
     // goddamn forms dont work in tables.
-    const username = row.querySelector('input[name="username"]')?.value
-    const email = row.querySelector('input[name="email"]')?.value
-    const email_confirmed = row.querySelector('input[name="email_confirmed"]')?.checked
-    const pending_email_update = row.querySelector('input[name="pending_email_update"]')?.value
-    const newsletter_subscription = row.querySelector('input[name="newsletter_subscription"]')?.checked
-    const disabled_email = row.querySelector('input[name="disabled_email"]')?.checked
-    const disabled = row.querySelector('input[name="disabled"]')?.checked
-    const disabled_reason = row.querySelector('textarea[name="disabled_reason"]')?.value?.trim()
-    const internal_note = row.querySelector('textarea[name="internal_note"]')?.value?.trim()
+    const username = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="username"]'))?.value || ''
+    const email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email"]'))?.value || ''
+    const email_confirmed = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email_confirmed"]'))?.checked || false
+    const pending_email_update = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="pending_email_update"]'))?.value || null
+    const newsletter_subscription = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="newsletter_subscription"]'))?.checked || false
+    const disabled_email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled_email"]'))?.checked || false
+    const disabled = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled"]'))?.checked || false
+    const disabled_reason = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="disabled_reason"]'))?.value?.trim() || null
+    const internal_note = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="internal_note"]'))?.value?.trim() ?? null
 
     const formState = {
       username,
@@ -69,54 +87,54 @@ export const userRowEdit = Component(({
     }
 
     try {
-      await onSave(formState)
+      if (onSave) await onSave(formState)
     } catch (err) {
       setDisabled(false)
-      setError(err)
+      setError(/** @type {Error} */(err))
     }
   }, [setDisabled, setError, rowRef?.current, onSave])
 
   return html`
     <tr ref="${rowRef}" class="bc-user-row-edit">
         <td>
-          ${onSave ? html`<button name="submit-button" onclick=${handleSave}>Save</button>` : null}
-          ${onCancelEdit ? html`<button onclick=${onCancelEdit}>Cancel</button>` : null}
+          ${onSave ? html`<button name="submit-button" onClick=${handleSave}>Save</button>` : null}
+          ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
           ${onDelete
             ? deleteConfirm
               ? html`
                 <button onClick=${handleCancelDelete}>Cancel</button>
-                <button ?disabled="${disabled}" onClick=${handleDelete}>Destroy</button>`
+                <button disabled="${disabled}" onClick=${handleDelete}>Destroy</button>`
               : html`<button onClick=${handleInitiateDelete}>Delete</button>`
             : null
           }
         </td>
         <td>${u.id}</td>
         <td>
-          <input ?disabled="${disabled}" type="text" name="username" value="${u.username}">
+          <input disabled="${disabled}" type="text" name="username" defaultValue="${u.username}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="email" name="email" value="${u.email}">
+          <input disabled="${disabled}" type="email" name="email" defaultValue="${u.email}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="email_confirmed" ?checked="${u.email_confirmed}">
+          <input disabled="${disabled}" type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="email" name="pending_email_update" value="${u.pending_email_update}">
+          <input disabled="${disabled}" type="email" name="pending_email_update" defaultValue="${u.pending_email_update}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="newsletter_subscription" ?checked="${u.newsletter_subscription}">
+          <input disabled="${disabled}" type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="disabled_email" ?checked="${u.disabled_email}">
+          <input disabled="${disabled}" type="checkbox" name="disabled_email" checked="${u.disabled_email}" />
         </td>
         <td>
-          <input ?disabled="${disabled}" type="checkbox" name="disabled" ?checked="${u.disabled}">
+          <input disabled="${disabled}" type="checkbox" name="disabled" checked="${u.disabled}" />
         </td>
         <td>
-          <textarea ?disabled="${disabled}" rows="2" name="disabled_reason">${u.disabled_reason}</textarea>
+          <textarea disabled="${disabled}" rows="2" name="disabled_reason">${u.disabled_reason}</textarea>
         </td>
         <td>
-          <textarea ?disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
+          <textarea disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
         </td>
         <td>
           <time datetime="${u.created_at}">
@@ -134,4 +152,4 @@ export const userRowEdit = Component(({
       ${error ? html`<div class="error-box">${error.message}</div>` : null}
     </tr>
   `
-})
+}

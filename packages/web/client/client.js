@@ -1,9 +1,15 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render } from 'uland-isomorphic'
-// import { useUser } from './hooks/useUser.js'
-import { badge } from './components/badge/badge.js'
 
-export const page = Component(() => {
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+// import { useUser } from './hooks/useUser.js'
+import { Badge } from './components/badge/badge.js'
+
+/** @type {FunctionComponent} */
+export const Page = () => {
   // const { user } = useUser()
 
   // useEffect(() => {
@@ -12,10 +18,10 @@ export const page = Component(() => {
 
   return html`
     <div class="bc-marketing">
-      ${badge(html`<a href="/register">Early Access</a>`)}
+      <${Badge}><a href="/register">Early Access</a><//>
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
-          <img src="/static/bread.png">
+          <img src="/static/bread.png" />
         </div>
         <h1 class="bc-marking-hero-title">
           Breadcrum
@@ -27,8 +33,8 @@ export const page = Component(() => {
 
         <div class="bc-marketing-hero-screenshot">
           <picture>
-            <source srcset="./static/screenshots/bookmark-window-dark.png" media="(prefers-color-scheme: dark)">
-            <img src="./static/screenshots/bookmark-window-light.png" alt="Screenshot of Breadcrum.net">
+            <source srcSet="./static/screenshots/bookmark-window-dark.png" media="(prefers-color-scheme: dark)" />
+            <img src="./static/screenshots/bookmark-window-light.png" alt="Screenshot of Breadcrum.net" />
           </picture>
         </div>
       </div>
@@ -45,8 +51,8 @@ export const page = Component(() => {
 
             <div class="bc-marketing-feature-screenshot">
               <picture>
-                <source srcset="./static/screenshots/bookmark-edit-dark.png" media="(prefers-color-scheme: dark)">
-                <img src="./static/screenshots/bookmark-edit-light.png" alt="Screenshot of Breadcrum.net">
+                <source srcSet="./static/screenshots/bookmark-edit-dark.png" media="(prefers-color-scheme: dark)" />
+                <img src="./static/screenshots/bookmark-edit-light.png" alt="Screenshot of Breadcrum.net" />
               </picture>
             </div>
           </div>
@@ -63,8 +69,8 @@ export const page = Component(() => {
             </p>
             <div class="bc-marketing-feature-screenshot">
               <picture>
-                <source srcset="./static/screenshots/apple-podcasts-dark.png" media="(prefers-color-scheme: dark)">
-                <img src="./static/screenshots/apple-podcasts-light.png" alt="Screenshot of Breadcrum.net">
+                <source srcSet="./static/screenshots/apple-podcasts-dark.png" media="(prefers-color-scheme: dark)" />
+                <img src="./static/screenshots/apple-podcasts-light.png" alt="Screenshot of Breadcrum.net" />
               </picture>
             </div>
           </div>
@@ -86,8 +92,8 @@ export const page = Component(() => {
 
             <div class="bc-marketing-feature-screenshot">
               <picture>
-                <source srcset="./static/screenshots/tag-window-dark.png" media="(prefers-color-scheme: dark)">
-                <img src="./static/screenshots/tag-window-light.png" alt="Screenshot of Breadcrum.net">
+                <source srcSet="./static/screenshots/tag-window-dark.png" media="(prefers-color-scheme: dark)" />
+                <img src="./static/screenshots/tag-window-light.png" alt="Screenshot of Breadcrum.net" />
               </picture>
             </div>
           </div>
@@ -166,8 +172,8 @@ export const page = Component(() => {
 
             <div class="bc-marketing-feature-screenshot">
               <picture>
-                <source srcset="./static/screenshots/feed-window-dark.png" media="(prefers-color-scheme: dark)">
-                <img src="./static/screenshots/feed-window-light.png" alt="Screenshot of Breadcrum.net">
+                <source srcSet="./static/screenshots/feed-window-dark.png" media="(prefers-color-scheme: dark)" />
+                <img src="./static/screenshots/feed-window-light.png" alt="Screenshot of Breadcrum.net" />
               </picture>
             </div>
           </div>
@@ -214,10 +220,13 @@ export const page = Component(() => {
           </div>
 
         </div>
-      </div>
+    </div>
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

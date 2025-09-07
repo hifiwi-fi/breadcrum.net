@@ -1,25 +1,37 @@
+/// <reference lib="dom" />
 /* eslint-env browser */
-import { Component, html, render, useState, useEffect } from 'uland-isomorphic'
+
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
+import { render } from 'preact'
+import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 
-export const page = Component(() => {
+/** @type {FunctionComponent} */
+export const Page = () => {
   const state = useLSP()
-  const { user, loading, error: userError } = useUser()
+  const { user, loading, error: userError } = useUser({ required: false })
   const [resetting, setResetting] = useState(false)
   const [reset, setReset] = useState(false)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))
 
   useEffect(() => {
     if (user && !loading) window.location.replace('/account')
-  }, [user])
+  }, [user?.id])
 
-  async function resetPassword (ev) {
+  async function resetPassword (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
     setResetting(true)
     setErrorMessage(null)
 
-    const email = ev.currentTarget.email.value
+    const form = /** @type {HTMLFormElement} */ (ev.currentTarget)
+    const emailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email'))
+
+    if (!emailElement) return
+
+    const email = emailElement.value
 
     try {
       const response = await fetch(`${state.apiUrl}/user/password:reset`, {
@@ -39,7 +51,7 @@ export const page = Component(() => {
       }
     } catch (err) {
       console.error(err)
-      setErrorMessage(err.message)
+      setErrorMessage(/** @type {Error} */(err).message)
     } finally {
       setResetting(false)
     }
@@ -56,7 +68,7 @@ export const page = Component(() => {
         : html`
           <div class="bc-password-reset">
             <form class="password-reset-form" id="password-reset-form" onsubmit=${resetPassword}>
-            <fieldset ?disabled=${resetting}>
+            <fieldset disabled=${resetting}>
               <legend>Reset Password</legend>
               <div class="bc-help-text">
                   ℹ️ Reset your password by submitting your email address below. If an account exists with that email address, a password email will be sent.
@@ -68,7 +80,7 @@ export const page = Component(() => {
                 </label>
               </div>
               <div class="button-cluster">
-                <input name="submit-button" type="submit">
+                <input name="submit-button" type="submit" />
               </div>
               ${errorMessage || userError
                   ? html`<div class="error-box">${errorMessage} ${userError}</div>`
@@ -80,12 +92,15 @@ export const page = Component(() => {
       `
       : html`
         <div>Logged in as ${user.username}</div>
-        <div>Redirecting to <a href="/account">account</a></button>
+        <div>Redirecting to <a href="/account">account</a></div>
         `
     }
 `
-})
+}
 
 if (typeof window !== 'undefined') {
-  render(document.querySelector('.bc-main'), page)
+  const container = document.querySelector('.bc-main')
+  if (container) {
+    render(html`<${Page}/>`, container)
+  }
 }

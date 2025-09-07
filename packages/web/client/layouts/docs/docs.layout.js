@@ -1,10 +1,26 @@
-import { html } from 'uland-isomorphic'
+/**
+ * @import { LayoutFunction } from '@domstack/static'
+ * @import { RootLayoutVars, PageReturn } from '../root/root.layout.js'
+*/
+
+import { html } from 'htm/preact'
 import { sep } from 'node:path'
-import { breadcrumb } from '../../components/breadcrumb/index.js'
-import { articleHeader } from '../../components/article-header/index.js'
+import { Breadcrumb } from '../../components/breadcrumb/index.js'
+import { ArticleHeader } from '../../components/article-header/index.js'
+import { tc } from '../../lib/typed-component.js'
 
 import defaultRootLayout from '../root/root.layout.js'
 
+/**
+ * Docs layout variables type - extends RootLayoutVars with docs-specific properties
+ * @typedef {RootLayoutVars & {
+ *  title: string,
+ *  publishDate: string,
+ *  updatedDate: string
+ * }} DocsLayoutVars
+ */
+
+/** @type {LayoutFunction<DocsLayoutVars, PageReturn>} */
 export default function articleLayout (args) {
   const { children, ...rest } = args
   const page = rest.page
@@ -12,9 +28,9 @@ export default function articleLayout (args) {
   const pathSegments = page.path.split(sep)
 
   const wrappedChildren = html`
-    ${breadcrumb({ pathSegments })}
+    <${Breadcrumb} pathSegments=${pathSegments} />
     <article class="h-entry" itemscope itemtype="http://schema.org/TechArticle">
-        ${articleHeader({
+        ${tc(ArticleHeader, {
             title: vars.title,
             authorImgUrl: null,
             authorImgAlt: null,
@@ -23,16 +39,13 @@ export default function articleLayout (args) {
             publishDate: vars.publishDate,
             updatedDate: vars.updatedDate
         })}
-
-      <section class="bc-docs-main e-content" itemprop="articleBody">
-        ${typeof children === 'string'
-          ? html([children])
-          : children /* Support both uhtml and string children. Optional. */
-        }
-      </section>
+      ${typeof children === 'string'
+        ? html`<section class="bc-docs-main e-content" itemprop="articleBody" dangerouslySetInnerHTML="${{ __html: children }}"/>`
+       : html`<section class="bc-docs-main e-content" itemprop="articleBody">${children}</main>`
+       }
     </article>
-    ${breadcrumb({ pathSegments })}
+    <${Breadcrumb} pathSegments=${pathSegments} />
   `
 
-  return defaultRootLayout({ children: wrappedChildren, ...rest })
+  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
 }

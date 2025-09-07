@@ -1,31 +1,27 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/**
- * @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js'
- */
-// @ts-expect-error
-import { Component, html } from 'uland-isomorphic'
+/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { FunctionComponent } from 'preact' */
+
+import { html } from 'htm/preact'
 
 /**
- * @typedef {({
- *  user,
- *  onEdit,
- * }: {
+ * @typedef {{
  *  user?: TypeUserRead | null,
  *  onEdit?: () => void,
- * }) => any} PasswordView
+ * }} PasswordViewProps
  */
 
 /**
- * @type {PasswordView}
+ * @type {FunctionComponent<PasswordViewProps>}
  */
-export const passwordView = Component(/** @type{PasswordView} */({ onEdit }) => {
+export const PasswordView = ({ onEdit }) => {
   return html`
     <dt>password</dt>
-    <dd>
-      **************
-      <button onClick=${onEdit}>Edit</button>
+    <dd class="password-view">
+      <span>**************</span>
+      <span><button onClick=${onEdit}>Edit</button></span>
     </dd>
   `
-})
+}

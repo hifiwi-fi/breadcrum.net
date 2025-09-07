@@ -1,21 +1,22 @@
-import { fullSerializedAdminUserProps } from './admin-user-props.js'
 import { userEditableUserProps } from '../../user/schemas/user-base.js'
-import { getAdminUsersQuery } from './get-admin-users-query.js'
+import { getAdminUsers } from './get-admin-users-query.js'
 import { addMillisecond } from '../../bookmarks/addMillisecond.js'
+import { schemaAdminUsersRead } from './schemas/schema-admin-user-read.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
  *
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
- *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
  *    }
  * }>}
  */
-export async function getAdminUsers (fastify, _opts) {
+export async function getAdminUsersRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -52,32 +53,13 @@ export async function getAdminUsers (fastify, _opts) {
           },
         },
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              data: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: fullSerializedAdminUserProps,
-                },
-              },
-              pagination: {
-                type: 'object',
-                properties: {
-                  before: { type: 'string', format: 'date-time' },
-                  after: { type: 'string', format: 'date-time' },
-                  top: { type: 'boolean' },
-                  bottom: { type: 'boolean' },
-                },
-              },
-            },
-          },
+          200: schemaAdminUsersRead
         },
       },
     },
     // GET users with administrative fields
-    async function getAdminUsersHandler (request, _reply) {
+    async function getAdminUsersHandler (request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       return fastify.pg.transact(async client => {
         const {
           before,
@@ -86,37 +68,38 @@ export async function getAdminUsers (fastify, _opts) {
           username,
         } = request.query
 
-        const adminUsersQuery = getAdminUsersQuery({
+        const results = await getAdminUsers({
+          fastify,
+          pg: client,
           before,
           after,
           perPage: perPage + 1,
           username,
         })
 
-        const results = await client.query(adminUsersQuery)
-
         const top = Boolean(
           (!before && !after) ||
-          (after && results.rows.length <= perPage)
+          (after && results.length <= perPage)
         )
         const bottom = Boolean(
-          (before && results.rows.length <= perPage) ||
-          (!before && !after && results.rows.length <= perPage)
+          (before && results.length <= perPage) ||
+          (!before && !after && results.length <= perPage)
         )
 
-        if (results.rows.length > perPage) {
+        if (results.length > perPage) {
           if (after) {
-            results.rows.shift()
+            results.shift()
           } else {
-            results.rows.pop()
+            results.pop()
           }
         }
 
-        const nextPage = bottom ? null : results.rows.at(-1)?.created_at
-        const prevPage = top ? null : addMillisecond(results.rows[0]?.created_at)
+        const nextPage = bottom ? null : results.at(-1)?.created_at ?? null
+        const prevPage = top ? null : addMillisecond(results[0]?.created_at) ?? null
 
-        return {
-          data: results.rows,
+        /** @type {ReturnBody} */
+        const returnData = {
+          data: results,
           pagination: {
             before: nextPage,
             after: prevPage,
@@ -124,6 +107,8 @@ export async function getAdminUsers (fastify, _opts) {
             bottom,
           },
         }
+
+        return reply.code(200).send(returnData)
       })
     }
   )

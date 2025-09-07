@@ -4,6 +4,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
@@ -13,6 +14,7 @@
 }
 
 .bc-archives-title-container-small {
+  line-clamp: 1;
   -webkit-line-clamp: 1;
   font-size: 0.8em;
 }
