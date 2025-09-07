@@ -2,7 +2,7 @@
 layout: article
 title: "🤦‍♂️ Frontend Rewrite"
 serif: false
-publishDate: "2025-08-30T03:12:22.391Z"
+publishDate: "2025-09-07T23:32:59.171Z"
 authorName: "Bret Comnes"
 authorUrl: "https://bret.io"
 authorImgUrl: "/static/bret-ava.png"
@@ -30,7 +30,9 @@ I wrote a big, long blog post about this switch, but I think rather than post al
 - Software development is chaotic. A turn at the beginning can permanently alter the trajectory of the project.
 - The usefulness of [LLMs][llms] as a refactoring tool drops off significantly when you try to have it do large transformations on novel or unique patterns/codebases.
 
----
+Onward and upward. Please don't let the pace discourage your support of the project.
+As alwayse feedback and ideas are always welcome.
+Your input caries a lot of weight at this point of the project still.
 
 [uhtml]: https://github.com/WebReflection/uhtml
 [preact]: https://preactjs.com
