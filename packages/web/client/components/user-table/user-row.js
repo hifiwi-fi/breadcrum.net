@@ -4,7 +4,7 @@
 /**
  * @import { FunctionComponent } from 'preact'
  * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
- * @import { UserFormState } from './user-row-edit.js'
+ * @import { SchemaTypeAdminUserUpdateClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-update.js'
  */
 
 import { html } from 'htm/preact'
@@ -38,7 +38,7 @@ export const UserRow = ({ user, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {UserFormState} */newUser) => {
+  const handleSave = useCallback(async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
     const payload = diffUpdate(user, newUser)
 
     const endpoint = `${state.apiUrl}/admin/users/${user.id}`
