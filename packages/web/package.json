@@ -55,7 +55,7 @@
     "preact": "^10.27.0",
     "preact-render-to-string": "^6.5.13",
     "resolve-email": "^4.0.1",
-    "undici": "^7.0.0",
+    "undici": "^7.16.0",
     "useragent": "^2.3.0"
   },
   "optionalDependencies": {
