@@ -20,6 +20,9 @@
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js --import otel.js"
   },
+  "overrides": {
+    "fast-json-stringify": "6.0.1"
+  },
   "dependencies": {
     "@breadcrum/extract-meta": "^2.0.0",
     "@breadcrum/resources": "file:../resources",
