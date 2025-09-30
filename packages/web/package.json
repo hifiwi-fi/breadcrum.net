@@ -66,7 +66,7 @@
     "@domstack/static": "^11.0.0-beta.6",
     "@fastify/type-provider-json-schema-to-ts": "^5.0.0",
     "@types/common-tags": "^1.8.4",
-    "@types/node": "^24.0.3",
+    "@types/node": "^24.6.0",
     "@types/nodemailer": "^7.0.1",
     "@types/useragent": "^2.3.4",
     "@types/pg": "^8.11.10",
