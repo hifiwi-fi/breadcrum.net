@@ -23,9 +23,6 @@
     "npm-run-all2": "^8.0.1",
     "typescript": "~5.9.0"
   },
-  "overrides": {
-    "fast-json-stringify": "6.0.1"
-  },
   "c8": {
     "reporter": [
       "lcov",

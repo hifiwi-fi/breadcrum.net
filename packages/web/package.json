@@ -88,9 +88,6 @@
     "why-is-node-running": "^3.2.2",
     "xmlbuilder": "^15.1.1"
   },
-  "overrides": {
-    "fast-json-stringify": "6.0.1"
-  },
   "engines": {
     "node": ">=23.0.0"
   },
