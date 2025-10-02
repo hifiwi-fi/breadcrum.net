@@ -18,12 +18,11 @@ export const schemaSummaryRead = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'object',
       description: 'Total job counts across all queues',
       additionalProperties: false,
-      required: ['jobs', 'active', 'pending', 'completed', 'failed'],
+      required: ['jobs', 'active', 'pending', 'failed'],
       properties: {
         jobs: { type: 'integer', description: 'Total number of jobs' },
         active: { type: 'integer', description: 'Currently processing jobs' },
         pending: { type: 'integer', description: 'Jobs waiting to be processed (created + retry)' },
-        completed: { type: 'integer', description: 'Successfully completed jobs' },
         failed: { type: 'integer', description: 'Failed jobs' },
       }
     },
@@ -33,12 +32,11 @@ export const schemaSummaryRead = /** @type {const} @satisfies {JSONSchema} */ ({
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['name', 'active', 'pending', 'completed', 'failed', 'total'],
+        required: ['name', 'active', 'pending', 'failed', 'total'],
         properties: {
           name: { type: 'string', description: 'Queue name' },
           active: { type: 'integer', description: 'Active jobs in this queue' },
           pending: { type: 'integer', description: 'Pending jobs in this queue' },
-          completed: { type: 'integer', description: 'Completed jobs in this queue' },
           failed: { type: 'integer', description: 'Failed jobs in this queue' },
           total: { type: 'integer', description: 'Total jobs in this queue' },
         }

@@ -9,7 +9,7 @@ import PgBoss from 'pg-boss'
 import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
-import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
+import { defaultBossOptions, defaultQueueOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
 /**
  * This plugin adds pg-boss queues
@@ -27,10 +27,6 @@ export default fp(async function (fastify, _) {
     fastify.log.error(error, 'pg-boss error')
   })
 
-  boss.on('monitor-states', (states) => {
-    fastify.log.info(states, 'pg-boss queue states')
-  })
-
   boss.on('wip', (workers) => {
     fastify.log.debug(workers, 'pg-boss workers in progress')
   })
@@ -45,9 +41,12 @@ export default fp(async function (fastify, _) {
 
   fastify.log.info({ isInstalled: await boss.isInstalled() })
 
-  await boss.createQueue(resolveEpisodeQName)
-  await boss.createQueue(resolveArchiveQName)
-  await boss.createQueue(resolveBookmarkQName)
+  // Create queues with v11 configuration
+  await boss.createQueue(resolveEpisodeQName, defaultQueueOptions)
+  await boss.createQueue(resolveArchiveQName, defaultQueueOptions)
+  await boss.createQueue(resolveBookmarkQName, defaultQueueOptions)
+
+  fastify.log.info('pg-boss queues created')
 
   /** @type {ResolveEpisodePgBossQ} */
   const resolveEpisodeQ = {

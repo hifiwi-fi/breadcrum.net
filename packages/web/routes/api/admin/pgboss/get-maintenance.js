@@ -9,8 +9,13 @@ import { schemaMaintenanceRead } from './schemas/schema-maintenance-read.js'
 /**
  * @typedef {Object} VersionRow
  * @property {number} version - pg-boss schema version
- * @property {Date|null} maintained_on - Last maintenance run time
- * @property {Date|null} monitored_on - Last monitor run time
+ * @property {Date|null} cron_on - Last cron/schedule run time
+ */
+
+/**
+ * @typedef {Object} TimesRow
+ * @property {Date|null} last_supervise - Most recent queue supervision time
+ * @property {Date|null} last_maintenance - Most recent queue maintenance time
  */
 
 /**
@@ -41,13 +46,12 @@ export async function getMaintenance (fastify, _opts) {
     async function getMaintenanceHandler (_request, reply) {
       /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
       try {
-        // Get version and last run times
+        // Get version from version table
         const versionQuery = SQL`
           SELECT
             version,
-            maintained_on,
-            monitored_on
-          FROM pgboss.version
+            cron_on
+          FROM pgboss_v11.version
           ORDER BY version DESC
           LIMIT 1
         `
@@ -56,24 +60,50 @@ export async function getMaintenance (fastify, _opts) {
         const versionResult = await fastify.pg.query(versionQuery)
         const versionData = versionResult.rows[0]
 
-        // Get pg-boss configuration from the instance
+        // Get most recent supervision and maintenance times from queue table
+        const timesQuery = SQL`
+          SELECT
+            MAX(monitor_on) as last_supervise,
+            MAX(maintain_on) as last_maintenance
+          FROM pgboss_v11.queue
+        `
+
+        /** @type {QueryResult<TimesRow>} */
+        const timesResult = await fastify.pg.query(timesQuery)
+        const lastSupervise = timesResult.rows[0]?.last_supervise || null
+        const lastMaintenance = timesResult.rows[0]?.last_maintenance || null
+
+        // Get pg-boss configuration
         const boss = fastify.pgboss.boss
         const config = fastify.pgboss.config
 
         // Check if pg-boss is installed
         const isInstalled = Boolean(await boss.isInstalled())
 
+        // Calculate if overdue
+        const now = Date.now()
+        const superviseIntervalMs = (config.superviseIntervalSeconds || 60) * 1000
+        const maintenanceIntervalMs = (config.maintenanceIntervalSeconds || 86400) * 1000
+
+        const supervisionOverdue = lastSupervise
+          ? (now - new Date(lastSupervise).getTime()) > (superviseIntervalMs * 2)
+          : true
+
+        const maintenanceOverdue = lastMaintenance
+          ? (now - new Date(lastMaintenance).getTime()) > (maintenanceIntervalMs * 2)
+          : true
+
         /** @type {ReturnBody} */
         const returnBody = {
           version: versionData?.version || null,
-          maintained_on: versionData?.maintained_on || null,
-          monitored_on: versionData?.monitored_on || null,
-          maintenance_interval_seconds: config.maintenanceIntervalSeconds || 300,
-          monitor_interval_seconds: config.monitorStateIntervalSeconds || 30,
-          archive_completed_after_seconds: config.archiveCompletedAfterSeconds || 3600,
-          archive_failed_after_seconds: config.archiveFailedAfterSeconds || (24 * 3600),
-          delete_after_days: config.deleteAfterDays || (config.deleteAfterHours ? config.deleteAfterHours / 24 : 2),
-          is_installed: isInstalled
+          last_supervise: lastSupervise,
+          last_maintenance: lastMaintenance,
+          supervise_interval_seconds: config.superviseIntervalSeconds || 60,
+          maintenance_interval_seconds: config.maintenanceIntervalSeconds || 86400,
+          delete_after_seconds: 604800, // 7 days default, could be per-queue
+          is_installed: isInstalled,
+          supervision_overdue: supervisionOverdue,
+          maintenance_overdue: maintenanceOverdue
         }
 
         return reply.code(200).send(returnBody)

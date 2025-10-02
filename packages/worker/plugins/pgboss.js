@@ -9,7 +9,7 @@ import PgBoss from 'pg-boss'
 import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
-import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
+import { defaultBossOptions, defaultQueueOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
 import { makeArchivePgBossP } from '../workers/archives/index.js'
@@ -29,10 +29,6 @@ export default fp(async function (fastify, _opts) {
     fastify.log.error(error, 'pg-boss error')
   })
 
-  boss.on('monitor-states', (states) => {
-    fastify.log.info(states, 'pg-boss queue states')
-  })
-
   boss.on('wip', (workers) => {
     fastify.log.debug(workers, 'pg-boss workers in progress')
   })
@@ -48,6 +44,13 @@ export default fp(async function (fastify, _opts) {
   fastify.log.info('pg-boss started')
 
   fastify.log.info({ isInstalled: await boss.isInstalled() })
+
+  // Create queues with v11 configuration
+  await boss.createQueue(resolveEpisodeQName, defaultQueueOptions)
+  await boss.createQueue(resolveArchiveQName, defaultQueueOptions)
+  await boss.createQueue(resolveBookmarkQName, defaultQueueOptions)
+
+  fastify.log.info('pg-boss queues created')
 
   // Create pg-boss workers with native processors
   /** @type {ResolveEpisodePgBossW} */
@@ -117,12 +120,57 @@ export default fp(async function (fastify, _opts) {
 
   fastify.decorate('pgboss', pgboss)
 
+  // Register observable gauge callbacks for pg-boss queue metrics
+  fastify.otel.queueDeferredGauge.addCallback(async (observableResult) => {
+    try {
+      const queues = await boss.getQueues()
+      for (const queue of queues) {
+        observableResult.observe(queue.deferredCount, { queue: queue.name })
+      }
+    } catch (err) {
+      fastify.log.error(err, 'Failed to collect pg-boss deferred queue metrics')
+    }
+  })
+
+  fastify.otel.queueQueuedGauge.addCallback(async (observableResult) => {
+    try {
+      const queues = await boss.getQueues()
+      for (const queue of queues) {
+        observableResult.observe(queue.queuedCount, { queue: queue.name })
+      }
+    } catch (err) {
+      fastify.log.error(err, 'Failed to collect pg-boss queued queue metrics')
+    }
+  })
+
+  fastify.otel.queueActiveGauge.addCallback(async (observableResult) => {
+    try {
+      const queues = await boss.getQueues()
+      for (const queue of queues) {
+        observableResult.observe(queue.activeCount, { queue: queue.name })
+      }
+    } catch (err) {
+      fastify.log.error(err, 'Failed to collect pg-boss active queue metrics')
+    }
+  })
+
+  fastify.otel.queueCompletedGauge.addCallback(async (observableResult) => {
+    try {
+      const queues = await boss.getQueues()
+      for (const queue of queues) {
+        observableResult.observe(queue.completedCount, { queue: queue.name })
+      }
+    } catch (err) {
+      fastify.log.error(err, 'Failed to collect pg-boss completed queue metrics')
+    }
+  })
+
   fastify.addHook('onClose', async (_instance) => {
     fastify.log.info('stopping pg-boss workers')
     await boss.stop()
   })
 },
 {
-  dependencies: ['env', 'pg'],
+  dependencies: ['env', 'pg', 'otel-metrics'],
   name: 'pgboss',
 })

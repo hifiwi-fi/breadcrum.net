@@ -29,12 +29,11 @@ export const schemaDashboardData = /** @type {const} @satisfies {JSONSchema} */ 
         totals: {
           type: 'object',
           additionalProperties: false,
-          required: ['jobs', 'active', 'pending', 'completed', 'failed'],
+          required: ['jobs', 'active', 'pending', 'failed'],
           properties: {
             jobs: { type: 'integer' },
             active: { type: 'integer' },
             pending: { type: 'integer' },
-            completed: { type: 'integer' },
             failed: { type: 'integer' }
           }
         },
@@ -43,12 +42,11 @@ export const schemaDashboardData = /** @type {const} @satisfies {JSONSchema} */ 
           items: {
             type: 'object',
             additionalProperties: false,
-            required: ['name', 'active', 'pending', 'completed', 'failed', 'total'],
+            required: ['name', 'active', 'pending', 'failed', 'total'],
             properties: {
               name: { type: 'string' },
               active: { type: 'integer' },
               pending: { type: 'integer' },
-              completed: { type: 'integer' },
               failed: { type: 'integer' },
               total: { type: 'integer' }
             }
@@ -137,17 +135,17 @@ export const schemaDashboardData = /** @type {const} @satisfies {JSONSchema} */ 
     maintenance: {
       type: 'object',
       additionalProperties: false,
-      required: ['version', 'maintained_on', 'monitored_on', 'maintenance_interval_seconds', 'monitor_interval_seconds', 'archive_completed_after_seconds', 'archive_failed_after_seconds', 'delete_after_days', 'is_installed'],
+      required: ['version', 'last_supervise', 'last_maintenance', 'supervise_interval_seconds', 'maintenance_interval_seconds', 'delete_after_seconds', 'is_installed', 'supervision_overdue', 'maintenance_overdue'],
       properties: {
         version: { type: 'integer', nullable: true },
-        maintained_on: { type: 'string', nullable: true },
-        monitored_on: { type: 'string', nullable: true },
+        last_supervise: { type: 'string', nullable: true },
+        last_maintenance: { type: 'string', nullable: true },
+        supervise_interval_seconds: { type: 'integer' },
         maintenance_interval_seconds: { type: 'integer' },
-        monitor_interval_seconds: { type: 'integer' },
-        archive_completed_after_seconds: { type: 'integer' },
-        archive_failed_after_seconds: { type: 'integer' },
-        delete_after_days: { type: 'integer' },
-        is_installed: { type: 'boolean' }
+        delete_after_seconds: { type: 'integer' },
+        is_installed: { type: 'boolean' },
+        supervision_overdue: { type: 'boolean' },
+        maintenance_overdue: { type: 'boolean' }
       }
     }
   }

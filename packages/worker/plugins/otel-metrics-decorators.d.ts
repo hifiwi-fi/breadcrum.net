@@ -1,5 +1,5 @@
 import 'fastify'
-import type { Counter, Histogram, Meter } from '@opentelemetry/api'
+import type { Counter, Histogram, Meter, ObservableGauge } from '@opentelemetry/api'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -33,6 +33,12 @@ declare module 'fastify' {
       httpFetchSeconds: Histogram;
       httpFetchSuccessCounter: Counter;
       httpFetchFailedCounter: Counter;
+
+      // pg-boss queue metrics (observable gauges)
+      queueDeferredGauge: ObservableGauge;
+      queueQueuedGauge: ObservableGauge;
+      queueActiveGauge: ObservableGauge;
+      queueCompletedGauge: ObservableGauge;
     };
   }
 }

@@ -132,10 +132,7 @@ export const Page = () => {
             <span class="label">Pending</span>
             <span class="value">${dashboardData?.summary?.totals?.pending}</span>
           </div>
-          <div class="stat">
-            <span class="label">Completed</span>
-            <span class="value">${dashboardData?.summary?.totals?.completed}</span>
-          </div>
+
           <div class="stat">
             <span class="label">Failed</span>
             <span class="value">${dashboardData?.summary?.totals?.failed}</span>
@@ -151,7 +148,7 @@ export const Page = () => {
             <div class="queue-stats">
               <span>Active: ${queue.active}</span>
               <span>Pending: ${queue.pending}</span>
-              <span>Completed: ${queue.completed}</span>
+
               <span>Failed: ${queue.failed}</span>
               <span>Total: ${queue.total}</span>
             </div>
@@ -209,9 +206,61 @@ export const Page = () => {
       </div>
 
       <div class="bc-pgboss-maintenance">
-        <h2>Maintenance</h2>
-        <p>Last run: ${dashboardData?.maintenance?.maintained_on ? new Date(dashboardData.maintenance.maintained_on).toLocaleString() : 'Never'}</p>
-        <p>Status: ${dashboardData?.maintenance?.is_installed ? '✓ Installed' : '✗ Not Installed'}</p>
+        <h2>Supervision & Maintenance</h2>
+
+        <div class="maintenance-section">
+          <h3>Queue Supervision</h3>
+          <p>
+            <strong>Last run:</strong> ${
+              dashboardData?.maintenance?.last_supervise
+                ? new Date(dashboardData.maintenance.last_supervise).toLocaleString()
+                : 'Never'
+            }
+          </p>
+          <p>
+            <strong>Interval:</strong> ${dashboardData?.maintenance?.supervise_interval_seconds}s
+            (monitors queues, expires active jobs)
+          </p>
+          <p>
+            <strong>Status:</strong>
+            <span class="${dashboardData?.maintenance?.supervision_overdue ? 'status-warning' : 'status-ok'}">
+              ${dashboardData?.maintenance?.supervision_overdue ? '⚠ Overdue' : '✓ Running'}
+            </span>
+          </p>
+        </div>
+
+        <div class="maintenance-section">
+          <h3>Job Cleanup (Maintenance)</h3>
+          <p>
+            <strong>Last run:</strong> ${
+              dashboardData?.maintenance?.last_maintenance
+                ? new Date(dashboardData.maintenance.last_maintenance).toLocaleString()
+                : 'Never'
+            }
+          </p>
+          <p>
+            <strong>Interval:</strong> ${dashboardData?.maintenance?.maintenance_interval_seconds}s
+            (${Math.round((dashboardData?.maintenance?.maintenance_interval_seconds || 0) / 3600)}h - deletes old completed jobs)
+          </p>
+          <p>
+            <strong>Retention:</strong> ${Math.round((dashboardData?.maintenance?.delete_after_seconds || 0) / 86400)} days
+          </p>
+          <p>
+            <strong>Status:</strong>
+            <span class="${dashboardData?.maintenance?.maintenance_overdue ? 'status-warning' : 'status-ok'}">
+              ${dashboardData?.maintenance?.maintenance_overdue ? '⚠ Overdue' : '✓ Running'}
+            </span>
+          </p>
+        </div>
+
+        <div class="maintenance-section">
+          <h3>Installation</h3>
+          <p>
+            <strong>Schema Status:</strong>
+            ${dashboardData?.maintenance?.is_installed ? '✓ Installed' : '✗ Not Installed'}
+            ${dashboardData?.maintenance?.version ? ` (v${dashboardData.maintenance.version})` : ''}
+          </p>
+        </div>
       </div>
     </div>
   `

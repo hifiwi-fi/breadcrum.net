@@ -1,0 +1,83 @@
+Index: /pg-boss/src/manager.js
+===================================================================
+--- /pg-boss/src/manager.js
++++ /pg-boss/src/manager.js
+@@ -679,10 +679,14 @@
+     if (options.db) {
+       return options.db
+     }
+ 
+-    assert(this.db._pgbdb && this.db.opened, 'Database connection is not opened')
++    // Custom db objects (without _pgbdb flag) are assumed to be ready
++    // Only check opened flag for pg-boss managed db instances
++    assert(!this.db._pgbdb || this.db.opened, 'Database connection is not opened')
+ 
++
++
+     return this.db
+   }
+ }
+ 
+Index: /pg-boss/types.d.ts
+===================================================================
+--- /pg-boss/types.d.ts
++++ /pg-boss/types.d.ts
+@@ -16,9 +16,9 @@
+     short: 'short',
+     singleton: 'singleton',
+     stately: 'stately'
+   }
+-  
++
+   interface Db {
+     executeSql(text: string, values: any[]): Promise<{ rows: any[] }>;
+   }
+ 
+@@ -58,9 +58,9 @@
+ 
+   interface QueueOptions {
+     expireInSeconds?: number;
+     retentionSeconds?: number;
+-    deleteAfterSeconds?: number;    
++    deleteAfterSeconds?: number;
+     retryLimit?: number;
+     retryDelay?: number;
+     retryBackoff?: boolean;
+     retryDelayMax?: number;
+@@ -235,8 +235,11 @@
+ 
+   on(event: "wip", handler: (data: PgBoss.Worker[]) => void): this;
+   off(event: "wip", handler: (data: PgBoss.Worker[]) => void): this;
+ 
++  on(event: "stopped", handler: () => void): this;
++  off(event: "stopped", handler: () => void): this;
++
+   start(): Promise<PgBoss>;
+   stop(options?: PgBoss.StopOptions): Promise<void>;
+ 
+   send(request: PgBoss.Request): Promise<string | null>;
+@@ -296,18 +299,20 @@
+   fail(name: string, ids: string[], options?: PgBoss.ConnectionOptions): Promise<void>;
+ 
+   getJobById<T>(name: string, id: string, options?: PgBoss.ConnectionOptions): Promise<PgBoss.JobWithMetadata<T> | null>;
+ 
+-  createQueue(name: string, options?: PgBoss.Queue): Promise<void>;
+-  updateQueue(name: string, options?: PgBoss.Queue): Promise<void>;
++  createQueue(name: string, options?: Omit<PgBoss.Queue, 'name'>): Promise<void>;
++  createQueue(options: PgBoss.Queue): Promise<void>;
++  updateQueue(name: string, options?: Omit<PgBoss.Queue, 'name'>): Promise<void>;
++  updateQueue(options: PgBoss.Queue): Promise<void>;
+   deleteQueue(name: string): Promise<void>;
+   getQueues(): Promise<PgBoss.QueueResult[]>;
+   getQueue(name: string): Promise<PgBoss.QueueResult | null>;
+   getQueueStats(name: string): Promise<number>;
+ 
+   supervise(name?: string): Promise<void>;
+-  isInstalled(): Promise<Boolean>;
+-  schemaVersion(): Promise<Number>;
++  isInstalled(): Promise<boolean>;
++  schemaVersion(): Promise<number>;
+ 
+   schedule(name: string, cron: string, data?: object, options?: PgBoss.ScheduleOptions): Promise<void>;
+   unschedule(name: string, key?: string): Promise<void>;
+   getSchedules(name?: string, key?: string): Promise<PgBoss.Schedule[]>;

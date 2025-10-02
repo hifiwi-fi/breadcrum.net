@@ -159,3 +159,60 @@
   border-radius: 5px;
   margin-top: 2rem;
 }
+
+.bc-pgboss-maintenance h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2em;
+  color: var(--foreground);
+}
+
+.bc-pgboss-maintenance h3:first-of-type {
+  margin-top: 0;
+}
+
+.maintenance-section {
+  padding: 1rem;
+  background: var(--background);
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--accent-midground);
+}
+
+.maintenance-section:last-child {
+  margin-bottom: 0;
+}
+
+.maintenance-section p {
+  margin: 0.5rem 0;
+  font-size: 0.95em;
+}
+
+.maintenance-section p:first-child {
+  margin-top: 0;
+}
+
+.maintenance-section p:last-child {
+  margin-bottom: 0;
+}
+
+.maintenance-section strong {
+  color: var(--accent-foreground);
+  margin-right: 0.5rem;
+}
+
+/* Status indicators */
+.status-ok {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status-warning {
+  color: #fd7e14;
+  font-weight: 600;
+}
+
+.status-error {
+  color: #dc3545;
+  font-weight: 600;
+}

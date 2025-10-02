@@ -133,7 +133,7 @@ export async function getJobs (fastify, _opts) {
         // Get total count
         const countQuery = SQL`
           SELECT COUNT(*) as total
-          FROM pgboss.job
+          FROM pgboss_v11.job
           ${whereClause}
         `
         /** @type {QueryResult<CountRow>} */
@@ -156,7 +156,7 @@ export async function getJobs (fastify, _opts) {
             data,
             output,
             singleton_key
-          FROM pgboss.job
+          FROM pgboss_v11.job
           ${whereClause}
           ${orderClause}
           LIMIT ${limit}

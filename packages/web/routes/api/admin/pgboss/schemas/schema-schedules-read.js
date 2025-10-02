@@ -15,9 +15,10 @@ export const schemaSchedulesRead = /** @type {const} @satisfies {JSONSchema} */ 
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['name', 'cron', 'timezone', 'data', 'options', 'created_on', 'updated_on'],
+        required: ['name', 'key', 'cron', 'timezone', 'data', 'options', 'created_on', 'updated_on'],
         properties: {
           name: { type: 'string', description: 'Schedule name' },
+          key: { type: 'string', description: 'Schedule key (unique identifier for multiple schedules per queue)' },
           cron: { type: 'string', description: 'Cron expression' },
           timezone: { type: 'string', description: 'Timezone for cron execution' },
           data: { type: 'object', nullable: true, additionalProperties: true, description: 'Job data template' },

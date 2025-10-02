@@ -9,6 +9,7 @@ import { schemaSchedulesRead } from './schemas/schema-schedules-read.js'
 /**
  * @typedef {Object} ScheduleRow
  * @property {string} name - Schedule name
+ * @property {string} key - Schedule key (unique identifier for multiple schedules per queue)
  * @property {string} cron - Cron expression
  * @property {string} timezone - Timezone for cron execution
  * @property {Record<string, any>|null} data - Job data template
@@ -48,14 +49,15 @@ export async function getSchedules (fastify, _opts) {
         const query = SQL`
           SELECT
             name,
+            key,
             cron,
             timezone,
             data,
             options,
             created_on,
             updated_on
-          FROM pgboss.schedule
-          ORDER BY name ASC
+          FROM pgboss_v11.schedule
+          ORDER BY name ASC, key ASC
         `
 
         /** @type {QueryResult<ScheduleRow>} */

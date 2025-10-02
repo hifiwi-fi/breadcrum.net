@@ -64,7 +64,7 @@ export async function getQueueStates (fastify, _opts) {
               name,
               state::text as state,
               COUNT(*)::int as count
-            FROM pgboss.job
+            FROM pgboss_v11.job
             GROUP BY name, state
 
             UNION ALL
@@ -74,7 +74,7 @@ export async function getQueueStates (fastify, _opts) {
               name,
               'all' as state,
               COUNT(*)::int as count
-            FROM pgboss.job
+            FROM pgboss_v11.job
             GROUP BY name
 
             UNION ALL
@@ -84,7 +84,7 @@ export async function getQueueStates (fastify, _opts) {
               NULL as name,
               state::text as state,
               COUNT(*)::int as count
-            FROM pgboss.job
+            FROM pgboss_v11.job
             GROUP BY state
 
             UNION ALL
@@ -94,7 +94,7 @@ export async function getQueueStates (fastify, _opts) {
               NULL as name,
               'all' as state,
               COUNT(*)::int as count
-            FROM pgboss.job
+            FROM pgboss_v11.job
           )
           SELECT name, state, count
           FROM state_counts

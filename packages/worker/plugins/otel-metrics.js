@@ -96,6 +96,23 @@ export default fp(async function (fastify, _) {
     httpFetchFailedCounter: meter.createCounter('breadcrum_http_fetch_failed_total', {
       description: 'The number of failed HTTP fetches',
     }),
+
+    // pg-boss queue metrics (observable gauges)
+    queueDeferredGauge: meter.createObservableGauge('breadcrum_queue_deferred', {
+      description: 'The number of deferred jobs in each queue',
+    }),
+
+    queueQueuedGauge: meter.createObservableGauge('breadcrum_queue_queued', {
+      description: 'The number of queued jobs in each queue',
+    }),
+
+    queueActiveGauge: meter.createObservableGauge('breadcrum_queue_active', {
+      description: 'The number of active jobs in each queue',
+    }),
+
+    queueCompletedGauge: meter.createObservableGauge('breadcrum_queue_completed', {
+      description: 'The number of completed jobs in each queue',
+    }),
   })
 },
 {
