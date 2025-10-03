@@ -46,7 +46,7 @@
     "gunzip-maybe": "^1.4.2",
     "hyperid": "^3.1.1",
     "jsdom": "^27.0.0",
-    "pg-boss": "^11.0.2",
+    "pg-boss": "^11.0.5",
     "pony-cause": "^2.1.11",
     "undici": "^7.0.0",
     "user-agents": "^1.1.355"
