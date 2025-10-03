@@ -110,8 +110,8 @@ export default fp(async function (fastify, _) {
       description: 'The number of active jobs in each queue',
     }),
 
-    queueCompletedGauge: meter.createObservableGauge('breadcrum_queue_completed', {
-      description: 'The number of completed jobs in each queue',
+    queueTotalGauge: meter.createObservableGauge('breadcrum_queue_total', {
+      description: 'The total number of jobs in each queue (deferred + queued + active)',
     }),
   })
 },

@@ -38,7 +38,7 @@ declare module 'fastify' {
       queueDeferredGauge: ObservableGauge;
       queueQueuedGauge: ObservableGauge;
       queueActiveGauge: ObservableGauge;
-      queueCompletedGauge: ObservableGauge;
+      queueTotalGauge: ObservableGauge;
     };
   }
 }

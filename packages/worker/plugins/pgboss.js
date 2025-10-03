@@ -120,50 +120,30 @@ export default fp(async function (fastify, _opts) {
 
   fastify.decorate('pgboss', pgboss)
 
-  // Register observable gauge callbacks for pg-boss queue metrics
-  fastify.otel.queueDeferredGauge.addCallback(async (observableResult) => {
-    try {
-      const queues = await boss.getQueues()
-      for (const queue of queues) {
-        observableResult.observe(queue.deferredCount, { queue: queue.name })
+  // Register batch observable callback for pg-boss queue metrics
+  // This calls boss.getQueues() once and reports to all 4 gauges
+  fastify.otel.meter.addBatchObservableCallback(
+    async (observableResult) => {
+      try {
+        const queues = await boss.getQueues()
+        for (const queue of queues) {
+          const attributes = { queue: queue.name }
+          observableResult.observe(fastify.otel.queueDeferredGauge, queue.deferredCount, attributes)
+          observableResult.observe(fastify.otel.queueQueuedGauge, queue.queuedCount, attributes)
+          observableResult.observe(fastify.otel.queueActiveGauge, queue.activeCount, attributes)
+          observableResult.observe(fastify.otel.queueTotalGauge, queue.totalCount, attributes)
+        }
+      } catch (err) {
+        fastify.log.error(err, 'Failed to collect pg-boss queue metrics')
       }
-    } catch (err) {
-      fastify.log.error(err, 'Failed to collect pg-boss deferred queue metrics')
-    }
-  })
-
-  fastify.otel.queueQueuedGauge.addCallback(async (observableResult) => {
-    try {
-      const queues = await boss.getQueues()
-      for (const queue of queues) {
-        observableResult.observe(queue.queuedCount, { queue: queue.name })
-      }
-    } catch (err) {
-      fastify.log.error(err, 'Failed to collect pg-boss queued queue metrics')
-    }
-  })
-
-  fastify.otel.queueActiveGauge.addCallback(async (observableResult) => {
-    try {
-      const queues = await boss.getQueues()
-      for (const queue of queues) {
-        observableResult.observe(queue.activeCount, { queue: queue.name })
-      }
-    } catch (err) {
-      fastify.log.error(err, 'Failed to collect pg-boss active queue metrics')
-    }
-  })
-
-  fastify.otel.queueCompletedGauge.addCallback(async (observableResult) => {
-    try {
-      const queues = await boss.getQueues()
-      for (const queue of queues) {
-        observableResult.observe(queue.completedCount, { queue: queue.name })
-      }
-    } catch (err) {
-      fastify.log.error(err, 'Failed to collect pg-boss completed queue metrics')
-    }
-  })
+    },
+    [
+      fastify.otel.queueDeferredGauge,
+      fastify.otel.queueQueuedGauge,
+      fastify.otel.queueActiveGauge,
+      fastify.otel.queueTotalGauge
+    ]
+  )
 
   fastify.addHook('onClose', async (_instance) => {
     fastify.log.info('stopping pg-boss workers')
