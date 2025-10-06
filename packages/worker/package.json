@@ -21,7 +21,7 @@
     "print-plugins": "fastify print-plugins app.js --import otel.js"
   },
   "dependencies": {
-    "@breadcrum/extract-meta": "^2.0.0",
+    "@breadcrum/extract-meta": "^2.0.1",
     "@breadcrum/resources": "file:../resources",
     "@bret/is-youtube-url": "^1.0.3",
     "@fastify/autoload": "^6.0.1",
