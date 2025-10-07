@@ -49,7 +49,7 @@
     "jsonfeed-to-rss": "^3.0.8",
     "nodemailer": "^7.0.7",
     "pg": "^8.6.0",
-    "pg-boss": "^11.0.5",
+    "pg-boss": "^11.0.6",
     "pony-cause": "^2.1.11",
     "postgrator-cli": "^9.0.0",
     "preact": "^10.27.0",
