@@ -39,11 +39,13 @@ export const EpisodeEdit = ({
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
 
-  const handleInitiateDelete = useCallback(() => {
+  const handleInitiateDelete = useCallback((/** @type {Event} */ev) => {
+    ev.preventDefault()
     setDeleteConfirm(true)
   }, [setDeleteConfirm])
 
-  const handleCancelDelete = useCallback(() => {
+  const handleCancelDelete = useCallback((/** @type {Event} */ev) => {
+    ev.preventDefault()
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
