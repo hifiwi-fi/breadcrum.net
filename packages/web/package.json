@@ -47,7 +47,7 @@
     "hyperid": "^3.1.1",
     "jsonfeed-to-atom": "^1.2.5",
     "jsonfeed-to-rss": "^3.0.8",
-    "nodemailer": "^7.0.7",
+    "nodemailer": "^7.0.9",
     "pg": "^8.6.0",
     "pg-boss": "^11.0.5",
     "pony-cause": "^2.1.11",
