@@ -3,9 +3,22 @@ import { getFeedUrl } from '../../feed-urls.js'
 import { getFeedQuery } from '../feed-query.js'
 import { getFeedWithDefaults } from '../../feed-defaults.js'
 
+/**
+ * @import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+ */
+
+/**
+ * Handles feed details requests
+ * @param {Object} params
+ * @param {FastifyInstance} params.fastify
+ * @param {FastifyRequest} params.request - Fastify request object (unused)
+ * @param {FastifyReply} params.reply
+ * @param {string} params.userId
+ * @param {string} params.feedId
+ */
 export async function feedDetailsHandler ({
   fastify,
-  request,
+  request: _request,
   reply,
   userId,
   feedId,
@@ -13,6 +26,7 @@ export async function feedDetailsHandler ({
   const feedQuery = getFeedQuery({
     ownerId: userId,
     feedId,
+    // @ts-expect-error - perPage is not in the expected type
     perPage: 1,
   })
 
@@ -39,6 +53,8 @@ export async function feedDetailsHandler ({
 
   return {
     data: {
+      // TODO: Fix any
+      // @ts-expect-error - ownerName is not in the expected type
       ...getFeedWithDefaults({ feed, ownerName, transport, host }),
       feed_url: getFeedUrl({
         transport,

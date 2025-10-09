@@ -661,3 +661,7 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `npm run prod-sim` - Start production simulation
 - `npm run print-routes` - Print all fastify routes
 - `npm run print-plugins` - Print all fastify plugins
+
+## External package availability
+
+If we need to work on an external package, you can likely find it in the ~/Developer directory. Packages by HifWifi, bomnes or bret are also available on GitHub.

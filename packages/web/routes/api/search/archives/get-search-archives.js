@@ -1,6 +1,7 @@
 import { getSearchArchivesQuery } from './get-search-archives-query.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -16,6 +17,8 @@ export async function getSearchArchives (fastify, _opts) {
         tags: ['search', 'archives'],
         querystring: {
           type: 'object',
+          required: ['query'],
+          additionalProperties: false,
           properties: {
             query: {
               type: 'string',
@@ -62,6 +65,8 @@ export async function getSearchArchives (fastify, _opts) {
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
+            required: ['data', 'pagination'],
             properties: {
               data: {
                 type: 'array',
@@ -81,6 +86,8 @@ export async function getSearchArchives (fastify, _opts) {
               },
               pagination: {
                 type: 'object',
+                additionalProperties: false,
+                required: ['top', 'bottom'],
                 properties: {
                   top: {
                     type: 'boolean',
@@ -90,6 +97,8 @@ export async function getSearchArchives (fastify, _opts) {
                   },
                   next: {
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -108,6 +117,8 @@ export async function getSearchArchives (fastify, _opts) {
                   },
                   prev: {
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -133,6 +144,9 @@ export async function getSearchArchives (fastify, _opts) {
     },
     // Get Bookmarks
     async function getSearchArchivesHandler (request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ReturnBody['pagination']} PaginationType */
+
       const userId = request.user.id
       const {
         rank,
@@ -170,6 +184,7 @@ export async function getSearchArchives (fastify, _opts) {
         results.rows.shift()
       }
 
+      /** @type {PaginationType} */
       const pagination = {
         top,
         bottom,
@@ -199,10 +214,13 @@ export async function getSearchArchives (fastify, _opts) {
         }
       }
 
-      return {
-        data: results.rows,
+      /** @type {ReturnBody} */
+      const response = {
+        // TODO: Fix ANY
+        data: /** @type {any} */ (results.rows),
         pagination,
       }
+      return reply.code(200).send(response)
     }
   )
 }

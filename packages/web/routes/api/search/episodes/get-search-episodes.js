@@ -2,6 +2,7 @@ import { getSearchEpisodesQuery } from './get-search-episodes-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -66,6 +67,7 @@ export async function getSearchEpisodes (fastify, _opts) {
           200: {
             type: 'object',
             additionalProperties: false,
+            required: ['data', 'pagination'],
             properties: {
               data: {
                 type: 'array',
@@ -86,6 +88,7 @@ export async function getSearchEpisodes (fastify, _opts) {
               pagination: {
                 type: 'object',
                 additionalProperties: false,
+                required: ['top', 'bottom'],
                 properties: {
                   top: {
                     type: 'boolean',
@@ -94,8 +97,9 @@ export async function getSearchEpisodes (fastify, _opts) {
                     type: 'boolean',
                   },
                   next: {
-                    additionalProperties: false,
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -113,8 +117,9 @@ export async function getSearchEpisodes (fastify, _opts) {
                     },
                   },
                   prev: {
-                    additionalProperties: false,
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -138,7 +143,10 @@ export async function getSearchEpisodes (fastify, _opts) {
         },
       },
     },
-    async function getSearchEpisodesHandler (request, _reply) {
+    async function getSearchEpisodesHandler (request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ReturnBody['pagination']} PaginationType */
+
       const userId = request.user.id
       const {
         rank,
@@ -176,31 +184,17 @@ export async function getSearchEpisodes (fastify, _opts) {
         results.rows.shift()
       }
 
-      const pagination = /** @type {{
-        top: boolean
-        bottom: boolean
-        prev?: {
-          rank: number
-          id: string
-          reverse: boolean
-          query: string
-        }
-        next?: {
-          rank: number
-          id: string
-          reverse: boolean
-          query: string
-        }
-      }} */ ({
-          top,
-          bottom,
-        })
+      /** @type {PaginationType} */
+      const pagination = {
+        top,
+        bottom,
+      }
 
       if (!top) {
         const firstResult = results.rows.at(0)
         if (firstResult) {
           pagination.prev = {
-            rank: firstResult.rank,
+            rank: String(firstResult.rank),
             id: firstResult.id,
             reverse: true,
             query,
@@ -212,7 +206,7 @@ export async function getSearchEpisodes (fastify, _opts) {
         const lastResult = results.rows.at(-1)
         if (lastResult) {
           pagination.next = {
-            rank: lastResult.rank,
+            rank: String(lastResult.rank),
             id: lastResult.id,
             reverse: false,
             query,
@@ -220,10 +214,13 @@ export async function getSearchEpisodes (fastify, _opts) {
         }
       }
 
-      return {
-        data: results.rows,
+      /** @type {ReturnBody} */
+      const response = {
+        // TODO: Fix ANY
+        data: /** @type {any} */ (results.rows),
         pagination,
       }
+      return reply.code(200).send(response)
     }
   )
 }
