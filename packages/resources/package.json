@@ -16,7 +16,7 @@
     "undici": "^7.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.3",
+    "@types/node": "^24.7.1",
     "@voxpelli/tsconfig": "^16.0.0",
     "c8": "^10.0.0",
     "neostandard": "^0.12.0",
