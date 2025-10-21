@@ -56,7 +56,7 @@
     "@types/concat-stream": "^2.0.3",
     "@types/gunzip-maybe": "^1.4.2",
     "@types/jsdom": "^27.0.0",
-    "@types/node": "^24.8.1",
+    "@types/node": "^24.9.1",
     "@types/user-agents": "^1.0.4",
     "@voxpelli/tsconfig": "^16.0.0",
     "c8": "^10.0.0",
