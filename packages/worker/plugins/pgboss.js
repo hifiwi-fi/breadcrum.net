@@ -53,28 +53,37 @@ export default fp(async function (fastify, _opts) {
   fastify.log.info('pg-boss queues created')
 
   // Create pg-boss workers with native processors
-  /** @type {ResolveEpisodePgBossW} */
-  const episodeWorker = await boss.work(
-    resolveEpisodeQName,
-    makeEpisodePgBossP({ fastify })
-  )
+  /** @type {ResolveEpisodePgBossW[]} */
+  const episodeWorkers = []
+  const episodeWorkerFn = makeEpisodePgBossP({ fastify })
+  for (let i = 0; i < fastify.config.EPISODE_WORKER_CONCURRENCY; i++) {
+    episodeWorkers.push(
+      await boss.work(resolveEpisodeQName, episodeWorkerFn)
+    )
+  }
 
-  /** @type {ResolveArchivePgBossW} */
-  const archiveWorker = await boss.work(
-    resolveArchiveQName,
-    makeArchivePgBossP({ fastify })
-  )
+  /** @type {ResolveArchivePgBossW[]} */
+  const archiveWorkers = []
+  const archiveWorkerFn = makeArchivePgBossP({ fastify })
+  for (let i = 0; i < fastify.config.ARCHIVE_WORKER_CONCURRENCY; i++) {
+    archiveWorkers.push(
+      await boss.work(resolveArchiveQName, archiveWorkerFn)
+    )
+  }
 
-  /** @type {ResolveBookmarkPgBossW} */
-  const bookmarkWorker = await boss.work(
-    resolveBookmarkQName,
-    makeBookmarkPgBossP({ fastify })
-  )
+  /** @type {ResolveBookmarkPgBossW[]} */
+  const bookmarkWorkers = []
+  const bookmarkWorkerFn = makeBookmarkPgBossP({ fastify })
+  for (let i = 0; i < fastify.config.BOOKMARK_WORKER_CONCURRENCY; i++) {
+    bookmarkWorkers.push(
+      await boss.work(resolveBookmarkQName, bookmarkWorkerFn)
+    )
+  }
 
   const workers = {
-    episodeWorker,
-    archiveWorker,
-    bookmarkWorker
+    episodeWorkers,
+    archiveWorkers,
+    bookmarkWorkers
   }
 
   // Create queue wrappers that match web package interface

@@ -52,6 +52,18 @@ export const schema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: 'deployment.environment=development',
     },
+    EPISODE_WORKER_CONCURRENCY: {
+      type: 'integer',
+      default: 2,
+    },
+    ARCHIVE_WORKER_CONCURRENCY: {
+      type: 'integer',
+      default: 2,
+    },
+    BOOKMARK_WORKER_CONCURRENCY: {
+      type: 'integer',
+      default: 2,
+    },
   },
 })
 
