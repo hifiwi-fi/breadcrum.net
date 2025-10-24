@@ -1,0 +1,28 @@
+name: Regenerate package-lock.json
+
+on:
+  workflow_dispatch:
+
+jobs:
+  regenerate-lockfile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+
+      - name: Make script executable
+        run: chmod +x .github/scripts/regenerate-lockfile.sh
+
+      - name: Run regenerate lockfile script
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/regenerate-lockfile.sh
