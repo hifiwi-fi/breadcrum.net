@@ -19,6 +19,7 @@ async function envPlugin (fastify, opts) {
     dotenv: {
       path: opts.dotEnvPath,
       debug: false,
+      quiet: true,
     }
   }
 

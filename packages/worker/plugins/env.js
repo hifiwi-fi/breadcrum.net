@@ -78,6 +78,7 @@ export default fp(async function (fastify, _opts) {
     dotenv: {
       path: resolve(import.meta.dirname, '../.env'),
       debug: false,
+      quiet: true,
     },
   })
 

@@ -32,9 +32,11 @@
  * @property {ProvidersConfig} providers - Service providers configuration
  */
 
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+
+dotenv.config({ quiet: true })
 
 const __dirname = import.meta.dirname
 const version = JSON.parse(
