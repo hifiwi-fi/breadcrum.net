@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from 'pg-boss'
+ * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveBookmarkData } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  * @import { ExtractMetaMeta } from '@breadcrum/extract-meta'

@@ -1,4 +1,4 @@
-import type PgBoss from 'pg-boss'
+import type PgBoss from '@breadcrum/resources/pgboss/types.js'
 import type {
   ResolveEpisodePgBossW,
   ResolveEpisodePgBossQ
@@ -17,9 +17,9 @@ declare module 'fastify' {
     pgboss: {
       boss: PgBoss
       workers: {
-        episodeWorker: ResolveEpisodePgBossW
-        archiveWorker: ResolveArchivePgBossW
-        bookmarkWorker: ResolveBookmarkPgBossW
+        resolveEpisode: ResolveEpisodePgBossW[]
+        resolveArchive: ResolveArchivePgBossW[]
+        resolveBookmark: ResolveBookmarkPgBossW[]
       }
       queues: {
         resolveEpisodeQ: ResolveEpisodePgBossQ

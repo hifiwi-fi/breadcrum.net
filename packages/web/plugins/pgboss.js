@@ -4,88 +4,37 @@
  * @import { ResolveBookmarkPgBossQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  */
 import fp from 'fastify-plugin'
-import PgBoss from 'pg-boss'
 
-import { resolveEpisodeQName } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
-import { resolveArchiveQName } from '@breadcrum/resources/archives/resolve-archive-queue.js'
-import { resolveBookmarkQName } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
-import { defaultBossOptions, defaultQueueOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
+import { createResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+import { createResolveArchiveQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
+import { createResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
+import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
 /**
  * This plugin adds pg-boss queues
  */
 export default fp(async function (fastify, _) {
-  const pg = fastify.pg
-  const bossConfig = {
-    ...defaultBossOptions,
-    db: { executeSql: pg.query },
+  // Start pg-boss with lifecycle management
+  const boss = await startPGBoss({
+    executeSql: fastify.pg.query,
+    logger: fastify.log
+  })
+
+  // Create queue wrappers using factory functions
+  // This automatically applies default configuration for each queue
+  fastify.log.info('Creating pg-boss queues...')
+  const queues = {
+    resolveEpisodeQ: await createResolveEpisodeQ({ boss }),
+    resolveArchiveQ: await createResolveArchiveQ({ boss }),
+    resolveBookmarkQ: await createResolveBookmarkQ({ boss })
   }
-  const boss = new PgBoss(bossConfig)
-
-  // Set up event listeners for pg-boss
-  boss.on('error', (error) => {
-    fastify.log.error(error, 'pg-boss error')
-  })
-
-  boss.on('wip', (workers) => {
-    fastify.log.debug(workers, 'pg-boss workers in progress')
-  })
-
-  boss.on('stopped', () => {
-    fastify.log.info('pg-boss stopped')
-  })
-
-  fastify.log.info('pg-boss starting')
-  await boss.start()
-  fastify.log.info('pg-boss started')
-
-  fastify.log.info({ isInstalled: await boss.isInstalled() })
-
-  // Create queues with v11 configuration
-  await boss.createQueue(resolveEpisodeQName, defaultQueueOptions)
-  await boss.createQueue(resolveArchiveQName, defaultQueueOptions)
-  await boss.createQueue(resolveBookmarkQName, defaultQueueOptions)
-
   fastify.log.info('pg-boss queues created')
-
-  /** @type {ResolveEpisodePgBossQ} */
-  const resolveEpisodeQ = {
-    name: resolveEpisodeQName,
-    send: (request) => boss.send({
-      name: resolveEpisodeQName,
-      data: request.data,
-      options: { ...request.options }
-    })
-  }
-
-  /** @type {ResolveArchivePgBossQ} */
-  const resolveArchiveQ = {
-    name: resolveArchiveQName,
-    send: (request) => boss.send({
-      name: resolveArchiveQName,
-      data: request.data,
-      options: { ...request.options }
-    })
-  }
-
-  /** @type {ResolveBookmarkPgBossQ} */
-  const resolveBookmarkQ = {
-    name: resolveBookmarkQName,
-    send: (request) => boss.send({
-      name: resolveBookmarkQName,
-      data: request.data,
-      options: { ...request.options }
-    })
-  }
 
   const pgboss = {
     boss,
     config: defaultBossOptions,
-    queues: {
-      resolveEpisodeQ,
-      resolveArchiveQ,
-      resolveBookmarkQ
-    }
+    queues
   }
 
   fastify.decorate('pgboss', pgboss)

@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from 'pg-boss'
+ * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveArchiveData } from '@breadcrum/resources/archives/resolve-archive-queue.js'
  */
 

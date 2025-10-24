@@ -1,6 +1,9 @@
 /**
  * @import PgBoss from 'pg-boss'
+ * @import { Queue } from 'pg-boss'
  */
+
+import { defaultQueueOptions } from '../pgboss/default-job-options.js'
 
 /**
  * User-provided metadata for a bookmark.
@@ -30,11 +33,25 @@ export const resolveBookmarkQName = 'resolveBookmark'
 export const resolveBookmarkJobName = 'resolve-bookmark'
 
 /**
- * pg-boss queue wrapper for resolve bookmark jobs
+ * Request shape for sending a resolve bookmark job
+ *
+ * @typedef {{
+ *   data: ResolveBookmarkData
+ *   options?: PgBoss.SendOptions
+ * }} ResolveBookmarkRequest
+ */
+
+/**
+ * Typed Queue Wrapper for Resolve Bookmark
+ *
+ * This wrapper automatically applies default queue configuration.
+ * The queue name and default options are baked in, but callers can
+ * override options if needed.
  *
  * @typedef {{
  *   name: string
- *   send: (request: { data: ResolveBookmarkData, options?: PgBoss.SendOptions }) => Promise<string | null>
+ *   send: (request: ResolveBookmarkRequest) => Promise<string | null>
+ *   insert: (data: ResolveBookmarkData[], options?: PgBoss.InsertOptions) => Promise<void>
  * }} ResolveBookmarkPgBossQ
  */
 
@@ -43,3 +60,47 @@ export const resolveBookmarkJobName = 'resolve-bookmark'
  *
  * @typedef {string} ResolveBookmarkPgBossW
  */
+
+/**
+ * Factory function to create a typed queue wrapper for bookmark resolution.
+ *
+ * This function:
+ * 1. Creates the queue in pg-boss (if not already created)
+ * 2. Returns a typed wrapper that automatically applies default configuration
+ *
+ * @param {Object} params
+ * @param {PgBoss} params.boss - PgBoss instance
+ * @param {Omit<Queue, 'name'>} [params.queueOptions] - Optional queue options (defaults to defaultQueueOptions)
+ * @returns {Promise<ResolveBookmarkPgBossQ>} Promise resolving to typed queue wrapper
+ */
+export async function createResolveBookmarkQ ({
+  boss,
+  queueOptions = defaultQueueOptions
+}) {
+  // Create the queue with merged options (defaults + user overrides)
+  // Idempotent - safe to call multiple times
+  await boss.createQueue(resolveBookmarkQName, {
+    ...defaultQueueOptions,
+    ...queueOptions
+  })
+
+  return {
+    name: resolveBookmarkQName,
+
+    send: (request) =>
+      boss.send({
+        name: resolveBookmarkQName,
+        data: request.data,
+        options: { ...request.options }
+      }),
+
+    insert: (dataArray, options) => {
+      /** @type {PgBoss.JobInsert<ResolveBookmarkData>[]} */
+      const jobs = dataArray.map(data => ({
+        name: resolveBookmarkQName,
+        data
+      }))
+      return options ? boss.insert(resolveBookmarkQName, jobs, options) : boss.insert(resolveBookmarkQName, jobs)
+    }
+  }
+}
