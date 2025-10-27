@@ -59,7 +59,7 @@ jobs:
     - uses: superfly/flyctl-actions/setup-flyctl@master
     - run: npm i
     - name: Archive lockfile
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: package-lock.json
         path: package-lock.json
