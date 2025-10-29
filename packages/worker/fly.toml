@@ -26,7 +26,7 @@ swap_size_mb = 1024
   FASTIFY_OPTIONS = "true"
   FASTIFY_IMPORT = "otel.js"
   NODE_ENV = "production"
-  NODE_OPTIONS = "--max-old-space-size=1024"
+  NODE_OPTIONS = "--max-old-space-size=512"
   PORT = "8080"
   METRICS = "1"
   OTEL_SERVICE_NAME = "breadcrum-worker"

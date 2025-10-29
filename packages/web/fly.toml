@@ -32,7 +32,7 @@ swap_size_mb = 1024
   FASTIFY_IMPORT = "otel.js"
   HOST = "breadcrum.net"
   NODE_ENV = "production"
-  NODE_OPTIONS = "--max-old-space-size=1024"
+  NODE_OPTIONS = "--max-old-space-size=512"
   PORT = "8080"
   PQUEUE_CONCURRENCY = "2"
   TRANSPORT = "https"
