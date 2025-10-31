@@ -26,7 +26,7 @@
     "@bret/is-youtube-url": "^1.0.3",
     "@fastify/autoload": "^6.0.1",
     "@fastify/env": "^5.0.1",
-    "@fastify/otel": "^0.12.0",
+    "@fastify/otel": "^0.13.0",
     "@fastify/postgres": "^6.0.1",
     "@fastify/redis": "^7.1.0",
     "@fastify/sensible": "^6.0.1",
