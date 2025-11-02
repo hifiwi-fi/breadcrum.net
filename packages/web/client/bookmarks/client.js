@@ -52,6 +52,7 @@ export const Page = () => {
     <${Search}
       placeholder="Search Bookmarks..."
       onSearch=${handleSearch}
+      autofocus=${true}
     />
     <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 

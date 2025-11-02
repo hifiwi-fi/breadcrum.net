@@ -13,6 +13,7 @@ import { useCallback } from 'preact/hooks'
  * @property {string} [placeholder]
  * @property {string} [value]
  * @property {(query: string) => void} [onSearch]
+ * @property {boolean} [autofocus]
  */
 
 /**
@@ -22,6 +23,7 @@ export const Search = ({
   placeholder = 'Search...',
   value,
   onSearch = () => {},
+  autofocus = false,
 }) => {
   const handleSearch = useCallback((/** @type {SubmitEvent & {currentTarget: HTMLFormElement}} */ev) => {
     ev.preventDefault()
@@ -41,6 +43,7 @@ export const Search = ({
             placeholder="${placeholder}"
             type="search"
             name="search"
+            autofocus=${autofocus ? '' : null}
           />
           <input name="search-button" type="submit" value="search" />
         </form>

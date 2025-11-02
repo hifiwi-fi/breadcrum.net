@@ -145,6 +145,7 @@ export const Page = () => {
       placeholder="Search Episodes..."
       value=${pageParams.get('query') || undefined}
       onSearch=${handleSearch}
+      autofocus=${true}
     />
 
     <div>

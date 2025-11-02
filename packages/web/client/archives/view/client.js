@@ -102,6 +102,7 @@ export const Page = () => {
       <${Search}
         placeholder="Search Archives..."
         onSearch=${handleSearch}
+        autofocus=${true}
       />
       ${archiveLoading ? html`<div>...</div>` : null}
       ${archiveError ? html`<div>${archiveError.message}</div>` : null}

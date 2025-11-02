@@ -98,6 +98,7 @@ export const Page = () => {
       <${Search}
         placeholder="Search Episodes..."
         onSearch=${handleSearch}
+        autofocus=${true}
       />
       ${episode
         ? tc(EpisodeList, {

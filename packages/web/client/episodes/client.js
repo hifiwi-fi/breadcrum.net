@@ -136,6 +136,7 @@ export const Page = () => {
     <${Search}
       placeholder="Search Episodes..."
       onSearch=${handleSearch}
+      autofocus=${true}
     />
     <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}

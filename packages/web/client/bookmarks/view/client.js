@@ -95,6 +95,7 @@ export const Page = () => {
       <${Search}
         placeholder="Search Bookmarks..."
         onSearch=${handleSearch}
+        autofocus=${true}
       />
       ${bookmarkLoading ? html`<div>...</div>` : null}
       ${bookmarkError ? html`<div>${bookmarkError.message}</div>` : null}

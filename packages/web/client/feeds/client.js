@@ -181,6 +181,7 @@ export const Page = () => {
     <${Search}
       placeholder="Search Feed..."
       onSearch=${handleSearch}
+      autofocus=${true}
     />
     <div>
       ${feed ? tc(FeedHeader, { feed, reload: reloadFeed }) : null}
