@@ -39,6 +39,11 @@ declare module 'fastify' {
       queueQueuedGauge: ObservableGauge;
       queueActiveGauge: ObservableGauge;
       queueTotalGauge: ObservableGauge;
+
+      // Auth token cleanup metrics
+      authTokensCleanedCounter: Counter;
+      authTokensCleanupJobCounter: Counter;
+      authTokensCleanupDuration: Histogram;
     };
   }
 }

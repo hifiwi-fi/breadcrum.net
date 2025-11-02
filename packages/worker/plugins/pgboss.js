@@ -13,6 +13,7 @@ import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
 import { makeArchivePgBossP } from '../workers/archives/index.js'
 import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
+import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
 
 /**
  * This plugin adds pg-boss workers
@@ -23,6 +24,11 @@ export default fp(async function (fastify, _opts) {
     executeSql: fastify.pg.query,
     logger: fastify.log
   })
+
+  // Schedule auth token cleanup job (runs at 3 AM UTC daily)
+  const cleanupAuthTokensJobName = 'cleanup-stale-auth-tokens'
+  await boss.schedule(cleanupAuthTokensJobName, '0 3 * * *', undefined, { tz: 'UTC' })
+  fastify.log.info({ jobName: cleanupAuthTokensJobName, schedule: '0 3 * * *' }, 'Scheduled auth token cleanup job')
 
   // Create queue wrappers using factory functions
   // This automatically applies default configuration for each queue
@@ -63,10 +69,15 @@ export default fp(async function (fastify, _opts) {
     )
   }
 
+  // Create auth token cleanup worker (scheduled job)
+  const cleanupAuthTokensWorkerFn = makeAuthTokenCleanupP({ fastify })
+  const cleanupAuthTokensWorker = await boss.work(cleanupAuthTokensJobName, cleanupAuthTokensWorkerFn)
+
   const workers = {
     [resolveEpisodeQName]: episodeWorkers,
     [resolveArchiveQName]: archiveWorkers,
-    [resolveBookmarkQName]: bookmarkWorkers
+    [resolveBookmarkQName]: bookmarkWorkers,
+    [cleanupAuthTokensJobName]: [cleanupAuthTokensWorker]
   }
 
   const pgboss = {
