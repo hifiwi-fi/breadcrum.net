@@ -38,33 +38,33 @@ jobs:
           - 6379:6379
 
     steps:
-    - uses: actions/checkout@v5
-    - name: Use Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version-file: package.json
+      - uses: actions/checkout@v5
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
 
-    - run: npm i
-    - name: Archive lockfile
-      uses: actions/upload-artifact@v5
-      with:
-        name: package-lock.json
-        path: package-lock.json
-    - run: npm run generate-default-env --workspaces --if-present
-    - run: npm run migrate --workspaces --if-present
-      env:
-        PGDATABASE: breadcrum
-        PGHOST: localhost
-        PGPASSWORD: postgres
-        PGPORT: 5432
-        PGUSER: postgres
-    - run: npm test
-    - name: Coveralls
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel: true
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        files: "packages/web/coverage/lcov.info packages/worker/coverage/lcov.info"
+      - run: npm ci
+      - name: Archive lockfile
+        uses: actions/upload-artifact@v5
+        with:
+          name: package-lock.json
+          path: package-lock.json
+      - run: npm run generate-default-env --workspaces --if-present
+      - run: npm run migrate --workspaces --if-present
+        env:
+          PGDATABASE: breadcrum
+          PGHOST: localhost
+          PGPASSWORD: postgres
+          PGPORT: 5432
+          PGUSER: postgres
+      - run: npm test
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: "packages/web/coverage/lcov.info packages/worker/coverage/lcov.info"
 
   coverage:
     needs: test

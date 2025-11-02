@@ -5,11 +5,11 @@ on:
     inputs:
       deploy-web:
         type: boolean
-        description: 'Deploy web service'
+        description: "Deploy web service"
         default: true
       deploy-worker:
         type: boolean
-        description: 'Deploy worker service'
+        description: "Deploy worker service"
         default: true
 
 env:
@@ -49,36 +49,36 @@ jobs:
           - 6379:6379
 
     steps:
-    - uses: actions/checkout@v5
-    - name: Use Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version-file: package.json
-        registry-url: 'https://registry.npmjs.org'
+      - uses: actions/checkout@v5
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: package.json
+          registry-url: "https://registry.npmjs.org"
 
-    - uses: superfly/flyctl-actions/setup-flyctl@master
-    - run: npm i
-    - name: Archive lockfile
-      uses: actions/upload-artifact@v5
-      with:
-        name: package-lock.json
-        path: package-lock.json
-    - run: npm run generate-default-env --workspaces --if-present
-    - run: npm run migrate --workspaces --if-present
-      env:
-        PGDATABASE: breadcrum
-        PGHOST: localhost
-        PGPASSWORD: postgres
-        PGPORT: 5432
-        PGUSER: postgres
-    - run: npm test
-    - name: Deploy web
-      run: npm run deploy:web
-      if: ${{ github.event.inputs.deploy-web == 'true' }}
-      env:
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-    - name: Deploy worker
-      run: npm run deploy:worker
-      if: ${{ github.event.inputs.deploy-worker == 'true' }}
-      env:
-        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: npm ci
+      - name: Archive lockfile
+        uses: actions/upload-artifact@v5
+        with:
+          name: package-lock.json
+          path: package-lock.json
+      - run: npm run generate-default-env --workspaces --if-present
+      - run: npm run migrate --workspaces --if-present
+        env:
+          PGDATABASE: breadcrum
+          PGHOST: localhost
+          PGPASSWORD: postgres
+          PGPORT: 5432
+          PGUSER: postgres
+      - run: npm test
+      - name: Deploy web
+        run: npm run deploy:web
+        if: ${{ github.event.inputs.deploy-web == 'true' }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Deploy worker
+        run: npm run deploy:worker
+        if: ${{ github.event.inputs.deploy-worker == 'true' }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
