@@ -2,7 +2,7 @@
  * @import { FastifyInstance } from 'fastify'
  * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
  */
-import { cleanupStaleAuthTokens } from '@breadcrum/resources/auth-tokens/cleanup-stale-tokens.js'
+import { cleanupStaleAuthTokens } from './cleanup-stale-tokens.js'
 
 /**
  * pg-boss compatible auth token cleanup processor

@@ -2,12 +2,14 @@
  * @import { ResolveEpisodePgBossW } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
  * @import { ResolveArchivePgBossW } from '@breadcrum/resources/archives/resolve-archive-queue.js'
  * @import { ResolveBookmarkPgBossW } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+ * @import { CleanupAuthTokensPgBossW } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
  */
 import fp from 'fastify-plugin'
 
 import { resolveEpisodeQName, createResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName, createResolveArchiveQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { resolveBookmarkQName, createResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { cleanupAuthTokensQName, createCleanupAuthTokensQ } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
 
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
@@ -25,11 +27,6 @@ export default fp(async function (fastify, _opts) {
     logger: fastify.log
   })
 
-  // Schedule auth token cleanup job (runs at 3 AM UTC daily)
-  const cleanupAuthTokensJobName = 'cleanup-stale-auth-tokens'
-  await boss.schedule(cleanupAuthTokensJobName, '0 3 * * *', undefined, { tz: 'UTC' })
-  fastify.log.info({ jobName: cleanupAuthTokensJobName, schedule: '0 3 * * *' }, 'Scheduled auth token cleanup job')
-
   // Create queue wrappers using factory functions
   // This automatically applies default configuration for each queue
   // NOTE: Queues must be created before workers are registered
@@ -37,9 +34,14 @@ export default fp(async function (fastify, _opts) {
   const queues = {
     resolveEpisodeQ: await createResolveEpisodeQ({ boss }),
     resolveArchiveQ: await createResolveArchiveQ({ boss }),
-    resolveBookmarkQ: await createResolveBookmarkQ({ boss })
+    resolveBookmarkQ: await createResolveBookmarkQ({ boss }),
+    cleanupAuthTokensQ: await createCleanupAuthTokensQ({ boss })
   }
   fastify.log.info('pg-boss queues created')
+
+  // Schedule auth token cleanup job (runs at 3 AM UTC daily)
+  await boss.schedule(cleanupAuthTokensQName, '0 3 * * *', undefined, { tz: 'UTC' })
+  fastify.log.info({ jobName: cleanupAuthTokensQName, schedule: '0 3 * * *' }, 'Scheduled auth token cleanup job')
 
   // Create pg-boss workers with native processors
   /** @type {ResolveEpisodePgBossW[]} */
@@ -70,14 +72,14 @@ export default fp(async function (fastify, _opts) {
   }
 
   // Create auth token cleanup worker (scheduled job)
-  const cleanupAuthTokensWorkerFn = makeAuthTokenCleanupP({ fastify })
-  const cleanupAuthTokensWorker = await boss.work(cleanupAuthTokensJobName, cleanupAuthTokensWorkerFn)
+  /** @type {CleanupAuthTokensPgBossW} */
+  const cleanupAuthTokensWorker = await boss.work(cleanupAuthTokensQName, makeAuthTokenCleanupP({ fastify }))
 
   const workers = {
     [resolveEpisodeQName]: episodeWorkers,
     [resolveArchiveQName]: archiveWorkers,
     [resolveBookmarkQName]: bookmarkWorkers,
-    [cleanupAuthTokensJobName]: [cleanupAuthTokensWorker]
+    [cleanupAuthTokensQName]: [cleanupAuthTokensWorker]
   }
 
   const pgboss = {
