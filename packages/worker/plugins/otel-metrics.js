@@ -113,6 +113,20 @@ export default fp(async function (fastify, _) {
     queueTotalGauge: meter.createObservableGauge('breadcrum_queue_total', {
       description: 'The total number of jobs in each queue (deferred + queued + active)',
     }),
+
+    // Auth token cleanup metrics
+    authTokensCleanedCounter: meter.createCounter('breadcrum_auth_tokens_cleaned_total', {
+      description: 'The number of stale auth tokens deleted',
+    }),
+
+    authTokensCleanupJobCounter: meter.createCounter('breadcrum_auth_tokens_cleanup_job_total', {
+      description: 'The number of times auth token cleanup job has run',
+    }),
+
+    authTokensCleanupDuration: meter.createHistogram('breadcrum_auth_tokens_cleanup_seconds', {
+      description: 'The time it takes to run auth token cleanup job',
+      unit: 's',
+    }),
   })
 },
 {
