@@ -1,6 +1,6 @@
 import { writeFile } from 'fs/promises'
 import { resolve } from 'path'
-import { schema } from '../plugins/env.js'
+import { envSchema } from '../config/env-schema.js'
 
 const __dirname = import.meta.dirname
 
@@ -10,7 +10,7 @@ const __dirname = import.meta.dirname
 if (process.env['ENV'] !== 'production') {
   const dotenv = []
 
-  for (const [name, opts] of Object.entries(schema.properties)) {
+  for (const [name, opts] of Object.entries(envSchema.properties)) {
     if (opts.default != null) dotenv.push(`${name}=${opts.default}`)
   }
 

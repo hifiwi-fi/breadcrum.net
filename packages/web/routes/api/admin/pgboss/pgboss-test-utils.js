@@ -1,6 +1,7 @@
 /**
  * Creates a test user with optional admin privileges
  * @param {import('fastify').FastifyInstance} app
+ * @param {import('node:test').TestContext} t
  * @param {object} options
  * @param {boolean} [options.admin] - Whether user should be admin
  * @returns {Promise<{
@@ -12,7 +13,7 @@
  *   isAdmin: boolean
  * }>}
  */
-export async function createTestUser (app, options = {}) {
+export async function createTestUser (app, t, options = {}) {
   const { admin = false } = options
   const testUsername = `test_user_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
   const testEmail = `test_${Date.now()}_${Math.random().toString(36).slice(2, 10)}@example.com`
@@ -45,6 +46,13 @@ export async function createTestUser (app, options = {}) {
   if (admin) {
     await app.pg.query('UPDATE users SET admin = true WHERE id = $1', [userId])
   }
+
+  // Setup cleanup
+  t.after(async () => {
+    if (userId) {
+      await app.pg.query('DELETE FROM users WHERE id = $1', [userId])
+    }
+  })
 
   return {
     userId,
