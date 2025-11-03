@@ -1,5 +1,5 @@
 /**
- * @import { PgClient } from '../types/pg-client.js'
+ * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  * @import { FastifyBaseLogger } from 'fastify'
  */
 
