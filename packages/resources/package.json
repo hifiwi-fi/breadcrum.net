@@ -12,7 +12,7 @@
   "dependencies": {
     "@nearform/sql": "^1.10.5",
     "ipaddr": "^0.1.0",
-    "pg-boss": "^11.1.2",
+    "pg-boss": "^12.5.0",
     "pony-cause": "^2.1.11",
     "undici": "^7.0.0"
   },
