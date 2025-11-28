@@ -17,6 +17,7 @@ updates:
       opentelemetry:
         patterns:
           - "@opentelemetry/*"
+          - "@fastify/otel"
       typescript:
         patterns:
           - "@voxpelli/tsconfig"
