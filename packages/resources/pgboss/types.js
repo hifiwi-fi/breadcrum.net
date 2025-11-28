@@ -14,4 +14,4 @@
  * - PgBoss.Queue
  */
 
-export { default } from 'pg-boss'
+export * from 'pg-boss'

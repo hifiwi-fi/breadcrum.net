@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
+ * @import {WorkHandler} from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveArchiveData } from '@breadcrum/resources/archives/resolve-archive-queue.js'
  */
 
@@ -17,12 +17,12 @@ import { extractArchive } from './extract-archive.js'
  * pg-boss compatible archive processor
  * @param {object} params
  * @param  { FastifyInstance } params.fastify
- * @return {PgBoss.WorkHandler<ResolveArchiveData>} pg-boss handler
+ * @return {WorkHandler<ResolveArchiveData>} pg-boss handler
  */
 export function makeArchivePgBossP ({ fastify }) {
   const logger = fastify.log
 
-  /** @type {PgBoss.WorkHandler<ResolveArchiveData>} */
+  /** @type {WorkHandler<ResolveArchiveData>} */
   return async function archivePgBossP (jobs) {
     for (const job of jobs) {
       const {

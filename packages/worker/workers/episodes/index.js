@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
+ * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveEpisodeData } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
  */
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
@@ -11,12 +11,12 @@ import { upcomingCheck } from './handle-upcoming.js'
  * pg-boss compatible episode processor
  * @param {object} params
  * @param  { FastifyInstance } params.fastify
- * @return {PgBoss.WorkHandler<ResolveEpisodeData>} pg-boss handler
+ * @return {WorkHandler<ResolveEpisodeData>} pg-boss handler
  */
 export function makeEpisodePgBossP ({ fastify }) {
   const logger = fastify.log
 
-  /** @type {PgBoss.WorkHandler<ResolveEpisodeData>} */
+  /** @type {WorkHandler<ResolveEpisodeData>} */
   return async function episodePgBossP (jobs) {
     for (const job of jobs) {
       const log = logger.child({

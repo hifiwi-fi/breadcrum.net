@@ -1,6 +1,7 @@
 /**
  * @import { MediumTypes } from './yt-dlp-api-client.js'
- * @import PgBoss from 'pg-boss'
+ * @import {PgBoss, SendOptions, JobInsert} from 'pg-boss'
+ * @import { InsertOptions } from 'pg-boss/dist/types.js'
  * @import { Queue } from 'pg-boss'
  */
 
@@ -26,7 +27,7 @@ export const resolveEpisodeJobName = 'resolve-episode'
  *
  * @typedef {{
  *   data: ResolveEpisodeData
- *   options?: PgBoss.SendOptions
+ *   options?: SendOptions
  * }} ResolveEpisodeRequest
  */
 
@@ -40,7 +41,7 @@ export const resolveEpisodeJobName = 'resolve-episode'
  * @typedef {{
  *   name: string
  *   send: (request: ResolveEpisodeRequest) => Promise<string | null>
- *   insert: (data: ResolveEpisodeData[], options?: PgBoss.InsertOptions) => Promise<void>
+ *   insert: (data: ResolveEpisodeData[], options?: InsertOptions) => Promise<string[] | null>
  * }} ResolveEpisodePgBossQ
  */
 
@@ -84,7 +85,7 @@ export async function createResolveEpisodeQ ({
       }),
 
     insert: (dataArray, options) => {
-      /** @type {PgBoss.JobInsert<ResolveEpisodeData>[]} */
+      /** @type {JobInsert<ResolveEpisodeData>[]} */
       const jobs = dataArray.map(data => ({
         name: resolveEpisodeQName,
         data

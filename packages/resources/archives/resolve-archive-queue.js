@@ -1,5 +1,6 @@
 /**
- * @import PgBoss from 'pg-boss'
+ * @import { PgBoss, SendOptions, JobInsert } from 'pg-boss'
+ * @import { InsertOptions } from 'pg-boss/dist/types.js'
  * @import { Queue } from 'pg-boss'
  */
 
@@ -23,7 +24,7 @@ export const resolveArchiveJobName = 'resolve-archive'
  *
  * @typedef {{
  *   data: ResolveArchiveData
- *   options?: PgBoss.SendOptions
+ *   options?: SendOptions
  * }} ResolveArchiveRequest
  */
 
@@ -37,7 +38,7 @@ export const resolveArchiveJobName = 'resolve-archive'
  * @typedef {{
  *   name: string
  *   send: (request: ResolveArchiveRequest) => Promise<string | null>
- *   insert: (data: ResolveArchiveData[], options?: PgBoss.InsertOptions) => Promise<void>
+ *   insert: (data: ResolveArchiveData[], options?: InsertOptions) => Promise<string[] | null>
  * }} ResolveArchivePgBossQ
  */
 
@@ -81,7 +82,7 @@ export async function createResolveArchiveQ ({
       }),
 
     insert: (dataArray, options) => {
-      /** @type {PgBoss.JobInsert<ResolveArchiveData>[]} */
+      /** @type {JobInsert<ResolveArchiveData>[]} */
       const jobs = dataArray.map(data => ({
         name: resolveArchiveQName,
         data

@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
+ * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveBookmarkData } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  * @import { ExtractMetaMeta } from '@breadcrum/extract-meta'
@@ -26,12 +26,12 @@ import { finalizeArchive } from '../archives/finalize-archive.js'
  * pg-boss compatible bookmark processor
  * @param {object} params
  * @param  { FastifyInstance } params.fastify
- * @return {PgBoss.WorkHandler<ResolveBookmarkData>} pg-boss handler
+ * @return {WorkHandler<ResolveBookmarkData>} pg-boss handler
  */
 export function makeBookmarkPgBossP ({ fastify }) {
   const logger = fastify.log
 
-  /** @type {PgBoss.WorkHandler<ResolveBookmarkData>} */
+  /** @type {WorkHandler<ResolveBookmarkData>} */
   return async function bookmarkPgBossP (jobs) {
     for (const job of jobs) {
       const {

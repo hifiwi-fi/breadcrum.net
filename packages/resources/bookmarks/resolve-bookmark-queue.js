@@ -1,5 +1,6 @@
 /**
- * @import PgBoss from 'pg-boss'
+ * @import {PgBoss, SendOptions, JobInsert} from 'pg-boss'
+ * @import { InsertOptions } from 'pg-boss/dist/types.js'
  * @import { Queue } from 'pg-boss'
  */
 
@@ -37,7 +38,7 @@ export const resolveBookmarkJobName = 'resolve-bookmark'
  *
  * @typedef {{
  *   data: ResolveBookmarkData
- *   options?: PgBoss.SendOptions
+ *   options?: SendOptions
  * }} ResolveBookmarkRequest
  */
 
@@ -51,7 +52,7 @@ export const resolveBookmarkJobName = 'resolve-bookmark'
  * @typedef {{
  *   name: string
  *   send: (request: ResolveBookmarkRequest) => Promise<string | null>
- *   insert: (data: ResolveBookmarkData[], options?: PgBoss.InsertOptions) => Promise<void>
+ *   insert: (data: ResolveBookmarkData[], options?: InsertOptions) => Promise<string[] | null>
  * }} ResolveBookmarkPgBossQ
  */
 
@@ -95,7 +96,7 @@ export async function createResolveBookmarkQ ({
       }),
 
     insert: (dataArray, options) => {
-      /** @type {PgBoss.JobInsert<ResolveBookmarkData>[]} */
+      /** @type {JobInsert<ResolveBookmarkData>[]} */
       const jobs = dataArray.map(data => ({
         name: resolveBookmarkQName,
         data
