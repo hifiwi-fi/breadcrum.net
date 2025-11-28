@@ -2,23 +2,15 @@ import { getBookmark } from '../get-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import {
- *  SchemaBookmarkWithArchivesAndEpisodes,
- * } from '../schemas/schema-bookmark-with-archives-and-episodes.js'
  * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
- * @import { SchemaEpisodeRead } from '../../episodes/schemas/schema-episode-read.js'
- * @import { SchemaArchiveRead } from '../../archives/schemas/schema-archive-read.js'
  */
 
 /**
- *
+ * Gets a single bookmark by ID
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  * SerializerSchemaOptions: {
  *    references: [
- *     SchemaBookmarkWithArchivesAndEpisodes,
- *     SchemaBookmarkRead,
- *     SchemaEpisodeRead,
- *     SchemaArchiveRead
+ *     SchemaBookmarkRead
  *   ],
  *   deserialize: [{
  *       pattern: {
@@ -59,12 +51,12 @@ export async function getBookmarkRoute (fastify, _opts) {
         },
       },
     },
-    async function getBookmarkHandler (request, reply) {
+    async function getBookmarkHandler (request, _reply) {
       const ownerId = request.user.id
       const { id: bookmarkId } = request.params
       const { sensitive } = request.query
 
-      const bookmark = getBookmark({
+      const bookmark = await getBookmark({
         fastify,
         ownerId,
         bookmarkId,
@@ -73,7 +65,7 @@ export async function getBookmarkRoute (fastify, _opts) {
       })
 
       if (!bookmark) {
-        return reply.notFound('bookmark id not found')
+        return _reply.notFound('bookmark id not found')
       }
 
       return bookmark

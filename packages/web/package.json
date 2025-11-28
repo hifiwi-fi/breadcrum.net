@@ -57,9 +57,6 @@
     "undici": "^7.0.0",
     "useragent": "^2.3.0"
   },
-  "optionalDependencies": {
-    "sodium-native": "^5.0.1"
-  },
   "devDependencies": {
     "@breadcrum/bookmarklet": "1.0.13",
     "@domstack/static": "^11.0.0-beta.6",
@@ -101,8 +98,7 @@
     "test": "run-s test:*",
     "test:eslint": "eslint . --ignore-pattern 'public/*'",
     "test:node": "c8 node --test --test-reporter spec --test-force-exit --test-concurrency 1",
-    "test:tsc-ci": "tsc --project tsconfig-ci.json",
-    "test-skip:tsc": "tsc",
+    "test:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:domstack": "npm run build:domstack -- --watch-only --drafts",

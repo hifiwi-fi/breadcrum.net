@@ -8,6 +8,10 @@ import { defaultBackendFlags } from './backend-flags.js'
  */
 
 /**
+ * @typedef {Record<string, any>} FlagSet - Feature flag set with flag names as keys
+ */
+
+/**
  * This plugins adds a flags system available to all routes
  */
 export default fp(async function (fastify, _) {
@@ -19,7 +23,7 @@ export default fp(async function (fastify, _) {
      * @param {PgClient} [options.pgClient] - The PostgreSQL client instance.
      * @param {boolean} [options.frontend=true] - Whether to retrieve frontend flags.
      * @param {boolean} [options.backend=true] - Whether to retrieve backend flags.
-     * @returns {Promise<Object>} The retrieved flag set.
+     * @returns {Promise<FlagSet>} The retrieved flag set.
      */
     async function ({
       pgClient,
@@ -37,6 +41,7 @@ export default fp(async function (fastify, _) {
       const client = pgClient ?? fastify.pg
 
       const flagsResults = await client.query(flagsQuery)
+      /** @type {FlagSet} */
       const actualFlagSet = {}
 
       const flagset = {

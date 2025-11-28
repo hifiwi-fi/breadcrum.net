@@ -1,6 +1,13 @@
 import SQL from '@nearform/sql'
 
-export async function getAdminStats (fastify, opts) {
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ */
+export async function getAdminStats (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -15,7 +22,7 @@ export async function getAdminStats (fastify, opts) {
       },
     },
     // Get admin flags
-    async function getAdminFlagsHandler (request, reply) {
+    async function getAdminFlagsHandler (_request, _reply) {
       const monthBookmarkCountQuery = SQL`
         select u.id, u.username, u.email, count(*) as bookmark_count
         from users u

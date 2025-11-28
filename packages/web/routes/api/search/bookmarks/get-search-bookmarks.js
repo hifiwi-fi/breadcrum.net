@@ -2,6 +2,7 @@ import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -17,6 +18,7 @@ export async function getSearchBookmarks (fastify, _opts) {
         tags: ['search', 'bookmarks'],
         querystring: {
           type: 'object',
+          required: ['query'],
           properties: {
             query: {
               type: 'string',
@@ -63,6 +65,8 @@ export async function getSearchBookmarks (fastify, _opts) {
         response: {
           200: {
             type: 'object',
+            additionalProperties: false,
+            required: ['data', 'pagination'],
             properties: {
               data: {
                 type: 'array',
@@ -82,6 +86,8 @@ export async function getSearchBookmarks (fastify, _opts) {
               },
               pagination: {
                 type: 'object',
+                additionalProperties: false,
+                required: ['top', 'bottom'],
                 properties: {
                   top: {
                     type: 'boolean',
@@ -91,6 +97,8 @@ export async function getSearchBookmarks (fastify, _opts) {
                   },
                   next: {
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -109,6 +117,8 @@ export async function getSearchBookmarks (fastify, _opts) {
                   },
                   prev: {
                     type: 'object',
+                    additionalProperties: false,
+                    required: ['rank', 'id', 'query', 'reverse'],
                     properties: {
                       rank: {
                         type: 'string',
@@ -134,6 +144,9 @@ export async function getSearchBookmarks (fastify, _opts) {
     },
     // Get Bookmarks
     async function getSearchBookmarksHandler (request, reply) {
+      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ReturnBody['pagination']} PaginationType */
+
       const userId = request.user.id
       const {
         rank,
@@ -146,7 +159,7 @@ export async function getSearchBookmarks (fastify, _opts) {
         reverse,
       } = request.query
 
-      const bookmarkQuery = getSearchBookmarksQuery({
+      const bookmarksQuery = getSearchBookmarksQuery({
         query,
         ownerId: userId,
         sensitive,
@@ -158,7 +171,7 @@ export async function getSearchBookmarks (fastify, _opts) {
         reverse,
       })
 
-      const results = await fastify.pg.query(bookmarkQuery)
+      const results = await fastify.pg.query(bookmarksQuery)
 
       const top = !rank || (!rank && !id) || (reverse && results.rows.length <= perPage)
       const bottom = !reverse && results.rows.length <= perPage
@@ -171,6 +184,7 @@ export async function getSearchBookmarks (fastify, _opts) {
         results.rows.shift()
       }
 
+      /** @type {PaginationType} */
       const pagination = {
         top,
         bottom,
@@ -200,10 +214,12 @@ export async function getSearchBookmarks (fastify, _opts) {
         }
       }
 
-      return {
-        data: results.rows,
+      /** @type {ReturnBody} */
+      const response = {
+        data: /** @type {any} */ (results.rows),
         pagination,
       }
+      return reply.code(200).send(response)
     }
   )
 }

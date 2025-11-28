@@ -1,8 +1,3 @@
-/**
- * @import { ResolveEpisodePgBossQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
- * @import { ResolveArchivePgBossQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
- * @import { ResolveBookmarkPgBossQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
- */
 import fp from 'fastify-plugin'
 
 import { createResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'

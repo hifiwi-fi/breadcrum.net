@@ -51,6 +51,15 @@ export default async function registerRoutes (fastify, _opts) {
               ...tokenWithUserProps.properties,
             },
           },
+          403: {
+            type: 'object',
+            properties: {
+              error: {
+                type: 'string',
+                description: 'Error message when registration is closed',
+              },
+            },
+          },
         },
       },
     },

@@ -2,6 +2,7 @@ import SQL from '@nearform/sql'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyRequest, FastifyReply } from 'fastify'
  */
 
 /**
@@ -18,10 +19,18 @@ export default async function (fastify, _opts) {
 
   fastify.decorateRequest('feedTokenUser', null)
 
-  async function validate (uuid, token, request, reply) {
+  /**
+   * Validates feed token authentication
+   * @param {string} uuid - User ID from basic auth
+   * @param {string} token - Feed token from basic auth
+   * @param {FastifyRequest} request - Fastify request object
+   * @param {FastifyReply} _reply - Fastify reply object (unused)
+   */
+  async function validate (uuid, token, request, _reply) {
     if (!uuid) throw new Error('Missing user')
     if (!token) throw new Error('Missing password')
-    const feedId = request?.params?.feed
+    // TODO: Fix ANY
+    const feedId = /** @type {any} */ (request?.params)?.feed
     if (!feedId) throw new Error('Missing feedId')
 
     const feedQuery = SQL`
@@ -35,7 +44,8 @@ export default async function (fastify, _opts) {
 
     const results = await fastify.pg.query(feedQuery)
     if (results.rowCount === 1) {
-      request.feedTokenUser = {
+      // TODO: Fix ANY
+      /** @type {any} */ (request).feedTokenUser = {
         userId: uuid,
         token,
       }

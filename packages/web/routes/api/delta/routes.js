@@ -15,7 +15,7 @@ export default async function deltaRoutes (fastify, _opts) {
         hide: true, // TODO: remove when implemented
       },
     },
-    async function (request, reply) {
+    async function (_request, reply) {
       return reply.notImplemented()
     }
   )
@@ -27,7 +27,7 @@ export default async function deltaRoutes (fastify, _opts) {
         hide: true, // TODO: remove when implemented
       },
     },
-    async function (request, reply) {
+    async function (_request, reply) {
       return reply.notImplemented()
     }
   )

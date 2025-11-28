@@ -1,13 +1,26 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ * @import { FastifyRequest } from 'fastify'
+ */
+
+/**
+ * @typedef {Object} FeedTokenUser
+ * @property {string} userId - The authenticated user ID from feed token
+ * @property {string} token - The feed token
+ */
+
+/**
+ * Augment FastifyRequest to include feedTokenUser property
+ * @typedef {FastifyRequest & { feedTokenUser?: FeedTokenUser }} FeedAuthRequest
  */
 
 /**
  *
+ * Handles placeholder episode routes for podcast feeds
  * @type {FastifyPluginAsyncJsonSchemaToTs}
  * @returns {Promise<void>}
  */
-export default async function podcastFeedsRoutes (fastify, _opts) {
+export default async function placeholderRoute (fastify, _opts) {
   fastify.get(
     '/',
     {
@@ -33,7 +46,7 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
       },
     },
     async function placeholderHandler (request, reply) {
-      const feedTokenUser = request.feedTokenUser
+      const feedTokenUser = /** @type {FeedAuthRequest} */ (request).feedTokenUser
       const userId = feedTokenUser?.userId ?? request?.user?.id
       if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
@@ -49,7 +62,7 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
 
       const flags = await fastify.getFlags({ frontend: false, backend: true })
       const metadata = await fastify.getYTDLPMetadataWrapper({
-        url: flags.placeholder_url,
+        url: flags['placeholder_url'],
         medium: 'video',
       })
 

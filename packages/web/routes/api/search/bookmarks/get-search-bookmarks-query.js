@@ -9,6 +9,20 @@ import {
  * @typedef {import('@nearform/sql').SqlStatement} SqlStatement
  */
 
+/**
+ * Builds a SQL query for searching bookmarks with various filters
+ * @param {Object} params - Search parameters
+ * @param {string} params.query - Search query string
+ * @param {string} params.ownerId - ID of the bookmark owner
+ * @param {number} params.perPage - Number of results per page
+ * @param {boolean} params.sensitive - Include sensitive bookmarks
+ * @param {boolean} params.starred - Filter for starred bookmarks
+ * @param {boolean} params.toread - Filter for unread bookmarks
+ * @param {string} [params.lastRank] - Rank for pagination
+ * @param {string} [params.lastId] - Last bookmark ID for pagination
+ * @param {boolean} [params.reverse=false] - Reverse the sort order
+ * @returns {SqlStatement} SQL query for searching bookmarks
+ */
 export function getSearchBookmarksQuery ({
   query,
   ownerId,

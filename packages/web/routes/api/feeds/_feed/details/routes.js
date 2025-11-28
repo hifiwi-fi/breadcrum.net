@@ -7,7 +7,11 @@ import { feedDetailsHandler } from './feed-details-handler.js'
 
 /**
  *
- * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
+ *   }
+ * }>}
  * @returns {Promise<void>}
  */
 export default async function getFeedDetails (fastify, _opts) {

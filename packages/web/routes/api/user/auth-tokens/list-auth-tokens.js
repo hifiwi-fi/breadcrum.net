@@ -4,6 +4,7 @@ import { getAuthTokens } from './get-auth-tokens-query.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { TypeAuthTokenReadSerialize } from './schemas/schema-auth-token-read.js'
+ * @import { AuthTokenQueryRead } from './get-auth-tokens-query.js'
  */
 
 /**
@@ -107,8 +108,8 @@ export async function listAuthTokens (fastify, _opts) {
           sort: sortOrder,
         } = request.query
 
-        /** @type {TypeAuthTokenReadSerialize[]} */
-        const tokens = await getAuthTokens({
+        /** @type {AuthTokenQueryRead[]} */
+        const tokensWithMicros = await getAuthTokens({
           fastify,
           pg: client,
           userId,
@@ -121,18 +122,18 @@ export async function listAuthTokens (fastify, _opts) {
 
         const top = Boolean(
           (!before && !after) ||
-          (after && tokens.length <= perPage)
+          (after && tokensWithMicros.length <= perPage)
         )
         const bottom = Boolean(
-          (before && tokens.length <= perPage) ||
-          (!before && !after && tokens.length <= perPage)
+          (before && tokensWithMicros.length <= perPage) ||
+          (!before && !after && tokensWithMicros.length <= perPage)
         )
 
-        if (tokens.length > perPage) {
+        if (tokensWithMicros.length > perPage) {
           if (after) {
-            tokens.shift()
+            tokensWithMicros.shift()
           } else {
-            tokens.pop()
+            tokensWithMicros.pop()
           }
         }
 
@@ -140,15 +141,19 @@ export async function listAuthTokens (fastify, _opts) {
         let nextPage = null
         let prevPage = null
 
-        if (!bottom && tokens.length > 0) {
-          const lastToken = tokens.at(-1)
+        if (!bottom && tokensWithMicros.length > 0) {
+          const lastToken = tokensWithMicros.at(-1)
           nextPage = lastToken ? `${lastToken.last_seen_micros}:${lastToken.jti}` : null
         }
 
-        if (!top && tokens.length > 0) {
-          const firstToken = tokens[0]
+        if (!top && tokensWithMicros.length > 0) {
+          const firstToken = tokensWithMicros[0]
           prevPage = firstToken ? `${firstToken.last_seen_micros}:${firstToken.jti}` : null
         }
+
+        // Remove last_seen_micros from response
+        /** @type {TypeAuthTokenReadSerialize[]} */
+        const tokens = tokensWithMicros.map(({ last_seen_micros: _unused, ...token }) => token)
 
         return reply.code(200).send({
           data: tokens,

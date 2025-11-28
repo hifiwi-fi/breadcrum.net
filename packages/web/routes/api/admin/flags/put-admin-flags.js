@@ -2,12 +2,19 @@ import SQL from '@nearform/sql'
 import { defaultFrontendFlags } from '../../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
 
+/**
+ * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
+ */
+
 const defaultFlags = {
   ...defaultFrontendFlags,
   ...defaultBackendFlags,
 }
 
-export async function putAdminFlags (fastify, opts) {
+/**
+ * @type {FastifyPluginAsyncJsonSchemaToTs}
+ */
+export async function putAdminFlags (fastify, _opts) {
   fastify.put(
     '/',
     {
@@ -41,9 +48,10 @@ export async function putAdminFlags (fastify, opts) {
       },
     },
     // Get flags
-    async function putAdminFlagsHandler (request, reply) {
+    async function putAdminFlagsHandler (request, _reply) {
       return fastify.pg.transact(async client => {
-        const requestFlags = request.body
+        // TODO: Fix ANY
+        const requestFlags = /** @type {Record<string, any>} */ (request.body)
         const updateFlags = []
         const deleteFlags = []
 
