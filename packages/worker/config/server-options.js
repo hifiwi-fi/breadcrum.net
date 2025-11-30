@@ -4,7 +4,7 @@
  */
 import { resolve } from 'path'
 import hyperid from 'hyperid'
-import { loggerOptions } from './logger-options.js'
+import { createLoggerOptions } from '@breadcrum/resources/fastify-common/logger-options.js'
 
 const hid = hyperid()
 
@@ -12,7 +12,7 @@ const fastifyOptions = /** @type{const} @satisfies {Partial<FastifyServerOptions
   trustProxy: true,
   genReqId: function (/* req */) { return hid() },
   disableRequestLogging: true,
-  logger: loggerOptions,
+  logger: createLoggerOptions({ serviceName: 'bc-worker' }),
 })
 
 const applicationOptions = /** @type {const} */ ({
