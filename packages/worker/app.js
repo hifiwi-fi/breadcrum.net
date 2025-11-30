@@ -1,14 +1,16 @@
 import AutoLoad from '@fastify/autoload'
 import { join } from 'node:path'
-import hyperid from 'hyperid'
+import { envSchema } from './config/env-schema.js'
+
+// Re-exporting the options object
+export { options } from './config/server-options.js'
 
 /**
- * @import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
- * @import { AutoloadPluginOptions } from '@fastify/autoload'
+ * @import { FastifyPluginAsync } from 'fastify'
+ * @import { AppOptions } from './config/server-options.js'
  */
 
 const __dirname = import.meta.dirname
-const hid = hyperid()
 
 /**
  * @type {FastifyPluginAsync<AppOptions>}
@@ -17,6 +19,9 @@ export default async function App (fastify, opts) {
   const testPattern = /.*(test|spec)(\.js|\.cjs|\.mjs)$/i
   const skipPattern = /.*.no-load(\.js|\.cjs|\.mjs)$/i
   const ignorePattern = new RegExp(`${testPattern.source}|${skipPattern.source}`)
+
+  // Load the env schema first thing
+  fastify.addSchema(envSchema)
 
   // This loads all global plugins defined in the plugins folder
   // Plugins should use fp and be named and define their
@@ -42,48 +47,4 @@ export default async function App (fastify, opts) {
     routeParams: true,
     options: { ...opts },
   })
-}
-
-const PinoLevelToSeverityLookup = {
-  trace: 'DEBUG',
-  debug: 'DEBUG',
-  info: 'INFO',
-  warn: 'WARNING',
-  error: 'ERROR',
-  fatal: 'CRITICAL',
-}
-
-/**
- * @typedef { {} &
- *   Partial<FastifyServerOptions> &
- *   Partial<AutoloadPluginOptions>
- * } AppOptions
- */
-
-/**
- * @type {AppOptions}
- */
-export const options = {
-  trustProxy: true,
-  genReqId: function (/* req */) { return hid() },
-  disableRequestLogging: true,
-  logger: {
-    mixin () {
-      return {
-        service: 'bc-worker',
-      }
-    },
-    messageKey: 'message',
-    formatters: {
-      level (label, number) {
-        return {
-          level: PinoLevelToSeverityLookup[
-            /** @type {keyof typeof PinoLevelToSeverityLookup} */
-            (label)
-          ] || PinoLevelToSeverityLookup.info,
-          levelN: number,
-        }
-      },
-    },
-  },
 }

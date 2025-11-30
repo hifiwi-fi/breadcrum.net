@@ -6,7 +6,8 @@ import { resolve } from 'path'
 import { createServerOptions } from '@breadcrum/resources/fastify-common/server-options.js'
 
 const fastifyOptions = createServerOptions({
-  serviceName: 'bc-web',
+  serviceName: 'bc-worker',
+  disableRequestLogging: true,
 })
 
 const applicationOptions = /** @type {const} */ ({

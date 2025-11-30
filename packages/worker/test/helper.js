@@ -3,38 +3,59 @@
 
 /**
  * @import { TestContext } from 'node:test'
+ * @import { FastifyInstance } from 'fastify'
+ * @import { DotEnvSchemaType } from '../config/env-schema.js'
+ * @import { AppOptions } from '../config/server-options.js'
 */
 
 import helper from 'fastify-cli/helper.js'
 import path from 'path'
-import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const AppPath = path.join(__dirname, '..', 'app.js')
+const appPath = path.join(import.meta.dirname, '../app.js')
+
+const testingEnv = /** @type {const} @satisfies {Partial<DotEnvSchemaType>} */ ({
+  // Add any testing-specific env overrides here if needed
+})
 
 // Fill in this config with all the configurations
 // needed for testing the application
-function config () {
-  return {}
+/**
+ *
+ * @param {Partial<DotEnvSchemaType>} env
+ * @returns {Partial<AppOptions>}
+ */
+function config (env) {
+  return {
+    envData: env,
+    skipOverride: true, // Register our application with fastify-plugin
+  }
 }
 
 /**
  * Automatically build and tear down our instance
  * @param {TestContext} t - Test context instance
+ * @param {Partial<DotEnvSchemaType>} [env]
+ * @param {object} [serverOptions]
+ * @returns {Promise<FastifyInstance>}
  */
-async function build (t) {
+async function build (t, env, serverOptions) {
   // you can set all the options supported by the fastify CLI command
-  const argv = [AppPath]
+  const argv = ['--options', appPath]
 
-  // fastify-plugin ensures that all decorators
-  // are exposed for testing purposes, this is
-  // different from the production setup
-  const app = await helper.build(argv, config())
+  /**
+   * fastify-plugin ensures that all decorators
+   * are exposed for testing purposes, this is
+   * different from the production setup
+   *
+   * @type {FastifyInstance}
+   */
+  const app = await helper.build(argv, config({ ...testingEnv, ...env }), serverOptions)
 
   // tear down our app after we are done
   t.after(async () => {
     await app.close()
+    // Add a small delay to ensure resources are released
+    await new Promise(resolve => setTimeout(resolve, 100))
   })
 
   await app.ready()
