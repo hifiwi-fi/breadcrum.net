@@ -1,6 +1,6 @@
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import PgBoss from '@breadcrum/resources/pgboss/types.js'
+ * @import {WorkHandler} from '@breadcrum/resources/pgboss/types.js'
  */
 import { cleanupStaleAuthTokens } from './cleanup-stale-tokens.js'
 
@@ -8,12 +8,12 @@ import { cleanupStaleAuthTokens } from './cleanup-stale-tokens.js'
  * pg-boss compatible auth token cleanup processor
  * @param {object} params
  * @param {FastifyInstance} params.fastify
- * @return {PgBoss.WorkHandler<Record<string, never>>} pg-boss handler
+ * @return {WorkHandler<Record<string, never>>} pg-boss handler
  */
 export function makeAuthTokenCleanupP ({ fastify }) {
   const logger = fastify.log
 
-  /** @type {PgBoss.WorkHandler<Record<string, never>>} */
+  /** @type {WorkHandler<Record<string, never>>} */
   return async function authTokenCleanupP (jobs) {
     for (const job of jobs) {
       const log = logger.child({
