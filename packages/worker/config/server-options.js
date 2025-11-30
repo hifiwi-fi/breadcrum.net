@@ -1,27 +1,21 @@
 /**
- * @import { FastifyServerOptions, FastifyPluginOptions } from 'fastify'
  * @import { DotEnvSchemaType } from '../config/env-schema.js'
+ * @import { ServerOptions } from '@breadcrum/resources/fastify-common/server-options.js'
  */
 import { resolve } from 'path'
-import hyperid from 'hyperid'
-import { createLoggerOptions } from '@breadcrum/resources/fastify-common/logger-options.js'
+import { createServerOptions } from '@breadcrum/resources/fastify-common/server-options.js'
 
-const hid = hyperid()
-
-const fastifyOptions = /** @type{const} @satisfies {Partial<FastifyServerOptions>} */ ({
-  trustProxy: true,
-  genReqId: function (/* req */) { return hid() },
+const fastifyOptions = createServerOptions({
+  serviceName: 'bc-worker',
   disableRequestLogging: true,
-  logger: createLoggerOptions({ serviceName: 'bc-worker' }),
 })
 
 const applicationOptions = /** @type {const} */ ({
-  dotEnvPath: resolve(import.meta.dirname, '../.env')
+  dotEnvPath: resolve(import.meta.dirname, '../.env'),
 })
 
 /**
- * @typedef {Partial<FastifyServerOptions> &
- *  Partial<FastifyPluginOptions> &
+ * @typedef {ServerOptions &
  *  typeof applicationOptions &
  *  Partial<{
  *    envData: Partial<DotEnvSchemaType>
@@ -29,7 +23,7 @@ const applicationOptions = /** @type {const} */ ({
  * } AppOptions
  */
 
-export const options = /** @type{const} @satisfies {AppOptions} */({
+export const options = /** @type {AppOptions} */ ({
   ...fastifyOptions,
-  ...applicationOptions
+  ...applicationOptions,
 })
