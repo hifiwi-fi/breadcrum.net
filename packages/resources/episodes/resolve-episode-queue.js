@@ -67,10 +67,19 @@ export async function createResolveEpisodeQ ({
   boss,
   queueOptions = defaultQueueOptions
 }) {
-  // Create the queue with merged options (defaults + user overrides)
+  // Episode-specific queue options
+  // YouTube URLs can have transient failures, so we retry more aggressively
+  const episodeQueueOptions = {
+    ...defaultQueueOptions,
+    retryLimit: 4, // Total of 5 attempts (1 initial + 4 retries)
+    retryDelay: 5, // Wait 5 seconds between retries (with exponential backoff)
+    retryBackoff: true, // Enable exponential backoff
+  }
+
+  // Create the queue with merged options (defaults + episode-specific + user overrides)
   // Idempotent - safe to call multiple times
   await boss.createQueue(resolveEpisodeQName, {
-    ...defaultQueueOptions,
+    ...episodeQueueOptions,
     ...queueOptions
   })
 

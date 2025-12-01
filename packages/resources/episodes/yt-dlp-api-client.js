@@ -1,4 +1,5 @@
 import { request as undiciRequest } from 'undici'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
 
 // TODO: move the shared elements of this back into breadcrum
 
@@ -64,9 +65,65 @@ export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
       get(key: object): Promise<any>;
       set(key: object, value: any, ttl?: number): Promise<void>;
     }} params.cache         The cache instance
+ * @param  {Number} [params.maxRetries] Maximum number of retries (default: 3 for YouTube, 0 for others)
+ * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
 export async function getYTDLPMetadata ({
+  url,
+  medium,
+  ytDLPEndpoint,
+  attempt = 0,
+  cache,
+  maxRetries,
+  retryDelayMs = 5000,
+}) {
+  const parsedUrl = new URL(url)
+  const isYouTube = isYouTubeUrl(parsedUrl)
+
+  // Default retry behavior: YouTube gets 3 retries, others get 0
+  const effectiveMaxRetries = maxRetries !== undefined ? maxRetries : (isYouTube ? 3 : 0)
+
+  let lastError
+
+  for (let retryAttempt = 0; retryAttempt <= effectiveMaxRetries; retryAttempt++) {
+    try {
+      return await getYTDLPMetadataAttempt({
+        url,
+        medium,
+        ytDLPEndpoint,
+        attempt: attempt + retryAttempt,
+        cache,
+      })
+    } catch (err) {
+      lastError = err
+      const isLastAttempt = retryAttempt === effectiveMaxRetries
+
+      if (!isLastAttempt) {
+        // Wait before next retry
+        await new Promise(resolve => setTimeout(resolve, retryDelayMs))
+      }
+    }
+  }
+
+  // All retries exhausted, throw the last error
+  throw lastError
+}
+
+/**
+ * Internal function to attempt a single getYTDLPMetadata request
+ * @param  {object} params
+ * @param  {string} params.url           the url of the video
+ * @param  {MediumTypes} params.medium        the desired filetype
+ * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
+ * @param  {Number} params.attempt      Cache busting attempt number
+ * @param  {{
+      get(key: object): Promise<any>;
+      set(key: object, value: any, ttl?: number): Promise<void>;
+    }} params.cache         The cache instance
+ * @return {Promise<YTDLPMetadata>}                       metadata object
+ */
+async function getYTDLPMetadataAttempt ({
   url,
   medium,
   ytDLPEndpoint,

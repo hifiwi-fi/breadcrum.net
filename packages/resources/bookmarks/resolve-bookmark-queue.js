@@ -78,10 +78,18 @@ export async function createResolveBookmarkQ ({
   boss,
   queueOptions = defaultQueueOptions
 }) {
-  // Create the queue with merged options (defaults + user overrides)
+  // Bookmark-specific queue options
+  // Bookmarks create resources throughout the job, so we disable retries
+  // to avoid duplicate resource creation
+  const bookmarkQueueOptions = {
+    ...defaultQueueOptions,
+    retryLimit: 0, // No retries - bookmark jobs create resources
+  }
+
+  // Create the queue with merged options (defaults + bookmark-specific + user overrides)
   // Idempotent - safe to call multiple times
   await boss.createQueue(resolveBookmarkQName, {
-    ...defaultQueueOptions,
+    ...bookmarkQueueOptions,
     ...queueOptions
   })
 

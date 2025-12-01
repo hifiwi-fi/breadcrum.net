@@ -38,12 +38,14 @@ export function makeEpisodePgBossP ({ fastify }) {
       log.info({ userId, url, bookmarkTitle, episodeId, medium }, 'processing episode')
 
       try {
+        // Disable internal retries - let pg-boss handle all retries at the job level
         const media = await getYTDLPMetadata({
           url,
           medium,
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
-          attempt: 0, // pg-boss handles retries differently
+          attempt: 0,
           cache: fastify.ytdlpCache,
+          maxRetries: 0, // pg-boss handles retries
         })
 
         const upcomingData = upcomingCheck({ media })

@@ -10,6 +10,7 @@
 
 import SQL from '@nearform/sql'
 import { JSDOM } from 'jsdom'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
 import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
@@ -64,7 +65,11 @@ export function makeBookmarkPgBossP ({ fastify }) {
       let media
       if (resolveEpisode) {
         log.info({ url }, 'resolving episode')
+        const parsedUrl = new URL(url)
+        const isYouTube = isYouTubeUrl(parsedUrl)
+
         try {
+          // getYTDLPMetadata handles retries internally (3 for YouTube, 0 for others)
           media = await getYTDLPMetadata({
             url,
             medium: 'video',
@@ -84,6 +89,41 @@ export function makeBookmarkPgBossP ({ fastify }) {
             },
             'getYTDLPMetadata threw during bookmark resolve (stats)'
           )
+
+          // For YouTube URLs that failed after retries, schedule delayed episode job
+          if (isYouTube) {
+            log.info('YouTube URL failed after retries, scheduling delayed episode job')
+
+            try {
+              const episodeEntity = await createEpisode({
+                client: pg,
+                userId,
+                bookmarkId,
+                type: 'redirect',
+                medium: 'video',
+                url,
+              })
+
+              const delayDate = new Date(Date.now() + 10000) // 10 seconds from now
+              await fastify.pgboss.queues.resolveEpisodeQ.send({
+                data: {
+                  userId,
+                  bookmarkTitle: userProvidedMeta.title,
+                  episodeId: episodeEntity.id,
+                  url,
+                  medium: 'video'
+                },
+                options: {
+                  startAfter: delayDate
+                }
+              })
+
+              log.info({ episodeId: episodeEntity.id, delayDate }, 'Scheduled delayed episode job for failed YouTube URL')
+            } catch (scheduleErr) {
+              log.error({ error: scheduleErr }, 'Failed to schedule delayed episode job')
+            }
+          }
+          // For non-YouTube URLs, don't schedule anything - just continue processing bookmark
         }
       }
 
