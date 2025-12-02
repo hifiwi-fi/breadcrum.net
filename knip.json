@@ -29,6 +29,7 @@
         "routes/**/index.js",
         "scripts/**/*.js",
         "test/**/*.js",
+        "workers/bookmarks/ua.js",
         "otel.js"
       ],
       "project": ["**/*.js"]
