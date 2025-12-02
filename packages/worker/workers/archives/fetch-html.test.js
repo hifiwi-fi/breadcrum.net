@@ -3,6 +3,7 @@ import { strict as assert } from 'node:assert'
 import { fetchHTML } from './fetch-html.js'
 
 test('fetchHTML should fetch HTML content from breadcrum.net blog post', async (_t) => {
+  // TODO: Make this pass when the site is down.
   const url = new URL('https://breadcrum.net/blog/2025/whats-going-on-with-episodes/')
 
   const html = await fetchHTML({ url })
