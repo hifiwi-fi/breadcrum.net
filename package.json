@@ -14,7 +14,6 @@
     "node": ">=24.0.0"
   },
   "devDependencies": {
-    "@voxpelli/tsconfig": "^16.0.0",
     "auto-changelog": "^2.0.0",
     "custompatch": "^1.1.4",
     "gh-release": "^7.0.0",
@@ -42,7 +41,7 @@
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
-    "test": "npm run test --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present && node -run knip",
     "test-web": "npm run test --workspace=@breadcrum/web",
     "test-worker": "npm run test --workspace=@breadcrum/worker",
     "neostandard": "eslint .",

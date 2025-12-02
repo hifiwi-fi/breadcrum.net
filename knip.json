@@ -1,9 +1,13 @@
 {
   "ignore": [],
-  "ignoreBinaries": ["flyctl", "dot"],
+  "ignoreBinaries": ["flyctl", "eslint"],
+  "ignoreUnresolved": ["spec"],
   "ignoreDependencies": [],
   "ignoreWorkspaces": [],
   "workspaces": {
+    ".": {
+      "entry": ["eslint.config.js"]
+    },
     "packages/web": {
       "entry": [
         "app.js",
@@ -11,10 +15,11 @@
         "plugins/**/*.js",
         "routes/**/{routes,autohooks}.js",
         "scripts/**/*.js",
-        "test/**/*.js"
+        "test/**/*.js",
+        "otel.js"
       ],
       "ignoreDependencies": ["highlight.js"],
-      "ignoreBinaries": ["pg-to-dbml", "postgres://postgres"],
+      "ignoreBinaries": ["pg-to-dbml"],
       "project": ["**/*.js"]
     },
     "packages/worker": {
@@ -23,12 +28,13 @@
         "plugins/**/*.js",
         "routes/**/index.js",
         "scripts/**/*.js",
-        "test/**/*.js"
+        "test/**/*.js",
+        "otel.js"
       ],
       "project": ["**/*.js"]
     },
     "packages/*": {
-      "entry": ["**/*.js"],
+      "entry": ["**/*.js", "eslint.config.js"],
       "project": ["**/*.js"]
     }
   }
