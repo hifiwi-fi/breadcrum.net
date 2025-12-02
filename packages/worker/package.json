@@ -53,6 +53,7 @@
     "user-agents": "^1.1.669"
   },
   "devDependencies": {
+    "@types/user-agents": "^1.0.4",
     "@fastify/type-provider-json-schema-to-ts": "^5.0.0",
     "@types/concat-stream": "^2.0.3",
     "@types/gunzip-maybe": "^1.4.2",

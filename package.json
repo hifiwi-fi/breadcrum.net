@@ -41,7 +41,7 @@
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
-    "test": "npm run test --workspaces --if-present && node -run knip",
+    "test": "npm run test --workspaces --if-present && npm run knip",
     "test-web": "npm run test --workspace=@breadcrum/web",
     "test-worker": "npm run test --workspace=@breadcrum/worker",
     "neostandard": "eslint .",
