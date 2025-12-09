@@ -46,7 +46,7 @@
     "fastify-healthcheck": "^5.0.0",
     "fastify-plugin": "^5.0.1",
     "gunzip-maybe": "^1.4.2",
-    "jsdom": "^27.0.1",
+    "jsdom": "^27.3.0",
     "json-schema-to-ts": "^3.1.1",
     "type-fest": "^5.2.0",
     "undici": "^7.0.0",
