@@ -22,7 +22,7 @@ export default async () => {
  */
 async function npmList () {
   try {
-    const { stdout, stderr } = await execPromise('npm ls')
+    const { stdout, stderr } = await execPromise('pnpm ls')
 
     if (stderr) {
       console.error(`Error: ${stderr}`)

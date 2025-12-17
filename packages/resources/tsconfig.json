@@ -6,13 +6,8 @@
     "erasableSyntaxOnly": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
   },
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "coverage",
-  ]
+  "include": ["**/*"],
+  "exclude": ["node_modules", "coverage"],
 }

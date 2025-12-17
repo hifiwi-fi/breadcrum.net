@@ -11,23 +11,24 @@
   },
   "dependencies": {
     "@bret/is-youtube-url": "^1.0.3",
-    "@fastify/postgres": "^6.0.2",
-    "@nearform/sql": "^1.10.5",
+    "@fastify/postgres": "catalog:",
+    "@nearform/sql": "catalog:",
     "hyperid": "^3.1.1",
     "ipaddr.js": "^2.3.0",
-    "pg": "^8.16.3",
+    "pg": "catalog:",
     "pg-boss": "^12.5.2",
-    "undici": "^7.0.0"
+    "undici": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^24.9.1",
-    "@voxpelli/tsconfig": "^16.0.0",
-    "c8": "^10.0.0",
-    "eslint": "^9.39.1",
-    "fastify": "^5.0.0",
-    "neostandard": "^0.12.0",
-    "npm-run-all2": "^8.0.1",
-    "typescript": "~5.9.0"
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "@voxpelli/tsconfig": "catalog:",
+    "c8": "catalog:",
+    "eslint": "catalog:",
+    "fastify": "catalog:",
+    "neostandard": "catalog:",
+    "npm-run-all2": "catalog:",
+    "typescript": "catalog:"
   },
   "c8": {
     "reporter": [

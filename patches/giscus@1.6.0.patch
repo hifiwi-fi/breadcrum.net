@@ -1,0 +1,12 @@
+diff --git a/dist/giscus.mjs b/dist/giscus.mjs
+index ef8f73fd4a936bb6d9f729158db226bf2de0d79d..f213ff34e143aba95815e21f182b6dfa3fea8692 100644
+--- a/dist/giscus.mjs
++++ b/dist/giscus.mjs
+@@ -167,6 +167,7 @@ let r = class extends g {
+   render() {
+     return d`
+       <iframe
++        credentialless
+         title="Comments"
+         scrolling="no"
+         class="loading"

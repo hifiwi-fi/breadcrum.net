@@ -17,7 +17,6 @@ on:
 
 env:
   FORCE_COLOR: 1
-  NPM_CONFIG_COLOR: always
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
 
 concurrency:
@@ -54,28 +53,33 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
           node-version-file: package.json
           registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Archive lockfile
         uses: actions/upload-artifact@v5
         with:
-          name: package-lock.json
-          path: package-lock.json
-      - run: npm run generate-default-env --workspaces --if-present
-      - run: npm run migrate --workspaces --if-present
+          name: pnpm-lock.yaml
+          path: pnpm-lock.yaml
+      - run: pnpm run -r generate-default-env
+      - run: pnpm run -r migrate
         env:
           PGDATABASE: breadcrum
           PGHOST: localhost
           PGPASSWORD: postgres
           PGPORT: 5432
           PGUSER: postgres
-      - run: npm test
+      - run: pnpm test
       - name: Set NEW_VERSION
         run: |
           if [ -z "${{ github.event.inputs.newversion }}" ]; then
@@ -90,14 +94,14 @@ jobs:
           git_username: ${{ github.actor }}
           newversion: ${{ env.NEW_VERSION }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_cmd: npm run release
+          publish_cmd: pnpm run release
       - name: Deploy web
-        run: npm run deploy:web
+        run: pnpm run deploy:web
         if: ${{ github.event.inputs.deploy-web == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       - name: Deploy worker
-        run: npm run deploy:worker
+        run: pnpm run deploy:worker
         if: ${{ github.event.inputs.deploy-worker == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

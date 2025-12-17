@@ -9,3 +9,4 @@ dependency-graph.html
 *.dbml
 .tap
 tsconfig.tsbuildinfo
+deploy

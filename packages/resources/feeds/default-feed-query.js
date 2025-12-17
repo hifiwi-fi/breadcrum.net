@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 /**
- * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
+ * @import { PgClient } from '../types/pg-client.js'
  */
 
 import SQL from '@nearform/sql'

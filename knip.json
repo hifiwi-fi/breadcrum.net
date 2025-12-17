@@ -19,7 +19,7 @@
         "otel.js"
       ],
       "ignoreDependencies": ["highlight.js"],
-      "ignoreBinaries": ["pg-to-dbml"],
+      "ignoreBinaries": [],
       "project": ["**/*.js"]
     },
     "packages/worker": {

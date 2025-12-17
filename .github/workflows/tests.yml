@@ -39,26 +39,38 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
           node-version-file: package.json
+          cache: "pnpm"
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - name: Archive lockfile
         uses: actions/upload-artifact@v5
         with:
-          name: package-lock.json
-          path: package-lock.json
-      - run: npm run generate-default-env --workspaces --if-present
-      - run: npm run migrate --workspaces --if-present
+          name: pnpm-lock.yaml
+          path: pnpm-lock.yaml
+      - run: pnpm run -r generate-default-env
+      - run: pnpm run -r migrate
         env:
           PGDATABASE: breadcrum
           PGHOST: localhost
           PGPASSWORD: postgres
           PGPORT: 5432
           PGUSER: postgres
-      - run: npm test
+      - name: Test resources
+        run: pnpm run --filter @breadcrum/resources test
+      - name: Test web
+        run: pnpm run --filter @breadcrum/web test
+      - name: Test worker
+        run: pnpm run --filter @breadcrum/worker test
+      - name: Run knip
+        run: pnpm run knip
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:

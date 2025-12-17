@@ -2,7 +2,8 @@ import SQL from '@nearform/sql'
 
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
+ * @import { PgClient } from '../types/pg-client.js'
+ * @import { QueryResult } from 'pg'
  */
 
 /**
@@ -40,6 +41,7 @@ export async function putTagsQuery ({
     set name = EXCLUDED.name
     returning id, name, created_at, updated_at;`
 
+  /** @type {QueryResult<{ id: string, name: string, created_at: Date, updated_at: Date }>} */
   const tagsResults = await pg.query(createTags)
 
   const applyTags = SQL`

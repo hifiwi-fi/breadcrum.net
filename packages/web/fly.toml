@@ -22,7 +22,7 @@ swap_size_mb = 1024
     NODE_VERSION = "24"
 
 [deploy]
-  release_command = "npm run migrate -- --no-config"
+  release_command = "pnpm run migrate --no-config"
 
 [env]
   ENV = "production"

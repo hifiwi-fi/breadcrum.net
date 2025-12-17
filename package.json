@@ -7,15 +7,11 @@
   "bugs": {
     "url": "https://github.com/hifiwi-fi/breadcrum.net/issues"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "engines": {
     "node": ">=24.0.0"
   },
   "devDependencies": {
     "auto-changelog": "^2.0.0",
-    "custompatch": "^1.1.4",
     "gh-release": "^7.0.0",
     "knip": "^5.66.2",
     "neostandard": "^0.12.0",
@@ -34,29 +30,31 @@
     "url": "https://github.com/hifiwi-fi/breadcrum.net.git"
   },
   "scripts": {
-    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm -f package-lock.json",
+    "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm -f pnpm-lock.yaml",
     "prepublishOnly": "git push --follow-tags && gh-release -y",
-    "postinstall": "custompatch",
     "release": "git push --follow-tags && gh-release -y",
     "version": "run-s version:*",
     "version:changelog": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:'",
     "version:git": "git add CHANGELOG.md",
-    "test": "npm run test --workspaces --if-present && npm run knip",
-    "test-web": "npm run test --workspace=@breadcrum/web",
-    "test-worker": "npm run test --workspace=@breadcrum/worker",
+    "test": "run-s test:*",
+    "test:all": "pnpm run -r test",
+    "test:knip": "pnpm run -r test:knip",
+    "test-web": "pnpm run --filter @breadcrum/web test",
+    "test-worker": "pnpm run --filter @breadcrum/worker test",
+    "test-resources": "pnpm run --filter @breadcrum/resources test",
     "neostandard": "eslint .",
     "watch": "FORCE_COLOR=1 run-p -n -l watch:*",
-    "watch:web": "npm run watch --workspace=@breadcrum/web",
-    "watch:worker": "npm run watch --workspace=@breadcrum/worker",
-    "build": "npm run build --workspaces --if-present",
-    "migrate": "npm run migrate --workspaces --if-present",
-    "start": "npm run watch",
+    "watch:web": "pnpm run --filter @breadcrum/web watch",
+    "watch:worker": "pnpm run --filter @breadcrum/worker watch",
+    "build": "pnpm run -r build",
+    "migrate": "pnpm run -r migrate",
+    "start": "pnpm run watch",
     "deploy": "run-s deploy:*",
     "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
     "deploy:worker": "flyctl deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
     "knip": "knip --dependencies",
     "new-blogpost": "node scripts/create-blogpost.js --title",
     "publish-draft": "node scripts/publish-blogpost.js",
-    "watch-tb": "npm run -w @breadcrum/web domstack-watch"
+    "watch-tb": "pnpm run --filter @breadcrum/web domstack-watch"
   }
 }

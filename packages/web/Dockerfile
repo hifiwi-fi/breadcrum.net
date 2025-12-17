@@ -5,58 +5,58 @@
 ## Do not pass secrets here.
 ARG ENV=production
 ARG NODE_ENV=production
-ARG HOST
-ARG TRANSPORT
 ARG NODE_VERSION=24
 
-FROM node:${NODE_VERSION}-alpine AS base
+FROM alpine:3.22 AS base
 
 LABEL maintainer="HifiWifi LLC"
 LABEL fly_launch_runtime="Fastify"
 
+# Install Node.js and pnpm from Alpine packages
+RUN apk add --no-cache python3 py3-pip nodejs git protobuf pnpm npm
+
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Throw-away install stage to reduce size of final image
+# Throw-away build stage to reduce size of final image
 FROM base AS build
 
 ARG ENV=production
 ARG NODE_ENV=production
-ARG HOST
-ARG TRANSPORT
 ARG NODE_VERSION
 
 # RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 # RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr yt-dlp
 
-# Copy just the manifest files (for caching)
-# Install node modules
-COPY --link package*.json ./
+# Copy workspace configuration and package files
+COPY --link pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY --link packages/web/package.json packages/web/package.json
 COPY --link packages/worker/package.json packages/worker/package.json
 COPY --link packages/resources/package.json packages/resources/package.json
-COPY --link patches/* patches/
+COPY --link patches/ patches/
 
-RUN npm i --include=dev
+# Install all dependencies (needed for build)
+RUN pnpm install --frozen-lockfile
 
 # Copy the whole project over
 COPY --link . .
-RUN npm run build
 
-# Install node modules for just the worker
-WORKDIR /usr/src/app/packages/web
-RUN npm i --omit=dev --install-links --workspaces=false
+# Run build
+RUN pnpm run build
+
+# Deploy web package to a standalone directory
+RUN pnpm --filter=@breadcrum/web deploy --prod ./deploy/web
 
 # Final stage for app image
 FROM base
 
-# Copy built application
-COPY --from=build /usr/src/app/packages/web /usr/src/app
+# Copy built application from deploy directory
+COPY --from=build /usr/src/app/deploy/web /usr/src/app
 
 # Create a user group 'nodegroup', create a user 'nodeuser' under 'nodegroup' and chown all the files to the app user.
 RUN addgroup -S nodegroup && \
-    adduser -S -D -h /usr/src/app nodeuser nodegroup && \
-    chown -R nodeuser:nodegroup /usr/src
+  adduser -S -D -h /usr/src/app nodeuser nodegroup && \
+  chown -R nodeuser:nodegroup /usr/src
 
 # Switch to 'nodeuser'
 USER nodeuser
