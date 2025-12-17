@@ -68,7 +68,7 @@
     "@voxpelli/tsconfig": "^16.0.0",
     "c8": "^10.0.0",
     "classnames": "^2.3.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "format-duration": "^3.0.0",
     "fragmentions": "^1.1.4",
     "giscus": "^1.6.0",
