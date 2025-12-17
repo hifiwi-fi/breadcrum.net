@@ -29,6 +29,9 @@
  * @property {string} transport - Protocol (http/https)
  * @property {string} host - Host and port
  * @property {string} baseUrl - Full base URL
+ * @property {string} themeColorLight - Theme color for light mode
+ * @property {string} themeColorDark - Theme color for dark mode
+ * @property {string} backgroundColor - Background color for PWA
  * @property {ProvidersConfig} providers - Service providers configuration
  */
 
@@ -81,6 +84,9 @@ export default async () => {
     transport,
     host,
     baseUrl,
+    themeColorLight: '#ffffff',
+    themeColorDark: '#1a1a1a',
+    backgroundColor: '#ffffff',
     providers: {
       hostingProvider: 'Fly.io',
       storageProvider: 'Backblaze B2',

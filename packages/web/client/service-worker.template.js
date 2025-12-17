@@ -9,7 +9,9 @@ import { stripIndent as js } from 'common-tags'
 export default async function * serviceWorkerTemplate ({
   vars: {
     siteName,
-    siteDescription
+    siteDescription,
+    themeColorLight,
+    backgroundColor
   }
 }) {
   // First item
@@ -24,23 +26,28 @@ export default async function * serviceWorkerTemplate ({
 
   // Second item
   const manifestData = {
+    id: '/bookmarks',
     name: siteName,
     short_name: siteName,
+    lang: 'en',
+    dir: 'ltr',
     categories: ['productivity', 'utilities', 'social'],
     description: siteDescription,
     start_url: '/bookmarks',
     display: 'minimal-ui',
+    theme_color: themeColorLight,
+    background_color: backgroundColor,
     screenshots: [
       {
         src: '/static/screenshots/bookmark-window-light.png',
-        sizes: '1730×2724',
+        sizes: '1730x2724',
         type: 'image/png',
         form_factor: 'narrow',
         label: 'Bookmark listing showing bookmarks with episodes and archives'
       },
       {
         src: '/static/screenshots/feed-window-light.png',
-        sizes: '1794×1728',
+        sizes: '1794x1728',
         type: 'image/png',
         form_factor: 'wide',
         label: 'Feed listing showing episodes sent to a podcast app'
@@ -82,6 +89,6 @@ export default async function * serviceWorkerTemplate ({
 
   yield {
     content: JSON.stringify(manifestData, null, 2),
-    outputName: 'manifest.json'
+    outputName: 'manifest.webmanifest'
   }
 }

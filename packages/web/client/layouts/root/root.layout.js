@@ -49,6 +49,8 @@ export default function defaultRootLayout ({
     siteTwitterUrl,
     bskyUrl,
     head,
+    themeColorLight,
+    themeColorDark,
   },
   scripts,
   styles,
@@ -72,6 +74,10 @@ export default function defaultRootLayout ({
     <link rel="alternate" title="${siteName} Blog (RSS Feed)" type="application/rss+xml" href="/feed.xml">
 
     <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="${siteName}">
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="${themeColorLight}" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="${themeColorDark}" media="(prefers-color-scheme: dark)">
 
     <link rel="shortcut icon" href="/static/bread-transformed.png">
 
