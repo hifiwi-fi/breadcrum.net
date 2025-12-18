@@ -67,7 +67,7 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: pnpm install --frozen-lockfile
       - name: Archive lockfile
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: pnpm-lock.yaml
           path: pnpm-lock.yaml
