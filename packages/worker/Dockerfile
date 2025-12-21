@@ -7,7 +7,7 @@ ARG ENV=production
 ARG NODE_ENV=production
 ARG NODE_VERSION=24
 
-FROM alpine:3.22 AS base
+FROM alpine:3.23 AS base
 
 LABEL maintainer="HifiWifi"
 LABEL fly_launch_runtime="Fastify"
