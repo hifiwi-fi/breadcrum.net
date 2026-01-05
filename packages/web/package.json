@@ -51,7 +51,7 @@
     "pg": "catalog:",
     "postgrator-cli": "^9.0.0",
     "preact": "^10.27.0",
-    "preact-render-to-string": "^6.6.3",
+    "preact-render-to-string": "^6.6.5",
     "resolve-email": "^4.0.27",
     "undici": "catalog:",
     "useragent": "^2.3.0"
