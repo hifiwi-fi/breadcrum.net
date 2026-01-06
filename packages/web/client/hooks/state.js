@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
+ * @import { TypeUserReadClient } from '../../routes/api/user/schemas/schema-user-read.js'
  */
 
 // @ts-expect-error
@@ -14,7 +14,7 @@ import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
 
 /**
  * @typedef {object} StateType
- * @property {TypeUserRead | null} user
+ * @property {TypeUserReadClient | null} user
  * @property {string} apiUrl
  * @property {string} host
  * @property {string} transport

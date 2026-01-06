@@ -142,7 +142,10 @@ export default async function registerRoutes (fastify, _opts) {
             username,
             email_confirmed,
             email_verify_token,
-            newsletter_subscription;
+            newsletter_subscription,
+            admin,
+            created_at,
+            updated_at;
           `
 
         const results = await client.query(query)

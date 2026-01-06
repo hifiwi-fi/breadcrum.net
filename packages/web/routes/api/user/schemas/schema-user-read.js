@@ -6,6 +6,7 @@ import { fullSerializedUserProps } from './user-base.js'
  * @typedef {FromSchema<SchemaUserRead, {
  *   deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date; }]
  * }>} TypeUserRead
+ * @typedef {FromSchema<SchemaUserRead>} TypeUserReadClient - Client-side type without date deserialization (dates are strings)
  */
 
 export const schemaUserRead = /** @type {const} @satisfies {JSONSchema} */ ({

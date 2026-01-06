@@ -1,5 +1,5 @@
 /**
- * @import { JSONSchema } from 'json-schema-to-ts'
+ * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
  */
 
 const emailPattern = /** @type {const} */("^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$") // eslint-disable-line no-useless-escape
@@ -62,6 +62,7 @@ const commonSerlializedUserProps = /** @type {const} @satisfies {JSONSchema} */ 
 
 export const fullSerializedUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
+  additionalProperties: false,
   properties: {
     id: { type: 'string', format: 'uuid' },
     ...commonSerlializedUserProps.properties,
@@ -70,14 +71,32 @@ export const fullSerializedUserProps = /** @type {const} @satisfies {JSONSchema}
   }
 })
 
+/**
+ * @typedef {typeof tokenWithUserProps} SchemaTokenWithUser
+ * @typedef {FromSchema<SchemaTokenWithUser>} TypeTokenWithUser
+ * @typedef {FromSchema<SchemaTokenWithUser>} TypeTokenWithUserClient - Client-side type without date deserialization (dates are strings)
+ */
+
 export const tokenWithUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
+  required: ['token', 'user'],
+  additionalProperties: false,
   properties: {
     token: {
       type: 'string',
     },
     user: {
       type: 'object',
+      required: [
+        'id',
+        'username',
+        'email',
+        'email_confirmed',
+        'created_at',
+        'admin',
+        'newsletter_subscription'
+      ],
+      additionalProperties: false,
       properties: {
         ...fullSerializedUserProps.properties,
       },

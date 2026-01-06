@@ -100,8 +100,8 @@
     "test:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
-    "watch:domstack": "pnpm run build:domstack -- --watch-only --drafts",
-    "domstack-watch": "pnpm run build:domstack -- --watch --drafts",
+    "watch:domstack": "pnpm run build:domstack --watch-only --drafts",
+    "domstack-watch": "pnpm run build:domstack --watch --drafts",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js --import otel.js",
     "generate-dbml": "pnpm dlx pg-to-dbml --c postgres://postgres@localhost/breadcrum"

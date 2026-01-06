@@ -2,6 +2,7 @@
 /* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
+/** @import { TypeTokenWithUserClient } from '../../routes/api/user/schemas/user-base.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
@@ -58,8 +59,9 @@ export const Page = () => {
       })
 
       if (response.ok && response.status === 201) {
+        /** @type {TypeTokenWithUserClient} */
         const body = await response.json()
-        state.user = body?.user
+        state.user = body.user
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }

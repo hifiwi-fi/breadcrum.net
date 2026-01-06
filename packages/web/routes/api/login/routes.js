@@ -57,7 +57,10 @@ export default async function loginRoutes (fastify, _opts) {
         email,
         username,
         email_confirmed,
-        newsletter_subscription
+        newsletter_subscription,
+        admin,
+        created_at,
+        updated_at
       from users
       where ${isEmail ? SQL`email = ${user}` : SQL`username = ${user}`}
       and password = crypt(${password}, password)

@@ -3,7 +3,7 @@
 /* eslint-env browser */
 
 /**
- * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
+ * @import { TypeUserReadClient } from '../../routes/api/user/schemas/schema-user-read.js'
  */
 
 /**
@@ -70,10 +70,10 @@ export function useUser ({
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const clone = response.clone()
-        /** @type {TypeUserRead} */
+        /** @type {TypeUserReadClient} */
         const body = await clone.json()
         for (const k of Object.keys(body)) {
-          if (state.user?.[/** @type {keyof TypeUserRead} */ (k)] !== body[/** @type {keyof TypeUserRead} */ (k)]) {
+          if (state.user?.[/** @type {keyof TypeUserReadClient} */ (k)] !== body[/** @type {keyof TypeUserReadClient} */ (k)]) {
             console.log('Updating user state')
             state.user = body
             break
