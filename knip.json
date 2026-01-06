@@ -35,7 +35,7 @@
       "project": ["**/*.js"]
     },
     "packages/*": {
-      "entry": ["**/*.js", "eslint.config.js"],
+      "entry": ["**/*.js"],
       "project": ["**/*.js"]
     }
   }

@@ -38,7 +38,7 @@
     "version:git": "git add CHANGELOG.md",
     "test": "run-s test:*",
     "test:all": "pnpm run -r test",
-    "test:knip": "pnpm run -r test:knip",
+    "test:knip": "pnpm run knip",
     "test-web": "pnpm run --filter @breadcrum/web test",
     "test-worker": "pnpm run --filter @breadcrum/worker test",
     "test-resources": "pnpm run --filter @breadcrum/resources test",
