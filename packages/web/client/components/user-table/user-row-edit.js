@@ -137,6 +137,16 @@ export const UserRowEdit = ({
           <textarea disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
         </td>
         <td>
+          ${u.last_seen
+            ? html`<time datetime="${u.last_seen}">
+                    ${(new Date(u.last_seen)).toLocaleString()}
+                  </time>`
+            : null
+          }
+        </td>
+        <td>${u.ip || ''}</td>
+        <td>${u.user_agent || ''}</td>
+        <td>
           <time datetime="${u.created_at}">
             ${(new Date(u.created_at)).toLocaleString()}
           </time>

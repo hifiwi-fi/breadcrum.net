@@ -18,6 +18,22 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       nullable: true,
       description: 'Any notes related to a user account. This value is private to the moderation of the website and should not be sent to users.',
     },
+    last_seen: {
+      type: 'string',
+      format: 'date-time',
+      nullable: true,
+      description: 'The last time the user was seen (from their most recent auth token).',
+    },
+    ip: {
+      type: 'string',
+      nullable: true,
+      description: 'The IP address from the user\'s most recent auth token.',
+    },
+    user_agent: {
+      type: 'string',
+      nullable: true,
+      description: 'The user agent from the user\'s most recent auth token.',
+    },
   }
 })
 

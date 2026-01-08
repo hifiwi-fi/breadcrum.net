@@ -70,6 +70,9 @@ export async function getAdminUsers (getAdminUsersParams) {
  * @property {string | null} internal_note
  * @property {boolean} admin
  * @property {boolean} disabled_email
+ * @property {Date | null} last_seen
+ * @property {string | null} ip
+ * @property {string | null} user_agent
  */
 
 /**
@@ -126,9 +129,25 @@ export const getAdminUsersQuery = ({
           : SQL`u.created_at desc, u.username desc`
         }
         ${perPage != null ? SQL`fetch first ${perPage} rows only` : SQL``}
+    ),
+    latest_tokens as (
+      select distinct on (owner_id)
+        owner_id,
+        last_seen,
+        ip,
+        user_agent
+      from auth_tokens
+      where owner_id in (select id from users_page)
+      order by owner_id, last_seen desc
     )
-    select *
+    select
+      u.*,
+      lt.last_seen,
+      lt.ip,
+      lt.user_agent
     from users_page u
+    left join latest_tokens lt
+    on u.id = lt.owner_id
     order by u.created_at desc, u.username desc
   `
 

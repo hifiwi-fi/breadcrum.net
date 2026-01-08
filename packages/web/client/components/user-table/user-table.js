@@ -35,6 +35,9 @@ export const UserTable = ({ users, reload, onDelete }) => {
           <th>disabled</th>
           <th>disabled_reason</th>
           <th>internal_note</th>
+          <th>last_seen</th>
+          <th>IP</th>
+          <th>user_agent</th>
           <th>created_at</th>
           <th>updated_at</th>
         </tr>
