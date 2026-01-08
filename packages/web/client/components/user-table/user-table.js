@@ -38,6 +38,8 @@ export const UserTable = ({ users, reload, onDelete }) => {
           <th>last_seen</th>
           <th>IP</th>
           <th>user_agent</th>
+          <th>registration_ip</th>
+          <th>registration_user_agent</th>
           <th>created_at</th>
           <th>updated_at</th>
         </tr>

@@ -73,6 +73,8 @@ export async function getAdminUsers (getAdminUsersParams) {
  * @property {Date | null} last_seen
  * @property {string | null} ip
  * @property {string | null} user_agent
+ * @property {string | null} registration_ip
+ * @property {string | null} registration_user_agent
  */
 
 /**
@@ -115,7 +117,9 @@ export const getAdminUsersQuery = ({
           u.disabled_reason,
           u.internal_note,
           u.admin,
-          coalesce(bh.disabled, false) as disabled_email
+          coalesce(bh.disabled, false) as disabled_email,
+          u.registration_ip,
+          u.registration_user_agent
         from users u
         left join email_blackhole bh
         on u.email = bh.email

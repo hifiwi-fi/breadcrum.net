@@ -120,6 +120,9 @@ export default async function registerRoutes (fastify, _opts) {
           }
         }
 
+        const userAgent = request.headers['user-agent']
+        const ip = Array.isArray(request.ips) ? [...request.ips].pop() : request.ip
+
         const query = SQL`
           insert into users (
               username,
@@ -127,14 +130,18 @@ export default async function registerRoutes (fastify, _opts) {
               password,
               email_verify_token,
               email_verify_token_exp,
-              newsletter_subscription
+              newsletter_subscription,
+              registration_ip,
+              registration_user_agent
             ) values (
               ${username},
               ${email},
               ${getPasswordHashQuery(password)},
               ${EMAIL_CONFIRM_TOKEN},
               ${EMAIL_CONFIRM_TOKEN_EXP},
-              ${newsletter_subscription}
+              ${newsletter_subscription},
+              ${ip || null}::inet,
+              ${userAgent || null}
           )
           returning
             id,

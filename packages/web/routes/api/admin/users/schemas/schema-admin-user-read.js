@@ -34,6 +34,16 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       nullable: true,
       description: 'The user agent from the user\'s most recent auth token.',
     },
+    registration_ip: {
+      type: 'string',
+      nullable: true,
+      description: 'The IP address used during account registration.',
+    },
+    registration_user_agent: {
+      type: 'string',
+      nullable: true,
+      description: 'The user agent string from the browser/client during account registration.',
+    },
   }
 })
 

@@ -44,6 +44,8 @@ export const UserRowView = ({
       </td>
       <td>${u.ip || ''}</td>
       <td>${u.user_agent || ''}</td>
+      <td>${u.registration_ip || ''}</td>
+      <td>${u.registration_user_agent || ''}</td>
       <td>
         <time datetime="${u.created_at}">
           ${(new Date(u.created_at)).toLocaleString()}
