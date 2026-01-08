@@ -23,8 +23,8 @@ export async function getFeed (fastify, _opts) {
     '/',
     {
       preHandler: fastify.auth([
-        fastify.verifyJWT,
-        fastify.basicAuth,
+        [fastify.verifyJWT, fastify.notDisabled],
+        [fastify.basicAuth, fastify.notDisabled],
       ], {
         relation: 'or',
       }),

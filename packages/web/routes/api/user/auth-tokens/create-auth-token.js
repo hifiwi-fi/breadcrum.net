@@ -19,7 +19,12 @@ export async function createAuthToken (fastify, _opts) {
   fastify.post(
     '/',
     {
-      preHandler: fastify.auth([fastify.verifyJWT]),
+      preHandler: fastify.auth([
+        fastify.verifyJWT,
+        fastify.notDisabled,
+      ], {
+        relation: 'and',
+      }),
       schema: {
         tags: ['auth-tokens'],
         summary: 'Create a new auth token',
