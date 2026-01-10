@@ -40,6 +40,10 @@ export const UserRow = ({ user, reload, onDelete }) => {
 
   const handleSave = useCallback(async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
     const payload = diffUpdate(user, newUser)
+    if (Object.keys(payload).length === 0) {
+      setEditing(false)
+      return
+    }
 
     const endpoint = `${state.apiUrl}/admin/users/${user.id}`
 

@@ -1,2 +1,190 @@
-.bc-user-row {}
+.bc-user-card {
+  border: 1px solid var(--accent-background);
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: color-mix(
+    in srgb,
+    var(--accent-background) 12%,
+    transparent
+  );
+}
 
+.bc-user-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bc-user-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.bc-user-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.bc-user-username {
+  font-size: 1.1rem;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.bc-user-email {
+  color: var(--accent-foreground);
+  word-break: break-word;
+}
+
+.bc-user-id-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--accent-foreground);
+}
+
+.bc-user-id {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+.bc-user-id-link {
+  color: inherit;
+}
+
+.bc-user-id-link:hover {
+  text-decoration: underline;
+}
+
+.bc-user-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.bc-user-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.bc-user-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 500;
+  background-color: var(--accent-background);
+  color: var(--accent-foreground);
+}
+
+.bc-user-badge-true {
+  color: var(--bc-episodes-color);
+  background-color: color-mix(
+    in srgb,
+    var(--bc-episodes-color) 12%,
+    transparent
+  );
+}
+
+.bc-user-badge-false {
+  color: var(--accent-foreground);
+  background-color: var(--accent-background);
+}
+
+.bc-user-badge-warning {
+  color: var(--bc-archives-color);
+  background-color: color-mix(
+    in srgb,
+    var(--bc-archives-color) 12%,
+    transparent
+  );
+}
+
+.bc-user-grid {
+  display: grid;
+  gap: 0.75rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 1rem;
+}
+
+.bc-user-field {
+  min-width: 0;
+}
+
+.bc-user-label {
+  color: var(--accent-foreground);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.2rem;
+  display: block;
+}
+
+.bc-user-value {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.bc-user-value-multiline {
+  white-space: pre-wrap;
+}
+
+.bc-user-value-mono {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+.bc-user-value-empty {
+  color: var(--accent-foreground);
+  font-style: italic;
+}
+
+.bc-user-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--accent-background);
+}
+
+.bc-user-meta-section {
+  min-width: 0;
+}
+
+.bc-user-meta-title {
+  color: var(--accent-foreground);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+
+.bc-user-meta-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+@media (max-width: 700px) {
+  .bc-user-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .bc-user-grid,
+  .bc-user-meta {
+    grid-template-columns: 1fr;
+  }
+}

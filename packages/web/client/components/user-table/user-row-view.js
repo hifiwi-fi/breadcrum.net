@@ -7,6 +7,7 @@
  */
 
 import { html } from 'htm/preact'
+import cn from 'classnames'
 
 /**
  * @typedef {object} UserRowViewProps
@@ -21,44 +22,178 @@ export const UserRowView = ({
   user: u,
   onEdit = () => {},
 }) => {
+  const viewHref = `./view/?id=${u.id}`
+  const pendingEmailUpdate = u.pending_email_update || ''
+  const disabledReason = u.disabled_reason || ''
+  const internalNote = u.internal_note || ''
+
   return html`
-    <tr class="bc-user-row-view">
-      <td><button onClick=${onEdit}>Edit</button></td>
-      <td><a href="${`./view/?id=${u.id}`}">${u.id}</a></td>
-      <td>${u.username}</td>
-      <td>${u.email}</td>
-      <td>${u.email_confirmed ? '✅' : '❌'}</td>
-      <td>${u.pending_email_update}</td>
-      <td>${u.newsletter_subscription ? '✅' : '❌'}</td>
-      <td>${u.disabled_email ? '✅' : '❌'}</td>
-      <td>${u.disabled ? '✅' : '❌'}</td>
-      <td>${u.disabled_reason}</td>
-      <td>${u.internal_note}</td>
-      <td>
-        ${u.last_seen
-          ? html`<time datetime="${u.last_seen}">
-                  ${(new Date(u.last_seen)).toLocaleString()}
-                </time>`
-          : null
-        }
-      </td>
-      <td>${u.ip || ''}</td>
-      <td>${u.user_agent || ''}</td>
-      <td>${u.registration_ip || ''}</td>
-      <td>${u.registration_user_agent || ''}</td>
-      <td>
-        <time datetime="${u.created_at}">
-          ${(new Date(u.created_at)).toLocaleString()}
-        </time>
-      </td>
-      <td>
-        ${u.updated_at
-          ? html`<time datetime="${u.updated_at}">
-                  ${(new Date(u.updated_at)).toLocaleString()}
-                </time>`
-          : null
-        }
-      </td>
-    </tr>
+    <article class="bc-user-card" role="listitem">
+      <div class="bc-user-card-header">
+        <div class="bc-user-heading">
+          <div class="bc-user-identity">
+            <a class="bc-user-username" href="${viewHref}">${u.username}</a>
+            <div class="bc-user-email">${u.email}</div>
+          </div>
+          <div class="bc-user-id-line">
+            <span class="bc-user-label">ID</span>
+            <a class="bc-user-id-link" href="${viewHref}">
+              <code class="bc-user-id">${u.id}</code>
+            </a>
+          </div>
+        </div>
+        <div class="bc-user-actions">
+          <button type="button" onClick=${onEdit}>Edit</button>
+        </div>
+      </div>
+
+      <div class="bc-user-status-row">
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': u.email_confirmed,
+          'bc-user-badge-false': !u.email_confirmed,
+        })}">
+          ${u.email_confirmed ? 'Email confirmed' : 'Email unconfirmed'}
+        </span>
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': u.newsletter_subscription,
+          'bc-user-badge-false': !u.newsletter_subscription,
+        })}">
+          ${u.newsletter_subscription ? 'Newsletter subscribed' : 'Newsletter unsubscribed'}
+        </span>
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': !u.disabled_email,
+          'bc-user-badge-false': u.disabled_email,
+          'bc-user-badge-warning': u.disabled_email,
+        })}">
+          ${u.disabled_email ? 'Email disabled' : 'Email ok'}
+        </span>
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': !u.disabled,
+          'bc-user-badge-false': u.disabled,
+          'bc-user-badge-warning': u.disabled,
+        })}">
+          ${u.disabled ? 'Account disabled' : 'Account active'}
+        </span>
+      </div>
+
+      <div class="bc-user-grid">
+        <div class="bc-user-field">
+          <div class="bc-user-label">Pending email update</div>
+          <div class="${cn({
+            'bc-user-value': true,
+            'bc-user-value-empty': !pendingEmailUpdate,
+          })}">
+            ${pendingEmailUpdate || 'None'}
+          </div>
+        </div>
+        <div class="bc-user-field">
+          <div class="bc-user-label">Disabled reason</div>
+          <div class="${cn({
+            'bc-user-value': true,
+            'bc-user-value-multiline': true,
+            'bc-user-value-empty': !disabledReason,
+          })}">
+            ${disabledReason || 'None'}
+          </div>
+        </div>
+        <div class="bc-user-field">
+          <div class="bc-user-label">Internal note</div>
+          <div class="${cn({
+            'bc-user-value': true,
+            'bc-user-value-multiline': true,
+            'bc-user-value-empty': !internalNote,
+          })}">
+            ${internalNote || 'None'}
+          </div>
+        </div>
+      </div>
+
+      <div class="bc-user-meta">
+        <div class="bc-user-meta-section">
+          <div class="bc-user-meta-title">Activity</div>
+          <div class="bc-user-meta-grid">
+            <div class="bc-user-field">
+              <div class="bc-user-label">Last seen</div>
+              ${u.last_seen
+                ? html`<time class="bc-user-value" datetime="${u.last_seen}">
+                        ${(new Date(u.last_seen)).toLocaleString()}
+                      </time>`
+                : html`<div class="${cn({
+                  'bc-user-value': true,
+                  'bc-user-value-empty': true,
+                })}">Never</div>`
+              }
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">Created</div>
+              <time class="bc-user-value" datetime="${u.created_at}">
+                ${(new Date(u.created_at)).toLocaleString()}
+              </time>
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">Updated</div>
+              ${u.updated_at
+                ? html`<time class="bc-user-value" datetime="${u.updated_at}">
+                        ${(new Date(u.updated_at)).toLocaleString()}
+                      </time>`
+                : html`<div class="${cn({
+                  'bc-user-value': true,
+                  'bc-user-value-empty': true,
+                })}">Never</div>`
+              }
+            </div>
+          </div>
+        </div>
+        <div class="bc-user-meta-section">
+          <div class="bc-user-meta-title">Client</div>
+          <div class="bc-user-meta-grid">
+            <div class="bc-user-field">
+              <div class="bc-user-label">IP</div>
+              <code class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-mono': true,
+                'bc-user-value-empty': !u.ip,
+              })}">
+                ${u.ip || 'Unknown'}
+              </code>
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">User agent</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-mono': true,
+                'bc-user-value-empty': !u.user_agent,
+              })}">
+                ${u.user_agent || 'Unknown'}
+              </div>
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">Registration IP</div>
+              <code class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-mono': true,
+                'bc-user-value-empty': !u.registration_ip,
+              })}">
+                ${u.registration_ip || 'Unknown'}
+              </code>
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">Registration user agent</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-mono': true,
+                'bc-user-value-empty': !u.registration_user_agent,
+              })}">
+                ${u.registration_user_agent || 'Unknown'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
   `
 }

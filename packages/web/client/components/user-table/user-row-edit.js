@@ -10,6 +10,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback } from 'preact/hooks'
+import cn from 'classnames'
 
 /**
  * @typedef {object} UserRowEditProps
@@ -31,7 +32,8 @@ export const UserRowEdit = ({
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const rowRef = useRef(/** @type {HTMLTableRowElement | null} */(null))
+  const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
+  const viewHref = `./view/?id=${u.id}`
 
   const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
@@ -60,19 +62,37 @@ export const UserRowEdit = ({
     setDisabled(true)
     setError(null)
 
-    const row = rowRef.current
-    if (!row) return
+    const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
+    if (!form) return
 
-    // goddamn forms dont work in tables.
-    const username = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="username"]'))?.value || ''
-    const email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email"]'))?.value || ''
-    const email_confirmed = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="email_confirmed"]'))?.checked || false
-    const pending_email_update = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="pending_email_update"]'))?.value || null
-    const newsletter_subscription = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="newsletter_subscription"]'))?.checked || false
-    const disabled_email = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled_email"]'))?.checked || false
-    const disabled = /** @type {HTMLInputElement | null} */(row.querySelector('input[name="disabled"]'))?.checked || false
-    const disabled_reason = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="disabled_reason"]'))?.value?.trim() || null
-    const internal_note = /** @type {HTMLTextAreaElement | null} */(row.querySelector('textarea[name="internal_note"]'))?.value?.trim() ?? null
+    const usernameElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('username'))
+    if (!usernameElement) return
+    const emailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email'))
+    if (!emailElement) return
+    const emailConfirmedElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('email_confirmed'))
+    if (!emailConfirmedElement) return
+    const pendingEmailUpdateElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('pending_email_update'))
+    if (!pendingEmailUpdateElement) return
+    const newsletterSubscriptionElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('newsletter_subscription'))
+    if (!newsletterSubscriptionElement) return
+    const disabledEmailElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('disabled_email'))
+    if (!disabledEmailElement) return
+    const disabledElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('disabled'))
+    if (!disabledElement) return
+    const disabledReasonElement = /** @type {HTMLTextAreaElement | null} */ (form.elements.namedItem('disabled_reason'))
+    if (!disabledReasonElement) return
+    const internalNoteElement = /** @type {HTMLTextAreaElement | null} */ (form.elements.namedItem('internal_note'))
+    if (!internalNoteElement) return
+
+    const username = usernameElement.value || ''
+    const email = emailElement.value || ''
+    const email_confirmed = emailConfirmedElement.checked
+    const pending_email_update = pendingEmailUpdateElement.value || null
+    const newsletter_subscription = newsletterSubscriptionElement.checked
+    const disabled_email = disabledEmailElement.checked
+    const disabled = disabledElement.checked
+    const disabled_reason = disabledReasonElement.value?.trim() || null
+    const internal_note = internalNoteElement.value?.trim() ?? null
 
     const formState = {
       username,
@@ -92,76 +112,165 @@ export const UserRowEdit = ({
       setDisabled(false)
       setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, rowRef?.current, onSave])
+  }, [setDisabled, setError, formRef?.current, onSave])
 
   return html`
-    <tr ref="${rowRef}" class="bc-user-row-edit">
-        <td>
-          ${onSave ? html`<button name="submit-button" onClick=${handleSave}>Save</button>` : null}
-          ${onCancelEdit ? html`<button onClick=${onCancelEdit}>Cancel</button>` : null}
-          ${onDelete
-            ? deleteConfirm
-              ? html`
-                <button onClick=${handleCancelDelete}>Cancel</button>
-                <button disabled="${disabled}" onClick=${handleDelete}>Destroy</button>`
-              : html`<button onClick=${handleInitiateDelete}>Delete</button>`
-            : null
-          }
-        </td>
-        <td>${u.id}</td>
-        <td>
-          <input disabled="${disabled}" type="text" name="username" defaultValue="${u.username}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="email" name="email" defaultValue="${u.email}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="email" name="pending_email_update" defaultValue="${u.pending_email_update}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="checkbox" name="disabled_email" checked="${u.disabled_email}" />
-        </td>
-        <td>
-          <input disabled="${disabled}" type="checkbox" name="disabled" checked="${u.disabled}" />
-        </td>
-        <td>
-          <textarea disabled="${disabled}" rows="2" name="disabled_reason">${u.disabled_reason}</textarea>
-        </td>
-        <td>
-          <textarea disabled="${disabled}" rows="2" name="internal_note">${u.internal_note}</textarea>
-        </td>
-        <td>
-          ${u.last_seen
-            ? html`<time datetime="${u.last_seen}">
-                    ${(new Date(u.last_seen)).toLocaleString()}
-                  </time>`
-            : null
-          }
-        </td>
-        <td>${u.ip || ''}</td>
-        <td>${u.user_agent || ''}</td>
-        <td>${u.registration_ip || ''}</td>
-        <td>${u.registration_user_agent || ''}</td>
-        <td>
-          <time datetime="${u.created_at}">
-            ${(new Date(u.created_at)).toLocaleString()}
-          </time>
-        </td>
-        <td>
-          ${u.updated_at
-            ? html`<time datetime="${u.updated_at}">
-                    ${(new Date(u.updated_at)).toLocaleString()}
-                  </time>`
-            : null
-          }
-        </td>
-      ${error ? html`<div class="error-box">${error.message}</div>` : null}
-    </tr>
+    <article class="bc-user-card bc-user-card-edit" role="listitem">
+      <form ref=${formRef} class="bc-user-edit-form" onsubmit=${handleSave}>
+        <fieldset disabled=${disabled}>
+          <div class="bc-user-card-header">
+            <div class="bc-user-heading">
+              <div class="bc-user-edit-title">Editing ${u.username}</div>
+              <div class="bc-user-id-line">
+                <span class="bc-user-label">ID</span>
+                <a class="bc-user-id-link" href="${viewHref}">
+                  <code class="bc-user-id">${u.id}</code>
+                </a>
+              </div>
+            </div>
+            <div class="bc-user-edit-actions">
+              <div class="button-cluster">
+                ${onSave ? html`<button type="submit" name="submit-button">Save</button>` : null}
+                ${onCancelEdit ? html`<button type="button" onClick=${onCancelEdit}>Cancel</button>` : null}
+              </div>
+              <div class="button-cluster">
+                ${onDelete
+                  ? deleteConfirm
+                    ? html`
+                      <button type="button" onClick=${handleCancelDelete}>Cancel</button>
+                      <button type="button" disabled=${disabled} onClick=${handleDelete}>Destroy</button>`
+                    : html`<button type="button" onClick=${handleInitiateDelete}>Delete</button>`
+                  : null
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="bc-user-edit-grid">
+            <label class="bc-user-field">
+              <span class="bc-user-label">Username</span>
+              <input type="text" name="username" defaultValue="${u.username}" />
+            </label>
+            <label class="bc-user-field">
+              <span class="bc-user-label">Email</span>
+              <input type="email" name="email" defaultValue="${u.email}" />
+            </label>
+            <label class="bc-user-field">
+              <span class="bc-user-label">Pending email update</span>
+              <input type="email" name="pending_email_update" defaultValue="${u.pending_email_update || ''}" />
+            </label>
+          </div>
+
+          <div class="bc-user-edit-flags">
+            <label class="bc-user-flag">
+              <input type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
+              <span>Email confirmed</span>
+            </label>
+            <label class="bc-user-flag">
+              <input type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
+              <span>Newsletter subscribed</span>
+            </label>
+            <label class="bc-user-flag">
+              <input type="checkbox" name="disabled_email" checked="${u.disabled_email}" />
+              <span>Email disabled</span>
+            </label>
+            <label class="bc-user-flag">
+              <input type="checkbox" name="disabled" checked="${u.disabled}" />
+              <span>Account disabled</span>
+            </label>
+          </div>
+
+          <div class="bc-user-edit-notes">
+            <label class="bc-user-field">
+              <span class="bc-user-label">Disabled reason</span>
+              <textarea rows="3" name="disabled_reason">${u.disabled_reason || ''}</textarea>
+            </label>
+            <label class="bc-user-field">
+              <span class="bc-user-label">Internal note</span>
+              <textarea rows="4" name="internal_note">${u.internal_note || ''}</textarea>
+            </label>
+          </div>
+
+          <div class="bc-user-meta">
+            <div class="bc-user-meta-section">
+              <div class="bc-user-meta-title">Activity</div>
+              <div class="bc-user-meta-grid">
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Last seen</div>
+                  ${u.last_seen
+                    ? html`<time class="bc-user-value" datetime="${u.last_seen}">
+                            ${(new Date(u.last_seen)).toLocaleString()}
+                          </time>`
+                    : html`<div class="bc-user-value bc-user-value-empty">Never</div>`
+                  }
+                </div>
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Created</div>
+                  <time class="bc-user-value" datetime="${u.created_at}">
+                    ${(new Date(u.created_at)).toLocaleString()}
+                  </time>
+                </div>
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Updated</div>
+                  ${u.updated_at
+                    ? html`<time class="bc-user-value" datetime="${u.updated_at}">
+                            ${(new Date(u.updated_at)).toLocaleString()}
+                          </time>`
+                    : html`<div class="bc-user-value bc-user-value-empty">Never</div>`
+                  }
+                </div>
+              </div>
+            </div>
+            <div class="bc-user-meta-section">
+              <div class="bc-user-meta-title">Client</div>
+              <div class="bc-user-meta-grid">
+                <div class="bc-user-field">
+                  <div class="bc-user-label">IP</div>
+                  <code class="${cn({
+                    'bc-user-value': true,
+                    'bc-user-value-mono': true,
+                    'bc-user-value-empty': !u.ip,
+                  })}">
+                    ${u.ip || 'Unknown'}
+                  </code>
+                </div>
+                <div class="bc-user-field">
+                  <div class="bc-user-label">User agent</div>
+                  <div class="${cn({
+                    'bc-user-value': true,
+                    'bc-user-value-mono': true,
+                    'bc-user-value-empty': !u.user_agent,
+                  })}">
+                    ${u.user_agent || 'Unknown'}
+                  </div>
+                </div>
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Registration IP</div>
+                  <code class="${cn({
+                    'bc-user-value': true,
+                    'bc-user-value-mono': true,
+                    'bc-user-value-empty': !u.registration_ip,
+                  })}">
+                    ${u.registration_ip || 'Unknown'}
+                  </code>
+                </div>
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Registration user agent</div>
+                  <div class="${cn({
+                    'bc-user-value': true,
+                    'bc-user-value-mono': true,
+                    'bc-user-value-empty': !u.registration_user_agent,
+                  })}">
+                    ${u.registration_user_agent || 'Unknown'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          ${error ? html`<div class="error-box">${error.message}</div>` : null}
+        </fieldset>
+      </form>
+    </article>
   `
 }

@@ -1,1 +1,75 @@
-.bc-user-row-edit {}
+.bc-user-card-edit {
+  background-color: color-mix(
+    in srgb,
+    var(--accent-background) 18%,
+    transparent
+  );
+}
+
+.bc-user-edit-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.bc-user-edit-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bc-user-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+
+.bc-user-edit-grid {
+  display: grid;
+  gap: 0.75rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: 1rem;
+}
+
+.bc-user-edit-grid input[type="text"],
+.bc-user-edit-grid input[type="email"] {
+  width: 100%;
+}
+
+.bc-user-edit-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.2rem;
+  margin-top: 1rem;
+}
+
+.bc-user-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.bc-user-edit-notes {
+  display: grid;
+  gap: 0.75rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 1rem;
+}
+
+.bc-user-edit-notes textarea {
+  width: 100%;
+}
+
+.button-cluster {
+  display: inline-flex;
+  gap: 0.4em;
+}
+
+@media (max-width: 700px) {
+  .bc-user-edit-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
