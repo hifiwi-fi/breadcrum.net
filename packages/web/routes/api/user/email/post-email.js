@@ -67,6 +67,21 @@ export async function postEmailRoute (fastify, _opts) {
           return reply.conflict('An account already exists with the requested email address')
         }
 
+        // Check if the new email is blackholed
+        const blackholeCheckQuery = SQL`
+          select email, disabled
+          from email_blackhole
+          where email = ${email} and disabled = true
+          fetch first row only;
+        `
+
+        const blackholeResults = await client.query(blackholeCheckQuery)
+        const isBlackholed = blackholeResults.rows.length > 0
+
+        if (isBlackholed) {
+          return reply.unprocessableEntity('This email address cannot be used due to previous delivery issues. Please try a different email address or contact support@breadcrum.net for assistance.')
+        }
+
         // Only validate email if EMAIL_VALIDATION is enabled
         if (fastify.config.EMAIL_VALIDATION) {
           const { emailResolves, mxRecords, error: emailError } = await resolveEmail(email)
