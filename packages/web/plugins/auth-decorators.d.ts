@@ -1,8 +1,15 @@
-import type { FastifyRequest } from 'fastify'
+import type { FastifyRequest as ImportedFastifyRequest } from 'fastify'
 
 declare module 'fastify' {
   interface FastifyInstance {
-    verifyAdmin(request: FastifyRequest): Promise<void>;
-    notDisabled(request: FastifyRequest): Promise<void>;
+    verifyAdmin(request: ImportedFastifyRequest): Promise<void>;
+    notDisabled(request: ImportedFastifyRequest): Promise<void>;
+  }
+
+  interface FastifyRequest {
+    feedTokenUser?: {
+      userId: string;
+      token: string;
+    } | null;
   }
 }

@@ -19,7 +19,9 @@ export default fp(async function (fastify, _) {
      */
     async function verifyAdmin (request) {
     // TODO: is this the right file for this?
-      const userId = request?.user?.id
+      // Support both JWT authentication (request.user.id) and basicAuth (request.feedTokenUser.userId)
+      // feedTokenUser is set by @fastify/basic-auth validation in feed route autohooks
+      const userId = request?.user?.id || request?.feedTokenUser?.userId
       if (!userId) throw new Error('verifyAdmin Error: No id found on request user object')
       const adminQuery = SQL`
     select u.admin
@@ -42,7 +44,9 @@ export default fp(async function (fastify, _) {
      */
     async function notDisabled (request) {
     // TODO: is this the right file for this?
-      const userId = request?.user?.id
+      // Support both JWT authentication (request.user.id) and basicAuth (request.feedTokenUser.userId)
+      // feedTokenUser is set by @fastify/basic-auth validation in feed route autohooks
+      const userId = request?.user?.id || request?.feedTokenUser?.userId
       if (!userId) throw new Error('notDisabled Error: No id found on request user object')
       const disabledQuery = SQL`
       select u.disabled
