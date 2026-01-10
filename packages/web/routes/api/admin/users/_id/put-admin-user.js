@@ -60,7 +60,6 @@ export async function putAdminUser (fastify, _opts) {
         if (targetUserUpdates.newsletter_subscription != null) updates.push(SQL`newsletter_subscription = ${targetUserUpdates.newsletter_subscription}`)
         if (targetUserUpdates.email_confirmed != null) updates.push(SQL`email_confirmed = ${targetUserUpdates.email_confirmed}`)
         if (targetUserUpdates.pending_email_update != null) updates.push(SQL`pending_email_update = ${targetUserUpdates.pending_email_update}`)
-        if (targetUserUpdates.disabled_email != null) updates.push(SQL`disabled_email = ${targetUserUpdates.disabled_email}`)
         if (targetUserUpdates.disabled != null) updates.push(SQL`disabled = ${targetUserUpdates.disabled}`)
         if (targetUserUpdates.disabled_reason != null) updates.push(SQL`disabled_reason = ${targetUserUpdates.disabled_reason}`)
         if (targetUserUpdates.internal_note != null) updates.push(SQL`internal_note = ${targetUserUpdates.internal_note}`)
@@ -73,8 +72,40 @@ export async function putAdminUser (fastify, _opts) {
           `
 
           await client.query(query)
-          await client.query('commit')
         }
+
+        // Handle disabled_email by managing email_blackhole table
+        if (targetUserUpdates.disabled_email != null) {
+          // Get the user's current email
+          const emailQuery = SQL`
+            SELECT email FROM users WHERE id = ${targetUserId};
+          `
+          const emailResult = await client.query(emailQuery)
+          const userEmail = emailResult.rows[0]?.email
+
+          if (userEmail) {
+            if (targetUserUpdates.disabled_email) {
+              // Add or enable email in blackhole
+              const upsertBlackholeQuery = SQL`
+                INSERT INTO email_blackhole (email, disabled)
+                VALUES (${userEmail}, true)
+                ON CONFLICT (email)
+                DO UPDATE SET disabled = true, updated_at = now();
+              `
+              await client.query(upsertBlackholeQuery)
+            } else {
+              // Disable or remove from blackhole
+              const disableBlackholeQuery = SQL`
+                UPDATE email_blackhole
+                SET disabled = false, updated_at = now()
+                WHERE email = ${userEmail};
+              `
+              await client.query(disableBlackholeQuery)
+            }
+          }
+        }
+
+        await client.query('commit')
 
         reply.status(202)
 
