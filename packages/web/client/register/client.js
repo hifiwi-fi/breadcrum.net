@@ -1,11 +1,22 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
-/* global turnstile */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeTokenWithUserClient } from '../../routes/api/user/schemas/user-base.js' */
-// @ts-expect-error Unhappy about direct type reference
-/** @import { Turnstile } from '@types/cloudflare-turnstile' */
+/**
+ * @typedef {{
+ *   sitekey: string,
+ *   callback?: (token: string) => void,
+ *   'timeout-callback'?: () => void,
+ *   'expired-callback'?: (token: string) => void,
+ *   'error-callback'?: (error: string) => void,
+ * }} TurnstileRenderParams
+ */
+/**
+ * @typedef {Object} TurnstileApi
+ * @property {(container: string | HTMLElement, params?: TurnstileRenderParams) => string | null | undefined} render
+ * @property {(container?: string | HTMLElement) => void} remove
+ */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
@@ -45,8 +56,9 @@ export const Page = () => {
 
     const tryRender = () => {
       if (!isMounted) return
-      /** @type {Turnstile | undefined} */
-      const turnstileApi = window.turnstile
+      const windowApi = /** @type {any} */ (window)
+      /** @type {TurnstileApi | undefined} */
+      const turnstileApi = windowApi.turnstile
       if (!turnstileApi) return
 
       widgetId = turnstileApi.render('#turnstile-container', {
@@ -85,7 +97,8 @@ export const Page = () => {
       window.clearInterval(intervalId)
       window.clearTimeout(timeoutId)
       if (widgetId) {
-        window.turnstile?.remove(widgetId)
+        const windowApi = /** @type {any} */ (window)
+        windowApi.turnstile?.remove(widgetId)
       }
     }
   }, [])
