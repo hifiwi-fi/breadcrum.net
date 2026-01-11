@@ -11,6 +11,7 @@ import {
   userEditableUserProps,
 } from '../user/schemas/user-base.js'
 import { resolveEmail } from 'resolve-email'
+import { request as undiciRequest } from 'undici'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -42,6 +43,10 @@ export default async function registerRoutes (fastify, _opts) {
           ],
           properties: {
             ...userEditableUserProps.properties,
+            turnstile_token: {
+              type: 'string',
+              maxLength: 2048,
+            },
           },
         },
         response: {
@@ -76,7 +81,56 @@ export default async function registerRoutes (fastify, _opts) {
             error: 'Registration is closed. Please try again later.',
           }
         }
-        const { username, email, password, newsletter_subscription } = request.body
+        const {
+          username,
+          email,
+          password,
+          newsletter_subscription,
+          turnstile_token,
+        } = request.body
+
+        const userAgent = request.headers['user-agent']
+        const ip = Array.isArray(request.ips) ? request.ips.at(-1) : request.ip
+
+        if (fastify.config.TURNSTILE_VALIDATE) {
+          if (!turnstile_token) {
+            return reply.unprocessableEntity('Turnstile verification failed.')
+          }
+
+          const params = new URLSearchParams({
+            secret: fastify.config.TURNSTILE_SECRET_KEY,
+            response: turnstile_token,
+          })
+
+          if (ip) {
+            params.set('remoteip', ip)
+          }
+
+          try {
+            const { statusCode, body } = await undiciRequest('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/x-www-form-urlencoded',
+              },
+              body: params.toString(),
+            })
+
+            const result = /** @type {{ success?: boolean, 'error-codes'?: string[] }} */ (await body.json())
+
+            if (statusCode < 200 || statusCode >= 300) {
+              request.log.warn({ status: statusCode, result }, 'Turnstile verification request failed.')
+              return reply.unprocessableEntity('Turnstile verification failed.')
+            }
+
+            if (!result?.success) {
+              request.log.info({ errors: result?.['error-codes'] }, 'Turnstile verification failed.')
+              return reply.unprocessableEntity('Turnstile verification failed.')
+            }
+          } catch (error) {
+            request.log.error({ err: error }, 'Turnstile verification error.')
+            return reply.unprocessableEntity('Turnstile verification failed.')
+          }
+        }
 
         const usernameQuery = SQL`
           select u.username
@@ -119,9 +173,6 @@ export default async function registerRoutes (fastify, _opts) {
             return reply.unprocessableEntity('There are problems with this email address, please try a different one.')
           }
         }
-
-        const userAgent = request.headers['user-agent']
-        const ip = Array.isArray(request.ips) ? [...request.ips].pop() : request.ip
 
         const query = SQL`
           insert into users (

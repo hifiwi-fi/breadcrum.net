@@ -39,6 +39,7 @@ swap_size_mb = 1024
   OTEL_SERVICE_NAME = "breadcrum-web"
   OTEL_SERVICE_VERSION = "1.0.0"
   OTEL_RESOURCE_ATTRIBUTES = "deployment.environment=production"
+  SECURE_IFRAMES = "true"
 
 [[services]]
   protocol = "tcp"

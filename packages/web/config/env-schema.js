@@ -10,6 +10,7 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   required: [
     'JWT_SECRET',
     'COOKIE_SECRET',
+    'TURNSTILE_SECRET_KEY',
   ],
   additionalProperties: false,
   properties: {
@@ -43,6 +44,10 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     TRANSPORT: {
       enum: ['http', 'https'],
       default: 'http',
+    },
+    SECURE_IFRAMES: {
+      type: 'boolean',
+      default: false,
     },
     SMTP_HOST: {
       type: 'string',
@@ -103,6 +108,19 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     RATE_LIMITING: {
       type: 'boolean',
       default: true,
+    },
+    TURNSTILE_VALIDATE: {
+      // TODO: Replace with a bypass token to allow tests against staging/prod.
+      type: 'boolean',
+      default: true,
+    },
+    TURNSTILE_SITEKEY: {
+      type: 'string',
+      default: '1x00000000000000000000AA',
+    },
+    TURNSTILE_SECRET_KEY: {
+      type: 'string',
+      default: '1x0000000000000000000000000000000AA',
     },
   },
 })
