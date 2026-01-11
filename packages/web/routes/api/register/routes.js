@@ -90,7 +90,7 @@ export default async function registerRoutes (fastify, _opts) {
         } = request.body
 
         const userAgent = request.headers['user-agent']
-        const ip = Array.isArray(request.ips) ? [...request.ips].pop() : request.ip
+        const ip = Array.isArray(request.ips) ? request.ips.at(-1) : request.ip
 
         if (fastify.config.TURNSTILE_VALIDATE) {
           if (!turnstile_token) {

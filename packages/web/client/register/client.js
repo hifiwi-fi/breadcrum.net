@@ -24,6 +24,7 @@ export const Page = () => {
   const { flags, loading: flagsLoading } = useFlags()
   const [registerError, setRegisterError] = useState(/** @type {Error | null} */(null))
   const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileError, setTurnstileError] = useState('')
 
   useEffect(() => {
     if ((user && !loading)) {
@@ -33,8 +34,14 @@ export const Page = () => {
 
   useEffect(() => {
     if (!turnstileSitekey) return
+    /** @type {string | null | undefined} */
     let widgetId
     let isMounted = true
+
+    const timeoutId = window.setTimeout(() => {
+      if (!isMounted) return
+      setTurnstileError('Turnstile failed to load. Please refresh and try again.')
+    }, 5000)
 
     const tryRender = () => {
       if (!isMounted) return
@@ -46,9 +53,27 @@ export const Page = () => {
         sitekey: turnstileSitekey,
         callback: function (token) {
           setTurnstileToken(token)
+          setTurnstileError('')
+        },
+        'error-callback': function () {
+          setTurnstileError('Turnstile failed to load. Please refresh and try again.')
+        },
+        'expired-callback': function () {
+          setTurnstileToken('')
+          setTurnstileError('Turnstile expired. Please try again.')
+        },
+        'timeout-callback': function () {
+          setTurnstileToken('')
+          setTurnstileError('Turnstile timed out. Please try again.')
         },
       })
 
+      if (!widgetId) {
+        setTurnstileError('Turnstile failed to load. Please refresh and try again.')
+        return
+      }
+
+      window.clearTimeout(timeoutId)
       window.clearInterval(intervalId)
     }
 
@@ -58,6 +83,7 @@ export const Page = () => {
     return () => {
       isMounted = false
       window.clearInterval(intervalId)
+      window.clearTimeout(timeoutId)
       if (widgetId) {
         window.turnstile?.remove(widgetId)
       }
@@ -82,6 +108,12 @@ export const Page = () => {
       const username = usernameElement.value
       const password = passwordElement.value
       const newsletter_subscription = newsletterElement.checked // eslint-disable-line camelcase
+
+      if (!turnstileToken) {
+        setTurnstileError('Turnstile verification required. Please complete the challenge.')
+        setSubmitting(false)
+        return
+      }
 
       const requestBody = {
         email,
@@ -171,9 +203,14 @@ export const Page = () => {
           </div>
           <div>
             <div id="turnstile-container"></div>
+            ${turnstileError ? html`<p>${turnstileError}</p>` : null}
           </div>
           <div class="button-cluster">
-            <input name="submit-button" type="submit" />
+            <input
+              name="submit-button"
+              type="submit"
+              disabled=${!turnstileToken}
+            />
           </div>
         </fieldset>
       </form>
