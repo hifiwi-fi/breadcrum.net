@@ -32,7 +32,6 @@ export default fp(async function (fastify, _) {
         'connect-src': [
           "'self'",
           'https://analytics.ahrefs.com',
-          'https://challenges.cloudflare.com',
         ],
         'frame-src': frameSrc,
         'script-src': [
