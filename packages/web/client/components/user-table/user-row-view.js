@@ -8,6 +8,7 @@
 
 import { html } from 'htm/preact'
 import cn from 'classnames'
+import { formatUserAgent } from './format-user-agent.js'
 
 /**
  * @typedef {object} UserRowViewProps
@@ -26,6 +27,8 @@ export const UserRowView = ({
   const pendingEmailUpdate = u.pending_email_update || ''
   const disabledReason = u.disabled_reason || ''
   const internalNote = u.internal_note || ''
+  const latestUserAgent = formatUserAgent(u.user_agent)
+  const registrationUserAgent = formatUserAgent(u.registration_user_agent)
 
   return html`
     <article class="bc-user-card" role="listitem">
@@ -165,10 +168,9 @@ export const UserRowView = ({
               <div class="bc-user-label">User agent</div>
               <div class="${cn({
                 'bc-user-value': true,
-                'bc-user-value-mono': true,
                 'bc-user-value-empty': !u.user_agent,
               })}">
-                ${u.user_agent || 'Unknown'}
+                ${latestUserAgent}
               </div>
             </div>
             <div class="bc-user-field">
@@ -185,10 +187,9 @@ export const UserRowView = ({
               <div class="bc-user-label">Registration user agent</div>
               <div class="${cn({
                 'bc-user-value': true,
-                'bc-user-value-mono': true,
                 'bc-user-value-empty': !u.registration_user_agent,
               })}">
-                ${u.registration_user_agent || 'Unknown'}
+                ${registrationUserAgent}
               </div>
             </div>
           </div>

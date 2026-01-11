@@ -11,6 +11,7 @@
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback } from 'preact/hooks'
 import cn from 'classnames'
+import { formatUserAgent } from './format-user-agent.js'
 
 /**
  * @typedef {object} UserRowEditProps
@@ -34,6 +35,8 @@ export const UserRowEdit = ({
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
   const viewHref = `./view/?id=${u.id}`
+  const latestUserAgent = formatUserAgent(u.user_agent)
+  const registrationUserAgent = formatUserAgent(u.registration_user_agent)
 
   const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
@@ -238,10 +241,9 @@ export const UserRowEdit = ({
                   <div class="bc-user-label">User agent</div>
                   <div class="${cn({
                     'bc-user-value': true,
-                    'bc-user-value-mono': true,
                     'bc-user-value-empty': !u.user_agent,
                   })}">
-                    ${u.user_agent || 'Unknown'}
+                    ${latestUserAgent}
                   </div>
                 </div>
                 <div class="bc-user-field">
@@ -258,10 +260,9 @@ export const UserRowEdit = ({
                   <div class="bc-user-label">Registration user agent</div>
                   <div class="${cn({
                     'bc-user-value': true,
-                    'bc-user-value-mono': true,
                     'bc-user-value-empty': !u.registration_user_agent,
                   })}">
-                    ${u.registration_user_agent || 'Unknown'}
+                    ${registrationUserAgent}
                   </div>
                 </div>
               </div>

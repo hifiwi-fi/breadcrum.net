@@ -6,6 +6,7 @@
  */
 
 import SQL from '@nearform/sql'
+import Useragent from 'useragent'
 
 /**
  * @typedef {object} GetAdminUsersQueryParams
@@ -47,12 +48,46 @@ export async function getAdminUsers (getAdminUsersParams) {
   const client = pg ?? fastify.pg
   const query = getAdminUsersQuery(getAdminUsersQueryParams)
 
-  /** @type {QueryResult<AdminUsersQueryRead>} */
+  /** @type {QueryResult<AdminUsersQueryReadDbResult>} */
   const results = await client.query(query)
 
   /** @type {AdminUsersQueryRead[]} */
-  const users = results.rows
+  const users = results.rows.map(parseUserAgents)
   return users
+}
+
+/**
+ *
+ * @param {AdminUsersQueryReadDbResult} user
+ * @returns AdminUsersQueryRead
+ */
+export function parseUserAgents (user) {
+  return {
+    ...user,
+    user_agent: parseUserAgentString(user.user_agent),
+    registration_user_agent: parseUserAgentString(user.registration_user_agent),
+  }
+}
+
+/**
+ *
+ * @param {string | null} userAgent
+ * @returns {UserAgentJson | null}
+ */
+function parseUserAgentString (userAgent) {
+  if (!userAgent) return null
+  const parsedAgent = Useragent.lookup(userAgent)
+  return parsedAgent
+    ? {
+        family: parsedAgent.family,
+        major: parsedAgent.major,
+        minor: parsedAgent.minor,
+        patch: parsedAgent.patch,
+        device: { ...parsedAgent.device },
+        os: { ...parsedAgent.os },
+        raw: userAgent
+      }
+    : null
 }
 
 /**
@@ -72,9 +107,43 @@ export async function getAdminUsers (getAdminUsersParams) {
  * @property {boolean} disabled_email
  * @property {Date | null} last_seen
  * @property {string | null} ip
- * @property {string | null} user_agent
+ * @property {UserAgentJson | null} user_agent
  * @property {string | null} registration_ip
- * @property {string | null} registration_user_agent
+ * @property {UserAgentJson | null} registration_user_agent
+ */
+
+/**
+ * @typedef {object} Device
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ */
+
+/**
+ * @typedef {object} OS
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ */
+
+/**
+ * @typedef {object} UserAgentJson
+ * @property {string} family
+ * @property {string} major
+ * @property {string} minor
+ * @property {string} patch
+ * @property {Device} device
+ * @property {OS} os
+ * @property {string} raw
+ */
+
+/**
+ * @typedef {Omit<AdminUsersQueryRead, 'user_agent' | 'registration_user_agent'> & {
+ *   user_agent: string | null,
+ *   registration_user_agent: string | null
+ * }} AdminUsersQueryReadDbResult
  */
 
 /**

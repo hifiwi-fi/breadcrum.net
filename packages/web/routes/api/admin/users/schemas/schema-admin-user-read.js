@@ -1,4 +1,5 @@
 import { fullSerializedUserProps } from '../../../user/schemas/user-base.js'
+import { authTokenProps } from '../../../user/auth-tokens/schemas/auth-token-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
@@ -30,9 +31,8 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       description: 'The IP address from the user\'s most recent auth token.',
     },
     user_agent: {
-      type: 'string',
-      nullable: true,
-      description: 'The user agent from the user\'s most recent auth token.',
+      ...authTokenProps.properties.user_agent,
+      description: 'The parsed user agent information from the user\'s most recent auth token.',
     },
     registration_ip: {
       type: 'string',
@@ -40,9 +40,8 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       description: 'The IP address used during account registration.',
     },
     registration_user_agent: {
-      type: 'string',
-      nullable: true,
-      description: 'The user agent string from the browser/client during account registration.',
+      ...authTokenProps.properties.user_agent,
+      description: 'The parsed user agent information from account registration.',
     },
   }
 })
