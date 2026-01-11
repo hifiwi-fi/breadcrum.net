@@ -16,7 +16,8 @@ const appPath = path.join(import.meta.dirname, '../app.js')
 const testingEnv = /** @type {const} @satisfies {Partial<DotEnvSchemaType>} */ ({
   EMAIL_SENDING: false,
   EMAIL_VALIDATION: false,
-  RATE_LIMITING: false
+  RATE_LIMITING: false,
+  TURNSTILE_VALIDATE: false,
 })
 
 // Fill in this config with all the configurations

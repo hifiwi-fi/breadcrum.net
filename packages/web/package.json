@@ -63,6 +63,7 @@
     "@types/common-tags": "^1.8.4",
     "@types/node": "catalog:",
     "@types/nodemailer": "^7.0.2",
+    "@types/cloudflare-turnstile": "^0.2.2",
     "@types/pg": "catalog:",
     "@types/useragent": "^2.3.4",
     "@voxpelli/tsconfig": "catalog:",

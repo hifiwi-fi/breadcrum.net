@@ -1,8 +1,11 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
+/* global turnstile */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeTokenWithUserClient } from '../../routes/api/user/schemas/user-base.js' */
+// @ts-expect-error Unhappy about direct type reference
+/** @import { Turnstile } from '@types/cloudflare-turnstile' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
@@ -11,6 +14,8 @@ import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useFlags } from '../hooks/useFlags.js'
 
+const turnstileSitekey = process.env['TURNSTILE_SITEKEY']
+
 /** @type {FunctionComponent} */
 export const Page = () => {
   const { user, loading, error: userError } = useUser({ required: false })
@@ -18,12 +23,28 @@ export const Page = () => {
   const [submitting, setSubmitting] = useState(false)
   const { flags, loading: flagsLoading } = useFlags()
   const [registerError, setRegisterError] = useState(/** @type {Error | null} */(null))
+  const [turnstileToken, setTurnstileToken] = useState('')
 
   useEffect(() => {
     if ((user && !loading)) {
       window.location.replace('/docs/tutorial')
     }
   }, [user?.id])
+
+  useEffect(() => {
+    if (!turnstileSitekey) return
+
+    /** @type { Turnstile } */
+    const widgetId = turnstile.render('#turnstile-container', {
+      sitekey: turnstileSitekey,
+      callback: function (token) {
+        setTurnstileToken(token)
+      },
+    })
+    return () => {
+      turnstile.remove(widgetId)
+    }
+  }, [])
 
   async function onRegister (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
@@ -44,12 +65,21 @@ export const Page = () => {
       const password = passwordElement.value
       const newsletter_subscription = newsletterElement.checked // eslint-disable-line camelcase
 
+      const requestBody = {
+        email,
+        username,
+        password,
+        // eslint-disable-next-line camelcase
+        newsletter_subscription,
+        turnstile_token: turnstileToken,
+      }
+
       const response = await fetch(`${state.apiUrl}/register`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ email, username, password, newsletter_subscription }), // eslint-disable-line camelcase
+        body: JSON.stringify(requestBody),
       })
 
       if (response.ok && response.status === 201) {
@@ -120,6 +150,9 @@ export const Page = () => {
               <input type="checkbox" name="newsletter_subscription" />
               Subscribe to news and updates
             </label>
+          </div>
+          <div>
+            <div id="turnstile-container"></div>
           </div>
           <div class="button-cluster">
             <input name="submit-button" type="submit" />
