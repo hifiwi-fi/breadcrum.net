@@ -33,16 +33,34 @@ export const Page = () => {
 
   useEffect(() => {
     if (!turnstileSitekey) return
+    let widgetId
+    let isMounted = true
 
-    /** @type { Turnstile } */
-    const widgetId = turnstile.render('#turnstile-container', {
-      sitekey: turnstileSitekey,
-      callback: function (token) {
-        setTurnstileToken(token)
-      },
-    })
+    const tryRender = () => {
+      if (!isMounted) return
+      /** @type {Turnstile | undefined} */
+      const turnstileApi = window.turnstile
+      if (!turnstileApi) return
+
+      widgetId = turnstileApi.render('#turnstile-container', {
+        sitekey: turnstileSitekey,
+        callback: function (token) {
+          setTurnstileToken(token)
+        },
+      })
+
+      window.clearInterval(intervalId)
+    }
+
+    const intervalId = window.setInterval(tryRender, 100)
+    tryRender()
+
     return () => {
-      turnstile.remove(widgetId)
+      isMounted = false
+      window.clearInterval(intervalId)
+      if (widgetId) {
+        window.turnstile?.remove(widgetId)
+      }
     }
   }, [])
 
