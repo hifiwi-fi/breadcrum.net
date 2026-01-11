@@ -16,10 +16,6 @@ export default fp(async function (fastify, _) {
     'https://challenges.cloudflare.com',
   ]
 
-  if (!fastify.config.SECURE_IFRAMES) {
-    frameSrc.push('https:')
-  }
-
   /** @type {{ policy?: 'require-corp' | 'credentialless' | 'unsafe-none' } | false} */
   const crossOriginEmbedderPolicy = fastify.config.SECURE_IFRAMES
     ? { policy: 'credentialless' }
