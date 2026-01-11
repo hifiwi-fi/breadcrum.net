@@ -32,7 +32,6 @@
  * @property {string} themeColorLight - Theme color for light mode
  * @property {string} themeColorDark - Theme color for dark mode
  * @property {string} backgroundColor - Background color for PWA
- * @property {string} turnstileSitekey - Turnstile sitekey for client usage
  * @property {ProvidersConfig} providers - Service providers configuration
  */
 
@@ -58,13 +57,10 @@ const host = process.env['HOST'] ?? 'localhost:3000'
 /** @type {string} */
 const baseUrl = `${transport}://${host}`
 /** @type {string} */
-const turnstileSitekey = process.env['TURNSTILE_SITEKEY'] ?? '1x00000000000000000000AA'
-
 /** @type {Record<string, string>} */
 export const browser = {
   'process.env.TRANSPORT': transport,
   'process.env.HOST': host,
-  'process.env.TURNSTILE_SITEKEY': turnstileSitekey,
 }
 
 /** @type {() => Promise<GlobalVars>} */
@@ -91,7 +87,6 @@ export default async () => {
     themeColorLight: '#ffffff',
     themeColorDark: '#1a1a1a',
     backgroundColor: '#ffffff',
-    turnstileSitekey,
     providers: {
       hostingProvider: 'Fly.io',
       storageProvider: 'Backblaze B2',

@@ -25,8 +25,6 @@ import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useFlags } from '../hooks/useFlags.js'
 
-const turnstileSitekey = process.env['TURNSTILE_SITEKEY']
-
 /** @type {FunctionComponent} */
 export const Page = () => {
   const { user, loading, error: userError } = useUser({ required: false })
@@ -36,12 +34,54 @@ export const Page = () => {
   const [registerError, setRegisterError] = useState(/** @type {Error | null} */(null))
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileError, setTurnstileError] = useState('')
+  const [turnstileSitekey, setTurnstileSitekey] = useState('')
 
   useEffect(() => {
     if ((user && !loading)) {
       window.location.replace('/docs/tutorial')
     }
   }, [user?.id])
+
+  useEffect(() => {
+    let isMounted = true
+    const controller = new AbortController()
+
+    const loadTurnstileKey = async () => {
+      try {
+        const response = await fetch(`${state.apiUrl}/config`, {
+          signal: controller.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error(`Config request failed: ${response.status} ${response.statusText}`)
+        }
+
+        const body = /** @type {{ turnstile_sitekey?: string }} */ (await response.json())
+        const sitekey = body.turnstile_sitekey
+
+        if (!isMounted) return
+
+        if (!sitekey) {
+          setTurnstileError('Turnstile configuration missing. Please try again later.')
+          return
+        }
+
+        setTurnstileError('')
+        setTurnstileSitekey(sitekey)
+      } catch (error) {
+        if (!isMounted) return
+        if (/** @type {{ name?: string }} */ (error)?.name === 'AbortError') return
+        setTurnstileError('Turnstile configuration failed to load. Please refresh and try again.')
+      }
+    }
+
+    loadTurnstileKey()
+
+    return () => {
+      isMounted = false
+      controller.abort()
+    }
+  }, [state.apiUrl])
 
   useEffect(() => {
     if (!turnstileSitekey) return
@@ -101,7 +141,7 @@ export const Page = () => {
         windowApi.turnstile?.remove(widgetId)
       }
     }
-  }, [])
+  }, [turnstileSitekey])
 
   async function onRegister (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
