@@ -20,6 +20,7 @@ swap_size_mb = 1024
     NODE_ENV = "production"
     TRANSPORT = "https"
     NODE_VERSION = "24"
+    TURNSTILE_SITEKEY = "0x4AAAAAACL3f3bqurpZAt1Z"
 
 [deploy]
   release_command = "pnpm run migrate --no-config"
