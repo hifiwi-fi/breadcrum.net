@@ -50,8 +50,8 @@ catalogs:
       specifier: ^0.209.0
       version: 0.209.0
     '@types/node':
-      specifier: ^25.0.3
-      version: 25.0.3
+      specifier: ^25.0.6
+      version: 25.0.6
     '@types/pg':
       specifier: ^8.11.10
       version: 8.16.0
@@ -109,10 +109,10 @@ importers:
         version: 2.5.0
       gh-release:
         specifier: ^7.0.0
-        version: 7.0.2(@types/node@25.0.3)
+        version: 7.0.2(@types/node@25.0.6)
       knip:
         specifier: ^5.80.1
-        version: 5.80.1(@types/node@25.0.3)(typescript@5.9.3)
+        version: 5.80.1(@types/node@25.0.6)(typescript@5.9.3)
       neostandard:
         specifier: ^0.12.0
         version: 0.12.2(@typescript-eslint/utils@8.52.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -149,7 +149,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.6
       '@types/pg':
         specifier: 'catalog:'
         version: 8.16.0
@@ -333,7 +333,7 @@ importers:
         version: 1.0.13
       '@domstack/static':
         specifier: ^11.0.0-beta.6
-        version: 11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.3)
+        version: 11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.6)
       '@fastify/type-provider-json-schema-to-ts':
         specifier: 'catalog:'
         version: 5.0.0
@@ -342,7 +342,7 @@ importers:
         version: 1.8.4
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.6
       '@types/nodemailer':
         specifier: ^7.0.2
         version: 7.0.4
@@ -511,7 +511,7 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.6
       '@types/user-agents':
         specifier: ^1.0.4
         version: 1.0.4
@@ -1827,6 +1827,9 @@ packages:
 
   '@types/node@25.0.3':
     resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
+
+  '@types/node@25.0.6':
+    resolution: {integrity: sha512-NNu0sjyNxpoiW3YuVFfNz7mxSQ+S4X2G28uqg2s+CzoqoQjLPsWSbsFFyztIAqt2vb8kfEAsJNepMGPTxFDx3Q==}
 
   '@types/nodemailer@7.0.4':
     resolution: {integrity: sha512-ee8fxWqOchH+Hv6MDDNNy028kwvVnLplrStm4Zf/3uHWw5zzo8FoYYeffpJtGs2wWysEumMH0ZIdMGMY1eMAow==}
@@ -6117,10 +6120,10 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@domstack/static@11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.3)':
+  '@domstack/static@11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.6)':
     dependencies:
       argsclopts: 1.0.5
-      async-folder-walker: 3.0.5(@types/node@25.0.3)
+      async-folder-walker: 3.0.5(@types/node@25.0.6)
       browser-sync: 3.0.4
       chokidar: 4.0.3
       clean-deep: 3.4.0
@@ -6507,12 +6510,12 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@inquirer/external-editor@1.0.3(@types/node@25.0.3)':
+  '@inquirer/external-editor@1.0.3(@types/node@25.0.6)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.1
     optionalDependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
 
   '@ioredis/commands@1.5.0': {}
 
@@ -7356,29 +7359,29 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
 
   '@types/estree@1.0.8': {}
 
   '@types/gunzip-maybe@1.4.3':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/jsdom@21.1.7':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
   '@types/jsdom@27.0.0':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -7409,10 +7412,14 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
+  '@types/node@25.0.6':
+    dependencies:
+      undici-types: 7.16.0
+
   '@types/nodemailer@7.0.4':
     dependencies:
       '@aws-sdk/client-sesv2': 3.962.0
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
     transitivePeerDependencies:
       - aws-crt
 
@@ -7420,7 +7427,7 @@ snapshots:
 
   '@types/pg@8.16.0':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       pg-protocol: 1.10.3
       pg-types: 2.2.0
 
@@ -7762,9 +7769,9 @@ snapshots:
 
   async-each-series@0.1.1: {}
 
-  async-folder-walker@3.0.5(@types/node@25.0.3):
+  async-folder-walker@3.0.5(@types/node@25.0.6):
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       ignore: 5.3.2
 
   async-function@1.0.0: {}
@@ -8414,7 +8421,7 @@ snapshots:
   engine.io@6.6.5:
     dependencies:
       '@types/cors': 2.8.19
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       accepts: 1.3.8
       base64id: 2.0.0
       cookie: 0.7.2
@@ -9075,7 +9082,7 @@ snapshots:
       simple-get: 4.0.1
       util-extend: 1.0.3
 
-  gh-release@7.0.2(@types/node@25.0.3):
+  gh-release@7.0.2(@types/node@25.0.6):
     dependencies:
       '@octokit/rest': 19.0.13
       changelog-parser: 3.0.1
@@ -9084,7 +9091,7 @@ snapshots:
       gh-release-assets: 2.0.1
       ghauth: 5.0.2
       github-url-to-object: 4.0.6
-      inquirer: 8.2.7(@types/node@25.0.3)
+      inquirer: 8.2.7(@types/node@25.0.6)
       shelljs: 0.8.5
       update-notifier: 5.1.0
       yargs: 17.7.2
@@ -9377,9 +9384,9 @@ snapshots:
 
   ini@2.0.0: {}
 
-  inquirer@8.2.7(@types/node@25.0.3):
+  inquirer@8.2.7(@types/node@25.0.6):
     dependencies:
-      '@inquirer/external-editor': 1.0.3(@types/node@25.0.3)
+      '@inquirer/external-editor': 1.0.3(@types/node@25.0.6)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -9793,10 +9800,10 @@ snapshots:
     dependencies:
       is-buffer: 1.1.6
 
-  knip@5.80.1(@types/node@25.0.3)(typescript@5.9.3):
+  knip@5.80.1(@types/node@25.0.6)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       fast-glob: 3.3.3
       formatly: 0.3.0
       jiti: 2.6.1
@@ -10543,7 +10550,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       long: 5.3.2
 
   protobufjs@8.0.0:
@@ -10558,7 +10565,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
       long: 5.3.2
 
   pseudomap@1.0.2: {}
