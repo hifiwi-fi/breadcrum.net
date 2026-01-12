@@ -62,13 +62,13 @@ export const ArchiveView = ({
       -->
 
 
-      ${ar.error
+      ${fullView && ar.error
         ? html`
-        <details class="bc-archive-error-box">
-          <summary>Error</summary>
-          <pre>${ar.error}</pre>
-        </details>
-        `
+          <details class="bc-archive-error-box">
+            <summary>Error</summary>
+            <pre>${ar.error}</pre>
+          </details>
+          `
         : null
       }
 

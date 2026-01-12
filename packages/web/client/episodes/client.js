@@ -15,6 +15,7 @@ import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
+import { useResolvePolling } from '../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -117,6 +118,15 @@ export const Page = () => {
       window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const hasPending = Array.isArray(episodes) && episodes.some(episode => (
+    episode?.ready === false && !episode?.error
+  ))
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadEpisodes,
+  })
 
   let beforeParams
   if (before) {

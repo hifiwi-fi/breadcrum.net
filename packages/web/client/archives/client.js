@@ -15,6 +15,7 @@ import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useReload } from '../hooks/useReload.js'
+import { useResolvePolling } from '../hooks/useResolvePolling.js'
 
 /**
  * @typedef {Object} ArchivesResponse
@@ -125,6 +126,15 @@ export const Page = () => {
       window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const hasPending = Array.isArray(archives) && archives.some(archive => (
+    archive?.ready === false && !archive?.error
+  ))
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadArchives,
+  })
 
   let beforeParams
   if (before) {

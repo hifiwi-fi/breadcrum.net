@@ -39,5 +39,6 @@ export const bookmarkReadProps = /** @type {const} @satisfies {JSONSchema} */ ({
     id: { type: 'string', format: 'uuid' },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
+    done: { type: 'boolean' },
   }
 })

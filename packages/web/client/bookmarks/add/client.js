@@ -6,7 +6,7 @@
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useState, useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 // @ts-ignore - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
@@ -14,6 +14,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
+import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -100,6 +101,40 @@ export const Page = () => {
   }, [query, state.apiUrl])
 
   const existingBookmark = Boolean(bookmark?.id)
+  const hasPending = Boolean(
+    bookmark?.id && (
+      bookmark?.done === false ||
+      bookmark?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
+      bookmark?.episodes?.some(episode => episode?.ready === false && !episode?.error)
+    )
+  )
+
+  const reloadBookmark = useCallback(async () => {
+    if (!bookmark?.id) return
+
+    const requestParams = new URLSearchParams()
+    requestParams.set('sensitive', state.sensitive.toString())
+
+    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}?${requestParams.toString()}`, {
+      method: 'get',
+      headers: {
+        'accept-encoding': 'application/json',
+      },
+    })
+
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      /** @type {TypeBookmarkReadClient} */
+      const body = await response.json()
+      setBookmark(body)
+    } else {
+      console.warn('Bookmark reload failed', response.status, response.statusText)
+    }
+  }, [bookmark?.id, state.apiUrl, state.sensitive])
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadBookmark,
+  })
 
   async function handleSaveBookmark (/** @type {TypeBookmarkReadClient} */ newBookmark) {
     // Clean request for updates

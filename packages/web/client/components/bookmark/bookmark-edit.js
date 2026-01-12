@@ -57,6 +57,13 @@ export const BookmarkEdit = ({
   const [episodePreviewError, setEpisodePreviewError] = useState(/** @type {Error | null} */(null))
   const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(/** @type {string | undefined} */(b?.url))
   const { signal: previewSignal, reload: previewReload } = useReload()
+  const isResolving = Boolean(
+    b?.id && (
+      b?.done === false ||
+      b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
+      b?.episodes?.some(episode => episode?.ready === false && !episode?.error)
+    )
+  )
 
   useEffect(() => {
     // Set bookmark archiveURL state when we get new ones in
@@ -311,7 +318,6 @@ export const BookmarkEdit = ({
       <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onSubmit=${handleSave}>
       <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
-
         <!-- Bookmark URL -->
         <div>
           <label class='block'>
@@ -535,6 +541,15 @@ export const BookmarkEdit = ({
           <div class="button-cluster button-spacing">
             ${onSave ? html`<span><input name="submit-button" type="submit" /></span>` : null}
             ${onCancelEdit ? html`<span><button type="button" onClick=${onCancelEdit}>Cancel</button></span>` : null}
+            ${isResolving
+              ? html`
+                <span class="bc-bookmark-resolve-status">
+                  <span aria-hidden="true">⏱</span>
+                  <span>Resolving</span>
+                  <span class="bc-resolve-dots" aria-hidden="true"></span>
+                </span>
+              `
+              : null}
           </div>
           <div class="button-spacing">
             ${onDeleteBookmark

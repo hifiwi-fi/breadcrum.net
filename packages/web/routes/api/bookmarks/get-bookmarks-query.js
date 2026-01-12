@@ -122,6 +122,7 @@ export const getBookmarksQuery = ({
           b.note,
           b.created_at,
           b.updated_at,
+          b.done,
           b.toread,
           b.sensitive,
           b.starred,

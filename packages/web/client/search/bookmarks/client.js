@@ -15,6 +15,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { BookmarkList } from '../../components/bookmark/bookmark-list.js'
+import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -121,6 +122,17 @@ export const Page = () => {
       window.location.replace(`./?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const hasPending = Array.isArray(bookmarks) && bookmarks.some(bookmark => (
+    bookmark?.done === false ||
+    (bookmark.archives?.some(archive => archive?.ready === false && !archive?.error)) ||
+    (bookmark.episodes?.some(episode => episode?.ready === false && !episode?.error))
+  ))
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reload,
+  })
 
   let nextParams
   if (next) {

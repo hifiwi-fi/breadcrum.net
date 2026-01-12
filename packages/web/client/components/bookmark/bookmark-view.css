@@ -4,6 +4,7 @@
 @import '../episode-title';
 @import '../archive-title';
 @import '../expand-text';
+@import './bookmark-resolve';
 
 .bc-bookmark-view {
   padding-bottom: 4px;

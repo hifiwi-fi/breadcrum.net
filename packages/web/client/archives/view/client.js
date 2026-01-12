@@ -14,6 +14,7 @@ import { useTitle } from '../../hooks/useTitle.js'
 import { ArchiveList } from '../../components/archive/archive-list.js'
 import { Search } from '../../components/search/index.js'
 import { useReload } from '../../hooks/useReload.js'
+import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -96,6 +97,13 @@ export const Page = () => {
       window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const hasPending = Boolean(archive && archive?.ready === false && !archive?.error)
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadArchive,
+  })
 
   return html`
     <div>

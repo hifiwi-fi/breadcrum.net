@@ -19,6 +19,7 @@ import { tc } from '../../lib/typed-component.js'
  * @property {TypeEpisodeReadClient} episode
  * @property {boolean | undefined} [clickForPreview]
  * @property {() => void} [onEdit]
+ * @property {boolean} [showError]
  */
 
 /**
@@ -28,6 +29,7 @@ export const EpisodeView = ({
   episode: e,
   clickForPreview,
   onEdit = () => {},
+  showError = false,
 }) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
 
@@ -109,7 +111,7 @@ export const EpisodeView = ({
         </a>
       </div>
 
-      ${e.error
+      ${showError && e.error
         ? html`
         <details class="bc-episode-error-box">
           <summary>Error</summary>

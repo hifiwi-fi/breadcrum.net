@@ -1,5 +1,6 @@
 @import '../archive-title';
 @import '../episode-title';
+@import './bookmark-resolve';
 
 .bc-bookmark-edit {
   & input[type="date"],
@@ -24,6 +25,9 @@
 
 .bc-bookmark-edit-fieldset {
   min-width: 0;
+  border: 1px solid var(--accent-background);
+  border-radius: 6px;
+  padding: 0.75rem;
 }
 
 .bc-bookmark-summary,

@@ -36,6 +36,13 @@ export const BookmarkView = ({
 }) => {
   const window = useWindow()
   const { pushState } = useQuery()
+  const isResolving = Boolean(
+    b?.done === false ||
+    b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
+    b?.episodes?.some(episode => episode?.ready === false && !episode?.error)
+  )
+  const visibleArchives = (b?.archives ?? []).filter(archive => !archive?.error)
+  const visibleEpisodes = (b?.episodes ?? []).filter(episode => !episode?.error)
 
   const onPageNav = (/** @type{MouseEvent} */ ev) => {
     const target = ev?.currentTarget
@@ -92,14 +99,23 @@ export const BookmarkView = ({
         }
       </div>
       <div class='bc-bookmark-entity-enumeration'>
-        ${b.archives?.length > 0 && b.archives.some(a => a.ready)
-          ? html`<div class='bc-bookmark-entity bc-archive-entity'>🗄️ <a href="${b.archives?.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${b.archives?.[0]?.id}`}">${b.archives?.length} archive${b.archives?.length > 1 ? 's' : ''}</a></div>`
+        ${visibleArchives.length > 0
+          ? html`<div class='bc-bookmark-entity bc-archive-entity'>🗄️ <a href="${visibleArchives.length > 1 ? `/archives?bid=${b.id}` : `/archives/view?id=${visibleArchives[0]?.id}`}">${visibleArchives.length} archive${visibleArchives.length > 1 ? 's' : ''}</a></div>`
           : null
         }
-        ${b.episodes?.length > 0 && b.episodes.some(e => e.ready)
-          ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${b.episodes?.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${b.episodes?.[0]?.id}`}">${b.episodes?.length} episode${b.episodes?.length > 1 ? 's' : ''}</a></div>`
+        ${visibleEpisodes.length > 0
+          ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${visibleEpisodes.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${visibleEpisodes[0]?.id}`}">${visibleEpisodes.length} episode${visibleEpisodes.length > 1 ? 's' : ''}</a></div>`
           : null
         }
+        ${isResolving
+          ? html`
+            <span class="bc-bookmark-resolve-status">
+              <span aria-hidden="true">⏱</span>
+              <span>Resolving</span>
+              <span class="bc-resolve-dots" aria-hidden="true"></span>
+            </span>
+          `
+          : null}
       </div>
       ${b.archive_urls?.length > 0
         ? html`${b.archive_urls.map(

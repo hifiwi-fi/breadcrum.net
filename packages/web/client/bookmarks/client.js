@@ -14,6 +14,7 @@ import { BookmarkList } from '../components/bookmark/bookmark-list.js'
 import { Search } from '../components/search/index.js'
 import { useBookmarks } from '../hooks/useBookmarks.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
+import { useResolvePolling } from '../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -47,6 +48,17 @@ export const Page = () => {
   const tagFilterRemovedParams = new URLSearchParams(query || '')
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
+
+  const hasPending = Array.isArray(bookmarks) && bookmarks.some(bookmark => (
+    bookmark?.done === false ||
+    (bookmark.archives?.some(archive => archive?.ready === false && !archive?.error)) ||
+    (bookmark.episodes?.some(episode => episode?.ready === false && !episode?.error))
+  ))
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadBookmarks,
+  })
 
   return html`
     <${Search}

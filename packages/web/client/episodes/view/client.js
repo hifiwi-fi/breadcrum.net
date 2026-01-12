@@ -15,6 +15,7 @@ import { useTitle } from '../../hooks/useTitle.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
 import { Search } from '../../components/search/index.js'
 import { useReload } from '../../hooks/useReload.js'
+import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -93,6 +94,13 @@ export const Page = () => {
     }
   }, [window])
 
+  const hasPending = Boolean(episode && episode?.ready === false && !episode?.error)
+
+  useResolvePolling({
+    enabled: hasPending,
+    onPoll: reloadEpisode,
+  })
+
   return html`
     <div>
       <${Search}
@@ -105,7 +113,8 @@ export const Page = () => {
             episode,
             reload: reloadEpisode,
             onDelete: handleDelete,
-            clickForPreview: false
+            clickForPreview: false,
+            showError: true
           })
         : null}
       ${episodeLoading ? html`<div>...</div>` : null}
