@@ -45,6 +45,7 @@ export async function createTestUser (app, t) {
   // Setup cleanup
   t.after(async () => {
     if (userId) {
+      await app.pg.query('DELETE FROM auth_tokens WHERE owner_id = $1', [userId])
       await app.pg.query('DELETE FROM users WHERE id = $1', [userId])
     }
   })

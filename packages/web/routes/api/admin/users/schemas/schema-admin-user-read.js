@@ -1,5 +1,5 @@
 import { fullSerializedUserProps } from '../../../user/schemas/user-base.js'
-import { authTokenProps } from '../../../user/auth-tokens/schemas/auth-token-base.js'
+import { authTokenProps, geoipRegionProps } from '../../../user/auth-tokens/schemas/auth-token-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
@@ -34,6 +34,10 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       ...authTokenProps.properties.user_agent,
       description: 'The parsed user agent information from the user\'s most recent auth token.',
     },
+    geoip: {
+      ...geoipRegionProps,
+      description: 'GeoIP region data for the user\'s most recent auth token IP.',
+    },
     registration_ip: {
       type: 'string',
       nullable: true,
@@ -42,6 +46,10 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
     registration_user_agent: {
       ...authTokenProps.properties.user_agent,
       description: 'The parsed user agent information from account registration.',
+    },
+    registration_geoip: {
+      ...geoipRegionProps,
+      description: 'GeoIP region data for the user\'s registration IP.',
     },
   }
 })

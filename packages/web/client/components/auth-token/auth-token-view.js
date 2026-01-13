@@ -11,6 +11,20 @@ import { formatRelativeTime } from '../../lib/format-relative-time.js'
 import cn from 'classnames'
 
 /**
+ * @param {TypeAuthTokenReadClient['geoip']} geoip
+ * @returns {string}
+ */
+function formatGeoip (geoip) {
+  if (!geoip) return 'Unknown'
+  const parts = [
+    geoip.city_name,
+    geoip.region_name,
+    geoip.country_name,
+  ].filter(Boolean)
+  return parts.length ? parts.join(', ') : 'Unknown'
+}
+
+/**
  * @typedef {object} AuthTokenViewProps
  * @property {TypeAuthTokenReadClient} authToken
  * @property {() => void} [onEdit]
@@ -23,6 +37,8 @@ export const AuthTokenView = ({
   authToken: t,
   onEdit = () => {},
 }) => {
+  const geoip = formatGeoip(t.geoip)
+
   return html`
     <div class="bc-auth-token-view">
       <div class="bc-auth-token-grid">
@@ -59,6 +75,14 @@ export const AuthTokenView = ({
             ? html`
               <div class="bc-auth-token-ip">
                 IP: <code>${t.ip}</code>
+              </div>
+            `
+            : null}
+          ${t.geoip
+            ? html`
+              <div class="bc-auth-token-geoip">
+                Location: ${geoip}
+                ${t.geoip.time_zone ? html`<span class="bc-auth-token-geoip-tz">${t.geoip.time_zone}</span>` : null}
               </div>
             `
             : null}

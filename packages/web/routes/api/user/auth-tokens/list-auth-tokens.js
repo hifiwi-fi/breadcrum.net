@@ -151,9 +151,16 @@ export async function listAuthTokens (fastify, _opts) {
           prevPage = firstToken ? `${firstToken.last_seen_micros}:${firstToken.jti}` : null
         }
 
+        const geoipLookup = fastify.geoip?.lookup
+
         // Remove last_seen_micros from response
         /** @type {TypeAuthTokenReadSerialize[]} */
-        const tokens = tokensWithMicros.map(({ last_seen_micros: _unused, ...token }) => token)
+        const tokens = tokensWithMicros.map(({ last_seen_micros: _unused, ...token }) => ({
+          ...token,
+          geoip: geoipLookup && token.ip
+            ? geoipLookup(token.ip)
+            : null,
+        }))
 
         return reply.code(200).send({
           data: tokens,

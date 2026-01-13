@@ -66,6 +66,8 @@ export function parseUserAgents (user) {
     ...user,
     user_agent: parseUserAgentString(user.user_agent),
     registration_user_agent: parseUserAgentString(user.registration_user_agent),
+    geoip: null,
+    registration_geoip: null,
   }
 }
 
@@ -108,8 +110,10 @@ function parseUserAgentString (userAgent) {
  * @property {Date | null} last_seen
  * @property {string | null} ip
  * @property {UserAgentJson | null} user_agent
+ * @property {GeoIpRegion | null} geoip
  * @property {string | null} registration_ip
  * @property {UserAgentJson | null} registration_user_agent
+ * @property {GeoIpRegion | null} registration_geoip
  */
 
 /**
@@ -140,7 +144,17 @@ function parseUserAgentString (userAgent) {
  */
 
 /**
- * @typedef {Omit<AdminUsersQueryRead, 'user_agent' | 'registration_user_agent'> & {
+ * @typedef {object} GeoIpRegion
+ * @property {string | null} country_iso
+ * @property {string | null} country_name
+ * @property {string | null} region_iso
+ * @property {string | null} region_name
+ * @property {string | null} city_name
+ * @property {string | null} time_zone
+ */
+
+/**
+ * @typedef {Omit<AdminUsersQueryRead, 'user_agent' | 'registration_user_agent' | 'geoip' | 'registration_geoip'> & {
  *   user_agent: string | null,
  *   registration_user_agent: string | null
  * }} AdminUsersQueryReadDbResult

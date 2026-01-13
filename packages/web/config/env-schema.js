@@ -97,6 +97,12 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: 'deployment.environment=development',
     },
+    MAXMIND_ACCOUNT_ID: {
+      type: 'string',
+    },
+    MAXMIND_LICENSE_KEY: {
+      type: 'string',
+    },
     EMAIL_SENDING: {
       type: 'boolean',
       default: true,

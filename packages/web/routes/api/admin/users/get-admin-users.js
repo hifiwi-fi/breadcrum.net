@@ -97,9 +97,21 @@ export async function getAdminUsersRoute (fastify, _opts) {
         const nextPage = bottom ? null : results.at(-1)?.created_at ?? null
         const prevPage = top ? null : addMillisecond(results[0]?.created_at) ?? null
 
+        const geoipLookup = fastify.geoip?.lookup
+
+        const users = results.map(user => ({
+          ...user,
+          geoip: geoipLookup && user.ip
+            ? geoipLookup(user.ip)
+            : null,
+          registration_geoip: geoipLookup && user.registration_ip
+            ? geoipLookup(user.registration_ip)
+            : null,
+        }))
+
         /** @type {ReturnBody} */
         const returnData = {
-          data: results,
+          data: users,
           pagination: {
             before: nextPage,
             after: prevPage,

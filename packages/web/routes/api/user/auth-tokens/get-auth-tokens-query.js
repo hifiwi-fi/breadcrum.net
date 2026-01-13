@@ -66,7 +66,8 @@ export function parseUserAgent (authToken) {
           os: { ...parsedAgent.os },
           raw: authToken.user_agent
         }
-      : null
+      : null,
+    geoip: null,
   }
 }
 
@@ -98,6 +99,16 @@ export function parseUserAgent (authToken) {
  */
 
 /**
+ * @typedef {object} GeoIpRegion
+ * @property {string | null} country_iso
+ * @property {string | null} country_name
+ * @property {string | null} region_iso
+ * @property {string | null} region_name
+ * @property {string | null} city_name
+ * @property {string | null} time_zone
+ */
+
+/**
  * @typedef {object} AuthTokenQueryRead
  * @property {string} jti
  * @property {"web" | "api"} source
@@ -110,10 +121,11 @@ export function parseUserAgent (authToken) {
  * @property {string | null} note
  * @property {UserAgentJson | null} user_agent
  * @property {string | null} ip
+ * @property {GeoIpRegion | null} geoip
  */
 
 /**
- * @typedef {Omit<AuthTokenQueryRead, 'user_agent'> & { user_agent: string }} AuthTokenQueryReadDbResult
+ * @typedef {Omit<AuthTokenQueryRead, 'user_agent' | 'geoip'> & { user_agent: string }} AuthTokenQueryReadDbResult
  */
 
 /**
