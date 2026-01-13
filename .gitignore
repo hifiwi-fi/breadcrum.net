@@ -10,3 +10,4 @@ dependency-graph.html
 .tap
 tsconfig.tsbuildinfo
 deploy
+packages/web/data/geoip

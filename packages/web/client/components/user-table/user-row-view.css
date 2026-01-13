@@ -149,6 +149,12 @@
   font-style: italic;
 }
 
+.bc-user-subvalue {
+  color: var(--accent-foreground);
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
 .bc-user-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

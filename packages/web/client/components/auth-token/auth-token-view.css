@@ -105,7 +105,8 @@
 
 .bc-auth-token-source,
 .bc-auth-token-user-agent,
-.bc-auth-token-ip {
+.bc-auth-token-ip,
+.bc-auth-token-geoip {
   min-width: 0;
   word-break: break-word;
 }
@@ -120,6 +121,13 @@
   font-family: var(--font-code);
   font-size: 0.9em;
   word-break: break-all;
+}
+
+.bc-auth-token-geoip-tz {
+  display: inline-block;
+  margin-left: 0.35rem;
+  color: var(--accent-foreground);
+  font-size: 0.85em;
 }
 
 /* Responsive breakpoints */

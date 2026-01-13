@@ -2,6 +2,44 @@
  * @import { JSONSchema } from 'json-schema-to-ts'
  */
 
+export const geoipRegionProps = /** @type {const} @satisfies {JSONSchema} */ ({
+  type: 'object',
+  nullable: true,
+  additionalProperties: false,
+  properties: {
+    country_iso: {
+      type: 'string',
+      nullable: true,
+      description: 'ISO 3166-1 country code for the IP.',
+    },
+    country_name: {
+      type: 'string',
+      nullable: true,
+      description: 'Country name for the IP.',
+    },
+    region_iso: {
+      type: 'string',
+      nullable: true,
+      description: 'ISO 3166-2 region code for the IP.',
+    },
+    region_name: {
+      type: 'string',
+      nullable: true,
+      description: 'Region name for the IP.',
+    },
+    city_name: {
+      type: 'string',
+      nullable: true,
+      description: 'City name for the IP.',
+    },
+    time_zone: {
+      type: 'string',
+      nullable: true,
+      description: 'IANA time zone for the IP.',
+    },
+  },
+})
+
 export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   required: [],
@@ -117,6 +155,10 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
       maxLength: 255,
       nullable: true,
       description: 'A note to identify the session (e.g., "Work laptop", "Home PC")',
+    },
+    geoip: {
+      ...geoipRegionProps,
+      description: 'The geoip region data for the last IP address used with this token.',
     },
     protect: {
       type: 'boolean',

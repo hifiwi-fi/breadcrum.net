@@ -79,7 +79,17 @@ jobs:
           PGPASSWORD: postgres
           PGPORT: 5432
           PGUSER: postgres
+      - name: Cache GeoIP data
+        uses: actions/cache@v4
+        with:
+          path: packages/web/data/geoip
+          key: geoip-${{ runner.os }}-v1
+          restore-keys: |
+            geoip-${{ runner.os }}-
       - run: pnpm test
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Set NEW_VERSION
         run: |
           if [ -z "${{ github.event.inputs.newversion }}" ]; then
@@ -100,6 +110,8 @@ jobs:
         if: ${{ github.event.inputs.deploy-web == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Deploy worker
         run: pnpm run deploy:worker
         if: ${{ github.event.inputs.deploy-worker == 'true' }}

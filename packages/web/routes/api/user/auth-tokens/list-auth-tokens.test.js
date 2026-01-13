@@ -8,9 +8,40 @@ import {
   assertPaginationShape
 } from './auth-tokens-test-utils.js'
 
+/**
+ * @param {import('node:assert')} assert
+ * @param {any} geoip
+ */
+function assertGeoipShape (assert, geoip) {
+  assert.ok(geoip, 'GeoIP data should be present')
+  assert.strictEqual(typeof geoip, 'object')
+  assert.ok('country_iso' in geoip)
+  assert.ok('country_name' in geoip)
+  assert.ok('region_iso' in geoip)
+  assert.ok('region_name' in geoip)
+  assert.ok('city_name' in geoip)
+  assert.ok('time_zone' in geoip)
+}
+
 await suite('list auth tokens', async () => {
   await test('list auth tokens - basic functionality', async (t) => {
-    const app = await build(t)
+    const accountId = process.env['MAXMIND_ACCOUNT_ID']
+    const licenseKey = process.env['MAXMIND_LICENSE_KEY']
+
+    assert.ok(accountId, 'MAXMIND_ACCOUNT_ID must be set for GeoIP tests')
+    assert.ok(licenseKey, 'MAXMIND_LICENSE_KEY must be set for GeoIP tests')
+
+    const app = await build(t, {
+      MAXMIND_ACCOUNT_ID: accountId,
+      MAXMIND_LICENSE_KEY: licenseKey,
+    })
+    if (!app.hasDecorator('geoip')) {
+      if (process.env['CI']) {
+        t.skip('GeoIP database not available in CI; skipping enrichment checks.')
+        return
+      }
+      assert.fail('GeoIP plugin should decorate fastify')
+    }
 
     await t.test('returns paginated list of tokens', async (t) => {
       const user = await createTestUser(app, t)
@@ -75,10 +106,47 @@ await suite('list auth tokens', async () => {
       assert.ok(new Date(token.last_seen).getTime() > 0, 'last_seen should be valid date')
       assert.ok(!('last_seen_micros' in token), 'last_seen_micros should not be anything')
     })
+
+    await t.test('enriches tokens with geoip when available', async (t) => {
+      const user = await createTestUser(app, t)
+      if (!user) return // Registration disabled
+
+      await app.pg.query('UPDATE auth_tokens SET ip = $1 WHERE owner_id = $2', ['1.1.1.1', user.userId])
+
+      const listRes = await app.inject({
+        method: 'GET',
+        url: '/api/user/auth-tokens',
+        headers: {
+          authorization: `Bearer ${user.token}`
+        }
+      })
+
+      assert.strictEqual(listRes.statusCode, 200)
+      const listBody = JSON.parse(listRes.payload)
+      const token = listBody.data[0]
+
+      assertGeoipShape(assert, token.geoip)
+    })
   })
 
   await test('list auth tokens - pagination', async (t) => {
-    const app = await build(t)
+    const accountId = process.env['MAXMIND_ACCOUNT_ID']
+    const licenseKey = process.env['MAXMIND_LICENSE_KEY']
+
+    assert.ok(accountId, 'MAXMIND_ACCOUNT_ID must be set for GeoIP tests')
+    assert.ok(licenseKey, 'MAXMIND_LICENSE_KEY must be set for GeoIP tests')
+
+    const app = await build(t, {
+      MAXMIND_ACCOUNT_ID: accountId,
+      MAXMIND_LICENSE_KEY: licenseKey,
+    })
+    if (!app.hasDecorator('geoip')) {
+      if (process.env['CI']) {
+        t.skip('GeoIP database not available in CI; skipping enrichment checks.')
+        return
+      }
+      assert.fail('GeoIP plugin should decorate fastify')
+    }
 
     await t.test('handles before cursor correctly', async (t) => {
       const user = await createTestUser(app, t)

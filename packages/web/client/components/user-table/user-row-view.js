@@ -11,6 +11,20 @@ import cn from 'classnames'
 import { formatUserAgent } from './format-user-agent.js'
 
 /**
+ * @param {SchemaTypeAdminUserReadClient['geoip']} geoip
+ * @returns {string}
+ */
+function formatGeoip (geoip) {
+  if (!geoip) return 'Unknown'
+  const parts = [
+    geoip.city_name,
+    geoip.region_name,
+    geoip.country_name,
+  ].filter(Boolean)
+  return parts.length ? parts.join(', ') : 'Unknown'
+}
+
+/**
  * @typedef {object} UserRowViewProps
  * @property {SchemaTypeAdminUserReadClient} user
  * @property {() => void} [onEdit]
@@ -29,6 +43,8 @@ export const UserRowView = ({
   const internalNote = u.internal_note || ''
   const latestUserAgent = formatUserAgent(u.user_agent)
   const registrationUserAgent = formatUserAgent(u.registration_user_agent)
+  const latestGeoip = formatGeoip(u.geoip)
+  const registrationGeoip = formatGeoip(u.registration_geoip)
 
   return html`
     <article class="bc-user-card" role="listitem">
@@ -174,6 +190,19 @@ export const UserRowView = ({
               </div>
             </div>
             <div class="bc-user-field">
+              <div class="bc-user-label">GeoIP</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-empty': !u.geoip,
+              })}">
+                ${latestGeoip}
+              </div>
+              ${u.geoip?.time_zone
+                ? html`<div class="bc-user-subvalue">${u.geoip.time_zone}</div>`
+                : null
+              }
+            </div>
+            <div class="bc-user-field">
               <div class="bc-user-label">Registration IP</div>
               <code class="${cn({
                 'bc-user-value': true,
@@ -191,6 +220,19 @@ export const UserRowView = ({
               })}">
                 ${registrationUserAgent}
               </div>
+            </div>
+            <div class="bc-user-field">
+              <div class="bc-user-label">Registration GeoIP</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-empty': !u.registration_geoip,
+              })}">
+                ${registrationGeoip}
+              </div>
+              ${u.registration_geoip?.time_zone
+                ? html`<div class="bc-user-subvalue">${u.registration_geoip.time_zone}</div>`
+                : null
+              }
             </div>
           </div>
         </div>

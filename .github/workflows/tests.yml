@@ -63,10 +63,20 @@ jobs:
           PGPASSWORD: postgres
           PGPORT: 5432
           PGUSER: postgres
+      - name: Cache GeoIP data
+        uses: actions/cache@v4
+        with:
+          path: packages/web/data/geoip
+          key: geoip-${{ runner.os }}-v1
+          restore-keys: |
+            geoip-${{ runner.os }}-
       - name: Test resources
         run: pnpm run --filter @breadcrum/resources test
       - name: Test web
         run: pnpm run --filter @breadcrum/web test
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Test worker
         run: pnpm run --filter @breadcrum/worker test
       - name: Run knip
