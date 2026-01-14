@@ -12,6 +12,7 @@ function assertGeoipShape (assert, geoip) {
   assert.strictEqual(typeof geoip, 'object')
   assert.ok('country_iso' in geoip)
   assert.ok('country_name' in geoip)
+  assert.ok('flag_emoji' in geoip)
   assert.ok('region_iso' in geoip)
   assert.ok('region_name' in geoip)
   assert.ok('city_name' in geoip)

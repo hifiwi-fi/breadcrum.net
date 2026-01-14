@@ -147,6 +147,7 @@ function parseUserAgentString (userAgent) {
  * @typedef {object} GeoIpRegion
  * @property {string | null} country_iso
  * @property {string | null} country_name
+ * @property {string | null} flag_emoji
  * @property {string | null} region_iso
  * @property {string | null} region_name
  * @property {string | null} city_name

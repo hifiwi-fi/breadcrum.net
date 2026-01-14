@@ -16,6 +16,7 @@ const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')
  * @typedef {object} GeoIpRegion
  * @property {string | null} country_iso
  * @property {string | null} country_name
+ * @property {string | null} flag_emoji
  * @property {string | null} region_iso
  * @property {string | null} region_name
  * @property {string | null} city_name
@@ -33,14 +34,32 @@ const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')
  */
 function mapCityResponse (response) {
   const region = response.subdivisions?.[0] ?? null
+  const countryIso = response.country?.isoCode ?? null
   return {
-    country_iso: response.country?.isoCode ?? null,
+    country_iso: countryIso,
     country_name: response.country?.names?.en ?? null,
+    flag_emoji: countryIsoToFlagEmoji(countryIso),
     region_iso: region?.isoCode ?? null,
     region_name: region?.names?.en ?? null,
     city_name: response.city?.names?.en ?? null,
     time_zone: response.location?.timeZone ?? null,
   }
+}
+
+/**
+ * @param {string | null} countryIso
+ * @returns {string | null}
+ */
+export function countryIsoToFlagEmoji (countryIso) {
+  if (!countryIso) return null
+  const upper = countryIso.toUpperCase()
+  if (!/^[A-Z]{2}$/.test(upper)) return null
+  const indicatorOffset = 0x1F1E6 - 0x41
+  const codePoints = [
+    upper.charCodeAt(0) + indicatorOffset,
+    upper.charCodeAt(1) + indicatorOffset,
+  ]
+  return String.fromCodePoint(...codePoints)
 }
 
 /** @type {FastifyPluginAsync} */

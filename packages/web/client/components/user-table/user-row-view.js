@@ -16,12 +16,16 @@ import { formatUserAgent } from './format-user-agent.js'
  */
 function formatGeoip (geoip) {
   if (!geoip) return 'Unknown'
+  const flag = geoip.flag_emoji
   const parts = [
     geoip.city_name,
     geoip.region_name,
     geoip.country_name,
   ].filter(Boolean)
-  return parts.length ? parts.join(', ') : 'Unknown'
+  const location = parts.length ? parts.join(', ') : null
+  if (flag && location) return `${flag} ${location}`
+  if (flag) return flag
+  return location ?? 'Unknown'
 }
 
 /**

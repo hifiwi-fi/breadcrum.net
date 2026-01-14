@@ -17,6 +17,11 @@ export const geoipRegionProps = /** @type {const} @satisfies {JSONSchema} */ ({
       nullable: true,
       description: 'Country name for the IP.',
     },
+    flag_emoji: {
+      type: 'string',
+      nullable: true,
+      description: 'Emoji flag for the IP country.',
+    },
     region_iso: {
       type: 'string',
       nullable: true,

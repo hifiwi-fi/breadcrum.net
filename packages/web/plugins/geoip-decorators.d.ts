@@ -3,6 +3,7 @@ import 'fastify'
 type GeoIpRegion = {
   country_iso: string | null,
   country_name: string | null,
+  flag_emoji: string | null,
   region_iso: string | null,
   region_name: string | null,
   city_name: string | null,
