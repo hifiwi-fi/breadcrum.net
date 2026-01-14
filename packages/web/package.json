@@ -63,7 +63,7 @@
     "@fastify/type-provider-json-schema-to-ts": "catalog:",
     "@types/common-tags": "^1.8.4",
     "@types/node": "catalog:",
-    "@types/nodemailer": "^7.0.2",
+    "@types/nodemailer": "^7.0.5",
     "@types/pg": "catalog:",
     "@types/useragent": "^2.3.4",
     "@voxpelli/tsconfig": "catalog:",
