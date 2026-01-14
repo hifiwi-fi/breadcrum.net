@@ -50,8 +50,8 @@ catalogs:
       specifier: ^0.209.0
       version: 0.209.0
     '@types/node':
-      specifier: ^25.0.3
-      version: 25.0.3
+      specifier: ^25.0.8
+      version: 25.0.8
     '@types/pg':
       specifier: ^8.11.10
       version: 8.16.0
@@ -149,7 +149,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.8
       '@types/pg':
         specifier: 'catalog:'
         version: 8.16.0
@@ -336,7 +336,7 @@ importers:
         version: 1.0.13
       '@domstack/static':
         specifier: ^11.0.0-beta.6
-        version: 11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.3)
+        version: 11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.8)
       '@fastify/type-provider-json-schema-to-ts':
         specifier: 'catalog:'
         version: 5.0.0
@@ -345,7 +345,7 @@ importers:
         version: 1.8.4
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.8
       '@types/nodemailer':
         specifier: ^7.0.5
         version: 7.0.5
@@ -517,7 +517,7 @@ importers:
         version: 27.0.0
       '@types/node':
         specifier: 'catalog:'
-        version: 25.0.3
+        version: 25.0.8
       '@types/user-agents':
         specifier: ^1.0.4
         version: 1.0.4
@@ -1833,9 +1833,6 @@ packages:
 
   '@types/node@24.10.4':
     resolution: {integrity: sha512-vnDVpYPMzs4wunl27jHrfmwojOGKya0xyM3sH+UE5iv5uPS6vX7UIoh6m+vQc5LGBq52HBKPIn/zcSZVzeDEZg==}
-
-  '@types/node@25.0.3':
-    resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
 
   '@types/node@25.0.8':
     resolution: {integrity: sha512-powIePYMmC3ibL0UJ2i2s0WIbq6cg6UyVFQxSCpaPxxzAaziRfimGivjdF943sSGV6RADVbk0Nvlm5P/FB44Zg==}
@@ -6141,10 +6138,10 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@domstack/static@11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.3)':
+  '@domstack/static@11.0.0-beta.7(@types/markdown-it@14.1.2)(@types/node@25.0.8)':
     dependencies:
       argsclopts: 1.0.5
-      async-folder-walker: 3.0.5(@types/node@25.0.3)
+      async-folder-walker: 3.0.5(@types/node@25.0.8)
       browser-sync: 3.0.4
       chokidar: 4.0.3
       clean-deep: 3.4.0
@@ -7384,7 +7381,7 @@ snapshots:
 
   '@types/concat-stream@2.0.3':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.8
 
   '@types/cors@2.8.19':
     dependencies:
@@ -7394,7 +7391,7 @@ snapshots:
 
   '@types/gunzip-maybe@1.4.3':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.8
 
   '@types/istanbul-lib-coverage@2.0.6': {}
 
@@ -7406,7 +7403,7 @@ snapshots:
 
   '@types/jsdom@27.0.0':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.8
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
 
@@ -7433,10 +7430,6 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
-  '@types/node@25.0.3':
-    dependencies:
-      undici-types: 7.16.0
-
   '@types/node@25.0.8':
     dependencies:
       undici-types: 7.16.0
@@ -7452,7 +7445,7 @@ snapshots:
 
   '@types/pg@8.16.0':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.8
       pg-protocol: 1.10.3
       pg-types: 2.2.0
 
@@ -7794,9 +7787,9 @@ snapshots:
 
   async-each-series@0.1.1: {}
 
-  async-folder-walker@3.0.5(@types/node@25.0.3):
+  async-folder-walker@3.0.5(@types/node@25.0.8):
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.8
       ignore: 5.3.2
 
   async-function@1.0.0: {}

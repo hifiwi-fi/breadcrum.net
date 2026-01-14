@@ -2,7 +2,7 @@
  * @import { ArgscloptsParseArgsOptionsConfig } from 'argsclopts'
  * @import { ParseArgsConfig } from 'node:util'
  */
-import { resolve } from 'node:path'
+import { resolve, join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { printHelpText } from 'argsclopts'
 import { updateGeoipDatabase } from '../lib/geoip-download.js'
@@ -42,6 +42,7 @@ const args = parseArgs(parseConfig)
 
 if (args.values['help']) {
   await printHelpText({
+    pkgPath: join(__dirname, '../package.json'),
     options,
     name: 'update-geoip-db',
     exampleFn: ({ name }) => `    Download and refresh MaxMind GeoLite2 databases\n\n    Examples:\n      ${name}\n      ${name} --env-file ./.env\n      ${name} --edition-id GeoLite2-City\n      ${name} --data-dir ./data/geoip\n      ${name} --force\n`,
@@ -100,6 +101,17 @@ await updateGeoipDatabase({
         return
       }
       console.warn(obj)
+    },
+    debug: (obj, message) => {
+      if (typeof obj === 'string') {
+        console.debug(obj)
+        return
+      }
+      if (message) {
+        console.debug(message, obj)
+        return
+      }
+      console.debug(obj)
     },
   },
 })

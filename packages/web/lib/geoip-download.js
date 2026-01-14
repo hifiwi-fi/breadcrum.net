@@ -17,6 +17,7 @@ const execFileAsync = promisify(execFile)
  * @typedef {object} GeoIpDownloadLogger
  * @property {(obj: object | string, msg?: string) => void} info
  * @property {(obj: object | string, msg?: string) => void} warn
+ * @property {(obj: object | string, msg?: string) => void} [debug]
  */
 
 /**
@@ -103,10 +104,11 @@ function getHeaderValue (response, headerName) {
 /**
  * @param {URL} url
  * @param {GeoIpRequestOptions} options
+ * @param {GeoIpDownloadLogger} logger
  * @param {number} [maxRedirects]
  * @returns {Promise<Dispatcher.ResponseData>}
  */
-async function requestWithRedirects (url, options, maxRedirects = 5) {
+async function requestWithRedirects (url, options, logger, maxRedirects = 5) {
   const response = await request(url, options)
   const location = response.headers['location']
   if (response.statusCode >= 300 && response.statusCode < 400 && location) {
@@ -116,7 +118,28 @@ async function requestWithRedirects (url, options, maxRedirects = 5) {
     }
     const redirectUrl = new URL(String(location), url)
     await drainResponse(response)
-    return requestWithRedirects(redirectUrl, options, maxRedirects - 1)
+
+    // Don't forward Authorization header to different hosts (e.g., R2 presigned URLs)
+    let redirectOptions = options
+    if (redirectUrl.host !== url.host && options.headers?.['Authorization']) {
+      logDebug(logger, 'Redirecting to different host, removing Authorization header', {
+        from: url.host,
+        to: redirectUrl.host,
+      })
+      redirectOptions = {
+        ...options,
+        headers: { ...options.headers }
+      }
+      delete redirectOptions.headers?.['Authorization']
+    } else {
+      logDebug(logger, 'Following redirect', {
+        from: url.toString(),
+        to: redirectUrl.toString(),
+        statusCode: response.statusCode,
+      })
+    }
+
+    return requestWithRedirects(redirectUrl, redirectOptions, logger, maxRedirects - 1)
   }
   return response
 }
@@ -193,7 +216,15 @@ export async function updateGeoipDatabase ({
     }
   }
 
-  const headResponse = await requestWithRedirects(archiveUrl, { headers, method: 'HEAD' })
+  logDebug(logger, `Sending HEAD request to ${archiveUrl.toString()}`, { headers })
+
+  const headResponse = await requestWithRedirects(archiveUrl, { headers, method: 'HEAD' }, logger)
+
+  logDebug(logger, `HEAD response status: ${headResponse.statusCode}`, {
+    statusCode: headResponse.statusCode,
+    lastModified: getHeaderValue(headResponse, 'last-modified'),
+    etag: getHeaderValue(headResponse, 'etag'),
+  })
 
   if (headResponse.statusCode === 304) {
     const updatedMetadata = {
@@ -250,7 +281,21 @@ export async function updateGeoipDatabase ({
     }
   }
 
-  const archiveResponse = await requestWithRedirects(archiveUrl, { headers, method: 'GET' })
+  // Remove conditional headers before GET request since we've determined update is needed
+  logDebug(logger, 'Removing conditional headers before GET request', {
+    hadIfNoneMatch: !!headers['If-None-Match'],
+    hadIfModifiedSince: !!headers['If-Modified-Since'],
+  })
+  delete headers['If-None-Match']
+  delete headers['If-Modified-Since']
+
+  logDebug(logger, `Sending GET request to ${archiveUrl.toString()}`, { headers })
+
+  const archiveResponse = await requestWithRedirects(archiveUrl, { headers, method: 'GET' }, logger)
+
+  logDebug(logger, `GET response status: ${archiveResponse.statusCode}`, {
+    statusCode: archiveResponse.statusCode,
+  })
 
   if (archiveResponse.statusCode === 304) {
     const updatedMetadata = {
@@ -279,7 +324,10 @@ export async function updateGeoipDatabase ({
   const shaUrl = new URL(archiveUrl)
   shaUrl.searchParams.set('suffix', shaSuffix)
 
-  const shaResponse = await requestWithRedirects(shaUrl, { method: 'GET' })
+  const shaResponse = await requestWithRedirects(shaUrl, {
+    headers: { Authorization: `Basic ${authHeader}` },
+    method: 'GET'
+  }, logger)
   if (shaResponse.statusCode < 200 || shaResponse.statusCode >= 300) {
     await drainResponse(shaResponse)
     throw new Error(`GeoIP checksum download failed with status ${shaResponse.statusCode}.`)
@@ -348,4 +396,19 @@ function logInfo (logger, message, meta) {
     return
   }
   logger.info(message)
+}
+
+/**
+ * @param {GeoIpDownloadLogger} logger
+ * @param {string} message
+ * @param {object} [meta]
+ * @returns {void}
+ */
+function logDebug (logger, message, meta) {
+  if (!logger.debug) return
+  if (meta) {
+    logger.debug(meta, message)
+    return
+  }
+  logger.debug(message)
 }

@@ -75,13 +75,19 @@ jobs:
           PGPASSWORD: postgres
           PGPORT: 5432
           PGUSER: postgres
-      - name: Cache GeoIP data
-        uses: actions/cache@v5
+      - name: Restore GeoIP cache
+        id: cache-geoip-restore
+        uses: actions/cache/restore@v5
         with:
           path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-v1
+          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
           restore-keys: |
             geoip-${{ runner.os }}-
+      - name: Update GeoIP data
+        run: node packages/web/scripts/update-geoip-db.js
+        env:
+          MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
+          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
@@ -98,3 +104,9 @@ jobs:
         if: ${{ github.event.inputs.deploy-worker == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      - name: Save GeoIP cache
+        if: always()
+        uses: actions/cache/save@v5
+        with:
+          path: packages/web/data/geoip
+          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
