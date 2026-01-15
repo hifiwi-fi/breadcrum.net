@@ -48,7 +48,7 @@
     "gunzip-maybe": "^1.4.2",
     "jsdom": "^27.0.1",
     "json-schema-to-ts": "^3.1.1",
-    "type-fest": "^5.2.0",
+    "type-fest": "^5.4.1",
     "undici": "catalog:",
     "user-agents": "^1.1.669"
   },
