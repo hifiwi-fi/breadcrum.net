@@ -71,10 +71,7 @@ export const Page = () => {
       ? confirmed
         ? html`
           <div>
-            ${query && query.get('update') && JSON.parse(query.get('update') || '{}')
-              ? 'Email address successfully updated!'
-              : 'Email address confirmed!'
-            }
+            ${query && query.get('update') && JSON.parse(query.get('update') || '{}') ? 'Email address successfully updated!' : 'Email address confirmed!'}
           </div>
         `
         : html`
@@ -93,9 +90,11 @@ export const Page = () => {
               }
           </div>
       `
-      : html`
-        <div>Please login to confirm your email address.</div>
-        <div>Redirecting to <a href="/login?redirect=${window ? encodeURIComponent(window.location.pathname + window.location.search) : '/email_confirm'}">login</a></div>
+    : html`
+        <div>
+          <div>Please login to confirm your email address.</div>
+          <div>Redirecting to <a href="/login?redirect=${window ? encodeURIComponent(window.location.pathname + window.location.search) : '/email_confirm'}">login</a></div>
+        </div>
         `
     }
   `
