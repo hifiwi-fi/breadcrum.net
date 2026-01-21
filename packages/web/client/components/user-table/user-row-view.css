@@ -101,12 +101,17 @@
 }
 
 .bc-user-badge-warning {
-  color: var(--bc-archives-color);
+  color: var(--bc-warning-color);
   background-color: color-mix(
     in srgb,
-    var(--bc-archives-color) 12%,
+    var(--bc-warning-color) 12%,
     transparent
   );
+}
+
+.bc-user-badge-danger {
+  color: var(--bc-danger-color);
+  background-color: color-mix(in srgb, var(--bc-danger-color) 12%, transparent);
 }
 
 .bc-user-grid {

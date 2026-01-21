@@ -74,7 +74,7 @@ export const UserRowView = ({
         <span class="${cn({
           'bc-user-badge': true,
           'bc-user-badge-true': u.email_confirmed,
-          'bc-user-badge-false': !u.email_confirmed,
+          'bc-user-badge-warning': !u.email_confirmed,
         })}">
           ${u.email_confirmed ? 'Email confirmed' : 'Email unconfirmed'}
         </span>
@@ -89,7 +89,7 @@ export const UserRowView = ({
           'bc-user-badge': true,
           'bc-user-badge-true': !u.disabled_email,
           'bc-user-badge-false': u.disabled_email,
-          'bc-user-badge-warning': u.disabled_email,
+          'bc-user-badge-danger': u.disabled_email,
         })}">
           ${u.disabled_email ? 'Email disabled' : 'Email ok'}
         </span>
@@ -97,7 +97,7 @@ export const UserRowView = ({
           'bc-user-badge': true,
           'bc-user-badge-true': !u.disabled,
           'bc-user-badge-false': u.disabled,
-          'bc-user-badge-warning': u.disabled,
+          'bc-user-badge-danger': u.disabled,
         })}">
           ${u.disabled ? 'Account disabled' : 'Account active'}
         </span>
