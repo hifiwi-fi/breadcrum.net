@@ -12,4 +12,4 @@ Connect with Breadcum on social media, feeds, irc and email:
 - 🐈 GitHub: [@hifiwi-fi](https://github.com/hifiwi-fi/breadcrum.net)
 - 🐘 Mastodon: [@breadcrum]({{ vars.mastodonUrl }})
 - 🌦️ BlueSky: [@breadcrum.net](https://bsky.app/profile/breadcrum.net)
-- 🐦 Twitter: [@breadcrum_](https://twitter.com/breadcrum_)
+- 🐦 Twitter: [@breadcrum_](https://x.com/breadcrum_)

@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 /* eslint-disable camelcase */
 
 /**
@@ -569,7 +568,7 @@ export const BookmarkEdit = ({
             <div class="bc-help-text">
               Version ${bookmarkletVersion}
               ${bookmarkletUpdateAvailable
-                ? html`<a onClick=${handleNewWindowLink} target="_blank" href="/docs/bookmarklets/">An updated bookmarklet is available</a>`
+                ? html`<a onClick=${handleNewWindowLink} target="_blank" href="/docs/bookmarks/bookmarklets/">An updated bookmarklet is available</a>`
               : null}
             </div>
             `

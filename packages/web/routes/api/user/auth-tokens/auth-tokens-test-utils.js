@@ -2,6 +2,10 @@ import { randomUUID } from 'node:crypto'
 import SQL from '@nearform/sql'
 
 /**
+ * @import { AuthTokenSource } from './schemas/auth-token-base.js'
+ */
+
+/**
  * Creates a test user and returns credentials plus cleanup function
  * @param {import('fastify').FastifyInstance} app
  * @param {import('node:test').TestContext} t
@@ -98,7 +102,7 @@ export async function createMultipleTokens (app, username, password, count) {
  * Creates tokens with specific last_seen dates
  * @param {import('fastify').FastifyInstance} app
  * @param {string} userId
- * @param {Array<{daysAgo: number, source?: 'web' | 'api' }>} tokenSpecs
+ * @param {Array<{daysAgo: number, source?: AuthTokenSource }>} tokenSpecs
  * @returns {Promise<Array<{jti: string, last_seen: Date}>>}
  */
 export async function createTokensWithDates (app, userId, tokenSpecs) {

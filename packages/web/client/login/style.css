@@ -2,6 +2,14 @@
   width: 100%;
 }
 
+.bc-login .bc-help-text {
+  display: block;
+  margin-top: 0.2em;
+  font-size: 0.8em;
+  font-weight: normal;
+  color: var(--accent-foreground);
+}
+
 .bc-login-password-reset-link {
   display: flex;
   justify-content: center;

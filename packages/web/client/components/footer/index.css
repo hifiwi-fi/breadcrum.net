@@ -24,6 +24,11 @@
   border-radius: 3px !important;
 }
 
+.bc-footer-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
 /* fairly arbitrary. Just make sure the content justification */
 @media screen and (max-width: 500px) {
   .bc-footer {

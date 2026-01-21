@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */
@@ -55,6 +54,7 @@ export const UsernameEdit = ({ user, onSave, onCancelEdit }) => {
       <div>
           <label class='block'>
             username:
+            <!-- Keep username rules in sync with /openapi and /docs/account/ -->
             <input class='block' pattern="^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$" minLength="1" maxLength="50" type="text" name="username" defaultValue="${user?.username}" autoCorrect="off" autoCapitalize="off" spellCheck="false"/>
           </label>
         </div>

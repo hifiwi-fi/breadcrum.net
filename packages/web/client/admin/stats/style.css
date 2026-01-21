@@ -1,0 +1,85 @@
+.bc-main {
+  max-width: unset;
+}
+
+.bc-admin-stats {
+  padding: 1rem;
+}
+
+.bc-admin-stats h1 {
+  margin-bottom: 1rem;
+}
+
+.bc-admin-stats-section {
+  margin-top: 2rem;
+}
+
+.bc-admin-stats-section h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.3em;
+}
+
+.bc-admin-stats-loading,
+.bc-admin-stats-error,
+.bc-admin-stats-empty {
+  padding: 0.5rem 0;
+}
+
+.bc-admin-stats-error {
+  color: #dc3545;
+}
+
+.bc-admin-stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.bc-admin-stats-card {
+  padding: 1rem;
+  background: var(--accent-background);
+  border-radius: 5px;
+  border: 1px solid var(--accent-midground);
+}
+
+.bc-admin-stats-label {
+  display: block;
+  font-size: 0.85em;
+  color: var(--accent-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.bc-admin-stats-value {
+  display: block;
+  font-size: 1.6em;
+  font-weight: 600;
+}
+
+.bc-admin-stats-table-wrapper {
+  overflow-x: auto;
+  background: var(--accent-background);
+  border-radius: 6px;
+  border: 1px solid var(--accent-midground);
+}
+
+.bc-admin-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bc-admin-stats-table th,
+.bc-admin-stats-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--accent-midground);
+}
+
+.bc-admin-stats-table th {
+  font-weight: 600;
+  color: var(--accent-foreground);
+}
+
+.bc-admin-stats-table tbody tr:last-child td {
+  border-bottom: none;
+}

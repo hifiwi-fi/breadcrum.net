@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /**
  * @import { FunctionComponent, ComponentChild, JSX } from 'preact'

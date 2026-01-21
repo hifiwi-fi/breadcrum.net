@@ -1,10 +1,9 @@
 /* account/style.css */
-@import './auth-tokens/auth-token-field.css';
+@import "./auth-tokens/auth-token-field.css";
+@import "./passkeys/passkeys-field.css";
 
 .bc-account-password-edit-submit-line .button-cluster,
-.password-view,
 .bc-account-username-edit .button-cluster,
-.username-view,
 .bc-account-email-edit-submit-line .button-cluster,
 .reset-buttons-state,
 .button-gap,
@@ -13,6 +12,20 @@
   gap: 0.4em;
 }
 
+.password-view,
+.username-view {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.bc-account-username-edit input.block,
+.bc-account-password-edit input.block,
+.bc-account-email-edit input.block {
+  width: 100%;
+  box-sizing: border-box;
+}
 
 .email-view-buttons {
   display: flex;

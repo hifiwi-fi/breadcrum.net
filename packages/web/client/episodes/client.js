@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeEpisodeReadClient } from '../../routes/api/episodes/schemas/schema-episode-read.js' */

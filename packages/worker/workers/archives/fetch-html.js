@@ -13,6 +13,8 @@ const GOOGLE_BOT_UA = 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compat
 const uaHacks = {
   'twitter.com': GOOGLE_BOT_UA,
   'mobile.twitter.com': GOOGLE_BOT_UA,
+  'x.com': GOOGLE_BOT_UA,
+  'mobile.x.com': GOOGLE_BOT_UA,
 }
 
 /**

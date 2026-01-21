@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 
@@ -62,6 +61,7 @@ export const PasswordEdit = ({ onSave, onCancelEdit }) => {
         <div>
           <label class='block'>
             password:
+            <!-- Keep password rules in sync with /openapi and /docs/account/ -->
             <input class="block" type="password" minLength="8" maxLength="255" name="password" />
           </label>
           <label class='block'>

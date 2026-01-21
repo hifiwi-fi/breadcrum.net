@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */

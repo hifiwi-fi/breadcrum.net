@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /**
  * @import { FunctionComponent } from 'preact'
@@ -14,6 +13,7 @@ import { NewsletterField } from './newsletter/newsletter-field.js'
 import { EmailField } from './email/email-field.js'
 import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
+import { PasskeysField } from './passkeys/passkeys-field.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -24,8 +24,9 @@ export const Page = () => {
       <dl>
         <${DisabledField} user=${user} />
         <${UsernameField} user=${user} reload=${reloadUser} />
-        <${PasswordField} />
         <${EmailField} user=${user} reload=${reloadUser} />
+        <${PasswordField} />
+        <${PasskeysField} />
         <${NewsletterField} user=${user} reload=${reloadUser} />
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>

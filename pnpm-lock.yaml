@@ -264,6 +264,9 @@ importers:
       '@opentelemetry/sdk-node':
         specifier: 'catalog:'
         version: 0.209.0(@opentelemetry/api@1.9.0)
+      '@passwordless-id/webauthn':
+        specifier: ^2.3.1
+        version: 2.3.1
       '@preact/signals':
         specifier: ^2.3.2
         version: 2.5.1(preact@10.28.2)
@@ -1536,6 +1539,9 @@ packages:
     resolution: {integrity: sha512-M7z0xjYQq1HdJk2DxTSLMvRMyBSI4wn4FXGcVQBsbAihgXevAReqwMdb593nmCK/OiFwSNcOaGIzUvzyzQ+95w==}
     cpu: [x64]
     os: [win32]
+
+  '@passwordless-id/webauthn@2.3.1':
+    resolution: {integrity: sha512-n75LOVz9J24FhEiLHiAfqC2gxh2wXJ4G+nvMxRy6fTpmhg6lK+tKwp/GZaXZjRXgUtPWHRVMtvCHKQQCfojXmw==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -7028,6 +7034,8 @@ snapshots:
 
   '@oxc-resolver/binding-win32-x64-msvc@11.16.2':
     optional: true
+
+  '@passwordless-id/webauthn@2.3.1': {}
 
   '@pinojs/redact@0.4.0': {}
 

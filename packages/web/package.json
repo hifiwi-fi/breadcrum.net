@@ -34,6 +34,7 @@
     "@opentelemetry/instrumentation-http": "catalog:",
     "@opentelemetry/instrumentation-runtime-node": "catalog:",
     "@opentelemetry/sdk-node": "catalog:",
+    "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",

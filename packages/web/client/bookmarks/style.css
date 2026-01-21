@@ -1,6 +1,14 @@
-@import '../components/bookmark/bookmark-list.css';
-@import '../components/search/index.css';
-@import '../components/pagination-buttons/index.css';
+@import "../components/bookmark/bookmark-list.css";
+@import "../components/bookmark/bookmark-quick-add.css";
+@import "../components/search/index.css";
+@import "../components/pagination-buttons/index.css";
+
+.bc-bookmarks-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em;
+}
 
 .bc-tag-filter-remove {
   color: var(--bc-tags-color);

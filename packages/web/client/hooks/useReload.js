@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 import { useState, useCallback } from 'preact/hooks'
 

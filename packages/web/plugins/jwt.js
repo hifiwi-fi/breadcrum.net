@@ -4,6 +4,7 @@ import SQL from '@nearform/sql'
 /**
  * @import { FastifyRequest } from 'fastify'
  * @import { QueryResult } from 'pg'
+ * @import { AuthTokenSource as AuthTokenSourceType } from '../routes/api/user/auth-tokens/schemas/auth-token-base.js'
  */
 
 /**
@@ -20,8 +21,8 @@ import SQL from '@nearform/sql'
  */
 
 /**
-  * @typedef {'web' | 'api'} AuthTokenSource
-  */
+ * @typedef {AuthTokenSourceType} AuthTokenSource
+ */
 
 /**
  * This plugins adds jwt token support

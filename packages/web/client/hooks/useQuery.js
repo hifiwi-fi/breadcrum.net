@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 import { useCallback } from 'preact/hooks'
 import { signal } from '@preact/signals'

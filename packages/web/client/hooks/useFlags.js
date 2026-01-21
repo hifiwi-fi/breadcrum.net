@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 import { useEffect, useState } from 'preact/hooks'
 import { useLSP } from './useLSP.js'

@@ -3,6 +3,7 @@
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  * @import { QueryResult } from 'pg'
  * @import { SqlStatement } from '@nearform/sql'
+ * @import { AuthTokenSource } from './schemas/auth-token-base.js'
  */
 
 import SQL from '@nearform/sql'
@@ -112,7 +113,7 @@ export function parseUserAgent (authToken) {
 /**
  * @typedef {object} AuthTokenQueryRead
  * @property {string} jti
- * @property {"web" | "api"} source
+ * @property {AuthTokenSource} source
  * @property {Date} created_at
  * @property {Date} updated_at
  * @property {Date} last_seen

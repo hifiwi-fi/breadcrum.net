@@ -92,6 +92,7 @@ async function geoipPlugin (fastify) {
     reader = await Reader.open(defaultGeoipPath, {
       cache: { max: 10000 },
       watchForUpdates: true,
+      watchForUpdatesNonPersistent: true,
     })
   } catch (err) {
     fastify.log.warn({ err, path: defaultGeoipPath }, 'GeoIP database failed to load; skipping GeoIP lookups')

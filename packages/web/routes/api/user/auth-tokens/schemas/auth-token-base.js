@@ -2,6 +2,12 @@
  * @import { JSONSchema } from 'json-schema-to-ts'
  */
 
+export const authTokenSourceValues = /** @type {const} */ (['web', 'api', 'passkey'])
+
+/**
+ * @typedef {typeof authTokenSourceValues[number]} AuthTokenSource
+ */
+
 export const geoipRegionProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   nullable: true,
@@ -56,7 +62,7 @@ export const authTokenProps = /** @type {const} @satisfies {JSONSchema} */ ({
     },
     source: {
       type: 'string',
-      enum: ['web', 'api']
+      enum: authTokenSourceValues
     },
     created_at: {
       type: 'string',

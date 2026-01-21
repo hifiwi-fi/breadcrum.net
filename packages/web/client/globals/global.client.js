@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 // @ts-expect-error - No type definitions available for mine.css
 import { toggleTheme } from 'mine.css'

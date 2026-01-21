@@ -13,6 +13,8 @@ const ua = new UserAgent()
 const uaHacks = {
   'twitter.com': GOOGLE_BOT_UA,
   'mobile.twitter.com': GOOGLE_BOT_UA,
+  'x.com': GOOGLE_BOT_UA,
+  'mobile.x.com': GOOGLE_BOT_UA,
 }
 
 /**

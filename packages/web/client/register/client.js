@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeTokenWithUserClient } from '../../routes/api/user/schemas/user-base.js' */
@@ -35,6 +34,50 @@ export const Page = () => {
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileError, setTurnstileError] = useState('')
   const [turnstileSitekey, setTurnstileSitekey] = useState('')
+  const clearValidationMessage = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    ev.currentTarget.setCustomValidity('')
+  }
+
+  const handleEmailInvalid = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    const input = ev.currentTarget
+    if (input.validity.valueMissing) {
+      input.setCustomValidity('Email is required.')
+    } else if (input.validity.typeMismatch) {
+      input.setCustomValidity('Enter a valid email address.')
+    } else if (input.validity.tooLong) {
+      input.setCustomValidity('Email must be 200 characters or fewer.')
+    } else {
+      input.setCustomValidity('Enter a valid email address.')
+    }
+  }
+
+  const handleUsernameInvalid = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    const input = ev.currentTarget
+    if (input.validity.valueMissing) {
+      input.setCustomValidity('Username is required.')
+    } else if (input.validity.patternMismatch) {
+      input.setCustomValidity('Use letters and numbers with ., _, or - between characters.')
+    } else if (input.validity.tooLong) {
+      input.setCustomValidity('Username must be 50 characters or fewer.')
+    } else if (input.validity.tooShort) {
+      input.setCustomValidity('Username must be at least 1 character.')
+    } else {
+      input.setCustomValidity('Enter a valid username.')
+    }
+  }
+
+  const handlePasswordInvalid = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
+    const input = ev.currentTarget
+    if (input.validity.valueMissing) {
+      input.setCustomValidity('Password is required.')
+    } else if (input.validity.tooShort) {
+      input.setCustomValidity('Password must be at least 8 characters.')
+    } else if (input.validity.tooLong) {
+      input.setCustomValidity('Password must be 255 characters or fewer.')
+    } else {
+      input.setCustomValidity('Enter a valid password.')
+    }
+  }
 
   useEffect(() => {
     if ((user && !loading)) {
@@ -215,7 +258,11 @@ export const Page = () => {
                 type="email"
                 name="email"
                 autocomplete="email"
+                onInput=${clearValidationMessage}
+                onInvalid=${handleEmailInvalid}
+                required
               />
+              <span class="bc-help-text">Use a valid email address (max 200 characters).</span>
             </label>
           </div>
           <div>
@@ -232,7 +279,11 @@ export const Page = () => {
                 autocapitalize="off"
                 spellcheck="false"
                 autocomplete="username"
+                onInput=${clearValidationMessage}
+                onInvalid=${handleUsernameInvalid}
+                required
               />
+              <span class="bc-help-text">1-50 characters. Letters and numbers; you may use ., _, or - between characters.</span>
             </label>
           </div>
           <div>
@@ -245,7 +296,11 @@ export const Page = () => {
                 minlength="8"
                 maxlength="255"
                 autocomplete="new-password"
+                onInput=${clearValidationMessage}
+                onInvalid=${handlePasswordInvalid}
+                required
               />
+              <span class="bc-help-text">At least 8 characters (max 255).</span>
             </label>
           </div>
           <div>

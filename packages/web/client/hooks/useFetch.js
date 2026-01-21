@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { Ref } from 'preact' */
 import { useRef, useReducer, useCallback, useEffect } from 'preact/hooks'

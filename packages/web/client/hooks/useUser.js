@@ -1,7 +1,5 @@
 /// <reference lib="dom" />
 
-/* eslint-env browser */
-
 /**
  * @import { TypeUserReadClient } from '../../routes/api/user/schemas/schema-user-read.js'
  */

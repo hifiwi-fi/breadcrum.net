@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 import { useEffect, useRef } from 'preact/hooks'
 import { useWindow } from './useWindow.js'

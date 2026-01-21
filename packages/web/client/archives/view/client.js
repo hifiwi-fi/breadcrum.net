@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js' */

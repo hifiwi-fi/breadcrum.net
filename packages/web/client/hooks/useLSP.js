@@ -3,7 +3,6 @@
  * @import { StateType } from './state.js'
  */
 
-/* eslint-env browser */
 import { useEffect } from 'preact/hooks'
 import { state } from './state.js'
 import { useReload } from './useReload.js'

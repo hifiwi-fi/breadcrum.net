@@ -1,0 +1,87 @@
+/* account/passkeys/passkeys-field.css */
+
+.bc-passkey-manage {
+  margin-bottom: 0.5em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-passkey-register-form {
+  margin-bottom: 1rem;
+}
+
+.bc-passkey-register-form input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bc-passkey-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.bc-passkey-item {
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-passkey-name {
+  font-weight: 500;
+  margin-bottom: 0.15rem;
+}
+
+.bc-passkey-details {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--accent-foreground);
+  margin-bottom: 0.25rem;
+}
+
+.bc-passkey-detail {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.bc-passkey-edit-submit-line {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bc-passkey-actions {
+  margin-top: 0;
+}
+
+.bc-passkey-item input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bc-passkey-edit-submit-line .button-cluster {
+  display: inline-flex;
+  gap: 0.4em;
+}
+
+.bc-empty-state,
+.bc-loading,
+.bc-info-message,
+.bc-error-message {
+  margin-top: 0.5rem;
+  color: var(--accent-foreground);
+}
+
+@media (max-width: 640px) {
+  .bc-passkey-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .bc-passkey-edit-submit-line {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

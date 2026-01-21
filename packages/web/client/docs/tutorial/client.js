@@ -1,11 +1,10 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
-import { bookmarklet } from '../bookmarklets/bookmarklet.js'
+import { bookmarklet } from '../bookmarks/bookmarklets/bookmarklet.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -14,7 +13,10 @@ export const Page = () => {
       Tutorial
     </h1>
 
-    <p>Welcome to 🥖 Breadcrum! Many things are still WIP but the following quick tutorial should get you up to speed.</p>
+    <p>
+      Welcome to 🥖 Breadcrum! Many things are still WIP but the following quick tutorial should get you up to speed.
+      For more detail, see the <a href="/docs/">docs index</a>.
+    </p>
 
     <h2>Step 1: Get the Bookmarklet</h2>
 
@@ -22,6 +24,9 @@ export const Page = () => {
       Everything you do on Breadcrum starts by adding a 🔖 Bookmark to your account.
       Creating bookmarks should be quick and painless.
       Until native app share sheets and WebExtensions are available for Breadcrum, the Bookmarklet is the best way to do this.
+      Learn more in <a href="/docs/bookmarks/bookmarklets/">Bookmarklets</a>.
+      iOS users can use <a href="/docs/bookmarks/apple-shortcuts/">Apple Shortcuts</a>,
+      and advanced users can prefill bookmarks via the <a href="/docs/bookmarks/bookmark-add-page-api/">Bookmark Add Page API</a>.
     </p>
 
     <p>
@@ -59,11 +64,19 @@ export const Page = () => {
       <figcaption>This window lets you create a new bookmark. You can add tags, a note, related archival links and even create podcast episodes from media found in the page.</figcaption>
     </figure>
 
-    <p>Fill in the details and click <code>Submit</code>.</p>
+    <p>
+      Fill in the details and click <code>Submit</code>.
+      See <a href="/docs/bookmarks/">Bookmarks</a> for lifecycle details, flags, and archive/episode options.
+    </p>
 
     <h2>Step 2: View your 🔖 Bookmarks</h2>
 
-    <p>Visit <a href="/bookmarks/">🔖 Bookmarks</a> to view your bookmarks.</p>
+    <p>
+      Visit <a href="/bookmarks/">🔖 Bookmarks</a> to view your bookmarks.
+      You can also explore <a href="/docs/bookmarks/starred/">Starred</a>,
+      <span> </span><a href="/docs/bookmarks/toread/">Read it later</a>, and
+      <span> </span><a href="/docs/bookmarks/private/">Private (Sensitive)</a>.
+    </p>
 
     <figure class="borderless">
       <picture>
@@ -75,7 +88,11 @@ export const Page = () => {
 
     <h2>Step 3: Subscribe to your 📡 Feed</h2>
 
-    <p>Visit <a href="/feeds/">📡 Feeds</a> to get your private Breadcrum podcast feed URL.</p>
+    <p>
+      Visit <a href="/feeds/">📡 Feeds</a> to get your private Breadcrum podcast feed URL.
+      Episodes are built from bookmarks, so it helps to skim <a href="/docs/episodes/">Episodes</a> and
+      <a href="/docs/archives/">Archives</a>.
+    </p>
 
     <figure class="borderless">
       <picture>
@@ -101,7 +118,10 @@ export const Page = () => {
 
     <h2>Step 4: Play around!</h2>
 
-    <p>Breadcrum has many features that will be documented soon! Follow <a href="https://twitter.com/breadcrum_">@_breadcrum</a> for updates as they are available.</p>
+    <p>
+      Breadcrum has many features that will be documented soon! Follow <a href="https://x.com/breadcrum_">@breadcrum_</a> for updates as they are available.
+      Manage login and security from <a href="/docs/account/">Account settings</a>.
+    </p>
   `
 }
 

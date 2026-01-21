@@ -1,2 +1,14 @@
 @import '../../components/breadcrumb/index.css';
 @import '../../components/article-header/index.css';
+
+.bc-docs-edit-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  margin: 0.5em 0;
+}
+
+.bc-docs-edit-link {
+  font-size: 0.8em;
+}

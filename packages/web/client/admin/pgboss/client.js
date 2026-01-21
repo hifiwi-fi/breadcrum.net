@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeDashboardDataRead } from '../../../routes/api/admin/pgboss/schemas/schema-dashboard-data.js' */

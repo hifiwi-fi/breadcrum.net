@@ -1,0 +1,14 @@
+@import "../../components/bookmark/bookmark-resolve.css";
+
+.bc-resolve-example {
+  display: inline-block;
+  margin: 0.4em 0 0.8em;
+}
+
+.bc-resolve-example .bc-bookmark-resolve-status {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  column-gap: 0.3em;
+  grid-template-columns: auto auto 1.2em;
+}

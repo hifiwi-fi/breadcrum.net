@@ -1,8 +1,7 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /**
- * @import { FunctionComponent } from 'preact'
+ * @import { FunctionComponent, ComponentChild } from 'preact'
  */
 
 import { html } from 'htm/preact'
@@ -16,6 +15,7 @@ import { html } from 'htm/preact'
  * @property {string | null | undefined} [authorUrl]
  * @property {string} publishDate
  * @property {string} updatedDate
+ * @property {ComponentChild} [extra]
  */
 
 /**
@@ -28,7 +28,8 @@ export const ArticleHeader = ({
   authorName,
   authorUrl,
   publishDate,
-  updatedDate
+  updatedDate,
+  extra
 }) => {
   return html`
       <header class="bc-article-header">
@@ -66,6 +67,7 @@ export const ArticleHeader = ({
             : null
           }
         </div>
+        ${extra ? html`${extra}` : null}
       </header>
   `
 }

@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */
@@ -61,6 +60,7 @@ export const EmailEdit = ({ user, onSave, onCancelEdit }) => {
         <div>
           <label class='block'>
             email:
+            <!-- Keep email rules in sync with /openapi and /docs/account/ -->
             <input class='block' minLength="1" maxLength="200" type="email" name="email" defaultValue="${user?.email}"/>
           </label>
         </div>

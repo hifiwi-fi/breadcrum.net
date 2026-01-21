@@ -128,5 +128,17 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: '1x0000000000000000000000000000000AA',
     },
+    PASSKEY_MAX_PER_USER: {
+      type: 'integer',
+      default: 10,
+      minimum: 1,
+      maximum: 100,
+      description: 'Maximum number of passkeys allowed per user',
+    },
+    PASSKEY_CHALLENGE_TIMEOUT: {
+      type: 'integer',
+      default: 300000,
+      description: 'Passkey challenge timeout in milliseconds (default: 5 minutes)',
+    },
   },
 })

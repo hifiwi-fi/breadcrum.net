@@ -7,6 +7,7 @@ const emailPattern = /** @type {const} */("^[a-zA-Z0-9.!#$%&''*+/=?^_`{|}~-]+@[a
 export const userEditableUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   properties: {
+    // Keep validation rules in sync with /openapi and /docs/account/
     username: {
       type: 'string',
       minLength: 1,

@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 
@@ -15,6 +14,7 @@ import { Search } from '../components/search/index.js'
 import { useBookmarks } from '../hooks/useBookmarks.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
+import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -45,6 +45,12 @@ export const Page = () => {
     }
   }, [window])
 
+  const handleQuickAdd = useCallback((/** @type {string} */ url) => {
+    if (window) {
+      window.location.replace(`/bookmarks/add?url=${encodeURIComponent(url)}`)
+    }
+  }, [window])
+
   const tagFilterRemovedParams = new URLSearchParams(query || '')
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
@@ -66,12 +72,11 @@ export const Page = () => {
       onSearch=${handleSearch}
       autofocus=${true}
     />
-    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
-
-    <div>
-      <span>🔖 <a href="./add">add +</a></span>
+    <div class="bc-bookmarks-actions">
+      ${tc(BookmarkQuickAdd, { onSubmitUrl: handleQuickAdd })}
       ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onClick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
     </div>
+    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
     ${Array.isArray(bookmarks)

@@ -61,7 +61,10 @@ export const Footer = ({
       <img class="rounded-icon" height="16" width="16" src="/static/jsonfeed.svg" alt="JSON feed icon" />
     </a>
     <a class="flex-center preserve-icon" href="${siteTwitterUrl}" rel="me" aria-label="Follow us on X" title="Follow us on X">
-      <img class="bc-footer-rounded" height="16" width="16" src="/static/twtr.svg" alt="X icon" />
+      <picture class="bc-footer-icon">
+        <source srcset="/static/x-logo-white.png" media="(prefers-color-scheme: dark)" />
+        <img class="bc-footer-rounded" height="16" width="16" src="/static/x-logo-black.png" alt="X icon" />
+      </picture>
     </a>
     <a class="flex-center preserve-icon" href="${discordUrl}" aria-label="Join us on Discord" title="Join us on Discord">
       <img height="16" width="16" src="/static/discord.svg" alt="Discord icon" />
