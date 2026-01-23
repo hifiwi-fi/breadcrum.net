@@ -4,6 +4,8 @@
  * @import { ResolveEpisodeData } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
  */
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { finalizeEpisode, finalizeEpisodeError } from './finaize-episode.js'
 import { upcomingCheck } from './handle-upcoming.js'
 
@@ -32,6 +34,8 @@ export function makeEpisodePgBossP ({ fastify }) {
       } = job.data
 
       const pg = fastify.pg
+      const isYouTube = isYouTubeUrl(new URL(url))
+      const retryOptions = isYouTube ? youtubeRetryOptions : undefined
 
       const jobStartTime = performance.now()
 
@@ -60,7 +64,8 @@ export function makeEpisodePgBossP ({ fastify }) {
           await fastify.pgboss.queues.resolveEpisodeQ.send({
             data: job.data,
             options: {
-              startAfter: releaseTimestampDate
+              startAfter: releaseTimestampDate,
+              ...(retryOptions ?? {})
             }
           })
 

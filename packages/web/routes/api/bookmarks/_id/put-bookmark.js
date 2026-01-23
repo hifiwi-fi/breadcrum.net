@@ -1,5 +1,7 @@
 import SQL from '@nearform/sql'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
+import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
 import { getBookmark } from '../get-bookmarks-query.js'
 
@@ -183,6 +185,9 @@ export async function putBookmark (fastify, _opts) {
           url: bookmark.createEpisode.url ?? updatedBookmark.url,
         })
 
+        const isYouTube = isYouTubeUrl(new URL(episodeURL))
+        const retryOptions = isYouTube ? youtubeRetryOptions : undefined
+
         await client.query('commit')
         fastify.otel.episodeCounter.add(1)
 
@@ -193,7 +198,8 @@ export async function putBookmark (fastify, _opts) {
             episodeId,
             url: episodeURL,
             medium: episodeMedium,
-          }
+          },
+          options: retryOptions
         })
       }
 

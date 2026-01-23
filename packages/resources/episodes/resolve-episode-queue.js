@@ -23,6 +23,17 @@ export const resolveEpisodeQName = 'resolveEpisode'
 export const resolveEpisodeJobName = 'resolve-episode'
 
 /**
+ * Retry settings for YouTube jobs with exponential backoff up to 1 hour.
+ * @type {SendOptions}
+ */
+export const youtubeRetryOptions = {
+  retryLimit: 12, // 13 attempts total
+  retryDelay: 5,
+  retryBackoff: true,
+  retryDelayMax: 60 * 60,
+}
+
+/**
  * Request shape for sending a resolve episode job
  *
  * @typedef {{
@@ -68,7 +79,7 @@ export async function createResolveEpisodeQ ({
   queueOptions = defaultQueueOptions
 }) {
   // Episode-specific queue options
-  // YouTube URLs can have transient failures, so we retry more aggressively
+  // Base retries for all episodes; YouTube jobs override per-send.
   const episodeQueueOptions = {
     ...defaultQueueOptions,
     retryLimit: 4, // Total of 5 attempts (1 initial + 4 retries)

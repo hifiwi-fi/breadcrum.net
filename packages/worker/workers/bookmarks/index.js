@@ -15,6 +15,7 @@ import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
 import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 
 import { fetchHTML } from '../archives/fetch-html.js'
 import { getSiteMetadata } from '../archives/get-site-metadata.js'
@@ -63,10 +64,13 @@ export function makeBookmarkPgBossP ({ fastify }) {
 
       /** @type { YTDLPMetadata | undefined } */
       let media
+      let retryOptions
+      let isYouTube = false
       if (resolveEpisode) {
         log.info({ url }, 'resolving episode')
         const parsedUrl = new URL(url)
-        const isYouTube = isYouTubeUrl(parsedUrl)
+        isYouTube = isYouTubeUrl(parsedUrl)
+        retryOptions = isYouTube ? youtubeRetryOptions : undefined
 
         try {
           // getYTDLPMetadata handles retries internally (3 for YouTube, 0 for others)
@@ -114,7 +118,8 @@ export function makeBookmarkPgBossP ({ fastify }) {
                   medium: 'video'
                 },
                 options: {
-                  startAfter: delayDate
+                  startAfter: delayDate,
+                  ...(retryOptions ?? {})
                 }
               })
 
@@ -246,7 +251,8 @@ export function makeBookmarkPgBossP ({ fastify }) {
                   medium: 'video'
                 },
                 options: {
-                  startAfter: releaseTimestampDate
+                  startAfter: releaseTimestampDate,
+                  ...(retryOptions ?? {})
                 }
               })
 
