@@ -155,6 +155,9 @@ export async function registrationVerify (fastify, _opts) {
       const result = await fastify.pg.query(insertQuery)
 
       const passkey = result.rows[0]
+      if (!passkey) {
+        return reply.internalServerError('Passkey creation failed')
+      }
 
       return reply.code(201).send(passkey)
     }

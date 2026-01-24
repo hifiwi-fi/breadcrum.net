@@ -83,7 +83,12 @@ export async function updatePasskey (fastify, _opts) {
         return reply.notFound('Passkey not found')
       }
 
-      return reply.code(200).send(result.rows[0])
+      const passkey = result.rows[0]
+      if (!passkey) {
+        return reply.notFound('Passkey not found')
+      }
+
+      return reply.code(200).send(passkey)
     }
   )
 }

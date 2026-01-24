@@ -1,18 +1,13 @@
 {
-  "extends": "@voxpelli/tsconfig/node20.json",
+  "extends": "@voxpelli/tsconfig/node24.json",
   "compilerOptions": {
     "noEmit": true,
     "skipLibCheck": true,
     "erasableSyntaxOnly": true,
     "allowImportingTsExtensions": true,
     "rewriteRelativeImportExtensions": true,
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
   },
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "coverage",
-    "node_modules"
-  ]
+  "include": ["**/*"],
+  "exclude": ["coverage", "node_modules"],
 }

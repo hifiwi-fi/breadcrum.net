@@ -53,7 +53,7 @@ export async function deletePasskey (fastify, _opts) {
         return reply.notFound('Passkey not found')
       }
 
-      return reply.code(204).send()
+      return reply.code(204).send(null)
     }
   )
 }

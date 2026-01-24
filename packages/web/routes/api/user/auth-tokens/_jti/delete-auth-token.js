@@ -58,7 +58,7 @@ export async function deleteAuthToken (fastify, _opts) {
         return reply.notFound('Auth token not found')
       }
 
-      return reply.code(204).send()
+      return reply.code(204).send(null)
     }
   )
 }

@@ -4,8 +4,10 @@
 ## These vars get baked into the image/web bundle at build time.
 ## Do not pass secrets here.
 ARG ENV=production
+ARG HOST=localhost:3000
 ARG NODE_ENV=production
 ARG NODE_VERSION=24
+ARG TRANSPORT=https
 
 FROM alpine:3.23 AS base
 
@@ -22,8 +24,10 @@ WORKDIR /usr/src/app
 FROM base AS build
 
 ARG ENV=production
+ARG HOST=localhost:3000
 ARG NODE_ENV=production
 ARG NODE_VERSION
+ARG TRANSPORT=https
 
 # RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
 # RUN apk add --no-cache pypy@testing ffmpeg brotli mutagen attr yt-dlp
