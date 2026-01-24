@@ -55,12 +55,19 @@ export const PaginationButtons = ({
 
   return html`
     <div class="pagination-buttons">
-      ${hasBefore
-        ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>`
-        : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">earlier</span>`
-      }
+      <div class="pagination-buttons-nav">
+        ${hasBefore
+          ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>`
+          : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">earlier</span>`
+        }
+        ${hasAfter
+          ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + afterParams}>later</a>`
+          : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">later</span>`
+        }
+      </div>
       ${showDatePicker
 ? html`
+      <div class="pagination-buttons-date">
         <input
           class="pagination-date-picker"
           type="date"
@@ -69,12 +76,9 @@ export const PaginationButtons = ({
           value=${dateValue ?? ''}
           onChange=${handleDateChange}
         />
+      </div>
       `
 : null}
-      ${hasAfter
-        ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + afterParams}>later</a>`
-        : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">later</span>`
-      }
     </div>
   `
 }

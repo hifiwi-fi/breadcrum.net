@@ -1,4 +1,12 @@
 .pagination-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6em;
+  width: 100%;
+}
+
+.pagination-buttons-nav {
   display: inline-flex;
   gap: 0.3em;
   align-items: center;
@@ -7,6 +15,12 @@
 .pagination-button {
   display: inline-flex;
   align-items: center;
+}
+
+.pagination-buttons-date {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .pagination-button-disabled {
