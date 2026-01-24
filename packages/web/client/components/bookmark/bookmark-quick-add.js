@@ -65,6 +65,9 @@ export const BookmarkQuickAdd = ({ onSubmitUrl }) => {
             <button type="submit">Add</button>
             <button type="button" onClick=${handleCancel}>Cancel</button>
           </form>
+          <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
+            Adding bookmarks is easier with the bookmarklet!
+          </a>
         `
         : html`
           <button type="button" onClick=${handleOpen}>🔖 add +</button>
