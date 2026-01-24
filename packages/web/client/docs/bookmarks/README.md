@@ -36,7 +36,7 @@ The bookmarklet always sends client-extracted metadata (title, summary, tags) an
    - Add public archive URLs.
    - Check "create new archive" to capture a readability snapshot.
    - Check "create new episode" and choose a medium to turn media into a podcast episode.
-4. Submit to save. Bookmarklet saves close the popup automatically.
+4. Submit to save. On desktop, <kbd>⌘</kbd>+<kbd>↵</kbd> submits. Bookmarklet saves close the popup automatically.
 
 ## Edit a bookmark
 

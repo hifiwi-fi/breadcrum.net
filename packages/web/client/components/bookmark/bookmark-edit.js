@@ -19,7 +19,7 @@ import { useReload } from '../../hooks/useReload.js'
 
 /**
  * @typedef {object} BookmarkEditProps
- * @property {TypeBookmarkReadClient} [bookmark]
+ * @property {Partial<TypeBookmarkReadClient> | null} [bookmark]
  * @property {boolean} [bookmarkletUpdateAvailable]
  * @property {string} [bookmarkletVersion]
  * @property {(formState: any) => Promise<void>} [onSave]
@@ -551,6 +551,9 @@ export const BookmarkEdit = ({
               : null}
           </div>
           <div class="button-spacing">
+            <span class="bc-help-text bc-submit-help">
+              <kbd>⌘</kbd><span aria-hidden="true">+</span><kbd>↵</kbd> submits bookmark
+            </span>
             ${onDeleteBookmark
               ? deleteConfirm
                 ? html`
