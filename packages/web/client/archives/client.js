@@ -1,4 +1,5 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeArchiveReadClient } from '../../routes/api/archives/schemas/schema-archive-read.js' */
@@ -120,11 +121,50 @@ export const Page = () => {
     }
   }, [window, pushState])
 
+  const onDateNav = useCallback((/** @type {string} */ url) => {
+    if (pushState && window) {
+      const resolvedUrl = new URL(url, window.location.href).toString()
+      pushState(resolvedUrl)
+      window.scrollTo({ top: 0 })
+    }
+  }, [window, pushState])
+
   const handleSearch = useCallback((/** @type {string} */ query) => {
     if (window) {
       window.location.replace(`/search/archives/?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const dateParams = new URLSearchParams(query || '')
+  const formatDateValue = (/** @type {Date | null} */ date) => {
+    if (!date || Number.isNaN(date.valueOf())) return ''
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const cursorDate = (() => {
+    const beforeCursor = dateParams.get('before')
+    const afterCursor = dateParams.get('after')
+    const cursor = beforeCursor ?? afterCursor
+    if (!cursor) return null
+    const cursorValue = Number(cursor)
+    if (Number.isNaN(cursorValue)) return null
+    const adjusted = beforeCursor ? cursorValue - 1 : cursorValue
+    const date = new Date(adjusted)
+    return Number.isNaN(date.valueOf()) ? null : date
+  })()
+
+  const hasArchives = Array.isArray(archives) && archives.length > 0
+  const topArchiveCreatedAt = hasArchives ? archives[0]?.created_at : null
+  const bottomArchiveCreatedAt = hasArchives
+    ? archives[archives.length - 1]?.created_at
+    : null
+  const topArchiveDate = topArchiveCreatedAt ? new Date(topArchiveCreatedAt) : null
+  const bottomArchiveDate = bottomArchiveCreatedAt ? new Date(bottomArchiveCreatedAt) : null
+  const topDateValue = formatDateValue(topArchiveDate) || formatDateValue(cursorDate)
+  const bottomDateValue = formatDateValue(bottomArchiveDate) || formatDateValue(cursorDate)
 
   const hasPending = Array.isArray(archives) && archives.some(archive => (
     archive?.ready === false && !archive?.error
@@ -155,7 +195,7 @@ export const Page = () => {
       onSearch=${handleSearch}
       autofocus=${true}
     />
-    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
+    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
     ${archivesError ? html`<div>${archivesError.message}</div>` : null}
     ${Array.isArray(archives)
@@ -169,7 +209,7 @@ export const Page = () => {
             />
           `)
         : null}
-    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
+    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

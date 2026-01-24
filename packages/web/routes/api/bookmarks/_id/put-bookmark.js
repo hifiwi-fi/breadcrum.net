@@ -191,16 +191,19 @@ export async function putBookmark (fastify, _opts) {
         await client.query('commit')
         fastify.otel.episodeCounter.add(1)
 
-        await fastify.pgboss.queues.resolveEpisodeQ.send({
-          data: {
-            userId,
-            bookmarkTitle: updatedBookmark.title,
-            episodeId,
-            url: episodeURL,
-            medium: episodeMedium,
-          },
-          options: retryOptions
-        })
+        const resolveEpisodeData = {
+          userId,
+          bookmarkTitle: updatedBookmark.title,
+          episodeId,
+          url: episodeURL,
+          medium: episodeMedium,
+        }
+
+        const resolveEpisodePayload = retryOptions
+          ? { data: resolveEpisodeData, options: retryOptions }
+          : { data: resolveEpisodeData }
+
+        await fastify.pgboss.queues.resolveEpisodeQ.send(resolveEpisodePayload)
       }
 
       if (bookmark.createArchive) {

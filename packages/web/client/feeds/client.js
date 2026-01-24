@@ -1,4 +1,5 @@
 /// <reference lib="dom" />
+/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 /** @import { TypeEpisodeReadClient } from '../../routes/api/episodes/schemas/schema-episode-read.js' */
@@ -156,11 +157,50 @@ export const Page = () => {
     }
   }, [window, pushState])
 
+  const onDateNav = useCallback((/** @type {string} */ url) => {
+    if (pushState && window) {
+      const resolvedUrl = new URL(url, window.location.href).toString()
+      pushState(resolvedUrl)
+      window.scrollTo({ top: 0 })
+    }
+  }, [window, pushState])
+
   const handleSearch = useCallback((/** @type {string} */query) => {
     if (window) {
       window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
     }
   }, [window])
+
+  const dateParams = new URLSearchParams(query || '')
+  const formatDateValue = (/** @type {Date | null} */ date) => {
+    if (!date || Number.isNaN(date.valueOf())) return ''
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const cursorDate = (() => {
+    const beforeCursor = dateParams.get('before')
+    const afterCursor = dateParams.get('after')
+    const cursor = beforeCursor ?? afterCursor
+    if (!cursor) return null
+    const cursorValue = Number(cursor)
+    if (Number.isNaN(cursorValue)) return null
+    const adjusted = beforeCursor ? cursorValue - 1 : cursorValue
+    const date = new Date(adjusted)
+    return Number.isNaN(date.valueOf()) ? null : date
+  })()
+
+  const hasEpisodes = Array.isArray(episodes) && episodes.length > 0
+  const topEpisodeCreatedAt = hasEpisodes ? episodes[0]?.created_at : null
+  const bottomEpisodeCreatedAt = hasEpisodes
+    ? episodes[episodes.length - 1]?.created_at
+    : null
+  const topEpisodeDate = topEpisodeCreatedAt ? new Date(topEpisodeCreatedAt) : null
+  const bottomEpisodeDate = bottomEpisodeCreatedAt ? new Date(bottomEpisodeCreatedAt) : null
+  const topDateValue = formatDateValue(topEpisodeDate) || formatDateValue(cursorDate)
+  const bottomDateValue = formatDateValue(bottomEpisodeDate) || formatDateValue(cursorDate)
 
   let beforeParams
   if (before) {
@@ -187,7 +227,7 @@ export const Page = () => {
       ${feedLoading ? html`<div>Loading feed...</div>` : null}
       ${feedError ? html`<div>${feedError.message}</div>` : null}
     </div>
-    <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
+    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
     ${episodesError ? html`<div>${episodesError.message}</div>` : null}
     ${Array.isArray(episodes)
@@ -198,7 +238,7 @@ export const Page = () => {
           clickForPreview: true
         }, e.id))
       : null}
-      <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
+      <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

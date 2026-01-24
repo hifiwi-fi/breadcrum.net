@@ -1,4 +1,17 @@
 .pagination-buttons {
   display: inline-flex;
   gap: 0.3em;
+  align-items: center;
+}
+
+.pagination-date-picker {
+  font: inherit;
+  line-height: 1;
+  height: 1.2em;
+  padding: 0;
+  min-width: 0;
+  width: auto;
+  max-width: 10ch;
+  box-sizing: content-box;
+  field-sizing: content;
 }
