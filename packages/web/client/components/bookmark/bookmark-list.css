@@ -1,2 +1,28 @@
 @import './bookmark-view.css';
 @import './bookmark-edit.css';
+
+.bc-bookmark-group-end .bc-bookmark-view {
+  border-bottom: none;
+}
+
+.bc-bookmark-date-separator {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin: 0.7em 0 0.4em;
+  color: var(--accent-foreground);
+  font-size: 0.75em;
+}
+
+.bc-bookmark-date-separator::before,
+.bc-bookmark-date-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--accent-background);
+}
+
+.bc-bookmark-date-separator span {
+  padding: 0 0.4em;
+  background: var(--background, transparent);
+  white-space: nowrap;
+}

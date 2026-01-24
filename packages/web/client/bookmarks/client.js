@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 /* eslint-env browser */
 
-/** @import { FunctionComponent } from 'preact' */
+/** @import { FunctionComponent, ComponentChild } from 'preact' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
@@ -106,6 +106,70 @@ export const Page = () => {
     onPoll: reloadBookmarks,
   })
 
+  const bookmarkRows = Array.isArray(bookmarks)
+    ? (() => {
+        const weekdayNames = [
+          'Sunday',
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday'
+        ]
+
+        /** @type {ComponentChild[]} */
+        const rows = []
+        let lastDateValue = ''
+
+        for (let index = 0; index < bookmarks.length; index += 1) {
+          const bookmark = bookmarks[index]
+          if (!bookmark) continue
+
+          const createdAt = bookmark.created_at
+          const dateValue = createdAt ? formatDateValue(new Date(createdAt)) : ''
+          const isDayChange = Boolean(dateValue && lastDateValue && dateValue !== lastDateValue)
+
+          if (isDayChange && createdAt) {
+            const date = new Date(createdAt)
+            const weekdayName = weekdayNames[date.getDay()]
+            rows.push(html`
+              <div class="bc-bookmark-date-separator" key=${`sep-${dateValue}-${bookmark.id}`}>
+                <span>${`${dateValue} ${weekdayName}`}</span>
+              </div>
+            `)
+          }
+
+          const nextBookmark = bookmarks[index + 1]
+          const nextCreatedAt = nextBookmark?.created_at
+          const nextDateValue = nextCreatedAt ? formatDateValue(new Date(nextCreatedAt)) : ''
+          const isGroupEnd = Boolean(dateValue && nextDateValue && dateValue !== nextDateValue)
+
+          const bookmarkNode = tc(BookmarkList, {
+            bookmark,
+            reload: reloadBookmarks,
+            onDelete: reloadBookmarks
+          }, bookmark.id)
+
+          if (isGroupEnd) {
+            rows.push(html`
+              <div class="bc-bookmark-group-end" key=${`group-end-${bookmark.id}`}>
+                ${bookmarkNode}
+              </div>
+            `)
+          } else {
+            rows.push(bookmarkNode)
+          }
+
+          if (dateValue) {
+            lastDateValue = dateValue
+          }
+        }
+
+        return rows
+      })()
+    : null
+
   return html`
     <${Search}
       placeholder="Search Bookmarks..."
@@ -119,15 +183,7 @@ export const Page = () => {
     <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
     ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
     ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
-    ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html`
-          ${tc(BookmarkList, {
-            bookmark: b,
-            reload: reloadBookmarks,
-            onDelete: reloadBookmarks
-          }, b.id)}
-        `)
-      : null}
+    ${bookmarkRows}
 
       <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
