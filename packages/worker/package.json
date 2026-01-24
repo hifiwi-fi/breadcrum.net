@@ -23,7 +23,7 @@
   "dependencies": {
     "@breadcrum/extract-meta": "^2.0.1",
     "@breadcrum/resources": "workspace:*",
-    "@bret/is-youtube-url": "^1.0.3",
+    "@bret/is-youtube-url": "catalog:",
     "@fastify/autoload": "catalog:",
     "@fastify/env": "catalog:",
     "@fastify/otel": "catalog:",

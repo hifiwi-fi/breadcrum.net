@@ -4,6 +4,7 @@ packages:
 injectWorkspacePackages: true
 
 catalog:
+  "@bret/is-youtube-url": ^1.0.5
   "@fastify/autoload": ^6.0.1
   "@fastify/env": ^5.0.1
   "@fastify/otel": ^0.16.0

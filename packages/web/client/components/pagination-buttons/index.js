@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-/* eslint-env browser */
 
 /** @import { FunctionComponent } from 'preact' */
 
@@ -29,6 +28,8 @@ export const PaginationButtons = ({
   dateValue
 }) => {
   const showDatePicker = Boolean(onDateNav && dateParams)
+  const hasBefore = Boolean(beforeParams)
+  const hasAfter = Boolean(afterParams)
   const maxDateValue = (() => {
     const today = new Date()
     if (Number.isNaN(today.valueOf())) return undefined
@@ -54,8 +55,12 @@ export const PaginationButtons = ({
 
   return html`
     <div class="pagination-buttons">
-      ${beforeParams ? html`<a onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>` : null}
-      ${showDatePicker ? html`
+      ${hasBefore
+        ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + beforeParams}>earlier</a>`
+        : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">earlier</span>`
+      }
+      ${showDatePicker
+? html`
         <input
           class="pagination-date-picker"
           type="date"
@@ -64,8 +69,12 @@ export const PaginationButtons = ({
           value=${dateValue ?? ''}
           onChange=${handleDateChange}
         />
-      ` : null}
-      ${afterParams ? html`<a onClick=${onPageNav} href=${'./?' + afterParams}>later</a>` : null}
+      `
+: null}
+      ${hasAfter
+        ? html`<a class="pagination-button" onClick=${onPageNav} href=${'./?' + afterParams}>later</a>`
+        : html`<span class="pagination-button pagination-button-disabled" aria-disabled="true">later</span>`
+      }
     </div>
   `
 }

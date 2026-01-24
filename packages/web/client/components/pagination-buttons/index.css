@@ -4,6 +4,15 @@
   align-items: center;
 }
 
+.pagination-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.pagination-button-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 .pagination-date-picker {
   font: inherit;
   line-height: 1;

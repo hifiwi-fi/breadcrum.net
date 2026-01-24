@@ -440,7 +440,6 @@ This pattern ensures:
 
 ```js
 /// <reference lib="dom" />
-/* eslint-env browser */
 ```
 
 ## Preact/HTM Template Constraints

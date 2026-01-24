@@ -5,6 +5,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@bret/is-youtube-url": "catalog:",
     "@breadcrum/resources": "workspace:*",
     "@fastify/accepts": "^5.0.1",
     "@fastify/auth": "^5.0.1",

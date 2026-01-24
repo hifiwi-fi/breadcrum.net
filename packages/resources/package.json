@@ -10,7 +10,7 @@
     "test:tsc": "tsc"
   },
   "dependencies": {
-    "@bret/is-youtube-url": "^1.0.3",
+    "@bret/is-youtube-url": "catalog:",
     "@fastify/postgres": "catalog:",
     "@nearform/sql": "catalog:",
     "hyperid": "^3.1.1",

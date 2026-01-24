@@ -10,14 +10,14 @@ description: "A look at what happened with Breadcrum in 2025."
 image: "./img/FIX-ME.png"
 ---
 
-Breadcrum is entering 2026, its 4th year! I know I said 4th year last year, but the I decided to start the clock on operation rather than inception.
+Breadcrum is entering 2026, its 4th year of live operation!
 Let's take a quick look at how 2025 went, what shipped, and where things are headed.
 
 ## By the Numbers
 
 <figure>
-  <a href="https://github.com/hifiwi-fi/breadcrum.net/graphs/contributors"><img src="./img/FIX-ME.png" alt="Breadcrum 2025 contribution graph"></a>
-  <figcaption>TODO: Add a short note about the cadence this year.</figcaption>
+  <a href="https://github.com/hifiwi-fi/breadcrum.net/graphs/contributors"><img src="./img/stats.png" alt="Breadcrum 2025 contribution graph"></a>
+  <figcaption>Commit count is up in 2025!</figcaption>
 </figure>
 
 |           | 2022 | 2023 | 2024  | 2025   |
@@ -27,6 +27,10 @@ Let's take a quick look at how 2025 went, what shipped, and where things are hea
 | Tags      | 235  | 597  | 1,091 | 1,697  |
 | Episodes  | 1,175| 3,579| 5,883 | 11,495 |
 | Archives  | 0    | 1,575| 3,573 | 5,375  |
+
+Breadcrum gained another 100 users and didn't quite double the number of bookmarks from last year. 
+Episodes continue to gain use.
+
 
 ## 2025 Highlights
 
