@@ -1,6 +1,6 @@
-@import '../archive-title';
-@import '../episode-title';
-@import './bookmark-resolve';
+@import "../archive-title";
+@import "../episode-title";
+@import "./bookmark-resolve";
 
 .bc-bookmark-edit {
   & input[type="date"],
@@ -89,4 +89,11 @@
 .button-spacing {
   display: flex;
   gap: 0.3em;
+  align-items: center;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .bc-submit-help {
+    display: none;
+  }
 }

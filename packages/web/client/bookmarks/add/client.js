@@ -14,6 +14,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { tc } from '../../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -186,17 +187,17 @@ export const Page = () => {
   }
 
   return html`
-    <${BookmarkEdit}
-      bookmark=${bookmark}
-      bookmarkletUpdateAvailable=${bookmarkletUpdateAvailable}
-      bookmarkletVersion=${bookmarkletVersion}
-      onSave=${handleSaveBookmark}
-      legend=${existingBookmark
+    ${tc(BookmarkEdit, {
+      bookmark,
+      bookmarkletUpdateAvailable,
+      ...(bookmarkletVersion !== undefined && { bookmarkletVersion }),
+      onSave: handleSaveBookmark,
+      legend: existingBookmark
         ? newlyCreated
           ? html`created: <code>${bookmark?.id}</code>`
           : html`edit: <code>${bookmark?.id}</code>`
-        : 'New bookmark'}
-    />
+        : 'New bookmark',
+    })}
   `
 }
 

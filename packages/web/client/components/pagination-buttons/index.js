@@ -45,12 +45,25 @@ export const PaginationButtons = ({
     if (!value) return
     const selectedDay = new Date(`${value}T00:00:00`)
     if (Number.isNaN(selectedDay.valueOf())) return
+    const today = new Date()
+    if (!Number.isNaN(today.valueOf())) {
+      const todayValue = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+      if (value === todayValue) {
+        const params = new URLSearchParams(dateParams)
+        params.delete('before')
+        params.delete('after')
+        const query = params.toString()
+        onDateNav(query ? `./?${query}` : './')
+        return
+      }
+    }
     const nextDay = new Date(selectedDay)
     nextDay.setDate(nextDay.getDate() + 1)
     const params = new URLSearchParams(dateParams)
     params.set('before', String(nextDay.valueOf()))
     params.delete('after')
-    onDateNav(`./?${params.toString()}`)
+    const query = params.toString()
+    onDateNav(query ? `./?${query}` : './')
   }, [onDateNav, dateParams])
 
   return html`
