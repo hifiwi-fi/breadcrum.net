@@ -530,7 +530,7 @@ This pattern ensures:
 - **Auto-formatting**: Use `pnpm run test:eslint --fix` to automatically fix ESLint formatting errors
 - **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/domstack`) to skip the resolve step and look up docs directly
 - Avoid branching or skipping tests. If something isn't right fail the tests.
-- Avoid using colsole debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
+- Avoid using console debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
 
 ## Client-Side Code
 
@@ -773,6 +773,14 @@ Fastify CLI watch ignores `src/client public data .tap` in addition to its own d
 Zed debug configurations launch `node_modules/fastify-cli/cli.js`, use `runtimeArgs: ['--import', './src/otel.js']` and `args: ['start', '--config', './src/config/fastify-cli.js', 'src/app.js']`, and select `APP_ROLE` through `env`, never role arguments.
 Keep native pnpm patches enabled in frozen installs and production dependency installs.
 Do not introduce workspace `pnpm deploy`, package filters, or separate per-role images.
+
+## pnpm workspace catalog
+
+If a package is used in more than one workspace, it should be moved to the `catalog:` in `pnpm-workspace.yaml` and referenced as `"catalog:"` in the consuming workspace `package.json` files. This keeps versions in sync across the monorepo.
+
+## Lockfile
+
+After modifying any `package.json` or `pnpm-workspace.yaml` dependencies, run `pnpm install` to update the lockfile.
 
 ## External package availability
 

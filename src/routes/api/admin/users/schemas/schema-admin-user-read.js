@@ -51,6 +51,42 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
       ...geoipRegionProps,
       description: 'GeoIP region data for the user\'s registration IP.',
     },
+    subscription_provider: {
+      type: 'string',
+      nullable: true,
+      description: 'Subscription provider (stripe or custom).',
+    },
+    subscription_status: {
+      type: 'string',
+      nullable: true,
+      description: 'Current subscription status (e.g., active, canceled, past_due).',
+    },
+    subscription_plan: {
+      type: 'string',
+      nullable: true,
+      description: 'Current subscription plan code (e.g., yearly_paid).',
+    },
+    subscription_display_name: {
+      type: 'string',
+      nullable: true,
+      description: 'Human-readable label for custom subscriptions (e.g., Friends & Family).',
+    },
+    subscription_period_end: {
+      type: 'string',
+      format: 'date-time',
+      nullable: true,
+      description: 'End of the current billing period.',
+    },
+    subscription_cancel_at_period_end: {
+      type: 'boolean',
+      nullable: true,
+      description: 'Whether the subscription is set to cancel at period end.',
+    },
+    stripe_customer_id: {
+      type: 'string',
+      nullable: true,
+      description: 'Stripe customer ID for linking to Stripe dashboard.',
+    },
   }
 })
 
