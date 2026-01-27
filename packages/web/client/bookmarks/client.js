@@ -1,6 +1,7 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent, ComponentChild } from 'preact' */
+/** @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'
@@ -15,6 +16,7 @@ import { useBookmarks } from '../hooks/useBookmarks.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
+import { QueryProvider } from '../lib/query-provider.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -94,10 +96,13 @@ export const Page = () => {
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
 
+  /** @typedef {TypeBookmarkReadClient['archives'][number] | null | undefined} BookmarkArchive */
+  /** @typedef {TypeBookmarkReadClient['episodes'][number] | null | undefined} BookmarkEpisode */
+
   const hasPending = Array.isArray(bookmarks) && bookmarks.some(bookmark => (
     bookmark?.done === false ||
-    (bookmark.archives?.some(archive => archive?.ready === false && !archive?.error)) ||
-    (bookmark.episodes?.some(episode => episode?.ready === false && !episode?.error))
+    (bookmark.archives?.some(/** @param {BookmarkArchive} archive */(archive) => archive?.ready === false && !archive?.error)) ||
+    (bookmark.episodes?.some(/** @param {BookmarkEpisode} episode */(episode) => episode?.ready === false && !episode?.error))
   ))
 
   useResolvePolling({
@@ -191,6 +196,6 @@ export const Page = () => {
 if (typeof window !== 'undefined') {
   const container = document.querySelector('.bc-main')
   if (container) {
-    render(html`<${Page}/>`, container)
+    render(html`<${QueryProvider}><${Page} /><//>`, container)
   }
 }
