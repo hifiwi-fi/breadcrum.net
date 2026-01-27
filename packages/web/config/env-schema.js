@@ -7,6 +7,7 @@
 
 import { mergeEnvSchemas } from '@breadcrum/resources/fastify-common/env-schema.js'
 import { authEnvSchema } from '#plugins/auth.js'
+import { billingEnvSchema } from '#plugins/billing.js'
 import { cookieEnvSchema } from '#plugins/cookie.js'
 import { emailEnvSchema } from '#plugins/email.js'
 import { geoipEnvSchema } from '#plugins/geoip.js'
@@ -22,6 +23,7 @@ import { ytDlpEnvSchema } from '#plugins/yt-dlp.js'
 
 const pluginEnvSchemas = /** @type {const} @satisfies {readonly EnvSchemaFragment[]} */ ([
   authEnvSchema,
+  billingEnvSchema,
   cookieEnvSchema,
   emailEnvSchema,
   geoipEnvSchema,

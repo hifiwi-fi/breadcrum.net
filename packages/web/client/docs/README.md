@@ -22,6 +22,7 @@ Please see the following sections for more information about Breadcrum.
 - ⚙️ [Account settings](./account/)
   - 🔑 [Auth Tokens](./account/auth-tokens/)
   - 🔐 [Passkeys](./account/passkeys/)
+- 💳 [Subscriptions & Pricing](./subscriptions/)
 - 📜 [Blog](/blog/)
 - ℹ️ [About](/about/)
 - 🙊 [Social Media](./social/)
