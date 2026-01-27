@@ -22,6 +22,7 @@ import { getSiteMetadata } from '../archives/get-site-metadata.js'
 import { extractArchive } from '../archives/extract-archive.js'
 import { upcomingCheck } from '../episodes/handle-upcoming.js'
 import { finalizeEpisode, finalizeEpisodeError } from '../episodes/finaize-episode.js'
+import { resolveEpisodeEmbed } from '../episodes/resolve-embed.js'
 import { finalizeArchive } from '../archives/finalize-archive.js'
 
 /**
@@ -263,13 +264,23 @@ export function makeBookmarkPgBossP ({ fastify }) {
                 releaseTimestamp: releaseTimestampDate.toLocaleString(),
               }, 'Upcoming episode for bookmark scheduled')
             } else if (mediaUrlFound) {
+              let oembed = null
+              try {
+                oembed = await resolveEpisodeEmbed({ fastify, url })
+              } catch (err) {
+                log.warn(err, 'Failed to resolve embed for episode')
+              }
+
+              console.dir({ oembed })
+
               await finalizeEpisode({
                 pg,
                 media,
                 bookmarkTitle: userProvidedMeta.title,
                 episodeId: episodeEntity.id,
                 userId,
-                url
+                url,
+                oembed,
               })
 
               log.info(`Episode ${episodeEntity.id} for ${url} is ready.`)

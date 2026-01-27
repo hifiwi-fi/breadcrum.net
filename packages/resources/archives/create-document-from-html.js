@@ -24,7 +24,7 @@ export function createDocumentFromHtml ({ html, url }) {
   virtualConsole.forwardTo(console, { jsdomErrors: 'none' })
 
   return (new JSDOM(htmlWithoutStyles, {
-    url,
+    url: url.toString(),
     virtualConsole,
   })).window.document
 }

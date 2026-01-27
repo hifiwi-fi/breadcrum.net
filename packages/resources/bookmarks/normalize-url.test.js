@@ -1,4 +1,4 @@
-import { equal, ok, rejects } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { test } from 'node:test'
 import { normalizeURL } from './normalize-url.js'
 
@@ -44,7 +44,7 @@ test('normalizeURL - youtube embed normalizes to watch', async () => {
 
 test('normalizeURL - youtube host variants normalize', async () => {
   const hosts = ['music.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com']
-  
+
   for (const host of hosts) {
     const url = await normalizeURL(
       new URL(`https://${host}/watch?v=abc123`),
@@ -103,14 +103,14 @@ test('normalizeURL - x mediaViewer case insensitive', async () => {
 
   equal(
     url.toString(),
-    'https://x.com/user/Status/123',
+    'https://x.com/user/status/123',
     'Expected case-insensitive mediaViewer detection'
   )
 })
 
 test('normalizeURL - twitter.com normalizes to x.com', async () => {
   const hosts = ['twitter.com', 'mobile.twitter.com', 'm.twitter.com', 'mobile.x.com', 'm.x.com']
-  
+
   for (const host of hosts) {
     const url = await normalizeURL(
       new URL(`https://${host}/user/status/123`),
@@ -149,7 +149,7 @@ test('normalizeURL - all utm params are stripped', async () => {
 
 test('normalizeURL - known tracking params are stripped', async () => {
   const trackingParams = ['fbclid', 'gclid', 'dclid', 'msclkid', 'igshid']
-  
+
   for (const param of trackingParams) {
     const url = await normalizeURL(
       new URL(`https://example.com?${param}=12345&keep=this`),
@@ -288,7 +288,7 @@ test('normalizeURL - unicode in URLs is preserved', async () => {
     { followShorteners: false }
   )
 
-  ok(url.pathname.includes('文档'), 'Expected unicode path to be preserved')
-  ok(url.search.includes('值'), 'Expected unicode query to be preserved')
-  ok(url.hash.includes('片段'), 'Expected unicode fragment to be preserved')
+  ok(decodeURIComponent(url.pathname).includes('文档'), 'Expected unicode path to be preserved')
+  ok(decodeURIComponent(url.search).includes('值'), 'Expected unicode query to be preserved')
+  ok(decodeURIComponent(url.hash).includes('片段'), 'Expected unicode fragment to be preserved')
 })

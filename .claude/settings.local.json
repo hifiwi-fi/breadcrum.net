@@ -5,7 +5,12 @@
       "mcp__acp__Edit",
       "mcp__acp__Write",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:publish.twitter.com)",
+      "WebFetch(domain:developer.x.com)",
+      "mcp__mcp-server-brave-search__brave_web_search",
+      "WebFetch(domain:developers.dailymotion.com)",
+      "WebFetch(domain:faq.dailymotion.com)"
     ]
   }
 }

@@ -15,6 +15,7 @@ import { resolveMimeType } from '@breadcrum/resources/episodes/resolve-mime-type
  * @param {string} params.episodeId
  * @param {string} params.userId
  * @param {PgClient} params.pg
+ * @param {object | null | undefined} [params.oembed]
  */
 export async function finalizeEpisode ({
   pg,
@@ -22,7 +23,8 @@ export async function finalizeEpisode ({
   bookmarkTitle,
   episodeId,
   userId,
-  url
+  url,
+  oembed,
 }) {
   const videoData = []
 
@@ -52,6 +54,12 @@ export async function finalizeEpisode ({
   }
   if ('thumbnail' in media) {
     videoData.push(SQL`thumbnail = ${media.thumbnail}`)
+  }
+  if (oembed !== undefined) {
+    videoData.push(SQL`oembed = ${oembed}`)
+  }
+  if ('release_timestamp' in media && media.release_timestamp) {
+    videoData.push(SQL`published_time = ${new Date(media.release_timestamp * 1000).toISOString()}`)
   }
 
   const query = SQL`

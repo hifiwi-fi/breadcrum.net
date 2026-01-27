@@ -1,4 +1,6 @@
 import { getEpisode } from '../episode-query-get.js'
+import { getFeedWithDefaults } from '../../feeds/feed-defaults.js'
+import { hydrateEmbed } from '../hydrate-embed.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -57,9 +59,13 @@ export async function getEpisodeRoute (fastify, _opts) {
         return reply.notFound('episide_id not found')
       }
 
-      console.log({
-        episode
+      episode.podcast_feed = getFeedWithDefaults({
+        feed: episode.podcast_feed,
+        transport: fastify.config.TRANSPORT,
+        host: fastify.config.HOST,
       })
+
+      hydrateEmbed(episode)
 
       return episode
     }
