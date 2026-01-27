@@ -3,6 +3,7 @@
 @import '../episode-title';
 @import '../cors-media/cors-media.css';
 @import '../expand-text/index.css';
+@import '../resolve-status/index.css';
 
 .bc-archive-view {
   padding-bottom: 4px;
@@ -28,6 +29,7 @@
 }
 
 .bc-date a,
+.bc-date span,
 .bc-archive-url-display a,
 .bc-archive-episodes-display {
   color: var(--accent-foreground);
@@ -46,4 +48,59 @@
 .bc-archive-excerpt {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+.bc-archive-footer {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--accent-background);
+}
+
+.bc-archive-footer-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
+}
+
+.bc-archive-footer-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: var(--accent-foreground);
+}
+
+.bc-archive-footer-item {
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.bc-archive-footer-label {
+  color: var(--accent-foreground);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.bc-archive-footer-label::after {
+  content: ':';
+}
+
+.bc-archive-footer-value {
+  word-break: break-word;
+  min-width: 0;
+}
+
+.bc-archive-footer-value code {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  word-break: break-all;
+}
+
+@media (max-width: 600px) {
+  .bc-archive-footer-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

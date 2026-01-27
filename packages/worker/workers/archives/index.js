@@ -5,7 +5,7 @@
  */
 
 import SQL from '@nearform/sql'
-import { JSDOM } from 'jsdom'
+import { createDocumentFromHtml } from '@breadcrum/resources/archives/create-document-from-html.js'
 import { fetchHTML } from './fetch-html.js'
 import { finalizeArchive } from './finalize-archive.js'
 import { extractArchive } from './extract-archive.js'
@@ -42,7 +42,7 @@ export function makeArchivePgBossP ({ fastify }) {
         const fetchDuration = (performance.now() - fetchStartTime) / 1000
         fastify.otel.archiveFetchSeconds.record(fetchDuration)
 
-        const initialDocument = (new JSDOM(html, { url })).window.document
+        const initialDocument = createDocumentFromHtml({ html, url })
 
         const extractionStartTime = performance.now()
         const article = await extractArchive({ document: initialDocument })

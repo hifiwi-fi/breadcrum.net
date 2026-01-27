@@ -1,0 +1,33 @@
+@keyframes bc-resolve-dots {
+  to {
+    width: 1.2em;
+  }
+}
+
+.bc-resolve-status,
+.bc-bookmark-resolve-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-size: 0.8em;
+  color: var(--bc-summary-accent);
+}
+
+.bc-resolve-dots {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: bc-resolve-dots 1.2s steps(4, end) infinite;
+}
+
+.bc-resolve-dots::after {
+  content: '...';
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-resolve-dots {
+    animation: none;
+    width: 1.2em;
+  }
+}

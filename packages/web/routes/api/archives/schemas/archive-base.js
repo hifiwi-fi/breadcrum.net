@@ -15,6 +15,7 @@ export const archiveProps = /** @type {const} @satisfies {JSONSchema} */ ({
     byline: { type: 'string' },
     direction: { type: 'string' },
     language: { type: 'string' },
+    published_time: { type: 'string', format: 'date-time' },
     ready: { type: 'boolean' },
     error: { type: 'string' },
     done: { type: 'boolean' }

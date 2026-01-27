@@ -9,7 +9,7 @@
  */
 
 import SQL from '@nearform/sql'
-import { JSDOM } from 'jsdom'
+import { createDocumentFromHtml } from '@breadcrum/resources/archives/create-document-from-html.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
@@ -144,7 +144,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
           fastify.otel.httpFetchSeconds.record(fetchDuration)
           fastify.otel.httpFetchSuccessCounter.add(1)
 
-          document = (new JSDOM(html, { url })).window.document
+          document = createDocumentFromHtml({ html, url })
         } catch (err) {
           const fetchDuration = (performance.now() - fetchStartTime) / 1000
           fastify.otel.httpFetchSeconds.record(fetchDuration)

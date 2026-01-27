@@ -12,6 +12,7 @@ import { Sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { ExpandText } from '../expand-text/index.js'
+import { ResolveStatus } from '../resolve-status/index.js'
 import cn from 'classnames'
 
 /**
@@ -106,15 +107,7 @@ export const BookmarkView = ({
           ? html`<div class='bc-bookmark-entity bc-episode-entity'>📼 <a href="${visibleEpisodes.length > 1 ? `/episodes?bid=${b.id}` : `/episodes/view?id=${visibleEpisodes[0]?.id}`}">${visibleEpisodes.length} episode${visibleEpisodes.length > 1 ? 's' : ''}</a></div>`
           : null
         }
-        ${isResolving
-          ? html`
-            <span class="bc-bookmark-resolve-status">
-              <span aria-hidden="true">⏱</span>
-              <span>Resolving</span>
-              <span class="bc-resolve-dots" aria-hidden="true"></span>
-            </span>
-          `
-          : null}
+        ${isResolving ? html`<${ResolveStatus} />` : null}
       </div>
       ${b.archive_urls?.length > 0
         ? html`${b.archive_urls.map(
