@@ -4,12 +4,25 @@
  * @typedef { FromSchema<EnvSchemaType> } DotEnvSchemaType
  */
 
+import { billingEnvSchema } from '../plugins/billing.js'
+import { otelMetricsEnvSchema } from '../plugins/otel-metrics.js'
+import { pgEnvSchema } from '../plugins/pg.js'
+import { pgbossEnvSchema } from '../plugins/pgboss.js'
+import { redisEnvSchema } from '../plugins/redis.js'
+
 export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:dotenv',
-  required: [],
+  required: [
+    ...billingEnvSchema.required,
+    ...otelMetricsEnvSchema.required,
+    ...pgEnvSchema.required,
+    ...pgbossEnvSchema.required,
+    ...redisEnvSchema.required,
+  ],
   additionalProperties: false,
   properties: {
+    // Base / cross-cutting
     ENV: {
       type: 'string',
       default: 'development',
@@ -27,45 +40,22 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
       enum: ['http', 'https'],
       default: 'http',
     },
-    DATABASE_URL: {
-      type: 'string',
-      default: 'postgres://postgres@localhost/breadcrum',
-    },
-    REDIS_CACHE_URL: {
-      type: 'string',
-      default: 'redis://localhost:6379/1',
-    },
+
+    // Worker-level (no plugin home)
     YT_DLP_API_URL: {
       type: 'string',
       default: 'http://user:pass@127.0.0.1:5000',
-    },
-    OTEL_SERVICE_NAME: {
-      type: 'string',
-      default: 'breadcrum-worker',
-    },
-    OTEL_SERVICE_VERSION: {
-      type: 'string',
-      default: '1.0.0',
-    },
-    OTEL_RESOURCE_ATTRIBUTES: {
-      type: 'string',
-      default: 'deployment.environment=development',
-    },
-    EPISODE_WORKER_CONCURRENCY: {
-      type: 'integer',
-      default: 2,
-    },
-    ARCHIVE_WORKER_CONCURRENCY: {
-      type: 'integer',
-      default: 2,
-    },
-    BOOKMARK_WORKER_CONCURRENCY: {
-      type: 'integer',
-      default: 2,
     },
     AUTH_TOKEN_RETENTION_DAYS: {
       type: 'integer',
       default: 365,
     },
+
+    // Plugin schemas
+    ...billingEnvSchema.properties,
+    ...otelMetricsEnvSchema.properties,
+    ...pgEnvSchema.properties,
+    ...pgbossEnvSchema.properties,
+    ...redisEnvSchema.properties,
   },
 })

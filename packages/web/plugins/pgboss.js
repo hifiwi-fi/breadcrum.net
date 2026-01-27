@@ -3,6 +3,7 @@ import fp from 'fastify-plugin'
 import { createResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { createResolveArchiveQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
 import { createResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import { createSyncSubscriptionQ } from '@breadcrum/resources/billing/sync-subscription-queue.js'
 import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
 import { defaultBossOptions } from '@breadcrum/resources/pgboss/default-job-options.js'
 
@@ -22,7 +23,8 @@ export default fp(async function (fastify, _) {
   const queues = {
     resolveEpisodeQ: await createResolveEpisodeQ({ boss }),
     resolveArchiveQ: await createResolveArchiveQ({ boss }),
-    resolveBookmarkQ: await createResolveBookmarkQ({ boss })
+    resolveBookmarkQ: await createResolveBookmarkQ({ boss }),
+    syncSubscriptionQ: await createSyncSubscriptionQ({ boss })
   }
   fastify.log.info('pg-boss queues created')
 

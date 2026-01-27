@@ -1,5 +1,17 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
 import { metrics } from '@opentelemetry/api'
+
+export const otelMetricsEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    OTEL_SERVICE_NAME: { type: 'string', default: 'breadcrum-worker' },
+    OTEL_SERVICE_VERSION: { type: 'string', default: '1.0.0' },
+    OTEL_RESOURCE_ATTRIBUTES: { type: 'string', default: 'deployment.environment=development' },
+  },
+  required: [],
+})
 
 /**
  * This plugin adds OpenTelemetry metrics under the 'otel' decorator.
@@ -127,6 +139,7 @@ export default fp(async function (fastify, _) {
       description: 'The time it takes to run auth token cleanup job',
       unit: 's',
     }),
+
   })
 },
 {

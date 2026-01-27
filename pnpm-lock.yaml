@@ -97,6 +97,9 @@ catalogs:
     pg:
       specifier: ^8.16.3
       version: 8.18.0
+    stripe:
+      specifier: ^20.3.1
+      version: 20.3.1
     typescript:
       specifier: ~5.9.0
       version: 5.9.3
@@ -192,6 +195,9 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 8.0.4
+      stripe:
+        specifier: 'catalog:'
+        version: 20.3.1(@types/node@25.2.3)
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -351,6 +357,9 @@ importers:
       resolve-email:
         specifier: ^4.0.34
         version: 4.0.34
+      stripe:
+        specifier: 'catalog:'
+        version: 20.3.1(@types/node@25.2.3)
       undici:
         specifier: 'catalog:'
         version: 7.16.0
@@ -367,6 +376,9 @@ importers:
       '@fastify/type-provider-json-schema-to-ts':
         specifier: 'catalog:'
         version: 5.0.0
+      '@stripe/stripe-js':
+        specifier: ^8.7.0
+        version: 8.7.0
       '@types/common-tags':
         specifier: ^1.8.4
         version: 1.8.4
@@ -520,6 +532,9 @@ importers:
       json-schema-to-ts:
         specifier: ^3.1.1
         version: 3.1.1
+      stripe:
+        specifier: 'catalog:'
+        version: 20.3.1(@types/node@25.2.3)
       type-fest:
         specifier: ^5.2.0
         version: 5.4.4
@@ -1504,6 +1519,10 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
+
+  '@stripe/stripe-js@8.7.0':
+    resolution: {integrity: sha512-tNUerSstwNC1KuHgX4CASGO0Md3CB26IJzSXmVlSuFvhsBP4ZaEPpY4jxWOn9tfdDscuVT4Kqb8cZ2o9nLCgRQ==}
+    engines: {node: '>=12.16'}
 
   '@stylistic/eslint-plugin@2.11.0':
     resolution: {integrity: sha512-PNRHbydNG5EH8NK4c+izdJlxajIR6GxcUhzsYNRsn6Myep4dsZt0qFCz3rCPnkvgO5FYibDcMqgNHUT+zvjYZw==}
@@ -4901,6 +4920,15 @@ packages:
     resolution: {integrity: sha512-1tB5mhVo7U+ETBKNf92xT4hrQa3pm0MZ0PQvuDnWgAAGHDsfp4lPSpiS6psrSiet87wyGPh9ft6wmhOMQ0hDiw==}
     engines: {node: '>=14.16'}
 
+  stripe@20.3.1:
+    resolution: {integrity: sha512-k990yOT5G5rhX3XluRPw5Y8RLdJDW4dzQ29wWT66piHrbnM2KyamJ1dKgPsw4HzGHRWjDiSSdcI2WdxQUPV3aQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   striptags@3.2.0:
     resolution: {integrity: sha512-g45ZOGzHDMe2bdYMdIvdAfCQkCTDMGBazSw1ypMowwGIee7ZQ5dU0rBJ8Jqgl+jAKIv4dbeE1jscZq9wid1Tkw==}
 
@@ -6419,6 +6447,8 @@ snapshots:
   '@sindresorhus/is@0.14.0': {}
 
   '@socket.io/component-emitter@3.1.2': {}
+
+  '@stripe/stripe-js@8.7.0': {}
 
   '@stylistic/eslint-plugin@2.11.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)':
     dependencies:
@@ -10299,6 +10329,10 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-json-comments@5.0.3: {}
+
+  stripe@20.3.1(@types/node@25.2.3):
+    optionalDependencies:
+      '@types/node': 25.2.3
 
   striptags@3.2.0: {}
 

@@ -9,7 +9,7 @@ import lsp from 'local-storage-proxy'
 import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
 
 /**
- * @typedef {{ [key: string]: boolean | string }} FrontendFlags
+ * @typedef {{ [key: string]: boolean | string | number }} FrontendFlags
  */
 
 /** @type {FrontendFlags} */

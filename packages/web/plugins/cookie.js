@@ -1,4 +1,15 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
+
+export const cookieEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    COOKIE_SECRET: { type: 'string' },
+    COOKIE_NAME: { type: 'string', default: 'breadcrum_token' },
+  },
+  required: ['COOKIE_SECRET'],
+})
 
 /**
  * This plugins adds cookie support

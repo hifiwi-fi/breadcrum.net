@@ -56,6 +56,7 @@
     "preact": "^10.27.0",
     "preact-render-to-string": "^6.6.3",
     "resolve-email": "^4.0.34",
+    "stripe": "catalog:",
     "undici": "catalog:",
     "useragent": "^2.3.0"
   },
@@ -63,6 +64,7 @@
     "@breadcrum/bookmarklet": "1.0.13",
     "@domstack/static": "^11.0.0-beta.6",
     "@fastify/type-provider-json-schema-to-ts": "catalog:",
+    "@stripe/stripe-js": "^8.7.0",
     "@types/common-tags": "^1.8.4",
     "@types/node": "catalog:",
     "@types/nodemailer": "^7.0.5",
@@ -105,6 +107,7 @@
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
     "watch:domstack": "pnpm run build:domstack --watch-only --drafts",
+    "watch:stripe-webhook": "stripe listen --forward-to ${TRANSPORT:-http}://${HOST:-localhost:3000}/api/billing/webhook",
     "domstack-watch": "pnpm run build:domstack --watch --drafts",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js --import otel.js",

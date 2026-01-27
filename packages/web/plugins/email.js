@@ -5,7 +5,24 @@ import SQL from '@nearform/sql'
 /**
  * @import { Transporter } from 'nodemailer'
  * @import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
+ * @import { JSONSchema } from 'json-schema-to-ts'
  */
+
+export const emailEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    EMAIL_SENDING: { type: 'boolean', default: true },
+    SMTP_HOST: { type: 'string' },
+    SMTP_PORT: { type: 'integer', default: 465 },
+    SMTP_SECURE: { type: 'boolean', default: true },
+    SMTP_USER: { type: 'string' },
+    SMTP_PASS: { type: 'string' },
+    APP_EMAIL: { type: 'string', default: 'support@breadcrum.net' },
+    SNS_USER: { type: 'string', default: 'sns-user' },
+    SNS_PASS: { type: 'string' },
+    EMAIL_VALIDATION: { type: 'boolean', default: true },
+  },
+  required: [],
+})
 
 /**
  * This plugins adds nodemailer

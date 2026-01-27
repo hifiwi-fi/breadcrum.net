@@ -425,7 +425,7 @@ This pattern ensures:
 - **Auto-formatting**: Use `npm run test:eslint -- --fix` to automatically fix ESLint formatting errors
 - **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/domstack`) to skip the resolve step and look up docs directly
 - Avoid branching or skipping tests. If something isn't right fail the tests.
-- Avoid using colsole debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
+- Avoid using console debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
 
 ## Client-Side Code
 
@@ -660,6 +660,14 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `npm run prod-sim` - Start production simulation
 - `npm run print-routes` - Print all fastify routes
 - `npm run print-plugins` - Print all fastify plugins
+
+## pnpm workspace catalog
+
+If a package is used in more than one workspace, it should be moved to the `catalog:` in `pnpm-workspace.yaml` and referenced as `"catalog:"` in the consuming workspace `package.json` files. This keeps versions in sync across the monorepo.
+
+## Lockfile
+
+After modifying any `package.json` or `pnpm-workspace.yaml` dependencies, run `pnpm install` to update the lockfile.
 
 ## External package availability
 
