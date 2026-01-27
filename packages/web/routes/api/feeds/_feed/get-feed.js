@@ -119,6 +119,10 @@ export async function getFeed (fastify, _opts) {
         },
         items: episodes.length > 0
           ? episodes.map(ep => {
+            const fallbackMimeType = ep.src_type && ep.ext
+              ? `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`
+              : undefined
+
             return {
               id: ep.id,
               url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
@@ -129,7 +133,7 @@ export async function getFeed (fastify, _opts) {
               // @ts-ignore
               attachments: cleanDeep([{
                 url: getEpisodeUrl({ transport, host, userId, token, feedId: pf.id, episodeId: ep.id }),
-                mime_type: `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`, // TODO: remove this hack
+                mime_type: ep.mime_type ?? fallbackMimeType,
                 title: ep.filename,
                 duration_in_seconds: ep.duration_in_seconds,
               }]),

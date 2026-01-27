@@ -5,6 +5,7 @@
 
 import SQL from '@nearform/sql'
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
+import { resolveMimeType } from '@breadcrum/resources/episodes/resolve-mime-type.js'
 
 /**
  * @param {object} params
@@ -41,6 +42,8 @@ export async function finalizeEpisode ({
 
   if ('ext' in media) videoData.push(SQL`ext = ${media.ext}`)
   if ('ext' in media) videoData.push(SQL`src_type = ${resolveType(media)}`)
+  const mimeType = resolveMimeType(media)
+  if (mimeType) videoData.push(SQL`mime_type = ${mimeType}`)
   if ('description' in media) {
     videoData.push(SQL`text_content = ${media.description}`)
   }
