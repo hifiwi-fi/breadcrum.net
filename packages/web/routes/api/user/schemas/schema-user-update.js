@@ -15,5 +15,9 @@ export const schemaUserUpdate = /** @type {const} @satisfies {JSONSchema} */ ({
   minProperties: 1,
   properties: {
     ...userEditableUserProps.properties,
+    service_notice_dismissed_hash: {
+      type: 'string',
+      nullable: true,
+    },
   },
 })

@@ -9,8 +9,13 @@ import lsp from 'local-storage-proxy'
 import { defaultFrontendFlags } from '../../plugins/flags/frontend-flags.js'
 
 /**
- * @typedef {typeof defaultFrontendFlags} FrontendFlags
+ * @typedef {{ [key: string]: boolean | string }} FrontendFlags
  */
+
+/** @type {FrontendFlags} */
+const defaultFrontendFlagValues = Object.fromEntries(
+  Object.entries(defaultFrontendFlags).map(([flag, flagMeta]) => [flag, flagMeta.default])
+)
 
 /**
  * @typedef {object} StateType
@@ -34,7 +39,7 @@ export const state = lsp('breadcrum', {
     sensitive: false,
     toread: false,
     starred: false,
-    flags: defaultFrontendFlags,
+    flags: defaultFrontendFlagValues,
   },
   lspReset: 6,
 })

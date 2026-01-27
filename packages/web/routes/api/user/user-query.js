@@ -56,6 +56,7 @@ export function getUserQuery ({
       u.admin,
       u.disabled,
       u.disabled_reason,
+      u.service_notice_dismissed_hash,
       coalesce(bh.disabled, false) as disabled_email
     from users u
     left join email_blackhole bh

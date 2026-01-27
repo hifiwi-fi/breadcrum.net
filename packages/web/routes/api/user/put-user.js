@@ -57,6 +57,9 @@ export async function putUserRoute (fastify, _opts) {
         }
         if ('password' in user) updates.push(SQL`password = ${getPasswordHashQuery(user.password)}`)
         if ('newsletter_subscription' in user) updates.push(SQL`newsletter_subscription = ${user.newsletter_subscription}`)
+        if ('service_notice_dismissed_hash' in user) {
+          updates.push(SQL`service_notice_dismissed_hash = ${user.service_notice_dismissed_hash}`)
+        }
 
         if (updates.length > 0) {
           const query = SQL`
