@@ -1,4 +1,5 @@
 import SQL from '@nearform/sql'
+import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
 import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
@@ -42,6 +43,21 @@ export async function putBookmark (fastify, _opts) {
     }),
     schema: {
       tags: ['bookmarks'],
+      querystring: {
+        type: 'object',
+        properties: {
+          normalize: {
+            type: 'boolean',
+            default: true,
+            description: 'Normalize URLs when updating them.',
+          },
+          exact_url: {
+            type: 'boolean',
+            default: false,
+            description: 'Skip normalization and use the submitted URL as-is.',
+          },
+        },
+      },
       params: {
         type: 'object',
         properties: {
@@ -75,6 +91,9 @@ export async function putBookmark (fastify, _opts) {
       const bookmarkId = request.params.id
       const bookmark = request.body
 
+      const { normalize, exact_url: exactUrl } = request.query
+      const shouldNormalize = exactUrl ? false : normalize
+
       // Check if bookmark exists:
       const bookmarkQuery = SQL`
               select url from bookmarks
@@ -91,14 +110,66 @@ export async function putBookmark (fastify, _opts) {
       /** @type {SQL.SqlStatement[]} */
       const updates = []
 
-      if (bookmark.url != null) updates.push(SQL`url = ${bookmark.url}`)
+      if (bookmark.url != null) {
+        if (shouldNormalize) {
+          try {
+            const submittedUrlString = bookmark.url
+            const submittedUrl = new URL(submittedUrlString)
+            const normalizedUrl = await normalizeURL(submittedUrl, { cache: fastify.cache })
+            bookmark.url = normalizedUrl.toString()
+            const originalUrl = normalizedUrl.toString() === submittedUrlString ? null : submittedUrlString
+            updates.push(SQL`url = ${bookmark.url}`)
+            updates.push(SQL`original_url = ${originalUrl}`)
+          } catch (err) {
+            return reply.badRequest('Invalid URL format')
+          }
+        } else {
+          updates.push(SQL`url = ${bookmark.url}`)
+          updates.push(SQL`original_url = ${null}`)
+        }
+      }
+
+      if (bookmark.archive_urls != null) {
+        if (shouldNormalize) {
+          try {
+            const normalizedArchiveUrls = await Promise.all(
+              bookmark.archive_urls.map(async (archiveUrl) => {
+                const normalized = await normalizeURL(new URL(archiveUrl), { cache: fastify.cache })
+                return normalized.toString()
+              })
+            )
+            bookmark.archive_urls = normalizedArchiveUrls
+          } catch (err) {
+            return reply.badRequest('Invalid archive URL format')
+          }
+        }
+        updates.push(SQL`archive_urls = ${bookmark.archive_urls}`)
+      }
+
+      if (shouldNormalize && bookmark.createEpisode?.url) {
+        try {
+          const normalizedEpisodeUrl = await normalizeURL(new URL(bookmark.createEpisode.url), { cache: fastify.cache })
+          bookmark.createEpisode.url = normalizedEpisodeUrl.toString()
+        } catch (err) {
+          return reply.badRequest('Invalid episode URL format')
+        }
+      }
+
+      if (shouldNormalize && bookmark.createArchive && typeof bookmark.createArchive === 'object' && bookmark.createArchive.url) {
+        try {
+          const normalizedArchiveUrl = await normalizeURL(new URL(bookmark.createArchive.url), { cache: fastify.cache })
+          bookmark.createArchive.url = normalizedArchiveUrl.toString()
+        } catch (err) {
+          return reply.badRequest('Invalid archive URL format')
+        }
+      }
+
       if (bookmark.title != null) updates.push(SQL`title = ${bookmark.title}`)
       if (bookmark.note != null) updates.push(SQL`note = ${bookmark.note}`)
       if (bookmark.summary != null) updates.push(SQL`summary = ${bookmark.summary}`)
       if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
       if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
       if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
-      if (bookmark.archive_urls != null) updates.push(SQL`archive_urls = ${bookmark.archive_urls}`)
 
       if (updates.length > 0) {
         const query = SQL`

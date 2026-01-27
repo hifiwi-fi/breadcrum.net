@@ -63,6 +63,11 @@ export async function putBookmarks (fastify, _opts) {
               default: true,
               description: 'Normalize URLs when looking them up or creating them.',
             },
+            exact_url: {
+              type: 'boolean',
+              default: false,
+              description: 'Skip normalization and use the submitted URL as-is.',
+            },
           }
         },
         response: {
@@ -104,8 +109,15 @@ export async function putBookmarks (fastify, _opts) {
           summary,
         } = request.body
 
-        const submittedUrl = new URL(request.body.url)
+        const submittedUrlString = request.body.url
         const submittedTitle = request.body.title
+
+        let submittedUrl
+        try {
+          submittedUrl = new URL(submittedUrlString)
+        } catch (err) {
+          return reply.badRequest('Invalid URL format')
+        }
 
         const {
           update,
@@ -113,17 +125,21 @@ export async function putBookmarks (fastify, _opts) {
           episode,
           archive,
           normalize,
+          exact_url: exactUrl,
         } = request.query
+
+        const shouldNormalize = exactUrl ? false : normalize
 
         // This will be the one possibly slow step
         // This needs to happen on create for de-dupe behavior
-        const workingUrl = normalize ? await normalizeURL(submittedUrl) : submittedUrl
+        const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache }) : submittedUrl
+        const workingUrlString = shouldNormalize ? workingUrl.toString() : submittedUrlString
 
         const maybeResult = await getBookmark({
           fastify,
           pg: client,
           ownerId: userId,
-          url: workingUrl.toString(),
+          url: workingUrlString,
           sensitive: true,
           perPage: 1,
         })
@@ -143,12 +159,12 @@ export async function putBookmarks (fastify, _opts) {
         }
 
         // Title will fallback to just being the URL on create
-        const workingTitle = submittedTitle || workingUrl.toString()
+        const workingTitle = submittedTitle || workingUrlString
 
         const bookmark = await createBookmark({
           fastify,
           pg: client,
-          url: workingUrl.toString(),
+          url: workingUrlString,
           title: workingTitle,
           note,
           toread,
@@ -156,7 +172,7 @@ export async function putBookmarks (fastify, _opts) {
           archiveUrls: archive_urls,
           summary,
           userId,
-          originalUrl: workingUrl.href === submittedUrl.href ? null : submittedUrl.toString(),
+          originalUrl: shouldNormalize && workingUrlString !== submittedUrlString ? submittedUrlString : null,
           meta,
           tags
         })
@@ -169,7 +185,7 @@ export async function putBookmarks (fastify, _opts) {
           await fastify.pgboss.queues.resolveBookmarkQ.send({
             data: {
               userId,
-              url: workingUrl.toString(),
+              url: workingUrlString,
               bookmarkId: bookmark.id,
               resolveBookmark: meta,
               resolveEpisode: episode,

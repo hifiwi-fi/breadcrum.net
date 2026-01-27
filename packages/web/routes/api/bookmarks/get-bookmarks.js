@@ -6,6 +6,7 @@
 
 import { getBookmarks } from './get-bookmarks-query.js'
 import { addMillisecond } from './addMillisecond.js'
+import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
@@ -43,6 +44,10 @@ export async function getBookmarksHandler (fastify) {
             url: {
               type: 'string',
               format: 'uri',
+            },
+            exact_url: {
+              type: 'boolean',
+              default: false,
             },
             tag: {
               type: 'string', minLength: 1, maxLength: 255,
@@ -100,6 +105,7 @@ export async function getBookmarksHandler (fastify) {
         after,
         per_page: perPage,
         url,
+        exact_url: exactUrl,
         tag,
         sensitive,
         starred,
@@ -118,7 +124,14 @@ export async function getBookmarksHandler (fastify) {
       if (tag) bookmarkParams.tag = tag
       if (before) bookmarkParams.before = before
       if (after) bookmarkParams.after = after
-      if (url) bookmarkParams.url = url
+      if (url) {
+        try {
+          const workingUrl = exactUrl ? url : (await normalizeURL(new URL(url), { cache: fastify.cache, followShorteners: false })).toString()
+          bookmarkParams.url = workingUrl
+        } catch (err) {
+          return reply.badRequest('Invalid URL format')
+        }
+      }
 
       const rows = await getBookmarks({ fastify, ...bookmarkParams })
 
