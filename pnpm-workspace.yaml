@@ -14,11 +14,11 @@ catalog:
   "@fastify/type-provider-json-schema-to-ts": ^5.0.0
   "@nearform/sql": ^1.10.5
   "@opentelemetry/api": ^1.9.0
-  "@opentelemetry/exporter-prometheus": ^0.209.0
+  "@opentelemetry/exporter-prometheus": ^0.211.0
   "@opentelemetry/host-metrics": ^0.38.0
-  "@opentelemetry/instrumentation-http": ^0.209.0
-  "@opentelemetry/instrumentation-runtime-node": ^0.22.0
-  "@opentelemetry/sdk-node": ^0.209.0
+  "@opentelemetry/instrumentation-http": ^0.211.0
+  "@opentelemetry/instrumentation-runtime-node": ^0.24.0
+  "@opentelemetry/sdk-node": ^0.211.0
   "@types/node": ^25.0.8
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
