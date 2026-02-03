@@ -71,8 +71,8 @@ catalogs:
       specifier: ^9.39.1
       version: 9.39.2
     fastify:
-      specifier: ^5.0.0
-      version: 5.7.1
+      specifier: ^5.7.3
+      version: 5.7.4
     fastify-cli:
       specifier: ^7.0.1
       version: 7.4.1
@@ -167,7 +167,7 @@ importers:
         version: 9.39.2(jiti@2.6.1)
       fastify:
         specifier: 'catalog:'
-        version: 5.7.1
+        version: 5.7.4
       neostandard:
         specifier: 'catalog:'
         version: 0.12.2(@typescript-eslint/utils@8.53.1(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
@@ -293,7 +293,7 @@ importers:
         version: 1.1.0
       fastify:
         specifier: 'catalog:'
-        version: 5.7.1
+        version: 5.7.4
       fastify-cli:
         specifier: 'catalog:'
         version: 7.4.1
@@ -483,7 +483,7 @@ importers:
         version: 3.3.1
       fastify:
         specifier: 'catalog:'
-        version: 5.7.1
+        version: 5.7.4
       fastify-cli:
         specifier: 'catalog:'
         version: 7.4.1
@@ -3074,8 +3074,8 @@ packages:
   fastify-user-agent@2.0.1:
     resolution: {integrity: sha512-Vfo6jWmD5aQGEuhJVrAB0K0hPRGqqeawS24Zz3KWkCLHYRPIHGiel3QJqCUnxsRjEvC2/+cegPEToJAeJh/faA==}
 
-  fastify@5.7.1:
-    resolution: {integrity: sha512-ZW7S4fxlZhE+tYWVokFzjh+i56R+buYKNGhrVl6DtN8sxkyMEzpJnzvO8A/ZZrsg5w6X37u6I4EOQikYS5DXpA==}
+  fastify@5.7.4:
+    resolution: {integrity: sha512-e6l5NsRdaEP8rdD8VR0ErJASeyaRbzXYpmkrpr2SuvuMq6Si3lvsaVy5C+7gLanEkvjpMDzBXWE5HPeb/hgTxA==}
 
   fastparallel@2.4.1:
     resolution: {integrity: sha512-qUmhxPgNHmvRjZKBFUNI0oZuuH9OlSIOXmJ98lhKPxMZZ7zS/Fi0wRHOihDSz0R1YiIOjxzOY4bq65YTcdBi2Q==}
@@ -8899,7 +8899,7 @@ snapshots:
       close-with-grace: 2.4.0
       commist: 3.2.0
       dotenv: 16.6.1
-      fastify: 5.7.1
+      fastify: 5.7.4
       fastify-plugin: 5.1.0
       generify: 4.2.0
       help-me: 5.0.0
@@ -8921,7 +8921,7 @@ snapshots:
       fastify-plugin: 5.1.0
       useragent: 2.3.0
 
-  fastify@5.7.1:
+  fastify@5.7.4:
     dependencies:
       '@fastify/ajv-compiler': 4.0.5
       '@fastify/error': 4.2.0
