@@ -16,6 +16,7 @@ import { EpisodeTitle } from '../episode-title/index.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { ArchiveTitle } from '../archive-title/index.js'
 import { useReload } from '../../hooks/useReload.js'
+import { ResolveStatus } from '../resolve-status/index.js'
 
 /**
  * @typedef {object} BookmarkEditProps
@@ -540,15 +541,7 @@ export const BookmarkEdit = ({
           <div class="button-cluster button-spacing">
             ${onSave ? html`<span><input name="submit-button" type="submit" /></span>` : null}
             ${onCancelEdit ? html`<span><button type="button" onClick=${onCancelEdit}>Cancel</button></span>` : null}
-            ${isResolving
-              ? html`
-                <span class="bc-bookmark-resolve-status">
-                  <span aria-hidden="true">⏱</span>
-                  <span>Resolving</span>
-                  <span class="bc-resolve-dots" aria-hidden="true"></span>
-                </span>
-              `
-              : null}
+            ${isResolving ? html`<${ResolveStatus} />` : null}
           </div>
           <div class="button-spacing">
             <span class="bc-help-text bc-submit-help">

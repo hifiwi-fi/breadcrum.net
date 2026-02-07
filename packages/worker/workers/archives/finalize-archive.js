@@ -32,6 +32,7 @@ export async function finalizeArchive ({
     if (article.byline != null) archiveData.push(SQL`byline = ${article.byline}`)
     if (article.dir != null) archiveData.push(SQL`direction = ${article.dir}`)
     if (article.lang != null) archiveData.push(SQL`language = ${article.lang}`)
+    if (article.publishedTime != null) archiveData.push(SQL`published_time = ${article.publishedTime}`)
   }
 
   const query = SQL`
