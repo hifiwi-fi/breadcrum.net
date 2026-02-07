@@ -5,8 +5,8 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@bret/is-youtube-url": "catalog:",
     "@breadcrum/resources": "workspace:*",
+    "@bret/is-youtube-url": "catalog:",
     "@fastify/accepts": "^5.0.1",
     "@fastify/auth": "^5.0.1",
     "@fastify/autoload": "catalog:",
@@ -37,6 +37,7 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
+    "@tanstack/react-query": "^5.90.20",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
@@ -55,6 +56,7 @@
     "postgrator-cli": "^9.0.0",
     "preact": "^10.27.0",
     "preact-render-to-string": "^6.6.3",
+    "react": "npm:@preact/compat@^18.3.1",
     "resolve-email": "^4.0.33",
     "undici": "catalog:",
     "useragent": "^2.3.0"

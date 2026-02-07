@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
+ * @import { TypeEpisodeReadClient } from '../../routes/api/episodes/schemas/schema-episode-read.js'
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
  */
 
@@ -13,14 +13,18 @@ import { useLSP } from './useLSP.js'
 import { useWindow } from './useWindow.js'
 
 /**
- * @typedef {object} BookmarksQueryData
- * @property {TypeBookmarkReadClient[] | null} bookmarks
+ * @typedef {object} EpisodesQueryData
+ * @property {TypeEpisodeReadClient[] | null} episodes
  * @property {Date | null} before
  * @property {Date | null} after
  * @property {boolean} top
  */
 
-export function useBookmarks () {
+/**
+ * @param {{ enabled?: boolean }} [options]
+ */
+export function useEpisodes (options = {}) {
+  const { enabled = true } = options
   const { user } = useUser({ required: false })
   const state = useLSP()
   const window = useWindow()
@@ -28,38 +32,38 @@ export function useBookmarks () {
 
   const queryString = useMemo(() => (query ? query.toString() : ''), [query])
   const queryKey = useMemo(() => ([
-    'bookmarks',
+    'episodes',
     user?.id ?? null,
     state.apiUrl,
     state.sensitive,
-    state.toread,
-    state.starred,
     queryString,
-  ]), [queryString, state.apiUrl, state.sensitive, state.starred, state.toread, user?.id])
+  ]), [queryString, state.apiUrl, state.sensitive, user?.id])
 
-  /** @type {UseQueryResult<BookmarksQueryData, Error>} */
-  const bookmarksQuery = useTanstackQuery(/** @type {UseQueryOptions<BookmarksQueryData, Error>} */ ({
+  /** @type {UseQueryResult<EpisodesQueryData, Error>} */
+  const episodesQuery = useTanstackQuery(/** @type {UseQueryOptions<EpisodesQueryData, Error>} */ ({
     queryKey,
-    enabled: Boolean(user),
+    enabled: Boolean(user) && enabled,
     placeholderData: keepPreviousData,
     /**
      * @param {{ signal: AbortSignal }} context
-     * @returns {Promise<BookmarksQueryData>}
+     * @returns {Promise<EpisodesQueryData>}
      */
     queryFn: async ({ signal }) => {
       const pageParams = new URLSearchParams(queryString)
+      const requestParams = new URLSearchParams()
 
       // Transform date string to date object
-      const pagePramsBefore = pageParams.get('before')
-      const pageParamsAfter = pageParams.get('after')
-      if (pagePramsBefore) pageParams.set('before', (new Date(+pagePramsBefore)).toISOString())
-      if (pageParamsAfter) pageParams.set('after', (new Date(+pageParamsAfter)).toISOString())
+      const beforeParam = pageParams.get('before')
+      const afterParam = pageParams.get('after')
+      if (beforeParam) requestParams.set('before', (new Date(+beforeParam)).toISOString())
+      if (afterParam) requestParams.set('after', (new Date(+afterParam)).toISOString())
+      const bidParam = pageParams.get('bid')
+      if (bidParam) requestParams.set('bookmark_id', bidParam)
 
-      pageParams.set('sensitive', state.sensitive.toString())
-      pageParams.set('toread', state.toread.toString())
-      pageParams.set('starred', state.starred.toString())
+      requestParams.set('sensitive', state.sensitive.toString())
+      requestParams.set('include_feed', 'true')
 
-      const response = await fetch(`${state.apiUrl}/bookmarks?${pageParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json',
@@ -70,7 +74,7 @@ export function useBookmarks () {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
         return {
-          bookmarks: body?.data ?? null,
+          episodes: body?.data ?? null,
           before: body?.pagination?.before ? new Date(body?.pagination?.before) : null,
           after: body?.pagination?.after ? new Date(body?.pagination?.after) : null,
           top: Boolean(body?.pagination?.top),
@@ -81,7 +85,7 @@ export function useBookmarks () {
     }
   }))
 
-  const { data, error, isPending, refetch, status } = bookmarksQuery
+  const { data, error, isPending, refetch, status } = episodesQuery
   const prevDataRef = useRef(data)
   const prevStatusRef = useRef(status)
 
@@ -113,38 +117,38 @@ export function useBookmarks () {
     prevStatusRef.current = status
   }, [data, queryString, status, window])
 
-  const reloadBookmarks = useCallback(async () => {
+  const reloadEpisodes = useCallback(async () => {
     await refetch()
   }, [refetch])
 
-  const bookmarks = data?.bookmarks ?? null
+  const episodes = data?.episodes ?? null
   const before = data?.before ?? null
   const after = data?.after ?? null
-  const bookmarksError = error || null
-  const bookmarksLoading = isPending
+  const episodesError = error
+  const episodesLoading = isPending
 
   let beforeParams
   if (before) {
     beforeParams = new URLSearchParams(query ?? '')
-    beforeParams.set('before', String(before.valueOf()))
+    beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
     afterParams = new URLSearchParams(query ?? '')
-    afterParams.set('after', String(after.valueOf()))
+    afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }
 
   return {
-    bookmarksLoading,
-    bookmarksError,
-    bookmarks,
-    reloadBookmarks,
+    episodes,
+    episodesLoading,
+    episodesError,
+    reloadEpisodes,
     before,
     after,
     beforeParams,
-    afterParams
+    afterParams,
   }
 }
