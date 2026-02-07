@@ -58,6 +58,11 @@ const commonSerlializedUserProps = /** @type {const} @satisfies {JSONSchema} */ 
       nullable: true,
       description: 'A note presented to the user regarding their account disabled status.',
     },
+    service_notice_dismissed_hash: {
+      type: 'string',
+      nullable: true,
+      description: 'Hash for the most recently dismissed service notice message.',
+    },
   }
 })
 

@@ -246,8 +246,8 @@ export const Page = () => {
   return html`
     <div class="bc-register">
       <form class="register-form" id="register-form" onSubmit=${onRegister}>
-        <fieldset disabled="${Boolean(user) || submitting || !flags.registration || flagsLoading}">
-          <legend>${flags.registration ? 'Register:' : 'Registration closed. Please come back soon!'}</legend>
+        <fieldset disabled="${Boolean(user) || submitting || !flags['registration'] || flagsLoading}">
+          <legend>${flags['registration'] ? 'Register:' : 'Registration closed. Please come back soon!'}</legend>
           <div>
             <label class="block">
               Email:

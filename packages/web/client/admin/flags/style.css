@@ -1,0 +1,155 @@
+/* admin/flags/style.css */
+
+.bc-admin-flags {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 0;
+}
+
+.bc-admin-flags fieldset {
+  border: 1px solid var(--accent-midground);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  background: var(--accent-background);
+}
+
+.bc-admin-flags-legend {
+  font-size: var(--small-font-size);
+  letter-spacing: 0.02em;
+}
+
+.bc-admin-flags-status,
+.bc-admin-flags-error {
+  margin: 0.75rem 0 0;
+  font-size: 0.9em;
+}
+
+.bc-admin-flags-error {
+  color: var(--bc-danger-color);
+}
+
+.bc-admin-flags-list {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) minmax(0, 1fr);
+  gap: 0.75rem 1.25rem;
+  margin: 1rem 0 0;
+}
+
+.bc-admin-flags-list dt,
+.bc-admin-flags-list dd {
+  margin: 0;
+}
+
+.bc-admin-flags-term {
+  font-size: var(--small-font-size);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.bc-admin-flags-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bc-admin-flags-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bc-admin-flags-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bc-admin-flags-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bc-admin-flags-description {
+  margin: 0;
+  color: var(--accent-foreground);
+  font-size: 0.85em;
+}
+
+.bc-admin-flags-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.bc-admin-flags-color-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.bc-admin-flags-color-title {
+  font-size: 0.85em;
+  color: var(--accent-foreground);
+}
+
+.bc-admin-flags-color-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.bc-admin-flags-color-input {
+  max-width: 220px;
+}
+
+.bc-admin-flags-color-picker {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--accent-midground);
+  background: var(--background);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bc-admin-flags-color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.bc-admin-flags-color-chip {
+  border: 1px solid var(--accent-midground);
+  background: var(--accent-background);
+  color: var(--text);
+  font-size: 0.75em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.bc-admin-flags-color-chip:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.bc-admin-flags-color-help {
+  margin: 0;
+  font-size: 0.75em;
+  color: var(--accent-foreground);
+}
+
+@media (max-width: 700px) {
+  .bc-admin-flags {
+    padding: 1rem 0;
+  }
+
+  .bc-admin-flags-list {
+    grid-template-columns: 1fr;
+  }
+
+  .bc-admin-flags-term {
+    padding-top: 0.35rem;
+  }
+}

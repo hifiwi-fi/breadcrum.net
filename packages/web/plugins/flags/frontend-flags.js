@@ -9,4 +9,24 @@ export const defaultFrontendFlags = /** @type {const} */ {
     default: false,
     description: 'Require an invite code to register',
   },
+  service_notice_message: {
+    type: 'string',
+    default: '',
+    description: 'Service notice banner message (non-dismissible)',
+  },
+  service_notice_message_color: {
+    type: 'string',
+    default: '',
+    description: 'Background color for the service notice banner (non-dismissible). Leave empty for default.',
+  },
+  service_notice_dismissible_message: {
+    type: 'string',
+    default: '',
+    description: 'Service notice banner message (dismissible)',
+  },
+  service_notice_dismissible_message_color: {
+    type: 'string',
+    default: '',
+    description: 'Background color for the service notice banner (dismissible). Leave empty for default.',
+  },
 }
