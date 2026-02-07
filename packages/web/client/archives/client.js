@@ -14,6 +14,7 @@ import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { useArchives } from '../hooks/useArchives.js'
 import { QueryProvider } from '../lib/query-provider.js'
+import { tc } from '../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -93,27 +94,65 @@ export const Page = () => {
     onPoll: reloadArchives,
   })
 
+  const showEmptyState = Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
+  const resultsClassName = showEmptyState
+    ? 'bc-archives-results bc-archives-results-empty'
+    : 'bc-archives-results'
+  const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
+  const afterParamsValue = afterParams ? afterParams.toString() : undefined
+
   return html`
-    <${Search}
-      placeholder="Search Archives..."
-      onSearch=${handleSearch}
-      autofocus=${true}
-    />
-    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
-    ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
-    ${archivesError ? html`<div>${archivesError.message}</div>` : null}
-    ${Array.isArray(archives)
-        ? archives.map(ar => html`
-            <${ArchiveList}
-              key=${ar.id}
-              archive=${ar}
-              reload=${reloadArchives}
-              onDelete=${reloadArchives}
-              clickForPreview=${true}
-            />
-          `)
-        : null}
-    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
+    <div class="bc-archives-page">
+      ${tc(Search, {
+        placeholder: 'Search Archives...',
+        onSearch: handleSearch,
+        autofocus: true,
+      })}
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-archives-pagination bc-archives-pagination-top">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: topDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
+      <div class=${resultsClassName}>
+        ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
+        ${archivesError ? html`<div>${archivesError.message}</div>` : null}
+        ${showEmptyState ? html`<div class="bc-archives-empty">Bookmark some articles!</div>` : null}
+        ${Array.isArray(archives)
+          ? archives.map(ar => html`
+              <${ArchiveList}
+                key=${ar.id}
+                archive=${ar}
+                reload=${reloadArchives}
+                onDelete=${reloadArchives}
+                clickForPreview=${true}
+              />
+            `)
+          : null}
+      </div>
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-archives-pagination bc-archives-pagination-bottom">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: bottomDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
+    </div>
   `
 }
 

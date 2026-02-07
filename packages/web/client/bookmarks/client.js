@@ -173,23 +173,74 @@ export const Page = () => {
         return rows
       })()
     : null
+  const showEmptyState = Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
+  const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
+  const afterParamsValue = afterParams ? afterParams.toString() : undefined
+  const resultsClassName = showEmptyState
+    ? 'bc-bookmarks-results bc-bookmarks-results-empty'
+    : 'bc-bookmarks-results'
 
   return html`
-    <${Search}
-      placeholder="Search Bookmarks..."
-      onSearch=${handleSearch}
-      autofocus=${true}
-    />
-    <div class="bc-bookmarks-actions">
-      ${tc(BookmarkQuickAdd, { onSubmitUrl: handleQuickAdd })}
-      ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onClick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
+    <div class="bc-bookmarks-page">
+      ${tc(Search, {
+        placeholder: 'Search Bookmarks...',
+        onSearch: handleSearch,
+        autofocus: true,
+      })}
+      <div class="bc-bookmarks-actions">
+        ${showEmptyState
+          ? null
+          : tc(BookmarkQuickAdd, { onSubmitUrl: handleQuickAdd })}
+        ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onClick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
+      </div>
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-bookmarks-pagination bc-bookmarks-pagination-top">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: topDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
+      <div class=${resultsClassName}>
+        ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
+        ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
+        ${showEmptyState
+          ? html`
+            <div class="bc-bookmarks-empty-state">
+              <div class="bc-bookmarks-empty">Add your first bookmark!</div>
+              <div class="bc-bookmarks-empty-quickadd">
+                ${tc(BookmarkQuickAdd, {
+                  onSubmitUrl: handleQuickAdd,
+                  showToggle: false,
+                  showCancel: false,
+                })}
+              </div>
+            </div>
+          `
+          : null}
+        ${bookmarkRows}
+      </div>
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-bookmarks-pagination bc-bookmarks-pagination-bottom">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: bottomDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
     </div>
-    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
-    ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
-    ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
-    ${bookmarkRows}
-
-      <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
   `
 }
 

@@ -28,7 +28,7 @@ The bookmarklet always sends client-extracted metadata (title, summary, tags) an
 
 ## Create a bookmark
 
-1. Use the [bookmarklet](/docs/bookmarks/bookmarklets/) or go to [/bookmarks/add](/bookmarks/add).
+1. Use the [bookmarklet](/docs/bookmarks/bookmarklets/) or go to [/bookmarks/submit](/bookmarks/submit/).
 2. The bookmarklet pre-fills title, summary, and tags from the page. Tags default to metadata and URL hints. Existing URLs open in edit mode.
 3. Fill in the URL, title, note, summary, and tags.
 3. Optional actions:

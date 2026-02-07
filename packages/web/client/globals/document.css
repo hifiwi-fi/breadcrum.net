@@ -8,9 +8,15 @@
 }
 
 /* style.css site specific stuff */
-.serif { font-family: var(--system-serif); }
-.sans { font-family: var(--system-sans); }
-.round { font-family: var(--system-round); }
+.serif {
+  font-family: var(--system-serif);
+}
+.sans {
+  font-family: var(--system-sans);
+}
+.round {
+  font-family: var(--system-round);
+}
 
 .bc-page-container {
   & textarea,
@@ -41,16 +47,21 @@
 }
 
 @supports not (min-height: 100dvh) {
-  _::-webkit-full-page-media, _:future, :root .bc-page-container {
+  _::-webkit-full-page-media,
+  _:future,
+  :root .bc-page-container {
     /* Safari min height hack  */
     min-height: -webkit-fill-available;
   }
 }
 
-.bc-header {}
+.bc-header {
+}
 
 .bc-main {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 46em;
   margin: 0 auto;
@@ -63,5 +74,6 @@
 }
 
 /* .bc-main > *:first-child { margin-top: 0 !important; } */
-.bc-main > *:last-child { margin-bottom: 0 !important; }
-
+.bc-main > *:last-child {
+  margin-bottom: 0 !important;
+}

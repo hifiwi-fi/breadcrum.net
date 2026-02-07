@@ -36,6 +36,7 @@ export const Page = () => {
   }, [dataReload, setDataReload])
 
   const pageParams = new URLSearchParams(query || '')
+  const queryValue = pageParams.get('query') ?? ''
 
   // Search bookmarks
   useEffect(() => {
@@ -105,7 +106,7 @@ export const Page = () => {
     }
   }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
 
-  const title = pageParams.get('query') ? ['🔖', pageParams.get('query') || '', '|', 'Bookmarks Search'] : []
+  const title = queryValue ? ['🔖', queryValue, '|', 'Bookmarks Search'] : []
   useTitle(...title)
 
   const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ ev) => {
@@ -151,44 +152,60 @@ export const Page = () => {
     prevParams.set('reverse', prev.reverse)
   }
 
+  const showEmptyState = Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
+  const resultsClassName = showEmptyState
+    ? 'bc-search-results bc-search-results-empty'
+    : 'bc-search-results'
+
   return html`
-    <${Search}
-      placeholder="Search Bookmarks..."
-      value=${pageParams.get('query') || undefined}
-      onSearch=${handleSearch}
-      autofocus=${true}
-    />
+    <div class="bc-search-page">
+      ${tc(Search, {
+        placeholder: 'Search Bookmarks...',
+        value: queryValue || '',
+        onSearch: handleSearch,
+        autofocus: true,
+      })}
 
-    <div>
-      ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${'\n'}
-      ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
-      ${'\n'}
-      🔎
-      ${'\n'}
-      🔖 <a href="${`../bookmarks?query=${pageParams.get('query') || ''}`}">bookmarks</a>
-      ${'\n'}
-      🗄️ <a href="${`../archives?query=${pageParams.get('query') || ''}`}">archives</a>
-      ${'\n'}
-      📼 <a href="${`../episodes?query=${pageParams.get('query') || ''}`}">episodes</a>
-    </div>
+      <div>
+        ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+        ${'\n'}
+        ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+        ${'\n'}
+        🔎
+        ${'\n'}
+        🔖 <a href="${`../bookmarks?query=${queryValue}`}">bookmarks</a>
+        ${'\n'}
+        🗄️ <a href="${`../archives?query=${queryValue}`}">archives</a>
+        ${'\n'}
+        📼 <a href="${`../episodes?query=${queryValue}`}">episodes</a>
+      </div>
 
-    ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
-    ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
+      <div class=${resultsClassName}>
+        ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
+        ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
+        ${showEmptyState
+          ? html`
+            <div class="bc-search-empty">
+              ${queryValue ? 'No bookmarks found.' : 'Search for bookmarks.'}
+            </div>
+          `
+          : null}
 
-    ${Array.isArray(bookmarks)
-      ? bookmarks.map(b => html`
-          ${tc(BookmarkList, {
-            bookmark: b,
-            reload,
-            onDelete: reload
-          }, b.id)}
-        `)
-      : null}
+        ${Array.isArray(bookmarks)
+          ? bookmarks.map(b => html`
+              ${tc(BookmarkList, {
+                bookmark: b,
+                reload,
+                onDelete: reload
+              }, b.id)}
+            `)
+          : null}
+      </div>
 
-    <div>
-      ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
-      ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      <div>
+        ${prev ? html`<a onClick=${onPageNav} href=${'./?' + prevParams}>prev</a>` : null}
+        ${next ? html`<a onClick=${onPageNav} href=${'./?' + nextParams}>next</a>` : null}
+      </div>
     </div>
   `
 }

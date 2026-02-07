@@ -1,4 +1,35 @@
-@import '../components/feed-header/feed-header.css';
-@import '../components/episode/episode-list.css';
-@import '../components/search/index.css';
-@import '../components/pagination-buttons/index.css';
+@import "../components/feed-header/feed-header.css";
+@import "../components/episode/episode-list.css";
+@import "../components/search/index.css";
+@import "../components/pagination-buttons/index.css";
+
+.bc-feeds-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1 1 auto;
+  gap: 0.8em;
+}
+
+.bc-feeds-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  flex-grow: 1;
+}
+
+.bc-feeds-results-empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.bc-feeds-empty {
+  color: var(--accent-foreground);
+  opacity: 0.7;
+  padding: 0.5em 0;
+  text-align: center;
+}
+
+.bc-feeds-pagination-bottom {
+  margin-top: auto;
+}

@@ -3,11 +3,57 @@
 @import "../components/search/index.css";
 @import "../components/pagination-buttons/index.css";
 
+.bc-bookmarks-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1 1 auto;
+}
+
 .bc-bookmarks-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6em;
+}
+
+.bc-bookmarks-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.bc-bookmarks-results-empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.bc-bookmarks-empty {
+  color: var(--accent-foreground);
+  opacity: 0.7;
+  padding: 0.5em 0;
+  text-align: center;
+}
+
+.bc-bookmarks-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.bc-bookmarks-empty-state .bc-bookmarks-empty {
+  padding: 0;
+}
+
+.bc-bookmarks-empty-quickadd {
+  margin-top: 0;
+}
+
+.bc-bookmarks-pagination-bottom {
+  margin-top: auto;
 }
 
 .bc-tag-filter-remove {

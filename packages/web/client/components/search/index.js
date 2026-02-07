@@ -10,7 +10,7 @@ import { useCallback } from 'preact/hooks'
 /**
  * @typedef {object} SearchProps
  * @property {string} [placeholder]
- * @property {string} [value]
+ * @property {string | undefined} [value]
  * @property {(query: string) => void} [onSearch]
  * @property {boolean} [autofocus]
  */
@@ -32,12 +32,14 @@ export const Search = ({
     onSearch(query)
   }, [onSearch])
 
+  const resolvedValue = value ?? ''
+
   return html`
     <div class="bc-search-container">
       <search role="search">
         <form onSubmit="${handleSearch}" class="search-form">
           <input
-            defaultValue="${value}"
+            defaultValue="${resolvedValue}"
             class="search-bar"
             placeholder="${placeholder}"
             type="search"

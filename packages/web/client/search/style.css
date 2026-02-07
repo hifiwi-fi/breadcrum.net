@@ -1,0 +1,39 @@
+.bc-search-landing {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  min-height: 100%;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.bc-search-landing-content {
+  width: min(32rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.bc-search-landing-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  text-align: center;
+}
+
+.bc-search-landing-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  justify-content: center;
+}
+
+.bc-search-landing-links a {
+  text-decoration: none;
+  justify-self: center;
+}
+
+.bc-search-landing-links a:hover {
+  text-decoration: underline;
+}

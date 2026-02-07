@@ -1,2 +1,29 @@
-@import '../../components/bookmark/bookmark-list.css';
-@import '../../components/search/index.css';
+@import "../../components/bookmark/bookmark-list.css";
+@import "../../components/search/index.css";
+
+.bc-search-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1 1 auto;
+  gap: 0.8em;
+}
+
+.bc-search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  flex-grow: 1;
+}
+
+.bc-search-results-empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.bc-search-empty {
+  color: var(--accent-foreground);
+  opacity: 0.7;
+  padding: 0.5em 0;
+  text-align: center;
+}

@@ -1,3 +1,34 @@
-@import '../components/archive/archive-list.css';
-@import '../components/search/index.css';
-@import '../components/pagination-buttons/index.css';
+@import "../components/archive/archive-list.css";
+@import "../components/search/index.css";
+@import "../components/pagination-buttons/index.css";
+
+.bc-archives-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1 1 auto;
+  gap: 0.8em;
+}
+
+.bc-archives-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  flex-grow: 1;
+}
+
+.bc-archives-results-empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.bc-archives-empty {
+  color: var(--accent-foreground);
+  opacity: 0.7;
+  padding: 0.5em 0;
+  text-align: center;
+}
+
+.bc-archives-pagination-bottom {
+  margin-top: auto;
+}

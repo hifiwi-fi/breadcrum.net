@@ -1,7 +1,32 @@
-@import '../components/search/index.css';
+@import "../components/search/index.css";
 
 .bc-main {
   padding-top: 1em;
+}
+
+.bc-tags-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  flex: 1 1 auto;
+}
+
+.bc-tags-results {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.bc-tags-results-empty {
+  justify-content: center;
+  align-items: center;
+}
+
+.bc-tags-empty {
+  color: var(--accent-foreground);
+  opacity: 0.7;
+  padding: 0.5em 0;
+  text-align: center;
 }
 
 .bc-tags-list {
@@ -12,5 +37,5 @@
 }
 
 .bc-tags-list a {
-  color:  var(--bc-tags-color);
+  color: var(--bc-tags-color);
 }

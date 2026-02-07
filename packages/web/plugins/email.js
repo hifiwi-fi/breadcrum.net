@@ -17,14 +17,31 @@ export default fp(async function (fastify, _) {
    * @type {Transporter | undefined}
    */
   let transport
-  if (
-    fastify.config.SMTP_HOST &&
-    fastify.config.SMTP_PORT &&
-    fastify.config.SMTP_SECURE &&
-    fastify.config.SMTP_USER &&
-    fastify.config.SMTP_PASS &&
-    fastify.config.EMAIL_SENDING === true
-  ) {
+  const emailSendingEnabled = fastify.config.EMAIL_SENDING === true
+  const transportConfig = [
+    ['SMTP_HOST', fastify.config.SMTP_HOST],
+    ['SMTP_PORT', fastify.config.SMTP_PORT],
+    ['SMTP_SECURE', fastify.config.SMTP_SECURE],
+    ['SMTP_USER', fastify.config.SMTP_USER],
+    ['SMTP_PASS', fastify.config.SMTP_PASS],
+  ]
+  const missingTransportConfig = transportConfig
+    .filter(([key, value]) => {
+      if (key === 'SMTP_SECURE') {
+        return value === undefined || value === null
+      }
+      return value === undefined || value === null || value === ''
+    })
+    .map(([key]) => key)
+
+  if (missingTransportConfig.length > 0) {
+    fastify.log.warn({
+      emailSendingEnabled,
+      missingTransportConfig,
+    }, 'SMTP transport not configured due to missing settings.')
+  }
+
+  if (emailSendingEnabled && missingTransportConfig.length === 0) {
     /** @type {SMTPTransport.Options} */
     const opts = {
       host: fastify.config.SMTP_HOST,

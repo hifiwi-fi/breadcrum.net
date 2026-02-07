@@ -73,16 +73,24 @@ export const Page = () => {
     }
   }, [state.apiUrl, state.sensitive])
 
+  const showEmptyState = Array.isArray(tags) && tags.length === 0 && !tagsLoading && !tagsError
+  const resultsClassName = showEmptyState
+    ? 'bc-tags-results bc-tags-results-empty'
+    : 'bc-tags-results'
+
   return html`
-    <div>
-      ${tagsLoading && !Array.isArray(tags) ? html`<div>...</div>` : null}
-      ${tagsError ? html`<div>${tagsError.message}</div>` : null}
-      ${Array.isArray(tags)
-        ? html`
-          <div class="bc-tags-list">
-            ${tags.map(tag => html`<a key=${tag.name} href=${`/bookmarks/?tag=${tag.name}`} style=${{ fontSize: sizeForCount(tag.count) }}>${tag.name}<sup>${tag.count}</sup></a>`)}
-          </div>`
-        : null}
+    <div class="bc-tags-page">
+      <div class=${resultsClassName}>
+        ${tagsLoading && !Array.isArray(tags) ? html`<div>...</div>` : null}
+        ${tagsError ? html`<div>${tagsError.message}</div>` : null}
+        ${showEmptyState ? html`<div class="bc-tags-empty">Tag some bookmarks!</div>` : null}
+        ${Array.isArray(tags)
+          ? html`
+            <div class="bc-tags-list">
+              ${tags.map(tag => html`<a key=${tag.name} href=${`/bookmarks/?tag=${tag.name}`} style=${{ fontSize: sizeForCount(tag.count) }}>${tag.name}<sup>${tag.count}</sup></a>`)}
+            </div>`
+          : null}
+      </div>
     </div>
 `
 }

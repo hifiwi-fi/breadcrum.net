@@ -10,14 +10,22 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 /**
  * @typedef {{
  *  onSubmitUrl: (url: string) => void,
+ *  openOnMount?: boolean,
+ *  showToggle?: boolean,
+ *  showCancel?: boolean,
  * }} BookmarkQuickAddProps
  */
 
 /**
  * @type {FunctionComponent<BookmarkQuickAddProps>}
  */
-export const BookmarkQuickAdd = ({ onSubmitUrl }) => {
-  const [open, setOpen] = useState(false)
+export const BookmarkQuickAdd = ({
+  onSubmitUrl,
+  openOnMount = false,
+  showToggle = true,
+  showCancel = true,
+}) => {
+  const [open, setOpen] = useState(openOnMount || !showToggle)
   const inputRef = useRef(/** @type {HTMLInputElement | null} */(null))
 
   useEffect(() => {
@@ -41,11 +49,12 @@ export const BookmarkQuickAdd = ({ onSubmitUrl }) => {
   }, [])
 
   const handleCancel = useCallback(() => {
+    if (!showToggle) return
     setOpen(false)
     if (inputRef.current) {
       inputRef.current.value = ''
     }
-  }, [])
+  }, [showToggle])
 
   return html`
     <div class="bc-bookmark-quick-add">
@@ -63,15 +72,17 @@ export const BookmarkQuickAdd = ({ onSubmitUrl }) => {
               />
             </label>
             <button type="submit">Add</button>
-            <button type="button" onClick=${handleCancel}>Cancel</button>
+            ${showCancel
+              ? html`<button type="button" onClick=${handleCancel}>Cancel</button>`
+              : null}
           </form>
           <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
             Adding bookmarks is easier with the bookmarklet!
           </a>
         `
-        : html`
-          <button type="button" onClick=${handleOpen}>🔖 add +</button>
-        `
+        : showToggle
+          ? html`<button type="button" onClick=${handleOpen}>🔖 add +</button>`
+          : null
       }
     </div>
   `

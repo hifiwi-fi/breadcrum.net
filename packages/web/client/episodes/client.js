@@ -93,24 +93,62 @@ export const Page = () => {
     onPoll: reloadEpisodes,
   })
 
+  const showEmptyState = Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
+  const resultsClassName = showEmptyState
+    ? 'bc-episodes-results bc-episodes-results-empty'
+    : 'bc-episodes-results'
+  const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
+  const afterParamsValue = afterParams ? afterParams.toString() : undefined
+
   return html`
-    <${Search}
-      placeholder="Search Episodes..."
-      onSearch=${handleSearch}
-      autofocus=${true}
-    />
-    <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${topDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
-    ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
-    ${episodesError ? html`<div>${episodesError.message}</div>` : null}
-    ${Array.isArray(episodes)
-      ? episodes.map(e => tc(EpisodeList, {
-          episode: e,
-          reload: reloadEpisodes,
-          onDelete: reloadEpisodes,
-          clickForPreview: true
-        }, e.id))
-      : null}
-      <${PaginationButtons} onPageNav=${onPageNav} onDateNav=${onDateNav} dateParams=${dateParams} dateValue=${bottomDateValue} beforeParams=${beforeParams} afterParams=${afterParams} />
+    <div class="bc-episodes-page">
+      ${tc(Search, {
+        placeholder: 'Search Episodes...',
+        onSearch: handleSearch,
+        autofocus: true,
+      })}
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-episodes-pagination bc-episodes-pagination-top">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: topDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
+      <div class=${resultsClassName}>
+        ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
+        ${episodesError ? html`<div>${episodesError.message}</div>` : null}
+        ${showEmptyState ? html`<div class="bc-episodes-empty">Bookmark some media!</div>` : null}
+        ${Array.isArray(episodes)
+          ? episodes.map(e => tc(EpisodeList, {
+              episode: e,
+              reload: reloadEpisodes,
+              onDelete: reloadEpisodes,
+              clickForPreview: true
+            }, e.id))
+          : null}
+      </div>
+      ${showEmptyState
+? null
+: html`
+        <div class="bc-episodes-pagination bc-episodes-pagination-bottom">
+          ${tc(PaginationButtons, {
+            onPageNav,
+            onDateNav,
+            dateParams,
+            dateValue: bottomDateValue,
+            beforeParams: beforeParamsValue,
+            afterParams: afterParamsValue,
+          })}
+        </div>
+      `}
+    </div>
   `
 }
 
