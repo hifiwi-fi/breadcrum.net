@@ -1,4 +1,5 @@
 @import "../components/search/index.css";
+@import "../components/loading-placeholder/index.css";
 
 .bc-main {
   padding-top: 1em;

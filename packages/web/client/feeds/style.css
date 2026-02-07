@@ -2,6 +2,7 @@
 @import "../components/episode/episode-list.css";
 @import "../components/search/index.css";
 @import "../components/pagination-buttons/index.css";
+@import "../components/loading-placeholder/index.css";
 
 .bc-feeds-page {
   display: flex;

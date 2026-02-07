@@ -8,6 +8,8 @@ import { useEffect, useState } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
+import { tc } from '../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -74,14 +76,17 @@ export const Page = () => {
   }, [state.apiUrl, state.sensitive])
 
   const showEmptyState = Array.isArray(tags) && tags.length === 0 && !tagsLoading && !tagsError
-  const resultsClassName = showEmptyState
+  const showLoadingPlaceholder = tagsLoading && (!Array.isArray(tags) || tags.length === 0)
+  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-tags-results bc-tags-results-empty'
     : 'bc-tags-results'
 
   return html`
     <div class="bc-tags-page">
       <div class=${resultsClassName}>
-        ${tagsLoading && !Array.isArray(tags) ? html`<div>...</div>` : null}
+        ${showLoadingPlaceholder
+          ? tc(LoadingPlaceholder, { label: 'Loading tags' })
+          : null}
         ${tagsError ? html`<div>${tagsError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-tags-empty">Tag some bookmarks!</div>` : null}
         ${Array.isArray(tags)

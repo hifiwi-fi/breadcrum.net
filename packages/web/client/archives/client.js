@@ -15,6 +15,7 @@ import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { useArchives } from '../hooks/useArchives.js'
 import { QueryProvider } from '../lib/query-provider.js'
 import { tc } from '../lib/typed-component.js'
+import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -95,7 +96,8 @@ export const Page = () => {
   })
 
   const showEmptyState = Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
-  const resultsClassName = showEmptyState
+  const showLoadingPlaceholder = archivesLoading && (!Array.isArray(archives) || archives.length === 0)
+  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-archives-results bc-archives-results-empty'
     : 'bc-archives-results'
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
@@ -123,7 +125,9 @@ export const Page = () => {
         </div>
       `}
       <div class=${resultsClassName}>
-        ${archivesLoading && !Array.isArray(archives) ? html`<div>...</div>` : null}
+        ${showLoadingPlaceholder
+          ? tc(LoadingPlaceholder, { label: 'Loading archives' })
+          : null}
         ${archivesError ? html`<div>${archivesError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-archives-empty">Bookmark some articles!</div>` : null}
         ${Array.isArray(archives)

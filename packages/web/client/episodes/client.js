@@ -15,6 +15,7 @@ import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { useEpisodes } from '../hooks/useEpisodes.js'
 import { QueryProvider } from '../lib/query-provider.js'
+import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -94,7 +95,8 @@ export const Page = () => {
   })
 
   const showEmptyState = Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
-  const resultsClassName = showEmptyState
+  const showLoadingPlaceholder = episodesLoading && (!Array.isArray(episodes) || episodes.length === 0)
+  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-episodes-results bc-episodes-results-empty'
     : 'bc-episodes-results'
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
@@ -122,7 +124,9 @@ export const Page = () => {
         </div>
       `}
       <div class=${resultsClassName}>
-        ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
+        ${showLoadingPlaceholder
+          ? tc(LoadingPlaceholder, { label: 'Loading episodes' })
+          : null}
         ${episodesError ? html`<div>${episodesError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-episodes-empty">Bookmark some media!</div>` : null}
         ${Array.isArray(episodes)

@@ -17,6 +17,7 @@ import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
 import { QueryProvider } from '../lib/query-provider.js'
+import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -174,9 +175,10 @@ export const Page = () => {
       })()
     : null
   const showEmptyState = Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
+  const showLoadingPlaceholder = bookmarksLoading && (!Array.isArray(bookmarks) || bookmarks.length === 0)
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
   const afterParamsValue = afterParams ? afterParams.toString() : undefined
-  const resultsClassName = showEmptyState
+  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-bookmarks-results bc-bookmarks-results-empty'
     : 'bc-bookmarks-results'
 
@@ -208,7 +210,9 @@ export const Page = () => {
         </div>
       `}
       <div class=${resultsClassName}>
-        ${bookmarksLoading && !Array.isArray(bookmarks) ? html`<div>...</div>` : null}
+        ${showLoadingPlaceholder
+          ? tc(LoadingPlaceholder, { label: 'Loading bookmarks' })
+          : null}
         ${bookmarksError ? html`<div>${bookmarksError.message}</div>` : null}
         ${showEmptyState
           ? html`

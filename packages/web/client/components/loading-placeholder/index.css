@@ -1,0 +1,31 @@
+.bc-loading-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 6rem;
+  color: var(--accent-foreground);
+  opacity: 0.8;
+}
+
+.bc-loading-placeholder-spinner {
+  display: inline-block;
+  font-size: 2rem;
+  animation: bc-bread-spin 1.2s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-loading-placeholder-spinner {
+    animation: none;
+  }
+}
+
+@keyframes bc-bread-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

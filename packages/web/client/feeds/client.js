@@ -17,6 +17,7 @@ import { FeedHeader } from '../components/feed-header/feed-header.js'
 import { Search } from '../components/search/index.js'
 import { useReload } from '../hooks/useReload.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
+import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -218,7 +219,8 @@ export const Page = () => {
   const afterParamsValue = afterParams ? afterParams.toString() : undefined
 
   const showEmptyState = Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
-  const resultsClassName = showEmptyState
+  const showLoadingPlaceholder = episodesLoading && (!Array.isArray(episodes) || episodes.length === 0)
+  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-feeds-results bc-feeds-results-empty'
     : 'bc-feeds-results'
 
@@ -249,7 +251,9 @@ export const Page = () => {
         </div>
       `}
       <div class=${resultsClassName}>
-        ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
+        ${showLoadingPlaceholder
+          ? tc(LoadingPlaceholder, { label: 'Loading episodes' })
+          : null}
         ${episodesError ? html`<div>${episodesError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-feeds-empty">Bookmark some media!</div>` : null}
         ${Array.isArray(episodes)
