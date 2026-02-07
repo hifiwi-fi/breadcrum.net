@@ -10,7 +10,7 @@ description: "A look at what happened with Breadcrum in 2024."
 image: "./img/bc-4-contribs.jpg"
 ---
 
-Breadcrum is entering 2025, its 4th year (3rd year in operation)!
+Breadcrum is entering 2025, it's 3rd year in operation!
 Let's take a quick look at how things went last year, what got done, and chat about the future of the project.
 
 ## By the Numbers
