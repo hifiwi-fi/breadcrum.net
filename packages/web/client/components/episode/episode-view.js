@@ -95,7 +95,8 @@ export const EpisodeView = ({
   fullView = false,
 }) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
-  const embedHtml = typeof e?.oembed?.html === 'string' ? e.oembed.html : null
+  const rawEmbedHtml = typeof e?.oembed?.html === 'string' ? e.oembed.html : null
+  const embedHtml = rawEmbedHtml ? rawEmbedHtml.replace(/<iframe /gi, '<iframe credentialless ') : null
   const embedAspectRatio = getEmbedAspectRatio(e?.oembed)
   const embedStyle = embedAspectRatio ? { '--bc-embed-aspect': embedAspectRatio } : undefined
   const embedProviderName = typeof e?.oembed?.provider_name === 'string' ? e.oembed.provider_name.toLowerCase() : ''
