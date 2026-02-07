@@ -7,6 +7,7 @@ export const bookmarkProps = /** @type {const} @satisfies {JSONSchema} */ ({
   required: [],
   properties: {
     url: { type: 'string', format: 'uri' },
+    original_url: { type: ['string', 'null'], format: 'uri' },
     title: { type: 'string', minLength: 1, maxLength: 255 },
     note: { type: 'string' },
     starred: { type: 'boolean' },

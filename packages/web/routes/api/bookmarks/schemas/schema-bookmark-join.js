@@ -10,7 +10,6 @@ import { bookmarkReadProps, bookmarkProps } from './bookmark-base.js'
 
 export const schemaBookmarkJoin = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
-  $id: 'schema:breadcrum:bookmark:join',
   // required: bookmarkReadProps.required,
   additionalProperties: false,
   properties: {
