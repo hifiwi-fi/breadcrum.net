@@ -7,6 +7,7 @@ import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-clien
 import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { finalizeEpisode, finalizeEpisodeError } from './finaize-episode.js'
+import { resolveEpisodeEmbed } from './resolve-embed.js'
 import { upcomingCheck } from './handle-upcoming.js'
 
 /**
@@ -77,13 +78,21 @@ export function makeEpisodePgBossP ({ fastify }) {
           throw new Error('No video URL was found in discovery step')
         }
 
+        let oembed = null
+        try {
+          oembed = await resolveEpisodeEmbed({ fastify, url })
+        } catch (err) {
+          log.warn(err, 'Failed to resolve embed for episode')
+        }
+
         await finalizeEpisode({
           pg,
           media,
           bookmarkTitle,
           episodeId,
           userId,
-          url
+          url,
+          oembed,
         })
 
         const totalDuration = (performance.now() - jobStartTime) / 1000

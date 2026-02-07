@@ -14,6 +14,13 @@ export default fp(async function (fastify, _) {
     'https://fosstodon.org',
     'https://embed.bsky.app',
     'https://challenges.cloudflare.com',
+    'https://www.youtube.com',
+    'https://www.youtube-nocookie.com',
+    'https://player.vimeo.com',
+    'https://w.soundcloud.com',
+    'https://open.spotify.com',
+    'https://geo.dailymotion.com',
+    'https://rumble.com',
   ]
 
   /** @type {{ policy?: 'require-corp' | 'credentialless' | 'unsafe-none' } | false} */

@@ -75,12 +75,11 @@ export const CorsMedia = ({
       : null
     }
     ${!previewActive
-      ? thumbnail
-        ? html`
-          <div class="bc-cors-media-thumbnail-group" tabindex="0" role="button" aria-pressed="false" onClick="${handlePreviewClick}" onKeyDown="${handleKeydown}">
-            <img class='bc-cors-media-thumbnail' src="${thumbnail}" />
-          </div>`
-        : html`<div onKeyDown="${handleKeydown}" tabindex="0" role="button" aria-pressed="false" onClick="${handlePreviewClick}" class='bc-cors-media-placeholder'><${PlayIcon} /></div>`
+      ? html`
+          <button class="bc-cors-media-activate" type="button" onClick="${handlePreviewClick}" onKeyDown="${handleKeydown}">
+            ${thumbnail ? html`<img src="${thumbnail}" alt="" class="bc-cors-media-activate-thumb" />` : null}
+            <span class="bc-cors-media-activate-label"><${PlayIcon} /> Play ${type ?? 'media'}</span>
+          </button>`
       : null
     }
   </div>

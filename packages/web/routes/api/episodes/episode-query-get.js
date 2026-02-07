@@ -102,6 +102,8 @@ export function episodePropsQuery ({
       ep.ext,
       ep.src_type,
       ep.thumbnail,
+      ep.oembed,
+      ep.published_time,
       ep.text_content,
       ep.ready,
       ep.error,

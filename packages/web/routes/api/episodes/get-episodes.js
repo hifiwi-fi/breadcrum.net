@@ -1,6 +1,7 @@
 import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { getEpisodes } from './episode-query-get.js'
 import { getFeedWithDefaults } from '../feeds/feed-defaults.js'
+import { hydrateEmbed } from './hydrate-embed.js'
 import { addMillisecond } from '../bookmarks/addMillisecond.js'
 
 /**
@@ -146,6 +147,10 @@ export async function getEpisodesRoute (fastify, _opts) {
 
         const nextPage = bottom ? null : episodes.at(-1)?.created_at ?? null
         const prevPage = top ? null : addMillisecond(episodes[0]?.created_at)
+
+        for (const episode of episodes) {
+          hydrateEmbed(episode)
+        }
 
         return {
           data: request.query.include_feed

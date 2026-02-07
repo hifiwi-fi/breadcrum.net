@@ -113,7 +113,8 @@ export const Page = () => {
             reload: reloadEpisode,
             onDelete: handleDelete,
             clickForPreview: false,
-            showError: true
+            showError: true,
+            fullView: true,
           })
         : null}
       ${episodeLoading ? html`<div>...</div>` : null}

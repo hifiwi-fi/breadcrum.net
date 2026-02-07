@@ -2,8 +2,8 @@ import { isNotSSRF } from '../urls/ssrf-check.js'
 
 /**
  * @typedef {object} NormalizeUrlCache
- * @property {(key: string) => Promise<{ item?: string } | { value?: string } | string | null | undefined>} get
- * @property {(key: string, value: string, ttlMs?: number) => Promise<void> | void} set
+ * @property {(key: string) => Promise<unknown>} get
+ * @property {(key: string, value: string, ttlMs: number) => Promise<void> | void} set
  */
 
 /**
@@ -69,6 +69,8 @@ const TRACKING_PARAMS = new Set([
   // X/Twitter media viewer
   'currenttweet',
   'currenttweetuser',
+  // Rumble
+  'e9s',
 ])
 
 const YOUTUBE_ALLOWED_PARAMS = new Set(['v', 'list', 'index', 't'])
@@ -96,7 +98,10 @@ export async function normalizeURL (url, options = {}) {
   sanitizeUrl(workingUrl)
 
   if (followShorteners && typeof fetch === 'function' && isShortenerHost(workingUrl.hostname)) {
-    workingUrl = await expandShortUrl(workingUrl, { maxRedirects, timeoutMs, cache })
+    const expandOptions = cache
+      ? { maxRedirects, timeoutMs, cache }
+      : { maxRedirects, timeoutMs, cache: undefined }
+    workingUrl = await expandShortUrl(workingUrl, expandOptions)
     sanitizeUrl(workingUrl)
   }
 
@@ -143,7 +148,7 @@ function applyHostRewrites (url) {
  * @returns {boolean}
  */
 function isValidYouTubeId (id) {
-  return id && id.length > 0 && id.length <= 20 && /^[a-zA-Z0-9_-]+$/.test(id)
+  return Boolean(id) && id.length > 0 && id.length <= 20 && /^[a-zA-Z0-9_-]+$/.test(id)
 }
 
 /**
@@ -151,8 +156,10 @@ function isValidYouTubeId (id) {
  */
 function normalizeYouTubeUrl (url) {
   if (url.hostname === 'youtu.be') {
-    const id = url.pathname.split('/').filter(Boolean)[0]
-    if (id && isValidYouTubeId(id)) {
+    const segments = url.pathname.split('/').filter(Boolean)
+    const id = segments[0]
+    // youtu.be canonical video links are a single path segment
+    if (segments.length === 1 && id && isValidYouTubeId(id)) {
       url.hostname = 'www.youtube.com'
       url.pathname = '/watch'
       url.searchParams.set('v', id)
@@ -185,9 +192,19 @@ function normalizeXUrl (url) {
   url.hostname = 'x.com'
 
   const segments = url.pathname.split('/').filter(Boolean)
-  if (segments.length >= 4 && segments[1].toLowerCase() === 'status' && segments[3].toLowerCase() === 'mediaviewer') {
-    const user = segments[0]
-    const statusId = segments[2]
+  const user = segments[0]
+  const statusSegment = segments[1]
+  const statusId = segments[2]
+  const mediaViewerSegment = segments[3]
+
+  if (
+    user &&
+    statusSegment &&
+    statusId &&
+    mediaViewerSegment &&
+    statusSegment.toLowerCase() === 'status' &&
+    mediaViewerSegment.toLowerCase() === 'mediaviewer'
+  ) {
     if (user && statusId) {
       url.pathname = `/${user}/status/${statusId}`
       url.search = ''
@@ -233,7 +250,7 @@ function sortQueryParams (url) {
 
 /**
  * @param {URL} url
- * @param {{ maxRedirects: number, timeoutMs: number, cache?: NormalizeUrlCache }} options
+ * @param {{ maxRedirects: number, timeoutMs: number, cache: NormalizeUrlCache | undefined }} options
  * @returns {Promise<URL>}
  */
 async function expandShortUrl (url, options) {
@@ -347,14 +364,14 @@ function isHttpProtocol (protocol) {
 /**
  * @param {string} href
  * @param {NormalizeUrlCache | undefined} cache
- * @returns {string | null}
+ * @returns {Promise<string | null>}
  */
 async function getShortenerCache (href, cache) {
   if (!cache) return null
 
   try {
     const cached = await cache.get(getShortenerCacheKey(href))
-    const value = cached?.item ?? cached?.value ?? cached
+    const value = unwrapShortenerCachedValue(cached)
     if (typeof value === 'string' && value.length > 0) {
       // Validate cached value is a valid URL before returning
       try {
@@ -367,6 +384,30 @@ async function getShortenerCache (href, cache) {
     }
   } catch (err) {
     // ignore cache failures
+  }
+
+  return null
+}
+
+/**
+ * Normalize cache return shapes from different adapters.
+ *
+ * @param {unknown} cached
+ * @returns {string | null | undefined}
+ */
+function unwrapShortenerCachedValue (cached) {
+  if (cached == null) return cached
+  if (typeof cached === 'string') return cached
+
+  if (typeof cached === 'object') {
+    /** @type {{ item?: unknown, value?: unknown }} */
+    const maybeCached = cached
+    if (Object.prototype.hasOwnProperty.call(maybeCached, 'item')) {
+      return typeof maybeCached.item === 'string' ? maybeCached.item : null
+    }
+    if (Object.prototype.hasOwnProperty.call(maybeCached, 'value')) {
+      return typeof maybeCached.value === 'string' ? maybeCached.value : null
+    }
   }
 
   return null

@@ -21,12 +21,13 @@ import { EpisodeView } from './episode-view.js'
  * @property {() => void} onDelete
  * @property {boolean | undefined} [clickForPreview]
  * @property {boolean} [showError]
+ * @property {boolean} [fullView]
  */
 
 /**
  * @type {FunctionComponent<EpisodeListProps>}
  */
-export const EpisodeList = ({ episode, reload, onDelete, clickForPreview, showError }) => {
+export const EpisodeList = ({ episode, reload, onDelete, clickForPreview, showError, fullView }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -84,6 +85,7 @@ export const EpisodeList = ({ episode, reload, onDelete, clickForPreview, showEr
             onEdit: handleEdit,
             clickForPreview,
             ...(showError !== undefined && { showError }),
+            ...(fullView !== undefined && { fullView }),
           })
     }
   </div>`
