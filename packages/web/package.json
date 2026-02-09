@@ -85,7 +85,7 @@
     "neostandard": "catalog:",
     "npm-run-all2": "catalog:",
     "p-map": "^7.0.0",
-    "type-fest": "^5.2.0",
+    "type-fest": "^5.4.4",
     "typescript": "catalog:",
     "xmlbuilder": "^15.1.1"
   },
