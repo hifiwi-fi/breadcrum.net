@@ -47,7 +47,7 @@ export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
  * @property {string} [channel_url] - URL of the channel (nullable, format: uri).
  * @property {string} [thumbnail] - Thumbnail URL (nullable, format: uri).
  * @property {string} [live_status] - Live status of the resource (nullable).
- * @property {number} [release_timestamp] - Release timestamp (nullable).
+ * @property {number} [release_timestamp] - Release timestamp in Unix seconds (nullable).
  */
 
 /**

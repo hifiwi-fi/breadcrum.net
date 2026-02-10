@@ -59,6 +59,7 @@ export async function finalizeEpisode ({
     videoData.push(SQL`oembed = ${oembed}`)
   }
   if ('release_timestamp' in media && media.release_timestamp) {
+    // release_timestamp is Unix seconds from yt-dlp API, convert to milliseconds for Date constructor
     videoData.push(SQL`published_time = ${new Date(media.release_timestamp * 1000).toISOString()}`)
   }
 

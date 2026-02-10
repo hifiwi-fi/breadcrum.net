@@ -10,7 +10,12 @@
       "WebFetch(domain:developer.x.com)",
       "mcp__mcp-server-brave-search__brave_web_search",
       "WebFetch(domain:developers.dailymotion.com)",
-      "WebFetch(domain:faq.dailymotion.com)"
+      "WebFetch(domain:faq.dailymotion.com)",
+      "mcp__mcp-server-context7__resolve-library-id",
+      "mcp__mcp-server-context7__query-docs",
+      "mcp__mcp-server-github__list_issues",
+      "mcp__mcp-server-github__issue_read",
+      "WebFetch(domain:cedwards.xyz)"
     ]
   }
 }
