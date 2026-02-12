@@ -15,7 +15,10 @@
       "mcp__mcp-server-context7__query-docs",
       "mcp__mcp-server-github__list_issues",
       "mcp__mcp-server-github__issue_read",
-      "WebFetch(domain:cedwards.xyz)"
+      "WebFetch(domain:cedwards.xyz)",
+      "WebFetch(domain:bret.io)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:unpkg.com)"
     ]
   }
 }

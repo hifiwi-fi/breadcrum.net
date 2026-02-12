@@ -2,11 +2,11 @@
 
 /**
  * @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
- * @import { UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
+ * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
-import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useQuery } from './useQuery.js'
 import { useLSP } from './useLSP.js'

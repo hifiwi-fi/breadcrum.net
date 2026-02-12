@@ -37,7 +37,7 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
-    "@tanstack/react-query": "^5.90.20",
+    "@tanstack/preact-query": "^5.91.0",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
@@ -55,7 +55,6 @@
     "postgrator-cli": "^9.0.0",
     "preact": "^10.27.0",
     "preact-render-to-string": "^6.6.3",
-    "react": "npm:@preact/compat@^18.3.1",
     "resolve-email": "^4.0.34",
     "undici": "catalog:",
     "useragent": "^2.3.0"
