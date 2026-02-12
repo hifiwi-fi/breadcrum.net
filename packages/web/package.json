@@ -41,7 +41,6 @@
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
-    "dotenv": "^17.0.0",
     "fast-json-body": "^1.1.0",
     "fastify": "catalog:",
     "fastify-cli": "catalog:",
