@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/preact-query'
 
 /**
  * @typedef {typeof globalThis & { __bcQueryClient?: QueryClient }} QueryClientGlobal
