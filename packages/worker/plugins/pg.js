@@ -1,4 +1,14 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
+
+export const pgEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    DATABASE_URL: { type: 'string', default: 'postgres://postgres@localhost/breadcrum' },
+  },
+  required: [],
+})
 
 /**
  * This plugins adds a postgres connection

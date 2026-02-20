@@ -12,12 +12,13 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { useReload } from '../../hooks/useReload.js'
 
 /**
- * @typedef {'boolean' | 'string'} FlagType
+ * @typedef {'boolean' | 'string' | 'number'} FlagType
  * @typedef {{ type: 'boolean', default: boolean, description: string }} BooleanFlagMeta
  * @typedef {{ type: 'string', default: string, description: string }} StringFlagMeta
- * @typedef {BooleanFlagMeta | StringFlagMeta} FlagMeta
+ * @typedef {{ type: 'number', default: number, description: string }} NumberFlagMeta
+ * @typedef {BooleanFlagMeta | StringFlagMeta | NumberFlagMeta} FlagMeta
  * @typedef {Record<string, FlagMeta>} FlagDefinitions
- * @typedef {Record<string, boolean | string>} FlagValues
+ * @typedef {Record<string, boolean | string | number>} FlagValues
  */
 
 /** @type {FlagDefinitions} */
@@ -128,6 +129,8 @@ export const Page = () => {
 
         if (flagMeta.type === 'boolean') {
           payload[flag] = formElement.checked
+        } else if (flagMeta.type === 'number') {
+          payload[flag] = Number(formElement.value)
         } else {
           payload[flag] = formElement.value
         }

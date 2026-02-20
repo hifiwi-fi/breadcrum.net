@@ -100,6 +100,16 @@ export const UserRowView = ({
         })}">
           ${u.disabled ? 'Account disabled' : 'Account active'}
         </span>
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': u.subscription_status === 'active' || u.subscription_status === 'trialing',
+          'bc-user-badge-warning': u.subscription_status === 'past_due',
+          'bc-user-badge-false': !u.subscription_status || u.subscription_status === 'canceled',
+        })}">
+          ${u.subscription_plan
+            ? `${u.subscription_plan} (${u.subscription_provider}${u.subscription_display_name ? ': ' + u.subscription_display_name : ''}, ${u.subscription_status}${u.subscription_cancel_at_period_end ? ', canceling' : ''})`
+            : 'Free plan'}
+        </span>
       </div>
 
       <div class="bc-user-grid">
@@ -132,6 +142,55 @@ export const UserRowView = ({
             ${internalNote || 'None'}
           </div>
         </div>
+        ${u.subscription_provider
+          ? html`
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription provider</div>
+              <div class="bc-user-value">${u.subscription_provider}</div>
+            </div>
+            ${u.subscription_display_name
+              ? html`
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Subscription label</div>
+                  <div class="bc-user-value">${u.subscription_display_name}</div>
+                </div>
+              `
+              : null
+            }
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription period end</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-empty': !u.subscription_period_end && u.subscription_provider !== 'custom',
+              })}">
+                ${u.subscription_period_end
+                  ? (new Date(u.subscription_period_end)).toLocaleString()
+                  : u.subscription_provider === 'custom'
+                    ? 'Lifetime'
+                    : 'N/A'}
+              </div>
+            </div>
+            ${u.subscription_provider === 'stripe' && u.stripe_customer_id
+              ? html`
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Stripe</div>
+                  <div class="bc-user-value">
+                    <a href="https://dashboard.stripe.com/customers/${u.stripe_customer_id}" target="_blank" rel="noopener">
+                      View in Stripe
+                    </a>
+                  </div>
+                </div>
+              `
+              : null
+            }
+          `
+          : html`
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription</div>
+              <div class="bc-user-value bc-user-value-empty">None</div>
+            </div>
+          `
+        }
       </div>
 
       <div class="bc-user-meta">

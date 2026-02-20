@@ -4,37 +4,44 @@
  * @typedef { FromSchema<EnvSchemaType> } DotEnvSchemaType
  */
 
+import { authEnvSchema } from '../plugins/auth.js'
+import { billingEnvSchema } from '../plugins/billing.js'
+import { cookieEnvSchema } from '../plugins/cookie.js'
+import { emailEnvSchema } from '../plugins/email.js'
+import { geoipEnvSchema } from '../plugins/geoip.js'
+import { helmetEnvSchema } from '../plugins/helmet.js'
+import { jwtEnvSchema } from '../plugins/jwt.js'
+import { otelMetricsEnvSchema } from '../plugins/otel-metrics.js'
+import { pgEnvSchema } from '../plugins/pg.js'
+import { rateLimitEnvSchema } from '../plugins/rate-limit.js'
+import { redisEnvSchema } from '../plugins/redis.js'
+import { swaggerEnvSchema } from '../plugins/swagger.js'
+import { ytDlpEnvSchema } from '../plugins/yt-dlp.js'
+
 export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:dotenv',
-  required: [
-    'JWT_SECRET',
-    'COOKIE_SECRET',
-    'TURNSTILE_SECRET_KEY',
-  ],
   additionalProperties: false,
+  required: [
+    ...authEnvSchema.required,
+    ...billingEnvSchema.required,
+    ...cookieEnvSchema.required,
+    ...emailEnvSchema.required,
+    ...geoipEnvSchema.required,
+    ...helmetEnvSchema.required,
+    ...jwtEnvSchema.required,
+    ...otelMetricsEnvSchema.required,
+    ...pgEnvSchema.required,
+    ...rateLimitEnvSchema.required,
+    ...redisEnvSchema.required,
+    ...swaggerEnvSchema.required,
+    ...ytDlpEnvSchema.required,
+  ],
   properties: {
+    // Base / cross-cutting
     ENV: {
       type: 'string',
       default: 'development',
-    },
-    JWT_SECRET: {
-      type: 'string',
-    },
-    COOKIE_SECRET: {
-      type: 'string',
-    },
-    COOKIE_NAME: {
-      type: 'string',
-      default: 'breadcrum_token',
-    },
-    DATABASE_URL: {
-      type: 'string',
-      default: 'postgres://postgres@localhost/breadcrum',
-    },
-    REDIS_CACHE_URL: {
-      type: 'string',
-      default: 'redis://localhost:6379/1',
     },
     HOST: {
       // Hostname and port (if needed)
@@ -45,100 +52,20 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
       enum: ['http', 'https'],
       default: 'http',
     },
-    SECURE_IFRAMES: {
-      type: 'boolean',
-      default: false,
-    },
-    SMTP_HOST: {
-      type: 'string',
-    },
-    SMTP_PORT: {
-      type: 'integer',
-      default: 465,
-    },
-    SMTP_SECURE: {
-      type: 'boolean',
-      default: true,
-    },
-    SMTP_USER: {
-      type: 'string',
-    },
-    SMTP_PASS: {
-      type: 'string',
-    },
-    APP_EMAIL: {
-      type: 'string',
-      default: 'support@breadcrum.net',
-    },
-    SNS_USER: {
-      type: 'string',
-      default: 'sns-user',
-    },
-    SNS_PASS: {
-      type: 'string',
-    },
-    YT_DLP_API_URL: {
-      type: 'string',
-      default: 'http://user:pass@127.0.0.1:5000',
-    },
-    SWAGGER: {
-      type: 'boolean',
-      default: true,
-    },
-    OTEL_SERVICE_NAME: {
-      type: 'string',
-      default: 'breadcrum-web',
-    },
-    OTEL_SERVICE_VERSION: {
-      type: 'string',
-      default: '1.0.0',
-    },
-    OTEL_RESOURCE_ATTRIBUTES: {
-      type: 'string',
-      default: 'deployment.environment=development',
-    },
-    MAXMIND_ACCOUNT_ID: {
-      type: 'string',
-    },
-    MAXMIND_LICENSE_KEY: {
-      type: 'string',
-    },
-    EMAIL_SENDING: {
-      type: 'boolean',
-      default: true,
-    },
-    EMAIL_VALIDATION: {
-      type: 'boolean',
-      default: true,
-    },
-    RATE_LIMITING: {
-      type: 'boolean',
-      default: true,
-    },
-    TURNSTILE_VALIDATE: {
-      // TODO: Replace with a bypass token to allow tests against staging/prod.
-      type: 'boolean',
-      default: true,
-    },
-    TURNSTILE_SITEKEY: {
-      type: 'string',
-      default: '1x00000000000000000000AA',
-    },
-    TURNSTILE_SECRET_KEY: {
-      type: 'string',
-      default: '1x0000000000000000000000000000000AA',
-    },
-    PASSKEY_MAX_PER_USER: {
-      type: 'integer',
-      default: 10,
-      minimum: 1,
-      maximum: 100,
-      description: 'Maximum number of passkeys allowed per user',
-    },
-    PASSKEY_CHALLENGE_TIMEOUT: {
-      type: 'integer',
-      default: 300000,
-      description: 'Passkey challenge timeout in milliseconds (default: 5 minutes)',
-    },
+
+    // Plugin schemas
+    ...authEnvSchema.properties,
+    ...billingEnvSchema.properties,
+    ...cookieEnvSchema.properties,
+    ...emailEnvSchema.properties,
+    ...geoipEnvSchema.properties,
+    ...helmetEnvSchema.properties,
+    ...jwtEnvSchema.properties,
+    ...otelMetricsEnvSchema.properties,
+    ...pgEnvSchema.properties,
+    ...rateLimitEnvSchema.properties,
+    ...redisEnvSchema.properties,
+    ...swaggerEnvSchema.properties,
+    ...ytDlpEnvSchema.properties,
   },
 })

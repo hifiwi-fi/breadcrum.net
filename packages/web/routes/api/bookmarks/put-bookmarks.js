@@ -8,6 +8,8 @@ import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
+import { getLatestSubscription, isSubscriptionActive } from '../billing/subscriptions.js'
+import { getMonthlyBookmarkUsage } from './bookmark-usage.js'
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
@@ -93,6 +95,12 @@ export async function putBookmarks (fastify, _opts) {
               },
             },
           },
+          402: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
         },
       }),
     },
@@ -155,6 +163,34 @@ export async function putBookmarks (fastify, _opts) {
               site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
               data: maybeResult,
             })
+          }
+        }
+
+        const {
+          subscriptions_required,
+          free_bookmarks_per_month: freeBookmarksPerMonth,
+        } = await fastify.getFlags({
+          frontend: true,
+          backend: true,
+        })
+
+        if (subscriptions_required) {
+          const subscription = await getLatestSubscription({
+            pg: client,
+            userId,
+          })
+          const activeSubscription = isSubscriptionActive(subscription)
+          if (!activeSubscription) {
+            const usage = await getMonthlyBookmarkUsage({
+              pg: client,
+              userId,
+              limit: freeBookmarksPerMonth,
+            })
+            if (usage.count >= usage.limit) {
+              return reply.code(402).send({
+                error: 'Free tier limit reached. Upgrade to add more bookmarks this month.',
+              })
+            }
           }
         }
 

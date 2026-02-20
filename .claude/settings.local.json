@@ -18,7 +18,19 @@
       "WebFetch(domain:cedwards.xyz)",
       "WebFetch(domain:bret.io)",
       "WebFetch(domain:registry.npmjs.org)",
-      "WebFetch(domain:unpkg.com)"
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "mcp__mcp-server-github__list_pull_requests",
+      "Bash(python3:*)",
+      "mcp__mcp-server-github__pull_request_read",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "mcp__mcp-server-github__get_me",
+      "Bash(gh repo view:*)",
+      "Bash(gh pr view:*)",
+      "mcp__mcp-server-github__add_issue_comment"
     ]
   }
 }

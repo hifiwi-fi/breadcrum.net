@@ -1,7 +1,7 @@
 ---
 title: Billing and Refund Policy
 publishDate: "2025-01-07T04:22:18.544Z"
-updatedDate: "2025-01-07T04:22:18.544Z"
+updatedDate: "2026-02-14T00:00:00.000Z"
 layout: docs
 ---
 
@@ -10,28 +10,31 @@ By using any paid services, you agree to the terms outlined here.
 
 ---
 
-## 1. Free and Paid Plans
+## 1. Free and Paid Subscriptions
 
-Breadcrum currently offers a free plan to all users.
-Paid plans may be introduced in the future.
-If so, clear pricing and billing details will be published on the site and during signup.
+{{ vars.siteName }} offers a free tier and a paid subscription.
+The free tier includes 10 new bookmarks per month, resetting on the 1st of each month (UTC).
+The paid subscription offers unlimited bookmarks and is billed yearly.
+Current subscription details are published on the [subscriptions and pricing](/docs/subscriptions/) page.
 
 ---
 
 ## 2. Subscription Billing
 
-When active, paid plans will be charged on a recurring basis (e.g. monthly or annually).
+Subscriptions are charged on a yearly recurring basis.
 You will be notified in advance of any price changes.
-You can cancel your subscription at any time from your account settings.
+You can cancel your subscription at any time from your [account settings](/account/).
 Canceling prevents future charges but does not retroactively refund past payments.
+You retain access to paid features until the end of your current billing period.
 
 ---
 
 ## 3. Payment Processing
 
-Payments are processed by a third-party provider (e.g. Stripe).
+Payments are processed by [Stripe](https://stripe.com).
 We do not store your full payment details on our servers.
-Billing data is securely transmitted and stored by the payment processor.
+Billing data is securely transmitted and stored by Stripe.
+You can manage your payment method and view invoices through the Stripe customer portal, accessible from your account settings.
 
 ---
 

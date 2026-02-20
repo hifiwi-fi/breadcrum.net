@@ -22,6 +22,7 @@
     "undici": "catalog:"
   },
   "devDependencies": {
+    "stripe": "catalog:",
     "@types/jsdom": "catalog:",
     "@types/mime-types": "^3.0.1",
     "@types/node": "catalog:",

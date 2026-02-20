@@ -1,5 +1,15 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
 import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+
+export const ytDlpEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    YT_DLP_API_URL: { type: 'string', default: 'http://user:pass@127.0.0.1:5000' },
+  },
+  required: [],
+})
 
 /**
  * This plugin adds yt-dlp fetching helpers

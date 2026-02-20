@@ -8,7 +8,7 @@
  */
 
 import { html } from 'htm/preact'
-import { useState, useRef, useCallback } from 'preact/hooks'
+import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
 import cn from 'classnames'
 import { formatUserAgent } from './format-user-agent.js'
 
@@ -18,6 +18,8 @@ import { formatUserAgent } from './format-user-agent.js'
  * @property {(formState: SchemaTypeAdminUserUpdateClient) => Promise<void>} [onSave]
  * @property {() => Promise<void>} [onDelete]
  * @property {() => void} [onCancelEdit]
+ * @property {string} [apiUrl]
+ * @property {() => void} [reload]
  */
 
 /**
@@ -28,14 +30,26 @@ export const UserRowEdit = ({
   onSave,
   onDelete,
   onCancelEdit,
+  apiUrl,
+  reload,
 }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
+  const [showGrantForm, setShowGrantForm] = useState(false)
+  const [subError, setSubError] = useState(/** @type {Error | null} */(null))
+  const [subLoading, setSubLoading] = useState(false)
+  const [removeConfirm, setRemoveConfirm] = useState(false)
+  const [grantUnlimited, setGrantUnlimited] = useState(true)
+  const [customUnlimited, setCustomUnlimited] = useState(!u.subscription_period_end)
   const viewHref = `./view/?id=${u.id}`
   const latestUserAgent = formatUserAgent(u.user_agent)
   const registrationUserAgent = formatUserAgent(u.registration_user_agent)
+
+  useEffect(() => {
+    setCustomUnlimited(!u.subscription_period_end)
+  }, [u.subscription_period_end])
 
   const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
@@ -116,6 +130,128 @@ export const UserRowEdit = ({
     }
   }, [setDisabled, setError, formRef?.current, onSave])
 
+  const subFormRef = useRef(/** @type {HTMLDivElement | null} */(null))
+
+  const handleOpenGrantForm = useCallback(() => {
+    setGrantUnlimited(true)
+    setSubError(null)
+    setShowGrantForm(true)
+  }, [])
+
+  const handleCloseGrantForm = useCallback(() => {
+    setShowGrantForm(false)
+    setSubError(null)
+    setGrantUnlimited(true)
+  }, [])
+
+  const handleGrantUnlimitedChange = useCallback((/** @type {Event} */ ev) => {
+    const target = /** @type {HTMLInputElement} */ (ev.currentTarget)
+    setGrantUnlimited(target.checked)
+  }, [])
+
+  const handleCustomUnlimitedChange = useCallback((/** @type {Event} */ ev) => {
+    const target = /** @type {HTMLInputElement} */ (ev.currentTarget)
+    setCustomUnlimited(target.checked)
+  }, [])
+
+  const handleGrantSubscription = useCallback(async () => {
+    setSubLoading(true)
+    setSubError(null)
+
+    const container = subFormRef.current
+    if (!container) return
+
+    const displayNameEl = /** @type {HTMLInputElement | null} */ (container.querySelector('[name="sub_display_name"]'))
+    const periodEndEl = /** @type {HTMLInputElement | null} */ (container.querySelector('[name="sub_period_end"]'))
+    const unlimitedEl = /** @type {HTMLInputElement | null} */ (container.querySelector('[name="sub_unlimited"]'))
+
+    const displayName = displayNameEl?.value?.trim()
+    if (!displayName) {
+      setSubError(new Error('Display name is required'))
+      setSubLoading(false)
+      return
+    }
+
+    const isUnlimited = unlimitedEl?.checked ?? false
+    const periodEndValue = isUnlimited ? null : (periodEndEl?.value || null)
+    if (!isUnlimited && !periodEndValue) {
+      setSubError(new Error('Period end is required unless unlimited is checked'))
+      setSubLoading(false)
+      return
+    }
+
+    const body = {
+      display_name: displayName,
+      current_period_end: periodEndValue ? new Date(periodEndValue).toISOString() : null,
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/subscription`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+
+      setShowGrantForm(false)
+      if (reload) reload()
+    } catch (err) {
+      setSubError(/** @type {Error} */(err))
+    } finally {
+      setSubLoading(false)
+    }
+  }, [apiUrl, u.id, reload])
+
+  const handleSyncStripe = useCallback(async () => {
+    setSubLoading(true)
+    setSubError(null)
+
+    try {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/sync`, {
+        method: 'post',
+      })
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+
+      if (reload) reload()
+    } catch (err) {
+      setSubError(/** @type {Error} */(err))
+    } finally {
+      setSubLoading(false)
+    }
+  }, [apiUrl, u.id, reload])
+
+  const handleRemoveSubscription = useCallback(async () => {
+    setSubLoading(true)
+    setSubError(null)
+
+    try {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/subscription`, {
+        method: 'delete',
+      })
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+
+      setRemoveConfirm(false)
+      if (reload) reload()
+    } catch (err) {
+      setSubError(/** @type {Error} */(err))
+    } finally {
+      setSubLoading(false)
+    }
+  }, [apiUrl, u.id, reload])
+
+  const isCustomSub = u.subscription_provider === 'custom'
+  const isStripeSub = u.subscription_provider === 'stripe'
+  const hasSub = !!u.subscription_provider
+
   return html`
     <article class="bc-user-card bc-user-card-edit" role="listitem">
       <form ref=${formRef} class="bc-user-edit-form" onsubmit=${handleSave}>
@@ -194,6 +330,129 @@ export const UserRowEdit = ({
           </div>
 
           <div class="bc-user-meta">
+            <div class="bc-user-meta-section">
+              <div class="bc-user-meta-title">Subscription</div>
+              <div class="bc-user-meta-grid">
+                ${!hasSub
+                  ? html`
+                    ${showGrantForm
+                      ? html`
+                        <div ref=${subFormRef}>
+                          <label class="bc-user-field">
+                            <span class="bc-user-label">Display name</span>
+                            <input type="text" name="sub_display_name" placeholder="e.g. Friends & Family, Gift" disabled=${subLoading} />
+                          </label>
+                          <label class="bc-user-flag">
+                            <input
+                              type="checkbox"
+                              name="sub_unlimited"
+                              checked=${grantUnlimited}
+                              onChange=${handleGrantUnlimitedChange}
+                              disabled=${subLoading}
+                            />
+                            <span>Unlimited plan (no expiration)</span>
+                          </label>
+                          <label class="bc-user-field">
+                            <span class="bc-user-label">Period end</span>
+                            <input type="date" name="sub_period_end" disabled=${subLoading || grantUnlimited} />
+                          </label>
+                          <div class="button-cluster">
+                            <button type="button" disabled=${subLoading} onClick=${handleGrantSubscription}>Grant</button>
+                            <button type="button" disabled=${subLoading} onClick=${handleCloseGrantForm}>Cancel</button>
+                          </div>
+                        </div>
+                      `
+                      : html`
+                        <div class="bc-user-field">
+                          <div class="bc-user-value bc-user-value-empty">No subscription (free plan)</div>
+                        </div>
+                        <div class="button-cluster">
+                          <button type="button" onClick=${handleOpenGrantForm}>Grant subscription</button>
+                        </div>
+                      `
+                    }
+                  `
+                  : null
+                }
+                ${isCustomSub
+                  ? html`
+                    <div ref=${subFormRef}>
+                      <label class="bc-user-field">
+                        <span class="bc-user-label">Display name</span>
+                        <input type="text" name="sub_display_name" defaultValue="${u.subscription_display_name || ''}" disabled=${subLoading} />
+                      </label>
+                      <label class="bc-user-flag">
+                        <input
+                          type="checkbox"
+                          name="sub_unlimited"
+                          checked=${customUnlimited}
+                          onChange=${handleCustomUnlimitedChange}
+                          disabled=${subLoading}
+                        />
+                        <span>Unlimited plan (no expiration)</span>
+                      </label>
+                      <label class="bc-user-field">
+                        <span class="bc-user-label">Period end</span>
+                        <input
+                          type="date"
+                          name="sub_period_end"
+                          defaultValue="${u.subscription_period_end ? new Date(u.subscription_period_end).toISOString().split('T')[0] : ''}"
+                          disabled=${subLoading || customUnlimited}
+                        />
+                      </label>
+                      <div class="bc-user-field">
+                        <div class="bc-user-label">Status</div>
+                        <div class="bc-user-value">${u.subscription_status}</div>
+                      </div>
+                      <div class="button-cluster">
+                        <button type="button" disabled=${subLoading} onClick=${handleGrantSubscription}>Update</button>
+                        ${removeConfirm
+                          ? html`
+                            <button type="button" onClick=${() => setRemoveConfirm(false)}>Cancel</button>
+                            <button type="button" disabled=${subLoading} onClick=${handleRemoveSubscription}>Confirm remove</button>
+                          `
+                          : html`<button type="button" onClick=${() => setRemoveConfirm(true)}>Remove subscription</button>`
+                        }
+                      </div>
+                    </div>
+                  `
+                  : null
+                }
+                ${isStripeSub
+                  ? html`
+                    <div class="bc-user-field">
+                      <div class="bc-user-label">Provider</div>
+                      <div class="bc-user-value">Stripe</div>
+                    </div>
+                    <div class="bc-user-field">
+                      <div class="bc-user-label">Status</div>
+                      <div class="bc-user-value">${u.subscription_status}${u.subscription_cancel_at_period_end ? ' (canceling)' : ''}</div>
+                    </div>
+                    <div class="bc-user-field">
+                      <div class="bc-user-label">Period end</div>
+                      <div class="bc-user-value">${u.subscription_period_end ? new Date(u.subscription_period_end).toLocaleString() : 'N/A'}</div>
+                    </div>
+                    <div class="button-cluster">
+                      ${u.stripe_customer_id
+                        ? html`<a href="https://dashboard.stripe.com/customers/${u.stripe_customer_id}" target="_blank" rel="noopener">Manage in Stripe</a>`
+                        : null
+                      }
+                      <button type="button" disabled=${subLoading} onClick=${handleSyncStripe}>Sync from Stripe</button>
+                    </div>
+                  `
+                  : null
+                }
+                ${!hasSub && u.stripe_customer_id
+                  ? html`
+                    <div class="button-cluster">
+                      <button type="button" disabled=${subLoading} onClick=${handleSyncStripe}>Sync from Stripe</button>
+                    </div>
+                  `
+                  : null
+                }
+                ${subError ? html`<div class="error-box">${subError.message}</div>` : null}
+              </div>
+            </div>
             <div class="bc-user-meta-section">
               <div class="bc-user-meta-title">Activity</div>
               <div class="bc-user-meta-grid">

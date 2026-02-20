@@ -1,4 +1,14 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
+
+export const helmetEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    SECURE_IFRAMES: { type: 'boolean', default: false },
+  },
+  required: [],
+})
 
 /**
  * This plugin adds fastify/fastify-helmet
