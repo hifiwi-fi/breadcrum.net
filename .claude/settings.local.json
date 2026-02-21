@@ -18,7 +18,8 @@
       "WebFetch(domain:cedwards.xyz)",
       "WebFetch(domain:bret.io)",
       "WebFetch(domain:registry.npmjs.org)",
-      "WebFetch(domain:unpkg.com)"
+      "WebFetch(domain:unpkg.com)",
+      "Bash(xargs cat:*)"
     ]
   }
 }

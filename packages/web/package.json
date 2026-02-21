@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "1.0.13",
-    "@domstack/static": "^11.0.0-beta.6",
+    "@domstack/static": "^11.0.2",
     "@fastify/type-provider-json-schema-to-ts": "catalog:",
     "@types/common-tags": "^1.8.4",
     "@types/node": "catalog:",
