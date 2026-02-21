@@ -9,7 +9,7 @@ import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useQuery } from '../hooks/useQuery.js'
-import { client } from '@passwordless-id/webauthn'
+import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

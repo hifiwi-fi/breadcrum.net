@@ -1,4 +1,4 @@
-import { server } from '@passwordless-id/webauthn'
+import { server } from '@passwordless-id/webauthn/dist/esm/index.js'
 import SQL from '@nearform/sql'
 import { verifyAndConsumeChallenge } from '../challenge-store.js'
 import { schemaPasskeyAuthenticateVerifyBody } from '../schemas/schema-passkey-authenticate-verify.js'

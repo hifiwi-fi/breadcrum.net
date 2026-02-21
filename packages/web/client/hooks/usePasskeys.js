@@ -8,7 +8,7 @@ import { useEffect, useState, useCallback } from 'preact/hooks'
 import { useUser } from './useUser.js'
 import { useLSP } from './useLSP.js'
 import { useReload } from './useReload.js'
-import { client } from '@passwordless-id/webauthn'
+import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
 
 export function usePasskeys () {
   const { user } = useUser({ required: false })
@@ -62,7 +62,7 @@ export function usePasskeys () {
     try {
       // I don think we actually need this:
       // Dynamic import to avoid loading WebAuthn library unless needed
-      // const { client } = await import('@passwordless-id/webauthn')
+      // const { client } = await import('@passwordless-id/webauthn/dist/esm/index.js')
 
       // Check if WebAuthn is available
       const isAvailable = client.isAvailable()
