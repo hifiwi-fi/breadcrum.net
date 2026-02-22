@@ -29,7 +29,7 @@ export default fp(async function (fastify, _) {
       routePrefix: '/openapi',
       logo: {
         type: 'image/png',
-        content: await fsp.readFile(path.join(import.meta.dirname, '../client/static/bread.png')),
+        content: await fsp.readFile(path.join(import.meta.dirname, '../routes/client/static/bread.png')),
       },
     })
   }

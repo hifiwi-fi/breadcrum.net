@@ -40,6 +40,7 @@
     "@tanstack/preact-query": "^5.91.0",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
+    "domstack-fastify": "file:../../../domstack-fastify",
     "common-tags": "^1.8.2",
     "fast-json-body": "^1.1.0",
     "fastify": "catalog:",
@@ -91,8 +92,7 @@
     "node": ">=23.0.0"
   },
   "scripts": {
-    "build": "run-s clean && run-p build:*",
-    "build:domstack": "dom --src client --dest public",
+    "build": "run-s clean",
     "clean": "rm -rf public && mkdir -p public",
     "migrate": "postgrator",
     "generate-default-env": "node scripts/generate-default-env.js",
@@ -104,8 +104,6 @@
     "test:tsc": "tsc",
     "watch": "run-s clean && run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git ./client ./public' -l info -P -p 3000 --options --address 0.0.0.0 app.js",
-    "watch:domstack": "pnpm run build:domstack --watch-only --drafts",
-    "domstack-watch": "pnpm run build:domstack --watch --drafts",
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js --import otel.js",
     "generate-dbml": "pnpm dlx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
