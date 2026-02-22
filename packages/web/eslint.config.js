@@ -9,8 +9,8 @@ import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 /** @type {string[]} */
 const ignores = resolveIgnoresFromGitignore()
 /** @type {string[]} */
-const clientFiles = ['client/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}']
-const clientPrefix = 'client/'
+const clientFiles = ['routes/client/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}']
+const clientPrefix = 'routes/'
 /** @type {string[]} */
 const extraTsFiles = ['**/*.cts', '**/*.mts']
 
@@ -47,7 +47,7 @@ const excludeClient = (config) => {
 
   return {
     ...config,
-    ignores: [...(config.ignores || []), 'client/**'],
+    ignores: [...(config.ignores || []), 'routes/client/**'],
   }
 }
 

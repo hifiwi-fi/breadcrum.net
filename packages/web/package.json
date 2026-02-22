@@ -40,7 +40,7 @@
     "@tanstack/preact-query": "^5.91.0",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
-    "domstack-fastify": "file:../../../domstack-fastify",
+    "@domstack/fastify": "file:../../../domstack-fastify",
     "common-tags": "^1.8.2",
     "fast-json-body": "^1.1.0",
     "fastify": "catalog:",

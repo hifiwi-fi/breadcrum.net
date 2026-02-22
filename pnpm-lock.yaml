@@ -204,6 +204,9 @@ importers:
       '@bret/is-youtube-url':
         specifier: 'catalog:'
         version: 1.0.5
+      '@domstack/fastify':
+        specifier: file:../../../domstack-fastify
+        version: file:../domstack-fastify(@fastify/static@9.0.0)(@types/markdown-it@14.1.2)(@types/node@25.2.3)(fastify@5.7.4)
       '@fastify/accepts':
         specifier: ^5.0.1
         version: 5.0.4
@@ -306,9 +309,6 @@ importers:
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
-      domstack-fastify:
-        specifier: file:../../../domstack-fastify
-        version: file:../domstack-fastify(@fastify/static@9.0.0)(@types/markdown-it@14.1.2)(@types/node@25.2.3)(fastify@5.7.4)
       fast-json-body:
         specifier: ^1.1.0
         version: 1.1.0
@@ -660,6 +660,16 @@ packages:
   '@csstools/css-tokenizer@4.0.0':
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
+
+  '@domstack/fastify@file:../domstack-fastify':
+    resolution: {directory: ../domstack-fastify, type: directory}
+    engines: {node: '>=20', npm: '>=10'}
+    peerDependencies:
+      '@fastify/static': '>=6'
+      fastify: '>=5'
+    peerDependenciesMeta:
+      '@fastify/static':
+        optional: true
 
   '@domstack/static@11.0.2':
     resolution: {integrity: sha512-pAAgDNBe5lJP5uNZSCKva2kAHE72tmLQ6Z9qePHBrNIZ6p0TWPjY71bMDdkv+rRiDoS0fQoR1qRNeddjPc9prA==}
@@ -2477,16 +2487,6 @@ packages:
 
   dompurify@3.3.1:
     resolution: {integrity: sha512-qkdCKzLNtrgPFP1Vo+98FRzJnBRGe4ffyCea9IwHB1fyxPOeNTHpLKYGd4Uk9xvNoH0ZoOjwZxNptyMwqrId1Q==}
-
-  domstack-fastify@file:../domstack-fastify:
-    resolution: {directory: ../domstack-fastify, type: directory}
-    engines: {node: '>=20', npm: '>=10'}
-    peerDependencies:
-      '@fastify/static': '>=6'
-      fastify: '>=5'
-    peerDependenciesMeta:
-      '@fastify/static':
-        optional: true
 
   dot-prop@5.3.0:
     resolution: {integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==}
@@ -5551,6 +5551,42 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
+  '@domstack/fastify@file:../domstack-fastify(@fastify/static@9.0.0)(@types/markdown-it@14.1.2)(@types/node@25.2.3)(fastify@5.7.4)':
+    dependencies:
+      async-folder-walker: 3.0.5(@types/node@25.2.3)
+      chokidar: 4.0.3
+      cpx2: 8.0.0
+      esbuild: 0.27.3
+      fastify: 5.7.4
+      fastify-plugin: 5.1.0
+      handlebars: 4.7.8
+      htm: 3.1.1
+      js-yaml: 4.1.1
+      markdown-it: 14.1.1
+      markdown-it-abbr: 2.0.0
+      markdown-it-anchor: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.1.1)
+      markdown-it-attrs: 4.3.1(markdown-it@14.1.1)
+      markdown-it-deflist: 3.0.0
+      markdown-it-emoji: 3.0.0
+      markdown-it-footnote: 4.0.0
+      markdown-it-highlightjs: 4.3.0
+      markdown-it-ins: 4.0.0
+      markdown-it-mark: 4.0.0
+      markdown-it-sub: 2.0.0
+      markdown-it-sup: 2.0.0
+      markdown-it-table-of-contents: 1.1.0
+      markdown-it-task-lists: 2.1.1
+      p-map: 7.0.4
+      preact: 10.28.3
+      preact-render-to-string: 6.6.5(preact@10.28.3)
+      pretty: 2.0.0
+    optionalDependencies:
+      '@fastify/static': 9.0.0
+    transitivePeerDependencies:
+      - '@types/markdown-it'
+      - '@types/node'
+      - supports-color
+
   '@domstack/static@11.0.2(@types/markdown-it@14.1.2)(@types/node@25.2.3)':
     dependencies:
       '@11ty/dependency-tree-typescript': 1.0.0
@@ -7509,42 +7545,6 @@ snapshots:
   dompurify@3.3.1:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
-
-  domstack-fastify@file:../domstack-fastify(@fastify/static@9.0.0)(@types/markdown-it@14.1.2)(@types/node@25.2.3)(fastify@5.7.4):
-    dependencies:
-      async-folder-walker: 3.0.5(@types/node@25.2.3)
-      chokidar: 4.0.3
-      cpx2: 8.0.0
-      esbuild: 0.27.3
-      fastify: 5.7.4
-      fastify-plugin: 5.1.0
-      handlebars: 4.7.8
-      htm: 3.1.1
-      js-yaml: 4.1.1
-      markdown-it: 14.1.1
-      markdown-it-abbr: 2.0.0
-      markdown-it-anchor: 9.2.0(@types/markdown-it@14.1.2)(markdown-it@14.1.1)
-      markdown-it-attrs: 4.3.1(markdown-it@14.1.1)
-      markdown-it-deflist: 3.0.0
-      markdown-it-emoji: 3.0.0
-      markdown-it-footnote: 4.0.0
-      markdown-it-highlightjs: 4.3.0
-      markdown-it-ins: 4.0.0
-      markdown-it-mark: 4.0.0
-      markdown-it-sub: 2.0.0
-      markdown-it-sup: 2.0.0
-      markdown-it-table-of-contents: 1.1.0
-      markdown-it-task-lists: 2.1.1
-      p-map: 7.0.4
-      preact: 10.28.3
-      preact-render-to-string: 6.6.5(preact@10.28.3)
-      pretty: 2.0.0
-    optionalDependencies:
-      '@fastify/static': 9.0.0
-    transitivePeerDependencies:
-      - '@types/markdown-it'
-      - '@types/node'
-      - supports-color
 
   dot-prop@5.3.0:
     dependencies:

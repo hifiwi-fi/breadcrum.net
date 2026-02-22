@@ -11,7 +11,7 @@
     "packages/web": {
       "entry": [
         "app.js",
-        "client/**/*.js",
+        "routes/client/**/*.js",
         "plugins/**/*.js",
         "routes/**/{routes,autohooks}.js",
         "scripts/**/*.js",
