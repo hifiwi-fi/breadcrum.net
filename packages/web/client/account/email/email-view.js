@@ -5,21 +5,22 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
- *  reload: () => void,
  * }} EmailViewProps
  */
 
 /**
  * @type {FunctionComponent<EmailViewProps>}
  */
-export const EmailView = ({ user, onEdit, reload }) => {
+export const EmailView = ({ user, onEdit }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [error, setError] = useState(/** @type { Error | null } */(null))
 
   const [requestingEmailVerification, setRequestingEmailVerification] = useState(false)
@@ -27,7 +28,25 @@ export const EmailView = ({ user, onEdit, reload }) => {
 
   const [requestingEmailUpdateVerification, setRequestingEmailUpdateVerification] = useState(false)
   const [emailUpdateVerificationRequested, setEmailUpdateVerificationRequested] = useState(false)
-  const [cancellingEmailUpdate, setCancellingEmailUpdate] = useState(false)
+
+  const cancelEmailUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${state.apiUrl}/user/email`, { method: 'delete' })
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onMutate: () => {
+      setError(null)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+    },
+    onError: (err) => {
+      console.error(err)
+      setError(/** @type {Error} */(err))
+    },
+  })
 
   const handleEmailConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
@@ -43,8 +62,7 @@ export const EmailView = ({ user, onEdit, reload }) => {
         body: JSON.stringify({ update: false }),
       })
 
-      if (response.ok && response.status === 202) {
-        await response.json()
+      if (response.ok) {
         console.log('Email verification requested')
         setEmailVerificationRequested(true)
       } else {
@@ -71,8 +89,7 @@ export const EmailView = ({ user, onEdit, reload }) => {
         body: JSON.stringify({ update: true }),
       })
 
-      if (response.ok && response.status === 202) {
-        await response.json()
+      if (response.ok) {
         console.log('Email verification requested')
         setEmailUpdateVerificationRequested(true)
       } else {
@@ -85,30 +102,6 @@ export const EmailView = ({ user, onEdit, reload }) => {
     }
   }, [state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
 
-  const handleCancelEmailUpdate = useCallback(async (/** @type {Event} */ev) => {
-    ev.preventDefault()
-    setCancellingEmailUpdate(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`${state.apiUrl}/user/email`, {
-        method: 'delete',
-      })
-
-      if (response.ok && response.status === 204) {
-        console.log('Email update deleted')
-        reload()
-      } else {
-        console.log(response)
-        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-      }
-    } catch (err) {
-      console.error(err)
-      setError(/** @type {Error} */(err))
-      setCancellingEmailUpdate(false)
-    }
-  }, [state.apiUrl, setCancellingEmailUpdate, setError, reload])
-
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
     <dd class='email-view-buttons'>
@@ -118,8 +111,8 @@ export const EmailView = ({ user, onEdit, reload }) => {
       </div>
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
-          onClick="${handleEmailConfirmRequest}"
-          disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
+          onClick=${handleEmailConfirmRequest}
+          disabled=${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}>
           ${
             emailVerificationRequested
               ? 'Email verification resent'
@@ -135,17 +128,17 @@ export const EmailView = ({ user, onEdit, reload }) => {
         ${user?.pending_email_update} (update pending verification)
         <div class="reset-buttons-state">
           <button
-            onClick="${handleEmailUpdateConfirmRequest}"
-            disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
+            onClick=${handleEmailUpdateConfirmRequest}
+            disabled=${requestingEmailUpdateVerification || emailUpdateVerificationRequested}>${
               emailUpdateVerificationRequested
                 ? 'Email update verification resent'
                 : 'Resend email update confirmation'
             }</button>
           <button
-            onClick="${handleCancelEmailUpdate}"
-            disabled="${cancellingEmailUpdate}"
+            onClick=${cancelEmailUpdateMutation.mutate}
+            disabled=${cancelEmailUpdateMutation.isPending}
           >
-            ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}
+            ${cancelEmailUpdateMutation.isPending ? 'Cancelling email update' : 'Cancel email update'}
           </button>
         </div>
       </div>
