@@ -4,10 +4,10 @@
 /** @import { TypeAdminStatsReadClient } from '../../../routes/api/admin/stats/schemas/schema-admin-stats-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 const countFormatter = new Intl.NumberFormat('en-US')
 
@@ -177,9 +177,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

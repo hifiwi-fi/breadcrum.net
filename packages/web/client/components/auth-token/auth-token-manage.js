@@ -16,13 +16,12 @@ import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**
  * @typedef {object} AuthTokenManageFieldProps
- * @property {() => void} reload
  */
 
 /**
  * @type {FunctionComponent<AuthTokenManageFieldProps>}
  */
-export const ManageAuthTokenField = ({ reload }) => {
+export const ManageAuthTokenField = () => {
   const [editMode, setEditMode] = useState(/** @type {EditMode} */(null))
 
   const handleCreateMode = useCallback(() => {
@@ -42,7 +41,6 @@ export const ManageAuthTokenField = ({ reload }) => {
     ${editMode === 'creating'
       ? tc(ManageAuthTokenCreateField, {
           handleCancelEditMode,
-          reload
         })
       : null
     }

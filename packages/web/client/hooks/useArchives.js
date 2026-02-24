@@ -5,7 +5,7 @@
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useQuery } from './useQuery.js'
@@ -78,11 +78,24 @@ export function useArchives (options = {}) {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
+        const top = Boolean(body?.pagination?.top)
+
+        if (top && window) {
+          const newParams = new URLSearchParams(queryString)
+          let modified = false
+          if (newParams.get('before')) { newParams.delete('before'); modified = true }
+          if (newParams.get('after')) { newParams.delete('after'); modified = true }
+          if (modified) {
+            const qs = newParams.toString()
+            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
+          }
+        }
+
         return {
           archives: body?.data ?? null,
           before: body?.pagination?.before ? new Date(body?.pagination?.before) : null,
           after: body?.pagination?.after ? new Date(body?.pagination?.after) : null,
-          top: Boolean(body?.pagination?.top),
+          top,
         }
       }
 
@@ -90,37 +103,7 @@ export function useArchives (options = {}) {
     }
   }))
 
-  const { data, error, isPending, refetch, status } = archivesQuery
-  const prevDataRef = useRef(data)
-  const prevStatusRef = useRef(status)
-
-  useEffect(() => {
-    const dataChanged = data !== prevDataRef.current
-    const statusChanged = status !== prevStatusRef.current
-
-    if (window && status === 'success' && data !== undefined && (dataChanged || statusChanged)) {
-      if (data.top) {
-        const newParams = new URLSearchParams(queryString)
-        let modified = false
-        if (newParams.get('before')) {
-          newParams.delete('before')
-          modified = true
-        }
-        if (newParams.get('after')) {
-          newParams.delete('after')
-          modified = true
-        }
-
-        if (modified) {
-          const qs = newParams.toString()
-          window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-        }
-      }
-    }
-
-    prevDataRef.current = data
-    prevStatusRef.current = status
-  }, [data, queryString, status, window])
+  const { data, error, isPending, refetch } = archivesQuery
 
   const reloadArchives = useCallback(async () => {
     await refetch()

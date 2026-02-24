@@ -8,6 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { AuthTokenEdit } from './auth-token-edit.js'
@@ -17,15 +18,14 @@ import { diffUpdate } from '../../lib/diff-update.js'
 /**
  * @typedef {object} AuthTokenListProps
  * @property {TypeAuthTokenReadClient} authToken
- * @property {() => void} [reload]
- * @property {() => void} [onDelete]
  */
 
 /**
  * @type {FunctionComponent<AuthTokenListProps>}
  */
-export const authTokenList = ({ authToken, reload, onDelete }) => {
+export const authTokenList = ({ authToken }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
 
   /** @type {[boolean, (editing: boolean) => void]} */
   const [editing, setEditing] = useState(false)
@@ -40,44 +40,54 @@ export const authTokenList = ({ authToken, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
+  const updateMutation = useMutation({
+    mutationFn: async (/** @type {TypeAuthTokenUpdate} */ newAuthToken) => {
+      const payload = diffUpdate(authToken, newAuthToken)
+      const response = await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
+        method: 'put',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
+      setEditing(false)
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
+        method: 'delete',
+        headers: {
+          'accept-encoding': 'application/json',
+        },
+      })
+    },
+    onSuccess: () => {
+      setDeleted(true)
+      queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
+    },
+  })
+
   /**
    * @type {(newAuthToken: TypeAuthTokenUpdate) => Promise<void>}
    */
-  const handleSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */newAuthToken) => {
-    const payload = diffUpdate(authToken, newAuthToken)
-
-    const endpoint = `${state.apiUrl}/user/auth-tokens/${authToken.jti}`
-
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (response.ok) {
-      if (reload) reload()
-      setEditing(false)
-    } else {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-  }, [authToken.jti, state.apiUrl, reload, setEditing])
+  const handleSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */ newAuthToken) => {
+    await updateMutation.mutateAsync(newAuthToken)
+  }, [updateMutation])
 
   /**
    * @type {() => Promise<void>}
    */
   const handleDeleteAuthToken = useCallback(async () => {
-    await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
-      method: 'delete',
-      headers: {
-        'accept-encoding': 'application/json',
-      },
-    })
-
-    setDeleted(true)
-    if (onDelete) onDelete()
-  }, [state.apiUrl, authToken.jti, setDeleted, onDelete])
+    await deleteMutation.mutateAsync()
+  }, [deleteMutation])
 
   return html`
   <div class="bc-auth-token">

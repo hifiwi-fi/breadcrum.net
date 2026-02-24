@@ -5,6 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { UsernameEdit } from './username-edit.js'
 import { UsernameView } from './username-view.js'
@@ -12,15 +13,15 @@ import { UsernameView } from './username-view.js'
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
- *  reload: () => void,
  * }} UsernameFieldProps
  */
 
 /**
  * @type {FunctionComponent<UsernameFieldProps>}
  */
-export const UsernameField = ({ user, reload }) => {
+export const UsernameField = ({ user }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
@@ -31,31 +32,30 @@ export const UsernameField = ({ user, reload }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {{ username: string }} */{ username }) => {
-    const endpoint = `${state.apiUrl}/user`
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ username }),
-    })
-
-    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-      console.log(await response.json())
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {{ username: string }} */{ username }) => {
+      const response = await fetch(`${state.apiUrl}/user`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ username }),
+      })
+      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+      return response.json()
+    },
+    onSuccess: () => {
       setEditing(false)
-      reload()
-    } else {
-      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-    }
-  }, [user?.username, state.apiUrl, setEditing, reload])
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+  })
 
   return html`
   ${
     editing
     ? html`<${UsernameEdit}
         user=${user}
-        onSave=${handleSave}
+        onSave=${saveMutation.mutateAsync}
         onCancelEdit=${handleCancelEdit}
       />`
     : html`<${UsernameView}

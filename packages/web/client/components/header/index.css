@@ -2,6 +2,7 @@
 @import '../star/index.css';
 @import '../toread/index.css';
 @import '../sensitive/index.css';
+@import '../loading-placeholder/index.css';
 
 .bc-header-nav {
   display: flex;
@@ -24,6 +25,18 @@
 
 .bc-logo {
   font-size: calc(var(--font-size-body) + var(--font-size-scale));
+}
+
+.bc-logo--fetching {
+  display: inline-block;
+  animation: bc-bread-spin 1.2s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bc-logo--fetching {
+    animation: none;
+  }
 }
 
 .bc-header-start,.bc-header-end {

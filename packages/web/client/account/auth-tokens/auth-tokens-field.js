@@ -24,7 +24,6 @@ export const AuthTokens = () => {
     tokensError,
     tokensLoading,
     tokens,
-    reloadAuthTokens,
     beforeParams,
     afterParams
   } = useAuthTokens()
@@ -44,7 +43,7 @@ export const AuthTokens = () => {
         Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
       </div>
 
-      <${ManageAuthTokenField} reload=${reloadAuthTokens} />
+      <${ManageAuthTokenField} />
 
       <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
@@ -52,7 +51,7 @@ export const AuthTokens = () => {
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
 
       ${Array.isArray(tokens)
-        ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} reload=${reloadAuthTokens} onDelete=${reloadAuthTokens} />`)
+        ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} />`)
         : null}
 
         <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />

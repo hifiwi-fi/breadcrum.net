@@ -3,13 +3,13 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 import { useWindow } from '../../../hooks/useWindow.js'
 import { useTitle } from '../../../hooks/useTitle.js'
 import { UserTable } from '../../../components/user-table/user-table.js'
 import { useAdminUser } from '../../../hooks/use-admin-user.js'
 import { tc } from '../../../lib/typed-component.js'
+import { mountPage } from '../../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -35,7 +35,6 @@ export const Page = () => {
     userLoading,
     userError,
     user,
-    reloadAdminUser,
     handleDelete
   } = useAdminUser(userId)
 
@@ -46,14 +45,9 @@ export const Page = () => {
     <div>
       ${userLoading ? html`<div>...</div>` : null}
       ${userError ? html`<div>${userError.message}</div>` : null}
-      ${user ? tc(UserTable, { users: [user], reload: reloadAdminUser, onDelete: handleDelete }) : null}
+      ${user ? tc(UserTable, { users: [user], onDelete: handleDelete }) : null}
     </div>
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

@@ -1,26 +1,20 @@
 /// <reference lib="dom" />
 
-import { useEffect, useState } from 'preact/hooks'
+import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useLSP } from './useLSP.js'
 
 export function useFlags () {
   const state = useLSP()
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(/** @type{Error | null} */(null))
-
-  useEffect(() => {
-    setLoading(true)
-    setError(null)
-    const controller = new AbortController()
-
-    const getFlags = async () => {
+  const { data: flags, isPending: loading, error } = useTanstackQuery({
+    queryKey: ['flags', state.apiUrl],
+    queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/flags`, {
         method: 'get',
         headers: {
           'accept-encoding': 'application/json',
         },
-        signal: controller.signal,
+        signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
@@ -29,19 +23,14 @@ export function useFlags () {
           console.log('Updating flag state')
           state.flags = body
         }
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+        return body
       }
-    }
 
-    getFlags().catch(err => {
-      console.error(err)
-      setError(err)
-    }).finally(() => {
-      setLoading(false)
-    })
-  }, [state.apiUrl])
-  return { flags: state.flags, loading, error }
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+  })
+
+  return { flags: flags ?? state.flags, loading, error: error || null }
 }
 
 /**

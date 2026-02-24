@@ -5,6 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { EmailEdit } from './email-edit.js'
 import { EmailView } from './email-view.js'
@@ -12,15 +13,15 @@ import { EmailView } from './email-view.js'
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
- *  reload: () => void,
  * }} EmailFieldProps
  */
 
 /**
  * @type {FunctionComponent<EmailFieldProps>}
  */
-export const EmailField = ({ user, reload }) => {
+export const EmailField = ({ user }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
@@ -31,36 +32,35 @@ export const EmailField = ({ user, reload }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {{ email: string }} */{ email }) => {
-    const endpoint = `${state.apiUrl}/user/email`
-    const response = await fetch(endpoint, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    })
-
-    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {{ email: string }} */{ email }) => {
+      const response = await fetch(`${state.apiUrl}/user/email`, {
+        method: 'post',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+      return response.json()
+    },
+    onSuccess: () => {
       setEditing(false)
-      reload()
-    } else {
-      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-    }
-  }, [state.apiUrl, setEditing, reload])
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+  })
 
   return html`
   ${
     editing
     ? html`<${EmailEdit}
         user=${user}
-        onSave=${handleSave}
+        onSave=${saveMutation.mutateAsync}
         onCancelEdit=${handleCancelEdit}
       />`
     : html`<${EmailView}
         user=${user}
         onEdit=${handleEdit}
-        reload=${reload}
       />`
   }
   `

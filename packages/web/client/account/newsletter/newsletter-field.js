@@ -4,66 +4,53 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { useState, useCallback } from 'preact/hooks'
+import { useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
- *  reload: () => void,
  * }} NewsletterFieldProps
  */
 
 /**
  * @type {FunctionComponent<NewsletterFieldProps>}
  */
-export const NewsletterField = ({ user, reload }) => {
+export const NewsletterField = ({ user }) => {
   const state = useLSP()
-  const [error, setError] = useState(/** @type {Error | null} */(null))
-  const [disabled, setDisabled] = useState(false)
+  const queryClient = useQueryClient()
+
+  const toggleMutation = useMutation({
+    mutationFn: async (/** @type {boolean} */ newSubscriptionState) => {
+      const response = await fetch(`${state.apiUrl}/user`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ newsletter_subscription: newSubscriptionState }),
+      })
+      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+      }
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+  })
 
   const handleToggle = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
-    setDisabled(true)
-    setError(null)
-
-    const newSubscriptionState = !user?.newsletter_subscription
-
-    const formState = {
-      newsletter_subscription: newSubscriptionState,
-    }
-
-    try {
-      const endpoint = `${state.apiUrl}/user`
-      const response = await fetch(endpoint, {
-        method: 'put',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(formState),
-      })
-
-      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        console.log(await response.json())
-        reload()
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-      }
-    } catch (err) {
-      setError(/** @type {Error} */(err))
-    } finally {
-      setDisabled(false)
-    }
-  }, [state.apiUrl, setDisabled, setError, user?.newsletter_subscription, reload])
+    await toggleMutation.mutateAsync(!user?.newsletter_subscription)
+  }, [toggleMutation, user?.newsletter_subscription])
 
   return html`
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input class="newsletter-label" onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${disabled} indeterminate=${disabled} checked=${user?.newsletter_subscription} />
+      <input class="newsletter-label" onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${toggleMutation.isPending} indeterminate=${toggleMutation.isPending} checked=${user?.newsletter_subscription} />
       <span>Subscribed</span>
     </label>
-    ${error ? html`<div class="error-box">${error.message}</div>` : null}
+    ${toggleMutation.error ? html`<div class="error-box">${/** @type {Error} */(toggleMutation.error).message}</div>` : null}
   </dd>
   `
 }

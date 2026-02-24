@@ -5,21 +5,22 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
- *  reload: () => void,
  * }} EmailViewProps
  */
 
 /**
  * @type {FunctionComponent<EmailViewProps>}
  */
-export const EmailView = ({ user, onEdit, reload }) => {
+export const EmailView = ({ user, onEdit }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [error, setError] = useState(/** @type { Error | null } */(null))
 
   const [requestingEmailVerification, setRequestingEmailVerification] = useState(false)
@@ -27,7 +28,22 @@ export const EmailView = ({ user, onEdit, reload }) => {
 
   const [requestingEmailUpdateVerification, setRequestingEmailUpdateVerification] = useState(false)
   const [emailUpdateVerificationRequested, setEmailUpdateVerificationRequested] = useState(false)
-  const [cancellingEmailUpdate, setCancellingEmailUpdate] = useState(false)
+
+  const cancelEmailUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${state.apiUrl}/user/email`, { method: 'delete' })
+      if (!response.ok || response.status !== 204) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+    onError: (err) => {
+      console.error(err)
+      setError(/** @type {Error} */(err))
+    },
+  })
 
   const handleEmailConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
@@ -87,27 +103,9 @@ export const EmailView = ({ user, onEdit, reload }) => {
 
   const handleCancelEmailUpdate = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
-    setCancellingEmailUpdate(true)
     setError(null)
-
-    try {
-      const response = await fetch(`${state.apiUrl}/user/email`, {
-        method: 'delete',
-      })
-
-      if (response.ok && response.status === 204) {
-        console.log('Email update deleted')
-        reload()
-      } else {
-        console.log(response)
-        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-      }
-    } catch (err) {
-      console.error(err)
-      setError(/** @type {Error} */(err))
-      setCancellingEmailUpdate(false)
-    }
-  }, [state.apiUrl, setCancellingEmailUpdate, setError, reload])
+    await cancelEmailUpdateMutation.mutateAsync()
+  }, [cancelEmailUpdateMutation])
 
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
@@ -143,9 +141,9 @@ export const EmailView = ({ user, onEdit, reload }) => {
             }</button>
           <button
             onClick="${handleCancelEmailUpdate}"
-            disabled="${cancellingEmailUpdate}"
+            disabled="${cancelEmailUpdateMutation.isPending}"
           >
-            ${cancellingEmailUpdate ? 'Cancelling email update' : 'Cancel email update'}
+            ${cancelEmailUpdateMutation.isPending ? 'Cancelling email update' : 'Cancel email update'}
           </button>
         </div>
       </div>

@@ -8,6 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { UserRowEdit } from './user-row-edit.js'
 import { UserRowView } from './user-row-view.js'
@@ -17,15 +18,15 @@ import { tc } from '../../lib/typed-component.js'
 /**
  * @typedef {object} UserRowProps
  * @property {SchemaTypeAdminUserReadClient} user
- * @property {() => void} reload
- * @property {() => void} onDelete
+ * @property {() => void} [onDelete]
  */
 
 /**
  * @type {FunctionComponent<UserRowProps>}
  */
-export const UserRow = ({ user, reload, onDelete }) => {
+export const UserRow = ({ user, onDelete }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
@@ -37,47 +38,45 @@ export const UserRow = ({ user, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
-    const payload = diffUpdate(user, newUser)
-    if (Object.keys(payload).length === 0) {
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
+      const payload = diffUpdate(user, newUser)
+      if (Object.keys(payload).length === 0) return
+
+      const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
       setEditing(false)
-      return
-    }
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-user', user.id] })
+    },
+  })
 
-    const endpoint = `${state.apiUrl}/admin/users/${user.id}`
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
+        method: 'delete',
+        headers: { 'accept-encoding': 'application/json' },
+      })
 
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (response.ok) {
-      reload()
-      setEditing(false)
-    } else {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-  }, [user?.id, state.apiUrl, reload, setEditing])
-
-  const handleDelete = useCallback(async () => {
-    const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
-      method: 'delete',
-      headers: {
-        'accept-encoding': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      const body = await response.text()
-      throw new Error(`Error deleting user: ${body}`)
-    }
-
-    setDeleted(true)
-    onDelete()
-  }, [state.apiUrl, user.id, setDeleted, onDelete])
+      if (!response.ok) {
+        throw new Error(`Error deleting user: ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      setDeleted(true)
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      if (onDelete) onDelete()
+    },
+  })
 
   return html`
     <!-- Row -->
@@ -86,8 +85,8 @@ export const UserRow = ({ user, reload, onDelete }) => {
       : editing
         ? tc(UserRowEdit, {
             user,
-            onSave: handleSave,
-            onDelete: handleDelete,
+            onSave: saveMutation.mutateAsync,
+            onDelete: deleteMutation.mutateAsync,
             onCancelEdit: handleCancelEdit,
           })
         : tc(UserRowView, {

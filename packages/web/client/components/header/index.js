@@ -5,6 +5,7 @@
  */
 import { html } from 'htm/preact'
 import { useCallback, useMemo } from 'preact/hooks'
+import { useIsFetching } from '@tanstack/preact-query'
 
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
@@ -21,6 +22,7 @@ export const Header = () => {
   const { user } = useUser({ required: false })
   const window = useWindow()
   const state = useLSP()
+  const isFetching = useIsFetching()
   const { flags } = useFlags()
   const { pushState } = useQuery()
 
@@ -104,7 +106,7 @@ export const Header = () => {
   <nav class="bc-header-nav">
     <div class="bc-header-start">
       <span class="bc-logo round">
-        <span>🥖 </span>
+        <span class=${isFetching ? 'bc-logo--fetching' : ''}>🥖 </span>
         ${!user ? html`<a href="/">Breadcrum</a>` : null}
       </span>
       ${user ? html`<a class="bc-username" href='/account/'>${user.username}</a>` : null}

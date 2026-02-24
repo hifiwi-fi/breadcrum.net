@@ -4,7 +4,6 @@
 /** @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useEffect, useState, useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 // @ts-ignore - version is a string from bookmarklet package
@@ -15,6 +14,7 @@ import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { tc } from '../../lib/typed-component.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -201,9 +201,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)
