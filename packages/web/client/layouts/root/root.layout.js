@@ -7,6 +7,7 @@ import { render } from 'preact-render-to-string'
 import { Header } from '../../components/header/index.js'
 import { Footer } from '../../components/footer/index.js'
 import { tc } from '../../lib/typed-component.js'
+import { QueryProvider } from '../../lib/query-provider.js'
 
 /*
 
@@ -120,6 +121,7 @@ export default function defaultRootLayout ({
    <html lang="en">
    <head>${headContent}</head>
    ${render(html`
+     <${QueryProvider}>
      <body class="bc-body">
        <div class="bc-page-container">
          <header class="bc-header">
@@ -138,6 +140,7 @@ export default function defaultRootLayout ({
         })}
        </div>
      </body>
+     <//>
    `)}
    </html>
   `
