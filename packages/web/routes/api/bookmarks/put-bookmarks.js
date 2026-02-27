@@ -171,7 +171,7 @@ export async function putBookmarks (fastify, _opts) {
           free_bookmarks_per_month: freeBookmarksPerMonth,
         } = await fastify.getFlags({
           frontend: true,
-          backend: true,
+          backend: false,
         })
 
         if (subscriptions_required) {

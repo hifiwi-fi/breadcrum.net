@@ -224,11 +224,80 @@ Admin `DELETE /api/admin/users/:id` behavior:
 - Deletes user row in app DB (cascade removes local billing rows).
 - Stripe `resource_missing` errors are treated as already-cleaned state; other Stripe failures block deletion.
 
+## PR #689 review items (2026-02-26)
+
+Items surfaced from inline PR review. Resolved items marked ✅.
+
+### Already resolved (verified in current code)
+- ✅ `syncStripeSubscriptionToDb` CTE atomic query exists in `billing-queries.js` (combines supertype + stripe subtype upsert).
+- ✅ `cancelStaleStripeSubscription` handles no-subscription-found case in `sync.js`.
+- ✅ CSS class names are correct (`bc-marketing-hero-title`, `bc-marketing-hero-description`) — typos were in original Copilot suggestion, not in current code.
+- ✅ Barrel export files (`web/routes/api/billing/billing-queries.js`, `web/routes/api/billing/sync.js`) deleted; imports go directly to `@breadcrum/resources`.
+- ✅ Admin routes already use correct names: `post-admin-billing-sync.js` → `/billing-sync`, `put/delete-admin-custom-subscription.js` → `/custom-subscription`.
+- ✅ `generate-default-env.js` already uses `opts.default != null`.
+- ✅ Worker sync errors already re-thrown (`throw err` in catch block).
+- ✅ `STRIPE_WEBHOOK_SECRET` not in `required` array of `billingEnvSchema`.
+- ✅ `docs/plans/` renamed to `docs/subscriptions/`; `docs/README.md` updated to "Subscriptions & Pricing".
+- ✅ `backend-flags.js` comment already notes `billing_enabled` comes from frontend flags via `getFlags({ frontend: true })`.
+- ✅ `post-portal.js` already has comment clarifying "Portal = Stripe Customer Portal session".
+- ✅ `post-sync.js` already has comment mapping to frontend component.
+- ✅ `SubscriptionView.isActive` uses `!this.latest_invoice_settled` (falsy check, semantically equivalent).
+
+### Still actionable
+
+#### Backend / data model
+- [x] **`createCustomSubscription` — make atomic with CTE** (`billing-queries.js:411`): Addressed. Converted to a single CTE query that upserts supertype + custom subtype atomically and returns subscription id.
+- [x] **`updated_at` managed by trigger** (`billing-queries.js:45`, `billing-queries.js:135`, `billing-queries.js:226`): Addressed in query layer. Removed manual `updated_at = now()` in billing upserts and now rely on table update triggers.
+- [x] **Review indexes against usage** (`030.do.billing.sql:5`): Completed with data model audit while adding single-provider invariant. Existing unique constraints already cover billing lookups; no additional billing index needed beyond quota index.
+- [x] **`plans.js` — consider pg enums** (`routes/api/billing/plans.js`): Addressed via migration `031.do.billing-subscription-invariants.sql` by introducing `subscription_plan_code` enum and migrating billing plan_code columns.
+- [x] **`subscription-view.js` refactor** (`subscription-view.js:31`): Addressed. Billing view model already uses base class + provider-specific subclasses (`StripeSubscriptionView`, `CustomSubscriptionView`).
+- [x] **Enforce single subscription type per user** (`schema-admin-user-read.js:54`): Addressed at DB + write-path level. Added `subscriptions_user_unique` constraint and switched subscription upserts to conflict on `user_id`.
+- [x] **`syncStripeSubscription` comment about `limit: 1`** (`sync.js:44`): Addressed. Added Stripe dashboard setting note for "Limit customers to one subscription".
+- [x] **`expand` array comment** (`sync.js:45`): Addressed. Added comment describing why `default_payment_method` and `latest_invoice` are expanded.
+
+#### Frontend / client
+- [x] **`BillingField` — migrate to tanstack query** (`billing-field.js:22`): Addressed. Added `useBilling()` hook using `@tanstack/preact-query` and migrated billing fetch state to query state.
+- [x] **Reactive `useSearchParams` hook** (`billing-field.js:44`): Addressed. `BillingField` now reads query params through `useSearchParams`, and `useQuery` now exposes `replaceState`.
+- [x] **Checkout button comment** (`billing-field.js:89`): Addressed. Added Stripe Checkout redirect comment near checkout handler.
+- [x] **Landing page badge** (`client.js:21`): Addressed. Badge now says "Subscribe now!".
+- [x] **Landing page plan section copy** (`client.js:30`, `client.js:61`): Addressed. Free/paid plan card copy rewritten for upsell and details moved to docs.
+- [x] **Landing page sustainability copy** (`client.js:176`): Addressed. Subscriptions block now includes sustainability/ongoing development messaging.
+- [x] **Landing page bookmark section** (`client.js:48`): Addressed in plan card copy by removing reset timing details and linking to docs.
+
+#### Webhook / email
+- [x] **Use Stripe email system for async checkout emails** (`webhook/routes.js:96`): Addressed in code path. Removed app-side async outcome email sender from webhook and added note that Stripe customer emails handle this.
+- [x] **Webhook 200 on missing customerId** (`webhook/routes.js:107`): Addressed. Added explicit comment that 200 is intentional to avoid retry loops on unmappable events.
+- [x] **Webhook event type source** (`webhook/routes.js:9`): Addressed partially with stronger typing. `allowedEvents` is now typed as `Set<Stripe.Event.Type>`.
+- [x] **Webhook deduplication** (next steps): Addressed for current side effects. Async email side effects were removed; sync queue already dedupes bursts via throttled singleton key (`customerId`).
+
+#### Docs / legal
+- [x] **`legal/billing/README.md`**: Addressed. Updated billing legal copy to reference subscriptions docs + flag-driven free-tier values.
+- [x] **`docs/subscriptions/README.md`**: Addressed. Added trial-period note clarifying Stripe-native trial handling.
+
+#### Flags / plugins
+- [x] **Consolidate flags** (`backend-flags.js:8`): Addressed. `subscriptions_required` moved to frontend flags and backend callers now read it through `getFlags({ frontend: true })`.
+- [x] **`billing-decorators.d.ts` in worker** (`worker/plugins/billing-decorators.d.ts`): Addressed with strict non-null Stripe typing. Worker now requires `STRIPE_SECRET_KEY` at boot and exposes `billing.stripe` as non-null.
+- [x] **`billing.js` plugin — clean up runtime guard** (`plugins/billing.js`): Verified addressed. No runtime guard remains; plugin initializes Stripe at boot.
+- [x] **`webhook/autohooks.js` raw-body pattern**: Addressed incrementally. Kept scoped parser override with explicit rationale and removed separate request decorator file.
+- [x] **`billing-request-decorators.d.ts`** (`routes/api/billing/billing-request-decorators.d.ts:5`): Addressed. Removed file; webhook routes now use local typed request casts for `rawBody`.
+
+#### Billing schema store pattern
+- [x] **Drop schema store pattern** (`routes/api/billing/schemas/billing.schema.js:7`): Addressed. Removed billing schema-store plugin and kept direct schema imports in billing routes.
+
+#### Bookmark usage / metering
+- [x] **Re-think `bookmark-usage.js`** (`routes/api/bookmarks/bookmark-usage.js`): Addressed by decision for v1. Kept count-on-read for correctness and documented write-counter tradeoffs inline.
+- [x] **Extend metering to more resources** (`put-bookmarks.js`): Addressed by scope decision for v1. Metering remains bookmark-only until separate product rules are defined for episodes/archives.
+
+### Additional open PR threads not previously captured in this checklist
+- [x] **Billing tests still TODO-only** (`packages/resources/billing/billing-queries.test.js`, `packages/web/routes/api/billing/billing.test.js`): Addressed. Replaced TODO placeholders with executable unit/integration tests.
+- [x] **Admin custom subscription schema audit** (`schema-admin-subscription-update.js`): Addressed. Removed `status`/`plan_code` from request body schema and now set canonical values server-side.
+- [x] **Helmet plugin usage audit** (`plugins/helmet.js`): Verified in codebase. Plugin is used (`static.js` depends on `helmet`).
+
 ## Next steps (short-term)
-1. Implement billing API/webhook tests (including async success/failure email cases).
-2. Add webhook event-id dedupe strategy for notification side effects (prevent duplicate async emails on webhook retries).
-3. Finalize Stripe dashboard payment-method configuration and persistent webhook endpoints.
-4. Prepare production secrets + live-mode product/price setup.
+1. Expand billing route integration coverage (checkout/portal/sync/webhook) now that TODO placeholders are removed.
+2. Finalize Stripe dashboard payment-method configuration and persistent webhook endpoints.
+3. Prepare production secrets + live-mode product/price setup.
+4. Investigate Stripe trial period configuration.
 
 ## Rollout plan
 - Keep `billing_enabled`/`subscriptions_required` as rollout controls.
@@ -240,3 +309,4 @@ Admin `DELETE /api/admin/users/:id` behavior:
 - Trial/grace period policy for failed renewals?
 - Should we persist additional Stripe invoice/payment records locally, or continue to rely on provider portal + normalized subscription summary?
 - Should async outcome emails have user-level opt-out, or always transactional/no-opt-out?
+- Does Stripe send its own async payment outcome emails? If so, should we disable our transactional ones?

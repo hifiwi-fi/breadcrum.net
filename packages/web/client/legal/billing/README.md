@@ -13,7 +13,7 @@ By using any paid services, you agree to the terms outlined here.
 ## 1. Free and Paid Subscriptions
 
 {{ vars.siteName }} offers a free tier and a paid subscription.
-The free tier includes 10 new bookmarks per month, resetting on the 1st of each month (UTC).
+The free tier includes a monthly bookmark quota. Current quota values are defined in the subscriptions docs and controlled by the `free_bookmarks_per_month` feature flag.
 The paid subscription offers unlimited bookmarks and is billed yearly.
 Current subscription details are published on the [subscriptions and pricing](/docs/subscriptions/) page.
 

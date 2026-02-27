@@ -34,6 +34,11 @@ export const defaultFrontendFlags = /** @type {const} */ {
     default: false,
     description: 'Show billing and subscription UI to users',
   },
+  subscriptions_required: {
+    type: 'boolean',
+    default: false,
+    description: 'Enforce paid subscriptions or free tier quotas',
+  },
   free_bookmarks_per_month: {
     type: 'number',
     default: 10,

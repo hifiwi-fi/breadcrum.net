@@ -37,11 +37,16 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
     stripeCustomerId: customerId,
   })
 
+  // Ignore Stripe events for customers not mapped to a local user.
   if (!userId) return
 
   const subscriptions = await stripe.subscriptions.list({
     customer: customerId,
+    // Stripe dashboard setting: "Limit customers to one subscription" must be enabled.
+    // With that constraint, fetching one row here is safe and deterministic.
     limit: 1,
+    // Expand gives us card details on default_payment_method and payment settlement status
+    // on latest_invoice in the same request.
     expand: ['data.default_payment_method', 'data.latest_invoice'],
   })
 
@@ -76,7 +81,6 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
     paymentMethodLast4 = pm.card.last4 ?? null
   }
 
-  // Atomically upsert subscription + stripe_subscription in a single CTE query
   await syncStripeSubscriptionToDb({
     pg,
     data: {

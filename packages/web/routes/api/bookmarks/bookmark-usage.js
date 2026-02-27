@@ -24,6 +24,11 @@ import { getMonthlyWindow } from '../billing/subscriptions.js'
 
 /**
  * Returns the user's current month bookmark usage.
+ *
+ * Note: v1 intentionally counts on read instead of using write-time counters.
+ * This avoids counter drift and keeps enforcement consistent with source-of-truth
+ * bookmark rows. If performance becomes a bottleneck, add write-time counters with
+ * periodic reconciliation.
  * @param {BookmarkUsageParams} params
  * @returns {Promise<BookmarkUsage>}
  */

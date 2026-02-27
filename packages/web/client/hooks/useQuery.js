@@ -16,7 +16,8 @@ if (typeof window !== 'undefined') {
 /**
  * @returns {{
  *   query: URLSearchParams | null,
- *   pushState: (url: string) => void
+ *   pushState: (url: string) => void,
+ *   replaceState: (url: string) => void
  * }}
  */
 export function useQuery () {
@@ -30,7 +31,13 @@ export function useQuery () {
     window?.history.pushState({}, '', url)
   }, [window])
 
-  return { query, pushState }
+  const replaceState = useCallback(/** @param {string} url */ (url) => {
+    const searchParams = (new URL(url)).search
+    querySignal.value = new URLSearchParams(searchParams)
+    window?.history.replaceState({}, '', url)
+  }, [window])
+
+  return { query, pushState, replaceState }
 }
 
 /**
@@ -38,11 +45,12 @@ export function useQuery () {
  * @param {T} [defaultValue] - Default value to return when parsing fails
  * @returns {{
  *   searchParams: T | null,
- *   pushState: (url: string) => void
+ *   pushState: (url: string) => void,
+ *   replaceState: (url: string) => void
  * }}
  */
 export function useSearchParams (defaultValue) {
-  const { query, pushState } = useQuery()
+  const { query, pushState, replaceState } = useQuery()
 
   /** @type {T | null} */
   let searchParams = null
@@ -60,5 +68,5 @@ export function useSearchParams (defaultValue) {
     searchParams = defaultValue || null
   }
 
-  return { searchParams, pushState }
+  return { searchParams, pushState, replaceState }
 }

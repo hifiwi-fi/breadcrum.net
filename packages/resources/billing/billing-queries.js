@@ -41,8 +41,7 @@ export async function upsertStripeCustomer ({ pg, userId, stripeCustomerId }) {
     )
     on conflict (user_id)
     do update set
-      stripe_customer_id = excluded.stripe_customer_id,
-      updated_at = now()
+      stripe_customer_id = excluded.stripe_customer_id
     returning stripe_customer_id
   `
 
@@ -115,8 +114,8 @@ export async function getUserBillingProfile ({ pg, userId }) {
  * Upserts a generic subscription row. For Stripe subscriptions, use the
  * returned id to upsert the stripe_subscriptions row.
  *
- * Uses (user_id, provider) as the conflict target so each provider gets
- * at most one subscription row per user.
+ * Uses user_id as the conflict target so each user has at most one
+ * active subscription provider row.
  *
  * @param {{ pg: PgClient, subscription: SubscriptionUpsert }} params
  * @returns {Promise<string>} The subscription id
@@ -130,9 +129,9 @@ export async function upsertSubscription ({ pg, subscription }) {
       ${subscription.userId},
       ${subscription.provider}
     )
-    on conflict (user_id, provider)
+    on conflict (user_id)
     do update set
-      updated_at = now()
+      provider = excluded.provider
     returning id
   `
 
@@ -222,8 +221,7 @@ export async function upsertStripeSubscription ({ pg, stripeSubscription }) {
       payment_method_last4 = excluded.payment_method_last4,
       latest_invoice_status = excluded.latest_invoice_status,
       latest_invoice_paid_at = excluded.latest_invoice_paid_at,
-      latest_invoice_settled = excluded.latest_invoice_settled,
-      updated_at = now()
+      latest_invoice_settled = excluded.latest_invoice_settled
   `
 
   await pg.query(query)
@@ -261,11 +259,16 @@ export async function upsertStripeSubscription ({ pg, stripeSubscription }) {
  */
 export async function syncStripeSubscriptionToDb ({ pg, data }) {
   const query = SQL`
-    with upserted_subscription as (
+    with deleted_other_provider as (
+      delete from subscriptions
+      where user_id = ${data.userId}
+        and provider <> 'stripe'
+    ),
+    upserted_subscription as (
       insert into subscriptions (user_id, provider)
       values (${data.userId}, 'stripe')
-      on conflict (user_id, provider)
-      do update set updated_at = now()
+      on conflict (user_id)
+      do update set provider = excluded.provider
       returning id
     )
     insert into stripe_subscriptions (
@@ -317,8 +320,7 @@ export async function syncStripeSubscriptionToDb ({ pg, data }) {
       payment_method_last4 = excluded.payment_method_last4,
       latest_invoice_status = excluded.latest_invoice_status,
       latest_invoice_paid_at = excluded.latest_invoice_paid_at,
-      latest_invoice_settled = excluded.latest_invoice_settled,
-      updated_at = now()
+      latest_invoice_settled = excluded.latest_invoice_settled
   `
   await pg.query(query)
 }
@@ -334,8 +336,7 @@ export async function cancelStaleStripeSubscription ({ pg, userId }) {
   const query = SQL`
     update stripe_subscriptions ss
     set
-      status = 'canceled',
-      updated_at = now()
+      status = 'canceled'
     from subscriptions s
     where s.id = ss.subscription_id
       and s.user_id = ${userId}
@@ -386,8 +387,7 @@ export async function upsertCustomSubscription ({ pg, customSubscription }) {
       plan_code = excluded.plan_code,
       display_name = excluded.display_name,
       current_period_start = excluded.current_period_start,
-      current_period_end = excluded.current_period_end,
-      updated_at = now()
+      current_period_end = excluded.current_period_end
   `
 
   await pg.query(query)
@@ -409,27 +409,56 @@ export async function upsertCustomSubscription ({ pg, customSubscription }) {
  * @returns {Promise<string>} The subscription id
  */
 export async function createCustomSubscription ({ pg, subscription }) {
-  const subscriptionId = await upsertSubscription({
-    pg,
-    subscription: {
-      userId: subscription.userId,
-      provider: 'custom',
-    },
-  })
+  const query = SQL`
+    with deleted_other_provider as (
+      delete from subscriptions
+      where user_id = ${subscription.userId}
+        and provider <> 'custom'
+    ),
+    upserted_subscription as (
+      insert into subscriptions (user_id, provider)
+      values (${subscription.userId}, 'custom')
+      on conflict (user_id)
+      do update set provider = excluded.provider
+      returning id
+    ),
+    upserted_custom_subscription as (
+      insert into custom_subscriptions (
+        subscription_id,
+        status,
+        plan_code,
+        display_name,
+        current_period_start,
+        current_period_end
+      )
+      select
+        id,
+        ${subscription.status},
+        ${subscription.planCode},
+        ${subscription.displayName},
+        now(),
+        ${subscription.currentPeriodEnd}
+      from upserted_subscription
+      on conflict (subscription_id)
+      do update set
+        status = excluded.status,
+        plan_code = excluded.plan_code,
+        display_name = excluded.display_name,
+        current_period_start = excluded.current_period_start,
+        current_period_end = excluded.current_period_end
+      returning subscription_id
+    )
+    select subscription_id as id
+    from upserted_custom_subscription
+  `
 
-  await upsertCustomSubscription({
-    pg,
-    customSubscription: {
-      subscriptionId,
-      status: subscription.status,
-      planCode: subscription.planCode,
-      displayName: subscription.displayName,
-      currentPeriodStart: new Date(),
-      currentPeriodEnd: subscription.currentPeriodEnd,
-    },
-  })
-
-  return subscriptionId
+  /** @type {QueryResult<{ id: string }>} */
+  const results = await pg.query(query)
+  const row = results.rows[0]
+  if (!row?.id) {
+    throw new Error('Failed to create custom subscription')
+  }
+  return row.id
 }
 
 /**

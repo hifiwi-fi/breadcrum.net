@@ -6,74 +6,53 @@ import { html } from 'htm/preact'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useFlags } from '../../hooks/useFlags.js'
-
-/**
- * @typedef {object} BillingData
- * @property {boolean} active
- * @property {{ provider: string | null, display_name: string | null, status: string | null, current_period_end: string | null, cancel_at: string | null, cancel_at_period_end: boolean, trial_end: string | null, payment_method: { brand: string | null, last4: string | null } | null }} subscription
- * @property {{ bookmarks_this_month: number, bookmarks_limit: number | null, window_start: string, window_end: string }} usage
- */
+import { useBilling } from '../../hooks/useBilling.js'
+import { useSearchParams } from '../../hooks/useQuery.js'
 
 /** @type {FunctionComponent} */
 export const BillingField = () => {
   const state = useLSP()
   const { flags } = useFlags()
-  const [billing, setBilling] = useState(/** @type {BillingData | null} */(null))
-  const [loading, setLoading] = useState(true)
+  const billingEnabled = Boolean(flags?.['billing_enabled'])
+  const { searchParams, replaceState } = useSearchParams(/** @type {{ billing?: string } | null} */ (null))
+  const billingParam = searchParams?.billing ?? null
+  const { data: billing, isPending: billingLoading, error: billingError, refetch } = useBilling({
+    enabled: billingEnabled,
+  })
+
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [actionLoading, setActionLoading] = useState(false)
   const [notice, setNotice] = useState(/** @type {string | null} */(null))
 
-  const fetchBilling = useCallback(async () => {
-    const response = await fetch(`${state.apiUrl}/billing/`, {
-      method: 'get',
-      headers: { accept: 'application/json' },
-    })
-    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-      return /** @type {BillingData} */ (await response.json())
-    }
-    throw new Error(`${response.status} ${response.statusText}`)
-  }, [state.apiUrl])
+  const clearBillingParam = useCallback(() => {
+    if (typeof window === 'undefined' || !billingParam) return
+    const params = new URLSearchParams(window.location.search)
+    params.delete('billing')
+    const qs = params.toString()
+    const nextUrl = `${window.location.origin}${window.location.pathname}${qs ? `?${qs}` : ''}`
+    replaceState(nextUrl)
+  }, [billingParam, replaceState])
 
   useEffect(() => {
-    if (!flags?.['billing_enabled']) {
-      setLoading(false)
-      return
-    }
-
-    const params = new URLSearchParams(window.location.search)
-    const billingParam = params.get('billing')
+    if (!billingEnabled || !billingParam) return
 
     const load = async () => {
       try {
         if (billingParam === 'success') {
           await fetch(`${state.apiUrl}/billing/sync`, { method: 'post' })
-        }
-
-        const data = await fetchBilling()
-        setBilling(data)
-
-        if (billingParam === 'success') {
+          await refetch()
           setNotice('Subscription activated.')
         } else if (billingParam === 'cancel') {
           setNotice('Checkout canceled.')
         }
-
-        if (billingParam) {
-          params.delete('billing')
-          const qs = params.toString()
-          const newUrl = `${window.location.pathname}${qs ? `?${qs}` : ''}`
-          window.history.replaceState(null, '', newUrl)
-        }
       } catch (err) {
         setError(/** @type {Error} */(err))
-      } finally {
-        setLoading(false)
       }
+      clearBillingParam()
     }
 
     load()
-  }, [state.apiUrl, flags?.['billing_enabled'], fetchBilling])
+  }, [billingEnabled, billingParam, clearBillingParam, refetch, state.apiUrl])
 
   const handleCheckout = useCallback(async (/** @type {Event} */ ev) => {
     ev.preventDefault()
@@ -86,6 +65,7 @@ export const BillingField = () => {
       })
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const data = await response.json()
+        // Stripe Checkout redirect. User returns to /account/ with billing=success|cancel.
         window.location.href = data.url
       } else {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
@@ -117,8 +97,9 @@ export const BillingField = () => {
     }
   }, [state.apiUrl])
 
-  if (!flags?.['billing_enabled']) return null
-  if (loading) return html`<dt>Billing</dt><dd>Loading...</dd>`
+  if (!billingEnabled) return null
+  if (billingLoading) return html`<dt>Billing</dt><dd>Loading...</dd>`
+  if (!billing) return html`<dt>Billing</dt><dd>Unavailable</dd>`
 
   const isActive = billing?.active ?? false
   const isCanceling = isActive && billing?.subscription?.cancel_at_period_end
@@ -140,7 +121,7 @@ export const BillingField = () => {
     <dt>Billing</dt>
     <dd>
       ${notice ? html`<div class="bc-help-text">${notice}</div>` : null}
-      ${error ? html`<div class="error-box">${error.message}</div>` : null}
+      ${error || billingError ? html`<div class="error-box">${(error || billingError)?.message}</div>` : null}
 
       <div>
         <strong>Plan:</strong> ${planLabel}

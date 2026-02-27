@@ -9,30 +9,25 @@ import Stripe from 'stripe'
 /**
  * @typedef {object} BillingClient
  * @property {'stripe'} provider
- * @property {StripeType | null} stripe
+ * @property {StripeType} stripe
  */
 
 export const billingEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   properties: {
-    STRIPE_SECRET_KEY: { type: 'string' },
+    STRIPE_SECRET_KEY: { type: 'string', minLength: 1 },
   },
-  required: [],
+  required: ['STRIPE_SECRET_KEY'],
 })
 
 /**
  * Billing provider client for the worker process.
- * Creates a Stripe instance if STRIPE_SECRET_KEY is configured.
+ * Initializes Stripe using STRIPE_SECRET_KEY.
  */
 export default fp(async function (fastify, _) {
-  /** @type {StripeType | null} */
-  const stripe = fastify.config.STRIPE_SECRET_KEY
-    ? new Stripe(fastify.config.STRIPE_SECRET_KEY)
-    : null
-
   /** @type {BillingClient} */
   const billing = {
     provider: 'stripe',
-    stripe,
+    stripe: new Stripe(fastify.config.STRIPE_SECRET_KEY),
   }
 
   fastify.decorate('billing', billing)

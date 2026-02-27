@@ -9,16 +9,6 @@ export const schemaAdminSubscriptionUpdate = /** @type {const} @satisfies {JSONS
   additionalProperties: false,
   required: ['display_name'],
   properties: {
-    status: {
-      type: 'string',
-      default: 'active',
-      description: 'Subscription status (typically "active").',
-    },
-    plan_code: {
-      type: 'string',
-      default: 'yearly_paid',
-      description: 'Plan code for the subscription.',
-    },
     display_name: {
       type: 'string',
       minLength: 1,

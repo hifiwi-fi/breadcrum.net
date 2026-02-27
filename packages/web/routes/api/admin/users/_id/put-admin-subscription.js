@@ -34,8 +34,6 @@ export async function putAdminCustomSubscription (fastify, _opts) {
     async function putAdminCustomSubscriptionHandler (request, reply) {
       const { id: targetUserId } = request.params
       const {
-        status = 'active',
-        plan_code: planCode = 'yearly_paid',
         display_name: displayName,
         current_period_end: currentPeriodEnd
       } = request.body
@@ -44,8 +42,8 @@ export async function putAdminCustomSubscription (fastify, _opts) {
         pg: fastify.pg,
         subscription: {
           userId: targetUserId,
-          status,
-          planCode,
+          status: 'active',
+          planCode: 'yearly_paid',
           displayName,
           currentPeriodEnd: currentPeriodEnd ? new Date(currentPeriodEnd) : null,
         },

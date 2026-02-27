@@ -17,7 +17,7 @@ export const Page = () => {
 
   return html`
     <div class="bc-marketing">
-      <${Badge}><a href="/docs/subscriptions/">Free + Paid Plans</a><//>
+      <${Badge}><a href="/docs/subscriptions/">Subscribe now!</a><//>
       <div class="bc-marketing-hero">
         <div class="bc-marketing-hero-icon">
           <img src="/static/bread.png" alt="Breadcrum logo" />
@@ -45,20 +45,20 @@ export const Page = () => {
         <section class="bc-marketing-plan-card">
           <h2>🆓 Free plan</h2>
           <p>
-            10 new bookmarks per month. Resets on the 1st of each month (UTC).
+            Start free with generous monthly bookmark usage and full access to core workflow features.
           </p>
           <p>
-            Access all existing bookmarks and core features.
+            See exact limits and policy details in <a href="/docs/subscriptions/">subscriptions and pricing</a>.
           </p>
         </section>
 
         <section class="bc-marketing-plan-card bc-marketing-plan-card-paid">
           <h2>💳 Paid plan</h2>
           <p>
-            Unlimited bookmarks on a yearly subscription.
+            Upgrade for unlimited bookmarking and uninterrupted saving when your workflow scales up.
           </p>
           <p>
-            Subscribe, cancel, and manage billing from <a href="/account/">account settings</a>.
+            Subscribe in minutes, then manage billing anytime from <a href="/account/">account settings</a>.
           </p>
         </section>
       </div>
@@ -172,9 +172,9 @@ export const Page = () => {
           <div class="bc-marketing-feature-block">
             <h2>💳 Subscriptions</h2>
             <p>
-              Breadcrum offers free and paid plans.
-              Free includes 10 new bookmarks per month. Paid is yearly and unlocks unlimited bookmarks.
-              See <a href="/docs/subscriptions/">subscriptions and pricing</a> for details.
+              Subscriptions keep Breadcrum sustainable and actively maintained.
+              Paid plans fund ongoing development, fixes, and long-term reliability while keeping a useful free tier available.
+              Compare options in <a href="/docs/subscriptions/">subscriptions and pricing</a>.
             </p>
           </div>
 

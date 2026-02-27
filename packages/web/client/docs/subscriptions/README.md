@@ -16,6 +16,7 @@ Breadcrum offers a free tier and a paid subscription.
 - Unlimited bookmarks.
 - Billed yearly.
 - Bookmark import (when available).
+- Optional trial periods can be configured in Stripe Checkout. If enabled, trial status and trial end are reflected in your account billing view.
 
 ## Billing
 

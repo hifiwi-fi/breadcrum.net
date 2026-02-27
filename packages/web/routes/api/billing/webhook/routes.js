@@ -1,10 +1,9 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { FastifyInstance, FastifyRequest } from 'fastify'
  * @import { Stripe } from 'stripe'
  */
-import { getUserBillingProfile, getUserIdByStripeCustomerId } from '@breadcrum/resources/billing/billing-queries.js'
 
+/** @type {Set<Stripe.Event.Type>} */
 const allowedEvents = new Set([
   'checkout.session.completed',
   'checkout.session.async_payment_succeeded',
@@ -47,6 +46,7 @@ export default async function billingWebhookRoute (fastify, _opts) {
       },
     },
     async function postBillingWebhookHandler (request, reply) {
+      const requestWithRawBody = /** @type {typeof request & { rawBody?: Buffer }} */ (request)
       const { billing_enabled: billingEnabled } = await fastify.getFlags({
         frontend: true,
         backend: false,
@@ -65,7 +65,7 @@ export default async function billingWebhookRoute (fastify, _opts) {
         return reply.internalServerError('Stripe webhook secret not configured')
       }
 
-      if (!request.rawBody) {
+      if (!requestWithRawBody.rawBody) {
         return reply.badRequest('Missing raw request body')
       }
 
@@ -73,7 +73,7 @@ export default async function billingWebhookRoute (fastify, _opts) {
       let event
       try {
         event = fastify.billing.stripe.webhooks.constructEvent(
-          request.rawBody,
+          requestWithRawBody.rawBody,
           signature,
           fastify.config.STRIPE_WEBHOOK_SECRET
         )
@@ -89,95 +89,19 @@ export default async function billingWebhookRoute (fastify, _opts) {
           : null
 
         if (customerId) {
+          // Queue wrapper uses sendThrottled(customerId) for retry/idempotency burst control.
           await fastify.pgboss.queues.syncSubscriptionQ.send({
             data: { customerId },
           })
-
-          await maybeSendAsyncCheckoutEmail({
-            fastify,
-            request,
-            event,
-            customerId,
-          })
         } else {
+          // Intentional: return 200 even when customerId is missing so webhook delivery
+          // does not retry indefinitely on malformed/unmappable events.
           request.log.warn({ eventId: event.id, eventType: event.type }, 'Webhook event missing customer ID')
         }
       }
 
+      // Async payment outcome emails are handled by Stripe customer email settings.
       return reply.code(200).send({ received: true })
     }
   )
-}
-
-/**
- * Sends transactional email for async Checkout payment outcomes.
- * Keeps entitlement state handling webhook/sync-driven.
- *
- * @param {object} params
- * @param {FastifyInstance} params.fastify
- * @param {FastifyRequest} params.request
- * @param {Stripe.Event} params.event
- * @param {string} params.customerId
- * @returns {Promise<void>}
- */
-async function maybeSendAsyncCheckoutEmail ({ fastify, request, event, customerId }) {
-  const isAsyncSuccess = event.type === 'checkout.session.async_payment_succeeded'
-  const isAsyncFailure = event.type === 'checkout.session.async_payment_failed'
-
-  if (!isAsyncSuccess && !isAsyncFailure) return
-
-  const sessionObject = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (event.data.object))
-  const mode = sessionObject['mode']
-  if (mode !== 'subscription') return
-
-  const userId = await getUserIdByStripeCustomerId({
-    pg: fastify.pg,
-    stripeCustomerId: customerId,
-  })
-
-  if (!userId) {
-    request.log.warn({ eventId: event.id, customerId }, 'No user mapping found for async checkout event')
-    return
-  }
-
-  const profile = await getUserBillingProfile({
-    pg: fastify.pg,
-    userId,
-  })
-
-  if (!profile?.email) {
-    request.log.warn({ eventId: event.id, userId }, 'No email found for async checkout event')
-    return
-  }
-
-  const accountUrl = `${fastify.config.TRANSPORT}://${fastify.config.HOST}/account/`
-
-  const subject = isAsyncSuccess
-    ? 'Your Breadcrum subscription payment settled'
-    : 'Breadcrum subscription payment failed'
-
-  const text = isAsyncSuccess
-    ? [
-        `Hi ${profile.username},`,
-        '',
-        'Your delayed payment has settled successfully.',
-        'Your paid subscription access is now active.',
-        '',
-        `Review your billing details: ${accountUrl}`,
-      ].join('\n')
-    : [
-        `Hi ${profile.username},`,
-        '',
-        'Your delayed payment did not complete, so your subscription was not activated.',
-        'Please update your payment method and try again.',
-        '',
-        `Manage billing: ${accountUrl}`,
-      ].join('\n')
-
-  await fastify.sendEmail({
-    toEmail: profile.email,
-    subject,
-    text,
-    includeUnsubscribe: false,
-  })
 }

@@ -1,73 +1,152 @@
 import { describe, it } from 'node:test'
-// @ts-expect-error - used when todo tests are implemented
-import assert from 'node:assert/strict' // eslint-disable-line no-unused-vars
+import assert from 'node:assert/strict'
+/**
+ * @import { PgClient } from '../types/pg-client.js'
+ */
+import {
+  getStripeCustomerId,
+  getUserIdByStripeCustomerId,
+  upsertStripeCustomer,
+  upsertSubscription,
+  syncStripeSubscriptionToDb,
+  createCustomSubscription,
+  cancelStaleStripeSubscription,
+} from './billing-queries.js'
+
+/**
+ * @param {(query: unknown) => Promise<{ rows: unknown[] }>} queryImpl
+ */
+function mockPg (queryImpl) {
+  return /** @type {PgClient} */ (/** @type {unknown} */ ({
+    query: queryImpl,
+  }))
+}
 
 describe('billing-queries', () => {
-  // --- getBillingCustomerId ---
+  it('getStripeCustomerId returns stripe customer id for existing user', async () => {
+    const pg = mockPg(async () => ({ rows: [{ stripe_customer_id: 'cus_123' }] }))
 
-  it('getBillingCustomerId returns provider_customer_id for existing user', { todo: true })
+    const customerId = await getStripeCustomerId({
+      pg,
+      userId: 'user-1',
+    })
 
-  it('getBillingCustomerId returns undefined for non-existent user', { todo: true })
+    assert.equal(customerId, 'cus_123')
+  })
 
-  // --- upsertBillingCustomer ---
+  it('getStripeCustomerId returns undefined when no mapping exists', async () => {
+    const pg = mockPg(async () => ({ rows: [] }))
 
-  it('upsertBillingCustomer inserts new billing customer', { todo: true })
+    const customerId = await getStripeCustomerId({
+      pg,
+      userId: 'missing-user',
+    })
 
-  it('upsertBillingCustomer updates existing billing customer on conflict', { todo: true })
+    assert.equal(customerId, undefined)
+  })
 
-  // --- getUserBillingProfile ---
+  it('getUserIdByStripeCustomerId returns user id for existing stripe customer', async () => {
+    const pg = mockPg(async () => ({ rows: [{ user_id: 'user-abc' }] }))
 
-  it('getUserBillingProfile returns email and username', { todo: true })
+    const userId = await getUserIdByStripeCustomerId({
+      pg,
+      stripeCustomerId: 'cus_abc',
+    })
 
-  it('getUserBillingProfile returns undefined for non-existent user', { todo: true })
+    assert.equal(userId, 'user-abc')
+  })
 
-  // --- getUserIdByCustomerId ---
+  it('upsertStripeCustomer returns customer id from upsert result', async () => {
+    const pg = mockPg(async () => ({ rows: [{ stripe_customer_id: 'cus_saved' }] }))
 
-  it('getUserIdByCustomerId returns user_id for existing customer', { todo: true })
+    const customerId = await upsertStripeCustomer({
+      pg,
+      userId: 'user-1',
+      stripeCustomerId: 'cus_saved',
+    })
 
-  it('getUserIdByCustomerId returns undefined for non-existent customer', { todo: true })
+    assert.equal(customerId, 'cus_saved')
+  })
 
-  // --- upsertSubscription ---
+  it('upsertSubscription returns subscription id from upsert result', async () => {
+    const pg = mockPg(async () => ({ rows: [{ id: 'sub-1' }] }))
 
-  it('upsertSubscription inserts new subscription', { todo: true })
+    const subscriptionId = await upsertSubscription({
+      pg,
+      subscription: {
+        userId: 'user-1',
+        provider: 'stripe',
+      },
+    })
 
-  it('upsertSubscription updates existing subscription on conflict', { todo: true })
+    assert.equal(subscriptionId, 'sub-1')
+  })
 
-  it('upsertSubscription stores payment method brand and last4', { todo: true })
+  it('syncStripeSubscriptionToDb issues one atomic query', async () => {
+    /** @type {unknown[]} */
+    const queries = []
+    const pg = mockPg(async (query) => {
+      queries.push(query)
+      return { rows: [] }
+    })
 
-  it('upsertSubscription handles null optional fields', { todo: true })
+    await syncStripeSubscriptionToDb({
+      pg,
+      data: {
+        userId: 'user-1',
+        stripeSubscriptionId: 'sub_stripe_1',
+        status: 'active',
+        planCode: 'yearly_paid',
+        priceId: 'price_1',
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 86400000),
+        cancelAt: null,
+        cancelAtPeriodEnd: false,
+        trialEnd: null,
+        paymentMethodBrand: 'visa',
+        paymentMethodLast4: '4242',
+        latestInvoiceStatus: 'paid',
+        latestInvoicePaidAt: new Date(),
+        latestInvoiceSettled: true,
+      },
+    })
 
-  // --- insertWebhookEvent ---
+    assert.equal(queries.length, 1)
+  })
 
-  it('insertWebhookEvent inserts new event and returns true', { todo: true })
+  it('createCustomSubscription writes supertype and subtype atomically', async () => {
+    /** @type {unknown[]} */
+    const queries = []
+    const pg = mockPg(async (query) => {
+      queries.push(query)
+      return { rows: [{ id: 'sub-custom-1' }] }
+    })
 
-  it('insertWebhookEvent returns false for duplicate event ID (idempotent)', { todo: true })
+    const subscriptionId = await createCustomSubscription({
+      pg,
+      subscription: {
+        userId: 'user-1',
+        status: 'active',
+        planCode: 'yearly_paid',
+        displayName: 'Gift',
+        currentPeriodEnd: null,
+      },
+    })
 
-  // --- getAllBillingCustomerIds ---
+    assert.equal(subscriptionId, 'sub-custom-1')
+    assert.equal(queries.length, 1)
+  })
 
-  it('getAllBillingCustomerIds returns all customer IDs for provider', { todo: true })
+  it('cancelStaleStripeSubscription executes cancellation update query', async () => {
+    /** @type {unknown[]} */
+    const queries = []
+    const pg = mockPg(async (query) => {
+      queries.push(query)
+      return { rows: [] }
+    })
 
-  it('getAllBillingCustomerIds returns empty array when no customers exist', { todo: true })
+    await cancelStaleStripeSubscription({ pg, userId: 'user-1' })
 
-  it('getAllBillingCustomerIds filters by provider', { todo: true })
-})
-
-describe('syncStripeSubscription', () => {
-  it('syncs active subscription state from Stripe to DB', { todo: true })
-
-  it('extracts period dates from subscription.items.data[0]', { todo: true })
-
-  it('extracts payment method brand and last4 from expanded default_payment_method', { todo: true })
-
-  it('handles missing payment method gracefully', { todo: true })
-
-  it('does nothing when customer ID has no matching user', { todo: true })
-
-  it('does nothing when customer has no subscriptions', { todo: true })
-
-  it('upserts subscription using provider_subscription_id for idempotency', { todo: true })
-
-  it('stores cancel_at and cancel_at_period_end for canceling subscriptions', { todo: true })
-
-  it('extracts plan_code from price lookup_key, falling back to nickname', { todo: true })
+    assert.equal(queries.length, 1)
+  })
 })

@@ -13,10 +13,11 @@ import Stripe from 'stripe'
 
 export const billingEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   properties: {
-    STRIPE_SECRET_KEY: { type: 'string' },
-    STRIPE_WEBHOOK_SECRET: { type: 'string' },
-    STRIPE_PRICE_LOOKUP_KEY: { type: 'string', default: 'yearly_paid' },
+    STRIPE_SECRET_KEY: { type: 'string', minLength: 1 },
+    STRIPE_WEBHOOK_SECRET: { type: 'string', minLength: 1 },
+    STRIPE_PRICE_LOOKUP_KEY: { type: 'string', minLength: 1, default: 'yearly_paid' },
   },
+  // Stripe config is required at boot. Feature flags gate route availability.
   required: ['STRIPE_SECRET_KEY'],
 })
 
