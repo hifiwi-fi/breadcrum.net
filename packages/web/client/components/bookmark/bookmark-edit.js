@@ -68,7 +68,7 @@ export const BookmarkEdit = ({
     if (b?.archive_urls?.length) {
       setArchiveURLs([...b.archive_urls])
     }
-  }, [...(b?.archive_urls ?? [])])
+  }, [b?.archive_urls?.join(',')])
 
   useEffect(() => {
     // Keyboard handler for ctl-enter saving
@@ -98,12 +98,12 @@ export const BookmarkEdit = ({
       searchParams.set('url', episodeURLValue)
       searchParams.set('medium', episodeMediumSelect)
       const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
-        headers: { 'content-type': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
       if (response.ok) {
-        return /** @type {TypeEpisodePreview} */ (response.json())
+        return /** @type {TypeEpisodePreview} */ (await response.json())
       }
 
       const err = await response.json()
@@ -270,7 +270,7 @@ export const BookmarkEdit = ({
       setDisabled(false)
       setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked, archiveURLs])
+  }, [setDisabled, setError, onSave, createEpisodeChecked, customEpisodeURLChecked, archiveURLs])
 
   const handleAddArchiveURL = useCallback((/** @type {Event} */ev) => {
     // Adding a new archive URL row

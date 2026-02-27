@@ -32,7 +32,7 @@ export const EmailView = ({ user, onEdit }) => {
   const cancelEmailUpdateMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`${state.apiUrl}/user/email`, { method: 'delete' })
-      if (!response.ok || response.status !== 204) {
+      if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     },
@@ -59,8 +59,7 @@ export const EmailView = ({ user, onEdit }) => {
         body: JSON.stringify({ update: false }),
       })
 
-      if (response.ok && response.status === 202) {
-        await response.json()
+      if (response.ok) {
         console.log('Email verification requested')
         setEmailVerificationRequested(true)
       } else {
@@ -87,8 +86,7 @@ export const EmailView = ({ user, onEdit }) => {
         body: JSON.stringify({ update: true }),
       })
 
-      if (response.ok && response.status === 202) {
-        await response.json()
+      if (response.ok) {
         console.log('Email verification requested')
         setEmailUpdateVerificationRequested(true)
       } else {
