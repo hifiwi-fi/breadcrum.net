@@ -8,9 +8,8 @@
 import { useCallback, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useQuery } from './useQuery.js'
+import { useQuery, useSearchParams } from './useQuery.js'
 import { useLSP } from './useLSP.js'
-import { useWindow } from './useWindow.js'
 
 /**
  * @typedef {object} EpisodesQueryData
@@ -27,8 +26,8 @@ export function useEpisodes (options = {}) {
   const { enabled = true } = options
   const { user } = useUser({ required: false })
   const state = useLSP()
-  const window = useWindow()
   const { query } = useQuery()
+  const { setParams } = useSearchParams(['before', 'after'])
 
   const queryString = useMemo(() => (query ? query.toString() : ''), [query])
   const queryKey = useMemo(() => ([
@@ -66,7 +65,7 @@ export function useEpisodes (options = {}) {
       const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })
@@ -75,14 +74,11 @@ export function useEpisodes (options = {}) {
         const body = await response.json()
         const top = Boolean(body?.pagination?.top)
 
-        if (top && window) {
-          const newParams = new URLSearchParams(queryString)
-          let modified = false
-          if (newParams.get('before')) { newParams.delete('before'); modified = true }
-          if (newParams.get('after')) { newParams.delete('after'); modified = true }
-          if (modified) {
-            const qs = newParams.toString()
-            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
+        if (top) {
+          const hasBefore = pageParams.get('before')
+          const hasAfter = pageParams.get('after')
+          if (hasBefore || hasAfter) {
+            setParams({ before: null, after: null })
           }
         }
 

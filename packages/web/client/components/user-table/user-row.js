@@ -7,7 +7,7 @@
  */
 
 import { html } from 'htm/preact'
-import { useState, useCallback } from 'preact/hooks'
+import { useState, useCallback, useMemo } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { UserRowEdit } from './user-row-edit.js'
@@ -27,6 +27,11 @@ import { tc } from '../../lib/typed-component.js'
 export const UserRow = ({ user, onDelete }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
+  const adminUsersQueryKeyPrefix = useMemo(() => (
+    state.user?.id
+      ? ['admin-users', state.user.id, state.apiUrl]
+      : ['admin-users']
+  ), [state.apiUrl, state.user?.id])
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
@@ -55,8 +60,8 @@ export const UserRow = ({ user, onDelete }) => {
     },
     onSuccess: () => {
       setEditing(false)
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
-      queryClient.invalidateQueries({ queryKey: ['admin-user', user.id] })
+      queryClient.invalidateQueries({ queryKey: adminUsersQueryKeyPrefix })
+      queryClient.invalidateQueries({ queryKey: ['admin-user', user.id, state.apiUrl] })
     },
   })
 
@@ -64,7 +69,7 @@ export const UserRow = ({ user, onDelete }) => {
     mutationFn: async () => {
       const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
         method: 'delete',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
       })
 
       if (!response.ok) {
@@ -73,7 +78,7 @@ export const UserRow = ({ user, onDelete }) => {
     },
     onSuccess: () => {
       setDeleted(true)
-      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+      queryClient.invalidateQueries({ queryKey: adminUsersQueryKeyPrefix })
       if (onDelete) onDelete()
     },
   })

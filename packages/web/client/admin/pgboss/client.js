@@ -28,25 +28,25 @@ export const Page = () => {
           fetch(`${state.apiUrl}/admin/pgboss/summary`, {
             method: 'get',
             headers: {
-              'accept-encoding': 'application/json',
+              accept: 'application/json',
             },
           }),
           fetch(`${state.apiUrl}/admin/pgboss/states`, {
             method: 'get',
             headers: {
-              'accept-encoding': 'application/json',
+              accept: 'application/json',
             },
           }),
           fetch(`${state.apiUrl}/admin/pgboss/jobs?limit=50`, {
             method: 'get',
             headers: {
-              'accept-encoding': 'application/json',
+              accept: 'application/json',
             },
           }),
           fetch(`${state.apiUrl}/admin/pgboss/maintenance`, {
             method: 'get',
             headers: {
-              'accept-encoding': 'application/json',
+              accept: 'application/json',
             },
           })
         ])

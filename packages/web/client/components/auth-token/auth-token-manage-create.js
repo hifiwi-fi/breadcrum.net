@@ -7,7 +7,7 @@
  */
 
 import { html } from 'htm/preact'
-import { useRef, useState, useCallback } from 'preact/hooks'
+import { useRef, useState, useCallback, useMemo } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
@@ -24,6 +24,11 @@ import { AuthTokenEdit } from './auth-token-edit.js'
 export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
+  const authTokensQueryKeyPrefix = useMemo(() => (
+    state.user?.id
+      ? ['auth-tokens', state.user.id, state.apiUrl]
+      : ['auth-tokens']
+  ), [state.apiUrl, state.user?.id])
   const [newToken, setNewToken] = useState(/** @type {TypeAuthTokenCreateResponseClient | null} */(null))
   const copyButton = useRef()
 
@@ -48,7 +53,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
     },
     onSuccess: (data) => {
       setNewToken(data)
-      queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
+      queryClient.invalidateQueries({ queryKey: authTokensQueryKeyPrefix })
     },
   })
 
@@ -89,7 +94,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
             defaultValue="${newToken.token}"
           />
           <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
-          <button type="button" onClick="${handleHideNewToken}">Hide</button>
+          <button type="button" onClick=${handleHideNewToken}>Hide</button>
         </div>
         <div class="bc-help-text bc-token-create-copy-help-text">
           ℹ️ New auth token created. Save it in a safe place as it will never be shown again.

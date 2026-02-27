@@ -48,7 +48,7 @@ export const ManageAuthTokenField = () => {
     ${!editMode
       ? html`
         <div class='button-gap'>
-          <button type="button" onClick="${handleCreateMode}">Create auth token</button>
+          <button type="button" onClick=${handleCreateMode}>Create auth token</button>
           <!-- <button type="button" onClick="${handleCleanMode}">Cleanup old tokens</button> -->
         </div>
       `

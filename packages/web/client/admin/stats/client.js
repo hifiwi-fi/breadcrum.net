@@ -70,7 +70,7 @@ export const Page = () => {
         const response = await fetch(`${state.apiUrl}/admin/stats`, {
           method: 'get',
           headers: {
-            'accept-encoding': 'application/json',
+            accept: 'application/json',
           },
         })
 

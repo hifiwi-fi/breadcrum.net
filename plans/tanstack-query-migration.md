@@ -1,8 +1,88 @@
 # TanStack Query Migration Plan
 
-## Status: COMPLETE ✅
+## Status: PHASE 4 COMPLETE ✅
 
-All steps implemented. `useReload.js` has been deleted. All tests pass (288 node tests, ESLint clean, TypeScript clean).
+Original migration was completed, but a post-migration audit found behavioral inconsistencies and a few correctness bugs. This document now tracks follow-up fixes.
+
+### Follow-Up Checklist
+
+| Step | Scope | Status |
+|---|---|---|
+| 1 | Normalize feed query key + reload callback dependencies (remove object-in-key and `join(',')` dependency hacks) | Complete |
+| 2 | Fix mutation error handling gaps (auth-token delete and feed save must fail on non-OK responses) | Complete |
+| 3 | Normalize invalidation keys to align with declared key conventions (`apiUrl`/`userId`-scoped prefixes) | Complete |
+| 4 | Replace remaining `queryKey.join(',')` callback dependencies in search/view pages with stable memoized keys | Complete |
+| 5 | Validation pass (targeted tests + lint/types where feasible) and document any residual intentional inconsistencies | Complete |
+
+### Progress Log
+
+- 2026-02-27: Started follow-up hardening pass and added this execution checklist.
+- 2026-02-27: Step 1 complete. `feeds/client.js` now uses a stable `queryString` key segment and memoized query keys/callback deps (no `queryKey.join(',')`).
+- 2026-02-27: Step 2 complete. Added explicit non-OK response handling for auth-token delete and feed save mutations.
+- 2026-02-27: Step 3 complete. Invalidation keys are now scoped to `apiUrl`/`userId` where available (hooks + account/admin/auth-token mutation components).
+- 2026-02-27: Step 4 complete. Removed all `queryKey.join(',')` dependency usage and switched search/view page query keys to memoized arrays.
+- 2026-02-27: Step 5 complete. Validation passed after changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (286 passing, 0 failing).
+- 2026-02-27: Step 6 complete. Search pages and feeds now use `useSearchParams` for URL param state and top-cursor cleanup.
+- 2026-02-27: Step 7 complete. `useAuthTokens` and `use-admin-users` moved off manual `window.history.replaceState` + ref-tracking to `useSearchParams` updates.
+- 2026-02-27: Step 8 complete. Normalized quoted event/boolean bindings in migration-related account/auth-token/feed/search/user-table/bookmark/episode components.
+- 2026-02-27: Step 9 complete. Validation passed after phase 2 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (286 passing, 0 failing).
+- 2026-02-27: Phase 3 started. Step 10 in progress to migrate view-page `id` reads from direct `window.location.search` parsing to `useSearchParams`.
+- 2026-02-27: Step 10 complete. `bookmarks/view/client.js` now derives `id` via `useSearchParams(['id'])` and only keeps redirect logic in an effect.
+- 2026-02-27: Step 11 in progress for `archives/view/client.js`.
+- 2026-02-27: Step 11 complete. `archives/view/client.js` now derives `id` via `useSearchParams(['id'])` with redirect-only effect behavior.
+- 2026-02-27: Step 12 in progress for `episodes/view/client.js`.
+- 2026-02-27: Step 12 complete. `episodes/view/client.js` now derives `id` via `useSearchParams(['id'])` with redirect-only effect behavior.
+- 2026-02-27: Step 13 in progress for validation and residual inconsistency update.
+- 2026-02-27: Step 13 complete. Validation passed after phase 3 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (286 passing, 0 failing).
+- 2026-02-27: Phase 4 started. Step 14 in progress for remaining mutation consistency and callback dependency fixes in legacy list components.
+- 2026-02-27: Step 14 complete. Legacy list save/delete/toggle paths now fail on non-OK responses and callback deps were corrected for delete handlers.
+- 2026-02-27: Step 15 in progress for query-signal-safe cursor cleanup in list hooks.
+- 2026-02-27: Step 15 complete. `useBookmarks`/`useArchives`/`useEpisodes` now clear `before/after` cursors through `useSearchParams().setParams` instead of direct history mutation.
+- 2026-02-27: Step 16 in progress for `admin/users/view/client.js` URL param consistency.
+- 2026-02-27: Step 16 complete. `admin/users/view/client.js` now uses `useSearchParams(['id'])` with redirect-only effect behavior.
+- 2026-02-27: Step 17 in progress to migrate `tags/client.js` onto TanStack Query.
+- 2026-02-27: Step 17 complete. `tags/client.js` now uses `useTanstackQuery` with a stable key and signal-aware fetch; manual effect state/logging removed.
+- 2026-02-27: Step 18 in progress for callback dependency normalization in migrated view pages.
+- 2026-02-27: Step 18 complete. Remaining migrated view callback deps were normalized (window dependencies included where referenced).
+- 2026-02-27: Step 19 in progress to normalize client `accept` request headers.
+- 2026-02-27: Step 19 complete. Client request headers now consistently use `accept: 'application/json'` (removed all `accept-encoding` occurrences in `packages/web/client`).
+- 2026-02-27: Step 20 in progress for validation and residual inconsistency update.
+- 2026-02-27: Step 20 complete. Validation passed after phase 4 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (286 passing, 0 failing).
+
+### Residual Inconsistencies (Deferred)
+
+- Template binding style (quoted vs unquoted handler/boolean attributes in `htm` templates) is still mixed across older components.
+- `reload` prop patterns inside `BookmarkList`/`ArchiveList`/`EpisodeList` remain (already documented as intentionally not migrated in this plan).
+
+### Phase 2 Checklist
+
+| Step | Scope | Status |
+|---|---|---|
+| 6 | Adopt `useSearchParams` in search/feed pages for URL param read/write and top-cursor cleanup | Complete |
+| 7 | Adopt `useSearchParams` in remaining pagination hooks still using `prevDataRef`/manual URL mutation (`useAuthTokens`, `use-admin-users`) | Complete |
+| 8 | Normalize quoted handler/boolean attribute bindings in migration-related UI files | Complete |
+| 9 | Validation pass for phase 2 changes and update residual list | Complete |
+
+### Phase 3 Checklist
+
+| Step | Scope | Status |
+|---|---|---|
+| 10 | Migrate `bookmarks/view/client.js` id parsing to `useSearchParams` (drop direct `window.location.search` parsing) | Complete |
+| 11 | Migrate `archives/view/client.js` id parsing to `useSearchParams` | Complete |
+| 12 | Migrate `episodes/view/client.js` id parsing to `useSearchParams` | Complete |
+| 13 | Validation pass (eslint/tsc/node) and residual inconsistency update | Complete |
+
+### Phase 4 Checklist
+
+| Step | Scope | Status |
+|---|---|---|
+| 14 | Harden mutation error handling and callback deps in `BookmarkList`/`ArchiveList`/`EpisodeList` | Complete |
+| 15 | Replace manual `window.history.replaceState` cursor cleanup in `useBookmarks`/`useArchives`/`useEpisodes` with `useSearchParams` setter | Complete |
+| 16 | Migrate `admin/users/view/client.js` URL `id` parsing to `useSearchParams` | Complete |
+| 17 | Migrate `tags/client.js` from manual fetch effect to `useTanstackQuery` | Complete |
+| 18 | Normalize remaining callback dependency inconsistencies in migrated view pages | Complete |
+| 19 | Normalize client request headers from `'accept-encoding': 'application/json'` to `accept` | Complete |
+| 20 | Validation pass (eslint/tsc/node) and residual inconsistency update | Complete |
 
 ---
 
@@ -115,7 +195,7 @@ The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryCl
 | Bookmark view | `['bookmark-view', bookmarkId, apiUrl, sensitive]` |
 | Archive view | `['archive-view', archiveId, apiUrl, sensitive]` |
 | Episode view | `['episode-view', episodeId, apiUrl, sensitive]` |
-| Feed episodes | `['feed-episodes', apiUrl, sensitive, query]` |
+| Feed episodes | `['feed-episodes', apiUrl, sensitive, queryString]` |
 | Feed details | `['feed-details', apiUrl, feedId]` |
 
 ---

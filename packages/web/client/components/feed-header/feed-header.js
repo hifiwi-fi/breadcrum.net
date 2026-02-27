@@ -40,13 +40,17 @@ export const FeedHeader = ({ feed, reload }) => {
     const payload = diffUpdate(feed, newFeed)
 
     const endpoint = `${state.apiUrl}/feeds/${feed.id}`
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
       },
       body: JSON.stringify(payload),
     })
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
 
     reload()
     setEditing(false)

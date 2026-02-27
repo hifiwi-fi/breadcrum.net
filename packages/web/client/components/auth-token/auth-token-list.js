@@ -7,7 +7,7 @@
  */
 
 import { html } from 'htm/preact'
-import { useState, useCallback } from 'preact/hooks'
+import { useState, useCallback, useMemo } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
@@ -26,6 +26,11 @@ import { diffUpdate } from '../../lib/diff-update.js'
 export const authTokenList = ({ authToken }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
+  const authTokensQueryKeyPrefix = useMemo(() => (
+    state.user?.id
+      ? ['auth-tokens', state.user.id, state.apiUrl]
+      : ['auth-tokens']
+  ), [state.apiUrl, state.user?.id])
 
   /** @type {[boolean, (editing: boolean) => void]} */
   const [editing, setEditing] = useState(false)
@@ -55,23 +60,27 @@ export const authTokenList = ({ authToken }) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
+      queryClient.invalidateQueries({ queryKey: authTokensQueryKeyPrefix })
       setEditing(false)
     },
   })
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
+      const response = await fetch(`${state.apiUrl}/user/auth-tokens/${authToken.jti}`, {
         method: 'delete',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
       })
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
     },
     onSuccess: () => {
       setDeleted(true)
-      queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
+      queryClient.invalidateQueries({ queryKey: authTokensQueryKeyPrefix })
     },
   })
 

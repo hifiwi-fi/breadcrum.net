@@ -118,7 +118,7 @@ export const Page = () => {
     const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}?${requestParams.toString()}`, {
       method: 'get',
       headers: {
-        'accept-encoding': 'application/json',
+        accept: 'application/json',
       },
     })
 

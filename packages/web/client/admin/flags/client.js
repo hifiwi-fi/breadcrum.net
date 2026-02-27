@@ -81,7 +81,7 @@ export const Page = () => {
     queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
@@ -109,8 +109,8 @@ export const Page = () => {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-flags'] })
-      queryClient.invalidateQueries({ queryKey: ['flags'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-flags', state.apiUrl] })
+      queryClient.invalidateQueries({ queryKey: ['flags', state.apiUrl] })
     },
   })
 

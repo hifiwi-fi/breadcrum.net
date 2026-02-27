@@ -34,7 +34,7 @@ export const NewsletterField = ({ user }) => {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
     },
   })
 
@@ -47,7 +47,7 @@ export const NewsletterField = ({ user }) => {
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input class="newsletter-label" onClick="${handleToggle}" type="checkbox" name="newsletter-subscription" disabled=${toggleMutation.isPending} indeterminate=${toggleMutation.isPending} checked=${user?.newsletter_subscription} />
+      <input class="newsletter-label" onClick=${handleToggle} type="checkbox" name="newsletter-subscription" disabled=${toggleMutation.isPending} indeterminate=${toggleMutation.isPending} checked=${user?.newsletter_subscription} />
       <span>Subscribed</span>
     </label>
     ${toggleMutation.error ? html`<div class="error-box">${/** @type {Error} */(toggleMutation.error).message}</div>` : null}

@@ -3,12 +3,11 @@
 /** @import { SchemaTypeAdminUserReadClient } from '../../routes/api/admin/users/schemas/schema-admin-user-read.js' */
 /** @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query' */
 
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useQuery } from './useQuery.js'
+import { useSearchParams } from './useQuery.js'
 import { useLSP } from './useLSP.js'
-import { useWindow } from './useWindow.js'
 
 /**
  * @typedef {object} AdminUsersQueryData
@@ -21,11 +20,21 @@ import { useWindow } from './useWindow.js'
 export function useAdminUsers () {
   const { user } = useUser()
   const state = useLSP()
-  const window = useWindow()
-  const { query } = useQuery()
+  const { params: queryParams, setParams } = useSearchParams(['before', 'after', 'per_page', 'username'])
   const queryClient = useQueryClient()
+  const beforeParam = queryParams['before']
+  const afterParam = queryParams['after']
+  const perPageParam = queryParams['per_page']
+  const usernameParam = queryParams['username']
 
-  const queryString = useMemo(() => (query ? query.toString() : ''), [query])
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams()
+    if (beforeParam) params.set('before', beforeParam)
+    if (afterParam) params.set('after', afterParam)
+    if (perPageParam) params.set('per_page', perPageParam)
+    if (usernameParam) params.set('username', usernameParam)
+    return params.toString()
+  }, [afterParam, beforeParam, perPageParam, usernameParam])
   const queryKey = useMemo(() => ([
     'admin-users',
     user?.id ?? null,
@@ -54,13 +63,16 @@ export function useAdminUsers () {
       const response = await fetch(`${state.apiUrl}/admin/users?${pageParams.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
+        if (body?.pagination?.top) {
+          setParams({ before: null, after: null })
+        }
         return {
           users: body?.data,
           before: body?.pagination?.before ? new Date(body?.pagination?.before) : null,
@@ -73,41 +85,11 @@ export function useAdminUsers () {
     }
   }))
 
-  const { data, error, isPending, status } = adminUsersQuery
-  const prevDataRef = useRef(data)
-  const prevStatusRef = useRef(status)
-
-  useEffect(() => {
-    const dataChanged = data !== prevDataRef.current
-    const statusChanged = status !== prevStatusRef.current
-
-    if (window && status === 'success' && data !== undefined && (dataChanged || statusChanged)) {
-      if (data.top) {
-        const newParams = new URLSearchParams(queryString)
-        let modified = false
-        if (newParams.get('before')) {
-          newParams.delete('before')
-          modified = true
-        }
-        if (newParams.get('after')) {
-          newParams.delete('after')
-          modified = true
-        }
-
-        if (modified) {
-          const qs = newParams.toString()
-          window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-        }
-      }
-    }
-
-    prevDataRef.current = data
-    prevStatusRef.current = status
-  }, [data, queryString, status, window])
+  const { data, error, isPending } = adminUsersQuery
 
   const reloadAdminUsers = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['admin-users'] })
-  }, [queryClient])
+    queryClient.invalidateQueries({ queryKey: ['admin-users', user?.id ?? null, state.apiUrl] })
+  }, [queryClient, state.apiUrl, user?.id])
 
   const users = data?.users
   const before = data?.before ?? null
@@ -117,14 +99,14 @@ export function useAdminUsers () {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query || '')
+    beforeParams = new URLSearchParams(queryString)
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query || '')
+    afterParams = new URLSearchParams(queryString)
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }

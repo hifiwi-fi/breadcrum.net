@@ -4,12 +4,13 @@
 /** @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
 
 import { html } from 'htm/preact'
-import { useEffect, useState, useCallback } from 'preact/hooks'
+import { useEffect, useCallback, useMemo } from 'preact/hooks'
 import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../../lib/typed-component.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useSearchParams } from '../../hooks/useQuery.js'
 import { BookmarkList } from '../../components/bookmark/bookmark-list.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
@@ -21,22 +22,23 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
+  const { params } = useSearchParams(['id'])
   const queryClient = useQueryClient()
-
-  const [bookmarkId, setBookmarkId] = useState(/** @type {string | null} */(null))
+  const bookmarkId = params['id']
 
   useEffect(() => {
     if (!window) return
-    const pageParams = new URLSearchParams(window.location.search)
-    const id = pageParams.get('id')
-    if (!id) {
+    if (!bookmarkId) {
       window.location.replace('/bookmarks')
-      return
     }
-    setBookmarkId(id)
-  }, [window])
+  }, [bookmarkId, window])
 
-  const queryKey = ['bookmark-view', bookmarkId, state.apiUrl, state.sensitive]
+  const queryKey = useMemo(() => ([
+    'bookmark-view',
+    bookmarkId,
+    state.apiUrl,
+    state.sensitive,
+  ]), [bookmarkId, state.apiUrl, state.sensitive])
 
   const { data: bookmark, isPending: bookmarkLoading, error: bookmarkError } = useTanstackQuery({
     queryKey,
@@ -46,7 +48,7 @@ export const Page = () => {
 
       const response = await fetch(`${state.apiUrl}/bookmarks/${bookmarkId}?${requestParams.toString()}`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
@@ -61,14 +63,14 @@ export const Page = () => {
 
   const reload = useCallback(() => {
     queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey.join(',')])
+  }, [queryClient, queryKey])
 
   const handleDelete = useCallback(() => {
     if (bookmark && window) {
       const beforeString = new Date(bookmark.created_at).valueOf()
       window.location.replace(`/bookmarks?after=${beforeString}`)
     }
-  }, [bookmark?.created_at])
+  }, [bookmark?.created_at, window])
 
   const title = bookmark?.title ? ['🔖', bookmark?.title] : []
   useTitle(...title)

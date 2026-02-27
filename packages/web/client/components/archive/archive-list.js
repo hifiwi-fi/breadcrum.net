@@ -38,7 +38,7 @@ export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
     const payload = diffUpdate(archive, newArchive)
     const endpoint = `${state.apiUrl}/archives/${archive.id}`
 
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
@@ -46,21 +46,29 @@ export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
       body: JSON.stringify(payload),
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     reload()
     setEditing(false)
   }, [archive, state.apiUrl, reload, setEditing])
 
   const handleDeleteArchive = useCallback(async () => {
-    await fetch(`${state.apiUrl}/archives/${archive.id}`, {
+    const response = await fetch(`${state.apiUrl}/archives/${archive.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json',
+        accept: 'application/json',
       },
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     setDeleted(true)
     onDelete()
-  }, [state.apiUrl, archive.id, setDeleted, reload])
+  }, [state.apiUrl, archive.id, setDeleted, onDelete])
 
   return html`
   <div class="bc-archive">

@@ -46,7 +46,7 @@ export const EmailField = ({ user }) => {
     },
     onSuccess: () => {
       setEditing(false)
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
     },
   })
 

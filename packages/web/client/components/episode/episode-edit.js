@@ -108,7 +108,7 @@ export const EpisodeEdit = ({
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" checked="${e?.explicit}" />
+              <input type="checkbox" name="explicit" checked=${e?.explicit} />
             </label>
           </div>
 

@@ -4,11 +4,12 @@
 /** @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js' */
 
 import { html } from 'htm/preact'
-import { useEffect, useState, useCallback } from 'preact/hooks'
+import { useEffect, useCallback, useMemo } from 'preact/hooks'
 import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useSearchParams } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { ArchiveList } from '../../components/archive/archive-list.js'
 import { Search } from '../../components/search/index.js'
@@ -20,22 +21,23 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
+  const { params } = useSearchParams(['id'])
   const queryClient = useQueryClient()
-
-  const [archiveId, setArchiveId] = useState(/** @type {string | null} */(null))
+  const archiveId = params['id']
 
   useEffect(() => {
     if (!window) return
-    const pageParams = new URLSearchParams(window.location.search)
-    const id = pageParams.get('id')
-    if (!id) {
+    if (!archiveId) {
       window.location.replace('/archives')
-      return
     }
-    setArchiveId(id)
-  }, [window])
+  }, [archiveId, window])
 
-  const queryKey = ['archive-view', archiveId, state.apiUrl, state.sensitive]
+  const queryKey = useMemo(() => ([
+    'archive-view',
+    archiveId,
+    state.apiUrl,
+    state.sensitive,
+  ]), [archiveId, state.apiUrl, state.sensitive])
 
   const { data: archive, isPending: archiveLoading, error: archiveError } = useTanstackQuery({
     queryKey,
@@ -46,7 +48,7 @@ export const Page = () => {
 
       const response = await fetch(`${state.apiUrl}/archives/${archiveId}?${requestParams.toString()}`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
@@ -61,7 +63,7 @@ export const Page = () => {
 
   const reloadArchive = useCallback(() => {
     queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey.join(',')])
+  }, [queryClient, queryKey])
 
   const handleDelete = useCallback(() => {
     if (window && archive?.bookmark?.id) {

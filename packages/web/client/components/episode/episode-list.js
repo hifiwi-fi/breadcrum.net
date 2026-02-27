@@ -44,7 +44,7 @@ export const EpisodeList = ({ episode, reload, onDelete, clickForPreview, showEr
     const payload = diffUpdate(episode, newEpisode)
     const endpoint = `${state.apiUrl}/episodes/${episode.id}`
 
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
@@ -52,21 +52,29 @@ export const EpisodeList = ({ episode, reload, onDelete, clickForPreview, showEr
       body: JSON.stringify(payload),
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     reload()
     setEditing(false)
   }, [episode, state.apiUrl, reload, setEditing])
 
   const handleDeleteEpisode = useCallback(async () => {
-    await fetch(`${state.apiUrl}/episodes/${episode.id}`, {
+    const response = await fetch(`${state.apiUrl}/episodes/${episode.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json',
+        accept: 'application/json',
       },
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     setDeleted(true)
     onDelete()
-  }, [state.apiUrl, episode.id, setDeleted, reload])
+  }, [state.apiUrl, episode.id, setDeleted, onDelete])
 
   return html`
   <div class="bc-episode">

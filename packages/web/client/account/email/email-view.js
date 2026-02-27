@@ -37,7 +37,7 @@ export const EmailView = ({ user, onEdit }) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
     },
     onError: (err) => {
       console.error(err)
@@ -116,8 +116,8 @@ export const EmailView = ({ user, onEdit }) => {
       </div>
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
-          onClick="${handleEmailConfirmRequest}"
-          disabled="${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}">
+          onClick=${handleEmailConfirmRequest}
+          disabled=${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}>
           ${
             emailVerificationRequested
               ? 'Email verification resent'
@@ -133,15 +133,15 @@ export const EmailView = ({ user, onEdit }) => {
         ${user?.pending_email_update} (update pending verification)
         <div class="reset-buttons-state">
           <button
-            onClick="${handleEmailUpdateConfirmRequest}"
-            disabled="${requestingEmailUpdateVerification || emailUpdateVerificationRequested}">${
+            onClick=${handleEmailUpdateConfirmRequest}
+            disabled=${requestingEmailUpdateVerification || emailUpdateVerificationRequested}>${
               emailUpdateVerificationRequested
                 ? 'Email update verification resent'
                 : 'Resend email update confirmation'
             }</button>
           <button
-            onClick="${handleCancelEmailUpdate}"
-            disabled="${cancelEmailUpdateMutation.isPending}"
+            onClick=${handleCancelEmailUpdate}
+            disabled=${cancelEmailUpdateMutation.isPending}
           >
             ${cancelEmailUpdateMutation.isPending ? 'Cancelling email update' : 'Cancel email update'}
           </button>

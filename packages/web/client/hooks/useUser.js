@@ -33,7 +33,7 @@ export function useUser ({
       const response = await fetch(`${state.apiUrl}/user`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })
@@ -84,18 +84,18 @@ export function useUser ({
     function pageNavHandler (event) {
       if (event.persisted) {
         console.log('refreshing state')
-        queryClient.invalidateQueries({ queryKey: ['user'] })
+        queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
       }
     }
     window.addEventListener('pageshow', pageNavHandler)
     return () => {
       window.removeEventListener('pageshow', pageNavHandler)
     }
-  })
+  }, [queryClient, state.apiUrl])
 
   const reloadUser = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['user'] })
-  }, [queryClient])
+    queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+  }, [queryClient, state.apiUrl])
 
   return {
     user: data ?? state.user,

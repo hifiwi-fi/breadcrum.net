@@ -61,12 +61,16 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
   }, [bookmark.id, state.apiUrl, reload, setEditing])
 
   const handleDeleteBookmark = useCallback(async () => {
-    await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
+    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
       method: 'delete',
       headers: {
-        'accept-encoding': 'application/json',
+        accept: 'application/json',
       },
     })
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
 
     setDeleted(true)
     onDelete()
@@ -74,7 +78,7 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
 
   const handleToggleToRead = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
@@ -84,13 +88,17 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
       }),
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     // TODO: optimistic updates without full reload
     reload()
   }, [state.apiUrl, bookmark.id, reload, bookmark.toread])
 
   const handleToggleStarred = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
@@ -100,13 +108,17 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
       }),
     })
 
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
+
     // TODO: optimistic updates without full reload
     reload()
   }, [state.apiUrl, bookmark.id, reload, bookmark.starred])
 
   const handleToggleSensitive = useCallback(async () => {
     const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    await fetch(endpoint, {
+    const response = await fetch(endpoint, {
       method: 'put',
       headers: {
         'content-type': 'application/json',
@@ -115,6 +127,10 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
         sensitive: !bookmark.sensitive,
       }),
     })
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+    }
 
     // TODO: optimistic updates without full reload
     reload()

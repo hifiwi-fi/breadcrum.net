@@ -4,12 +4,13 @@
 /** @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js' */
 
 import { html } from 'htm/preact'
-import { useEffect, useState, useCallback } from 'preact/hooks'
+import { useEffect, useCallback, useMemo } from 'preact/hooks'
 import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../../lib/typed-component.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useSearchParams } from '../../hooks/useQuery.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
 import { Search } from '../../components/search/index.js'
@@ -21,22 +22,23 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
+  const { params } = useSearchParams(['id'])
   const queryClient = useQueryClient()
-
-  const [episodeId, setEpisodeId] = useState(/** @type {string | null} */(null))
+  const episodeId = params['id']
 
   useEffect(() => {
     if (!window) return
-    const pageParams = new URLSearchParams(window.location.search)
-    const id = pageParams.get('id')
-    if (!id) {
+    if (!episodeId) {
       window.location.replace('/episodes')
-      return
     }
-    setEpisodeId(id)
-  }, [window])
+  }, [episodeId, window])
 
-  const queryKey = ['episode-view', episodeId, state.apiUrl, state.sensitive]
+  const queryKey = useMemo(() => ([
+    'episode-view',
+    episodeId,
+    state.apiUrl,
+    state.sensitive,
+  ]), [episodeId, state.apiUrl, state.sensitive])
 
   const { data: episode, isPending: episodeLoading, error: episodeError } = useTanstackQuery({
     queryKey,
@@ -47,7 +49,7 @@ export const Page = () => {
 
       const response = await fetch(`${state.apiUrl}/episodes/${episodeId}?${requestParams.toString()}`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
@@ -62,13 +64,13 @@ export const Page = () => {
 
   const reloadEpisode = useCallback(() => {
     queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey.join(',')])
+  }, [queryClient, queryKey])
 
   const handleDelete = useCallback(() => {
     if (episode?.bookmark?.id && window) {
       window.location.replace(`/bookmarks/view?id=${episode.bookmark.id}`)
     }
-  }, [episode?.bookmark?.id])
+  }, [episode?.bookmark?.id, window])
 
   const title = episode?.display_title ? ['📼', episode?.display_title] : []
   useTitle(...title)

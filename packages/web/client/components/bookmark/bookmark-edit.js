@@ -492,7 +492,7 @@ export const BookmarkEdit = ({
               custom url
             </label>
             ${'\n'}
-            <button type="button" onClick="${handlePreviewRefresh}">refresh preview</button>
+            <button type="button" onClick=${handlePreviewRefresh}>refresh preview</button>
           </div>
 
           <input class="${cn({

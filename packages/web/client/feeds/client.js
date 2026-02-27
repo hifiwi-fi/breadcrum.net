@@ -10,7 +10,7 @@ import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useQuery, useSearchParams } from '../hooks/useQuery.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { FeedHeader } from '../components/feed-header/feed-header.js'
@@ -24,18 +24,33 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { pushState } = useQuery()
+  const { params: feedParams, setParams } = useSearchParams(['feed_id', 'before', 'after'])
   const queryClient = useQueryClient()
+  const feedIdParam = feedParams['feed_id']
+  const beforeParam = feedParams['before']
+  const afterParam = feedParams['after']
 
-  const pageParams = useMemo(() => new URLSearchParams(query || ''), [query])
-  const feedId = pageParams.get('feed_id')
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams()
+    if (feedIdParam) params.set('feed_id', feedIdParam)
+    if (beforeParam) params.set('before', beforeParam)
+    if (afterParam) params.set('after', afterParam)
+    return params.toString()
+  }, [afterParam, beforeParam, feedIdParam])
+  const feedId = feedIdParam
 
-  const episodesQueryKey = ['feed-episodes', state.apiUrl, state.sensitive, query]
+  const episodesQueryKey = useMemo(() => ([
+    'feed-episodes',
+    state.apiUrl,
+    state.sensitive,
+    queryString,
+  ]), [queryString, state.apiUrl, state.sensitive])
 
   const { data: episodesData, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
     queryKey: episodesQueryKey,
     queryFn: async ({ signal }) => {
-      const requestParams = new URLSearchParams(query || '')
+      const requestParams = new URLSearchParams(queryString)
 
       // Transform date string to date object
       const beforeParam = requestParams.get('before')
@@ -52,22 +67,15 @@ export const Page = () => {
 
       const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
 
-        if (body?.pagination?.top && window) {
-          const newParams = new URLSearchParams(query || '')
-          let modified = false
-          if (newParams.get('before')) { newParams.delete('before'); modified = true }
-          if (newParams.get('after')) { newParams.delete('after'); modified = true }
-          if (modified) {
-            const qs = newParams.toString()
-            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-          }
+        if (body?.pagination?.top) {
+          setParams({ before: null, after: null })
         }
 
         return body
@@ -79,7 +87,11 @@ export const Page = () => {
     placeholderData: keepPreviousData,
   })
 
-  const feedQueryKey = ['feed-details', state.apiUrl, feedId]
+  const feedQueryKey = useMemo(() => ([
+    'feed-details',
+    state.apiUrl,
+    feedId,
+  ]), [feedId, state.apiUrl])
 
   const { data: feedData, isPending: feedLoading, error: feedError } = useTanstackQuery({
     queryKey: feedQueryKey,
@@ -90,7 +102,7 @@ export const Page = () => {
 
       const response = await fetch(`${state.apiUrl}${requestURL}`, {
         method: 'get',
-        headers: { 'accept-encoding': 'application/json' },
+        headers: { accept: 'application/json' },
         signal,
       })
 
@@ -106,11 +118,11 @@ export const Page = () => {
 
   const reloadEpisodes = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: episodesQueryKey })
-  }, [queryClient, episodesQueryKey.join(',')])
+  }, [episodesQueryKey, queryClient])
 
   const reloadFeed = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: feedQueryKey })
-  }, [queryClient, feedQueryKey.join(',')])
+  }, [feedQueryKey, queryClient])
 
   const episodesBody = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { before?: string, after?: string, top?: boolean } } | undefined} */ (episodesData)
   const episodes = episodesBody?.data
@@ -140,7 +152,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
+  const dateParams = new URLSearchParams(queryString)
   const formatDateValue = (/** @type {Date | null | undefined} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()
@@ -171,14 +183,14 @@ export const Page = () => {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query || '')
+    beforeParams = new URLSearchParams(queryString)
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query || '')
+    afterParams = new URLSearchParams(queryString)
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }

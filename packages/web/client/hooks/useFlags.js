@@ -12,7 +12,7 @@ export function useFlags () {
       const response = await fetch(`${state.apiUrl}/flags`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })

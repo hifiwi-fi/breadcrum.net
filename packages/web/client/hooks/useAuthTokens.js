@@ -5,12 +5,11 @@
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 
-import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useQuery } from './useQuery.js'
+import { useSearchParams } from './useQuery.js'
 import { useLSP } from './useLSP.js'
-import { useWindow } from './useWindow.js'
 
 /**
  * @typedef {object} AuthTokensQueryData
@@ -23,11 +22,21 @@ import { useWindow } from './useWindow.js'
 export function useAuthTokens () {
   const { user } = useUser({ required: false })
   const state = useLSP()
-  const window = useWindow()
-  const { query } = useQuery()
+  const { params: queryParams, setParams } = useSearchParams(['before', 'after', 'per_page', 'sort'])
   const queryClient = useQueryClient()
+  const beforeParam = queryParams['before']
+  const afterParam = queryParams['after']
+  const perPageParam = queryParams['per_page']
+  const sortParam = queryParams['sort']
 
-  const queryString = useMemo(() => (query ? query.toString() : ''), [query])
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams()
+    if (beforeParam) params.set('before', beforeParam)
+    if (afterParam) params.set('after', afterParam)
+    if (perPageParam) params.set('per_page', perPageParam)
+    if (sortParam) params.set('sort', sortParam)
+    return params.toString()
+  }, [afterParam, beforeParam, perPageParam, sortParam])
   const queryKey = useMemo(() => ([
     'auth-tokens',
     user?.id ?? null,
@@ -50,13 +59,16 @@ export function useAuthTokens () {
       const response = await fetch(`${state.apiUrl}/user/auth-tokens?${params.toString()}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
+        if (body?.pagination?.top) {
+          setParams({ before: null, after: null })
+        }
         return {
           tokens: body?.data ?? null,
           before: body?.pagination?.before ?? null,
@@ -69,41 +81,11 @@ export function useAuthTokens () {
     }
   }))
 
-  const { data, error, isPending, status } = authTokensQuery
-  const prevDataRef = useRef(data)
-  const prevStatusRef = useRef(status)
-
-  useEffect(() => {
-    const dataChanged = data !== prevDataRef.current
-    const statusChanged = status !== prevStatusRef.current
-
-    if (window && status === 'success' && data !== undefined && (dataChanged || statusChanged)) {
-      if (data.top) {
-        const newParams = new URLSearchParams(queryString)
-        let modified = false
-        if (newParams.get('before')) {
-          newParams.delete('before')
-          modified = true
-        }
-        if (newParams.get('after')) {
-          newParams.delete('after')
-          modified = true
-        }
-
-        if (modified) {
-          const qs = newParams.toString()
-          window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-        }
-      }
-    }
-
-    prevDataRef.current = data
-    prevStatusRef.current = status
-  }, [data, queryString, status, window])
+  const { data, error, isPending } = authTokensQuery
 
   const reloadAuthTokens = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['auth-tokens'] })
-  }, [queryClient])
+    queryClient.invalidateQueries({ queryKey: ['auth-tokens', user?.id ?? null, state.apiUrl] })
+  }, [queryClient, state.apiUrl, user?.id])
 
   const tokens = data?.tokens ?? null
   const before = data?.before ?? null
@@ -113,14 +95,14 @@ export function useAuthTokens () {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query ?? '')
+    beforeParams = new URLSearchParams(queryString)
     beforeParams.set('before', before)
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query ?? '')
+    afterParams = new URLSearchParams(queryString)
     afterParams.set('after', after)
     afterParams.delete('before')
   }

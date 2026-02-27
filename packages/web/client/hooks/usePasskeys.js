@@ -36,8 +36,8 @@ export function usePasskeys () {
   })
 
   const invalidatePasskeys = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['passkeys'] })
-  }, [queryClient])
+    queryClient.invalidateQueries({ queryKey: ['passkeys', user?.id ?? null, state.apiUrl] })
+  }, [queryClient, state.apiUrl, user?.id])
 
   const registerMutation = useMutation({
     mutationFn: async (/** @type {string} */ name) => {

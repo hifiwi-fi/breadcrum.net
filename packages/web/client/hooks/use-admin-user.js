@@ -37,7 +37,7 @@ export function useAdminUser (userId) {
       const response = await fetch(`${state.apiUrl}/admin/users/${userId}`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
         signal,
       })
@@ -53,8 +53,8 @@ export function useAdminUser (userId) {
   const { data: user, error: userError, isPending: userLoading } = adminUserQuery
 
   const reloadAdminUser = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['admin-user', userId] })
-  }, [queryClient, userId])
+    queryClient.invalidateQueries({ queryKey: ['admin-user', userId, state.apiUrl] })
+  }, [queryClient, state.apiUrl, userId])
 
   /**
    * Handle user deletion by redirecting to users list
