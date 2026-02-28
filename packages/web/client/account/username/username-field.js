@@ -44,9 +44,9 @@ export const UsernameField = ({ user }) => {
       }
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: (/** @type {TypeUserRead} */ data) => {
       setEditing(false)
-      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+      queryClient.setQueryData(['user', state.apiUrl], data)
     },
   })
 

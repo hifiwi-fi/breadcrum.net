@@ -4,7 +4,7 @@
 
 import { html } from 'htm/preact'
 import { useCallback, useMemo, useRef } from 'preact/hooks'
-import { useQuery as useTanstackQuery, useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/preact-query'
 import { defaultFrontendFlags } from '../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../plugins/flags/backend-flags.js'
 import { useUser } from '../../hooks/useUser.js'
@@ -76,7 +76,7 @@ export const Page = () => {
     []
   )
 
-  const { data: serverFlags, isPending: serverFlagsLoading, error: serverFlagsError } = useTanstackQuery({
+  const { data: serverFlags, isPending: serverFlagsLoading, error: serverFlagsError } = useQuery({
     queryKey: ['admin-flags', state.apiUrl],
     queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {

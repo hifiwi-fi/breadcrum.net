@@ -19,7 +19,8 @@
       "WebFetch(domain:bret.io)",
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:unpkg.com)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "mcp__mcp-server-github__pull_request_read"
     ]
   }
 }

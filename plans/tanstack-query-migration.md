@@ -1,6 +1,6 @@
 # TanStack Query Migration Plan
 
-## Status: PHASE 4 COMPLETE ✅
+## Status: PHASE 5 COMPLETE ✅
 
 Original migration was completed, but a post-migration audit found behavioral inconsistencies and a few correctness bugs. This document now tracks follow-up fixes.
 
@@ -48,6 +48,13 @@ Original migration was completed, but a post-migration audit found behavioral in
 - 2026-02-27: Step 19 complete. Client request headers now consistently use `accept: 'application/json'` (removed all `accept-encoding` occurrences in `packages/web/client`).
 - 2026-02-27: Step 20 in progress for validation and residual inconsistency update.
 - 2026-02-27: Step 20 complete. Validation passed after phase 4 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (286 passing, 0 failing).
+- 2026-02-27: Phase 5 started. PR #690 review feedback triaged — copilot feedback assessed (3 deferred, 5 already fixed/outdated); bcomnes action items captured.
+- 2026-02-27: Step 21 complete. Removed `useTanstackQuery` alias in 5 files where there is no naming conflict with the local `hooks/useQuery.js`: `archives/view/client.js`, `bookmarks/view/client.js`, `episodes/view/client.js`, `admin/flags/client.js`, `components/bookmark/bookmark-edit.js`. Files that import `useQuery` from both TanStack and the local hooks file retain the alias (`feeds/client.js`, `search/*.js`, `tags/client.js`).
+- 2026-02-27: Step 22 complete. `email-field.js` and `username-field.js` `onSuccess` handlers now call `queryClient.setQueryData(['user', apiUrl], data)` directly from the mutation response instead of re-fetching via `invalidateQueries`.
+- 2026-02-27: Step 23 complete. `admin/pgboss/client.js` migrated from `useState+useEffect` to `useQuery` with signal-aware parallel fetches and `enabled: Boolean(user)`.
+- 2026-02-27: Step 24 complete. `admin/stats/client.js` migrated from `useState+useEffect` to `useQuery` with signal-aware fetch and `enabled: Boolean(user)`.
+- 2026-02-27: Step 25 complete. `admin/redis-cache/client.js` migrated from manual state to `useMutation`; uses `flushMutation.isPending`/`isSuccess`/`error` for UI state.
+- 2026-02-27: Step 26 complete. Validation passed after phase 5 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (all ok, 0 failing).
 
 ### Residual Inconsistencies (Deferred)
 
@@ -83,6 +90,47 @@ Original migration was completed, but a post-migration audit found behavioral in
 | 18 | Normalize remaining callback dependency inconsistencies in migrated view pages | Complete |
 | 19 | Normalize client request headers from `'accept-encoding': 'application/json'` to `accept` | Complete |
 | 20 | Validation pass (eslint/tsc/node) and residual inconsistency update | Complete |
+
+---
+
+## Phase 5: PR Review Follow-Up (#690)
+
+### Phase 5 Checklist
+
+| Step | Scope | Status |
+|---|---|---|
+| 21 | Remove `useTanstackQuery` alias from non-hook page/component files (use `useQuery` directly) | Complete |
+| 22 | Use `setQueryData` with mutation response in `email-field.js` and `username-field.js` (avoid extra re-fetch) | Complete |
+| 23 | Migrate `admin/pgboss/client.js` from `useEffect+useState` to `useQuery` | Complete |
+| 24 | Migrate `admin/stats/client.js` from `useEffect+useState` to `useQuery` | Complete |
+| 25 | Migrate `admin/redis-cache/client.js` from manual state to `useMutation` | Complete |
+| 26 | Validation pass (eslint/tsc/node) | Complete |
+
+### Copilot Feedback Assessment
+
+| Thread | File | Assessment | Action |
+|---|---|---|---|
+| `keysString` in `useMemo` dep | `hooks/useQuery.js:68` | **Not a bug.** `keysString = keys.join(',')` in the dep array is intentionally defensive — if a caller passes an inline array literal like `['id']` on each render, `keysString` stays `'id'` (stable), preventing spurious `useMemo` re-runs. The copilot concern about infinite re-renders is backwards — this pattern prevents them. | No change. |
+| Tutorial test coverage | `docs/tutorial/README.md:100` | Now a static markdown file rendered server-side; no client-side component exists to unit-test. Low value. | Defer. |
+| Bookmarklets test coverage | `docs/bookmarks/bookmarklets/client.js:41` | Copy functionality uses `navigator.clipboard` API requiring complex browser API mocking for minimal gain. | Defer. |
+| `queryKey.join(',')` in search pages | `search/episodes`, `search/archives` (outdated threads) | Already fixed in Step 4. Threads are outdated. | No change needed. |
+
+### bcomnes Feedback Notes
+
+| Thread | File | Resolution |
+|---|---|---|
+| `useTanstackQuery` alias | `admin/flags/client.js:7` and `archives/view/client.js:8` | Remove alias in all non-hook client files — Step 21 |
+| Signal in queryFn fetch | `admin/flags/client.js:86` | The `queryFn` already passes `signal`. For `mutationFn`, TanStack v5 does not provide signals to mutations (unlike queries). Form-save mutations don't need abort support — no change. |
+| `enabled: Boolean(user)` | `admin/flags/client.js:94` | Confirmed: `enabled: Boolean(user)` prevents the query from running until the user is loaded/authenticated. Correct behavior. |
+| Mutation signal check | `admin/flags/client.js:103` | Confirmed: TanStack v5 `mutationFn` does not receive a signal parameter. AbortController would require manual wiring. Low value for form-submit mutations — no change. |
+| Flags vs admin flags | `admin/flags/client.js:114` | `['flags', apiUrl]` = public feature-flags endpoint (`/api/flags`), readable by all users. `['admin-flags', apiUrl]` = admin-only endpoint (`/api/admin/flags`). Both invalidated on save because admin flag changes also affect the public flags cache. |
+| Update cache from response | `account/email/email-field.js:49` | Implement `setQueryData` with mutation response instead of `invalidateQueries` — Step 22 |
+| `mutateAsync` explanation | `account/email/email-field.js:58` | `saveMutation.mutateAsync` is TanStack's async version of `mutate` — returns a Promise and re-throws errors (unlike `mutate` which swallows them). `EmailEdit.onSave` awaits it in a try/catch, so `mutateAsync` is the correct choice here. No change needed. |
+| Update cache from response | `account/username/username-field.js:49` | Implement `setQueryData` with mutation response — Step 22 |
+| Migrate to `useTanstackQuery` | `admin/pgboss/client.js:22` | Step 23 |
+| Migrate to `useMutation` | `admin/redis-cache/client.js:26` | Step 25 |
+| Migrate to `useTanstackQuery` | `admin/stats/client.js:70` | Step 24 |
+| Confirm TanStack Query usage | `admin/users/client.js:25` | Confirmed: `useAdminUsers` hook uses `useTanstackQuery` internally (migrated in Phase 1, Step 3). The page itself delegates to the hook and doesn't need `useTanstackQuery` directly. |
 
 ---
 
@@ -197,6 +245,8 @@ The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryCl
 | Episode view | `['episode-view', episodeId, apiUrl, sensitive]` |
 | Feed episodes | `['feed-episodes', apiUrl, sensitive, queryString]` |
 | Feed details | `['feed-details', apiUrl, feedId]` |
+| pg-boss dashboard | `['pgboss-dashboard', apiUrl]` |
+| Admin stats | `['admin-stats', apiUrl]` |
 
 ---
 

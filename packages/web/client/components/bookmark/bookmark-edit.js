@@ -9,7 +9,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
-import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
+import { useQuery } from '@tanstack/preact-query'
 import cn from 'classnames'
 import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
@@ -91,7 +91,7 @@ export const BookmarkEdit = ({
     }
   }, [formRef])
 
-  const { data: episodePreview, isPending: episodePreviewLoading, error: episodePreviewError } = useTanstackQuery({
+  const { data: episodePreview, isPending: episodePreviewLoading, error: episodePreviewError } = useQuery({
     queryKey: ['episode-preview', state.apiUrl, episodeURLValue, episodeMediumSelect, previewVersion],
     queryFn: async ({ signal }) => {
       const searchParams = new URLSearchParams()

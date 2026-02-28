@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useEffect, useCallback, useMemo } from 'preact/hooks'
-import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
+import { useQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../../lib/typed-component.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
@@ -40,7 +40,7 @@ export const Page = () => {
     state.sensitive,
   ]), [episodeId, state.apiUrl, state.sensitive])
 
-  const { data: episode, isPending: episodeLoading, error: episodeError } = useTanstackQuery({
+  const { data: episode, isPending: episodeLoading, error: episodeError } = useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams()

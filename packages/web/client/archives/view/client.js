@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useEffect, useCallback, useMemo } from 'preact/hooks'
-import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
+import { useQuery, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
@@ -39,7 +39,7 @@ export const Page = () => {
     state.sensitive,
   ]), [archiveId, state.apiUrl, state.sensitive])
 
-  const { data: archive, isPending: archiveLoading, error: archiveError } = useTanstackQuery({
+  const { data: archive, isPending: archiveLoading, error: archiveError } = useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams()
