@@ -55,6 +55,7 @@ Original migration was completed, but a post-migration audit found behavioral in
 - 2026-02-27: Step 24 complete. `admin/stats/client.js` migrated from `useState+useEffect` to `useQuery` with signal-aware fetch and `enabled: Boolean(user)`.
 - 2026-02-27: Step 25 complete. `admin/redis-cache/client.js` migrated from manual state to `useMutation`; uses `flushMutation.isPending`/`isSuccess`/`error` for UI state.
 - 2026-02-27: Step 26 complete. Validation passed after phase 5 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (all ok, 0 failing).
+- 2026-02-28: Migrated `BookmarkList`, `ArchiveList`, `EpisodeList` mutations to `useMutation`. Removed `reload` prop from all three components and all callers. `onDelete` made optional and now only used for view-page navigation. Components self-invalidate their resource's list, view, and search query prefixes on mutation success. Validation passed (eslint, tsc, 340 tests passing, 0 failing).
 
 ### Residual Inconsistencies (Deferred)
 
@@ -210,6 +211,9 @@ The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryCl
 | File | Change |
 |---|---|
 | `components/bookmark/bookmark-edit.js` | Episode preview: 5 state vars + `useReload` + `useEffect` + `AbortController` → `useTanstackQuery`. Preview key includes `episodeURLValue`, `episodeMediumSelect`, `previewVersion` (version bumped on manual refresh) |
+| `components/bookmark/bookmark-list.js` | `reload`/`onDelete` props removed; save/delete/toggle handlers migrated to `useMutation`; `onSuccess` invalidates `['bookmarks']`, `['bookmark-view']`, `['search-bookmarks']` |
+| `components/archive/archive-list.js` | Same migration; `onSuccess` invalidates `['archives']`, `['archive-view']`, `['search-archives']` |
+| `components/episode/episode-list.js` | Same migration; `onSuccess` invalidates `['episodes']`, `['episode-view']`, `['search-episodes']`, `['feed-episodes']` |
 
 ### QueryProvider Plumbing
 
@@ -254,7 +258,6 @@ The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryCl
 
 - **`login/client.js`**, **`register/client.js`** — one-shot auth flows with redirect-on-success; `useMutation` adds minimal value
 - **`hooks/useResolvePolling.js`** — custom polling with back-pressure (skips overlapping requests, tracks next-due time); TanStack's `refetchInterval` doesn't model this well
-- **Mutations in `BookmarkList`, `ArchiveList`, `EpisodeList`** — these components still use manual fetch + `reload()`/`onDelete()` props internally; callers pass `invalidateQueries` wrappers as `reload`. A future step could migrate these too.
 
 ---
 

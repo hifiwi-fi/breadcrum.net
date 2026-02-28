@@ -184,8 +184,6 @@ export const Page = () => {
           ? bookmarks.map(b => html`
               ${tc(BookmarkList, {
                 bookmark: b,
-                reload,
-                onDelete: reload
               }, b.id)}
             `)
           : null}

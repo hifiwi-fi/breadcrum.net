@@ -182,8 +182,6 @@ export const Page = () => {
           ? archives.map(a => html`
               ${tc(ArchiveList, {
                 archive: a,
-                reload,
-                onDelete: reload
               }, a.id)}
             `)
           : null}

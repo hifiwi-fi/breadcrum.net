@@ -98,7 +98,6 @@ export const Page = () => {
       ${episode
         ? tc(EpisodeList, {
             episode,
-            reload: reloadEpisode,
             onDelete: handleDelete,
             clickForPreview: false,
             showError: true,

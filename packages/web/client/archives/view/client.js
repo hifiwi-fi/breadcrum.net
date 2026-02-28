@@ -100,7 +100,6 @@ export const Page = () => {
 ? html`
         <${ArchiveList}
           archive=${archive}
-          reload=${reloadArchive}
           onDelete=${handleDelete}
           fullView=${true}
         />

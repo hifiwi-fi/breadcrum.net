@@ -8,6 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 
@@ -17,14 +18,20 @@ import { diffUpdate } from '../../lib/diff-update.js'
 
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient,
- * reload: () => void,
- * onDelete: () => void,
+ * onDelete?: () => void,
  * fullView?: boolean
 }>} */
-export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
+export const ArchiveList = ({ archive, onDelete, fullView }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
+
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['archives'] })
+    queryClient.invalidateQueries({ queryKey: ['archive-view'] })
+    queryClient.invalidateQueries({ queryKey: ['search-archives'] })
+  }, [queryClient])
 
   const handleEdit = useCallback(() => {
     setEditing(true)
@@ -34,41 +41,43 @@ export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(/** @param {ArchiveFormState} newArchive */ async (newArchive) => {
-    const payload = diffUpdate(archive, newArchive)
-    const endpoint = `${state.apiUrl}/archives/${archive.id}`
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {ArchiveFormState} */ newArchive) => {
+      const payload = diffUpdate(archive, newArchive)
 
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+      const response = await fetch(`${state.apiUrl}/archives/${archive.id}`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      setEditing(false)
+      invalidate()
+    },
+  })
 
-    reload()
-    setEditing(false)
-  }, [archive, state.apiUrl, reload, setEditing])
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${state.apiUrl}/archives/${archive.id}`, {
+        method: 'delete',
+        headers: { accept: 'application/json' },
+      })
 
-  const handleDeleteArchive = useCallback(async () => {
-    const response = await fetch(`${state.apiUrl}/archives/${archive.id}`, {
-      method: 'delete',
-      headers: {
-        accept: 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-
-    setDeleted(true)
-    onDelete()
-  }, [state.apiUrl, archive.id, setDeleted, onDelete])
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      setDeleted(true)
+      invalidate()
+      onDelete?.()
+    },
+  })
 
   return html`
   <div class="bc-archive">
@@ -77,8 +86,8 @@ export const ArchiveList = ({ archive, reload, onDelete, fullView }) => {
       : editing
         ? tc(ArchiveEdit, {
             archive,
-            onSave: handleSave,
-            onDeleteArchive: handleDeleteArchive,
+            onSave: (/** @type {ArchiveFormState} */ newArchive) => saveMutation.mutateAsync(newArchive),
+            onDeleteArchive: () => deleteMutation.mutateAsync(),
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${archive?.id}</code>`,
           })

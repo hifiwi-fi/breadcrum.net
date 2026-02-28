@@ -131,8 +131,6 @@ export const Page = () => {
         ${Array.isArray(episodes)
           ? episodes.map(e => tc(EpisodeList, {
               episode: e,
-              reload: reloadEpisodes,
-              onDelete: reloadEpisodes,
               clickForPreview: true
             }, e.id))
           : null}

@@ -182,8 +182,6 @@ export const Page = () => {
           ? episodes.map(e => html`
               ${tc(EpisodeList, {
                 episode: e,
-                reload,
-                onDelete: reload
               }, e.id)}
             `)
           : null}

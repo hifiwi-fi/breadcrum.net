@@ -151,8 +151,6 @@ export const Page = () => {
 
           const bookmarkNode = tc(BookmarkList, {
             bookmark,
-            reload: reloadBookmarks,
-            onDelete: reloadBookmarks
           }, bookmark.id)
 
           if (isGroupEnd) {

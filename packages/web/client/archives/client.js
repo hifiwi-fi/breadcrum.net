@@ -134,8 +134,6 @@ export const Page = () => {
               <${ArchiveList}
                 key=${ar.id}
                 archive=${ar}
-                reload=${reloadArchives}
-                onDelete=${reloadArchives}
                 clickForPreview=${true}
               />
             `)

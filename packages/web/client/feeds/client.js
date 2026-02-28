@@ -116,10 +116,6 @@ export const Page = () => {
     enabled: Boolean(user),
   })
 
-  const reloadEpisodes = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: episodesQueryKey })
-  }, [episodesQueryKey, queryClient])
-
   const reloadFeed = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: feedQueryKey })
   }, [feedQueryKey, queryClient])
@@ -238,8 +234,6 @@ export const Page = () => {
         ${Array.isArray(episodes)
           ? episodes.map(e => tc(EpisodeList, {
               episode: e,
-              reload: reloadEpisodes,
-              onDelete: reloadEpisodes,
               clickForPreview: true
             }, e.id))
           : null}

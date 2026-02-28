@@ -7,6 +7,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { BookmarkEdit } from './bookmark-edit.js'
@@ -16,17 +17,23 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 /**
  * @typedef {object} BookmarkListProps
  * @property {TypeBookmarkReadClient} bookmark
- * @property {() => void} reload
- * @property {() => void} onDelete
+ * @property {() => void} [onDelete]
  */
 
 /**
  * @type {FunctionComponent<BookmarkListProps>}
  */
-export const BookmarkList = ({ bookmark, reload, onDelete }) => {
+export const BookmarkList = ({ bookmark, onDelete }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
+
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
+    queryClient.invalidateQueries({ queryKey: ['bookmark-view'] })
+    queryClient.invalidateQueries({ queryKey: ['search-bookmarks'] })
+  }, [queryClient])
 
   const handleEdit = useCallback(() => {
     setEditing(true)
@@ -36,105 +43,73 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {any} */newBookmark) => {
-    const payload = diffUpdate(bookmark, newBookmark, {
-      tags: arraySetEqual,
-      archive_urls: arraySetEqual,
-    })
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {any} */ newBookmark) => {
+      const payload = diffUpdate(bookmark, newBookmark, {
+        tags: arraySetEqual,
+        archive_urls: arraySetEqual,
+      })
 
-    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
+      const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (response.ok) {
-      reload()
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
       setEditing(false)
-    } else {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-  }, [bookmark.id, state.apiUrl, reload, setEditing])
+      invalidate()
+    },
+  })
 
-  const handleDeleteBookmark = useCallback(async () => {
-    const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
-      method: 'delete',
-      headers: {
-        accept: 'application/json',
-      },
-    })
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
+        method: 'delete',
+        headers: { accept: 'application/json' },
+      })
 
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      setDeleted(true)
+      invalidate()
+      onDelete?.()
+    },
+  })
 
-    setDeleted(true)
-    onDelete()
-  }, [state.apiUrl, bookmark.id, setDeleted, onDelete])
+  const toggleMutation = useMutation({
+    mutationFn: async (/** @type {Record<string, unknown>} */ patch) => {
+      const response = await fetch(`${state.apiUrl}/bookmarks/${bookmark.id}`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
 
-  const handleToggleToRead = useCallback(async () => {
-    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        toread: !bookmark.toread,
-      }),
-    })
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: invalidate,
+  })
 
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
+  const handleToggleToRead = useCallback(() => {
+    toggleMutation.mutate({ toread: !bookmark.toread })
+  }, [toggleMutation, bookmark.toread])
 
-    // TODO: optimistic updates without full reload
-    reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.toread])
+  const handleToggleStarred = useCallback(() => {
+    toggleMutation.mutate({ starred: !bookmark.starred })
+  }, [toggleMutation, bookmark.starred])
 
-  const handleToggleStarred = useCallback(async () => {
-    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        starred: !bookmark.starred,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-
-    // TODO: optimistic updates without full reload
-    reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.starred])
-
-  const handleToggleSensitive = useCallback(async () => {
-    const endpoint = `${state.apiUrl}/bookmarks/${bookmark.id}`
-    const response = await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        sensitive: !bookmark.sensitive,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
-    }
-
-    // TODO: optimistic updates without full reload
-    reload()
-  }, [state.apiUrl, bookmark.id, reload, bookmark.sensitive])
+  const handleToggleSensitive = useCallback(() => {
+    toggleMutation.mutate({ sensitive: !bookmark.sensitive })
+  }, [toggleMutation, bookmark.sensitive])
 
   return html`
   <div class="bc-bookmark">
@@ -143,8 +118,8 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
       : editing
         ? tc(BookmarkEdit, {
             bookmark,
-            onSave: handleSave,
-            onDeleteBookmark: handleDeleteBookmark,
+            onSave: (/** @type {any} */ newBookmark) => saveMutation.mutateAsync(newBookmark),
+            onDeleteBookmark: () => deleteMutation.mutateAsync(),
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${bookmark?.id}</code>`,
           })
