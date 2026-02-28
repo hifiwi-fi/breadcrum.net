@@ -114,7 +114,7 @@ export const Page = () => {
     },
   })
 
-  const handleFlagSave = useCallback(async (/** @type {Event} */ev) => {
+  const handleFlagSave = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
 
     const form = formRef.current
@@ -133,7 +133,7 @@ export const Page = () => {
       }
     }
 
-    await saveMutation.mutateAsync(payload)
+    saveMutation.mutate(payload)
   }, [saveMutation, formRef])
 
   const isLoading = serverFlagsLoading || saveMutation.isPending

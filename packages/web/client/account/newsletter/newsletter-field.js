@@ -38,9 +38,9 @@ export const NewsletterField = ({ user }) => {
     },
   })
 
-  const handleToggle = useCallback(async (/** @type {Event} */ev) => {
+  const handleToggle = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
-    await toggleMutation.mutateAsync(!user?.newsletter_subscription)
+    toggleMutation.mutate(!user?.newsletter_subscription)
   }, [toggleMutation, user?.newsletter_subscription])
 
   return html`

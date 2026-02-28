@@ -99,10 +99,10 @@ export const EmailView = ({ user, onEdit }) => {
     }
   }, [state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
 
-  const handleCancelEmailUpdate = useCallback(async (/** @type {Event} */ev) => {
+  const handleCancelEmailUpdate = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
     setError(null)
-    await cancelEmailUpdateMutation.mutateAsync()
+    cancelEmailUpdateMutation.mutate()
   }, [cancelEmailUpdateMutation])
 
   return html`
