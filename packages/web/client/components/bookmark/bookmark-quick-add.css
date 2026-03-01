@@ -10,6 +10,7 @@
 .bc-quick-add-help {
   text-decoration: none;
   flex-basis: 100%;
+  font-size: 0.75em;
 }
 
 .bc-quick-add-help:hover {
@@ -28,9 +29,10 @@
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.4em;
+  gap: 0.25em;
   width: 100%;
   min-inline-size: 0;
+  padding: 0.25em 0.5em 0.35em;
 }
 
 .bc-quick-add-label {
