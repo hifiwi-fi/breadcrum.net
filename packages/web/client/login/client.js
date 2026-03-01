@@ -5,6 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
+import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { useQuery } from '../hooks/useQuery.js'
@@ -14,6 +15,7 @@ import { mountPage } from '../lib/mount-page.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const { user, loading, error: userError } = useUser({ required: false })
   const [loggingIn, setLoggingIn] = useState(false)
   const [loginError, setLoginError] = useState(/** @type {Error | null} */(null))
@@ -145,6 +147,7 @@ export const Page = () => {
         if (verifyResponse.ok && verifyResponse.status === 201) {
           /** @type {TypeTokenWithUserClient} */
           const body = await verifyResponse.json()
+          queryClient.setQueryData(['user', state.apiUrl], body.user)
           state.user = body.user
           // Redirect will happen via the user effect
         } else {
@@ -193,6 +196,7 @@ export const Page = () => {
       if (response.ok && response.status === 201) {
         /** @type {TypeTokenWithUserClient} */
         const body = await response.json()
+        queryClient.setQueryData(['user', state.apiUrl], body.user)
         state.user = body.user
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
