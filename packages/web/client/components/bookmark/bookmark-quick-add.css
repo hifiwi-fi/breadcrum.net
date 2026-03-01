@@ -9,6 +9,7 @@
 
 .bc-quick-add-help {
   text-decoration: none;
+  flex-basis: 100%;
 }
 
 .bc-quick-add-help:hover {
