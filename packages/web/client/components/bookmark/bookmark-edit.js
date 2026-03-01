@@ -54,7 +54,6 @@ export const BookmarkEdit = ({
   const [episodeMediumSelect, setEpisodeMediumSelect] = useState(/** @type {string} */('video'))
   const [episodeURLValue, setEpisodeURLValue] = useState(/** @type {string} */(b?.url ?? ''))
   const [previewVersion, setPreviewVersion] = useState(0)
-  const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(/** @type {string | undefined} */(b?.url))
   const isResolving = Boolean(
     b?.id && (
       b?.done === false ||
@@ -162,38 +161,24 @@ export const BookmarkEdit = ({
     const form = formRef.current
     const createEpisodeURLNode = form?.['createEpisodeURL']
     if (!checked && createEpisodeURLNode) {
-      if (createEpisodeURLNode.value !== form?.['url'].value) {
-        createEpisodeURLNode.value = form?.['url'].value
-        setEpisodeURLValue(createEpisodeURLNode.value)
-      }
+      // Reset the DOM input back to the bookmark URL when custom URL is unchecked
+      createEpisodeURLNode.value = form?.['url'].value
     }
-  }, [formRef, setCustomEpisodeURLChecked, setEpisodeURLValue])
-
-  const handleBookmarkURLInput = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
-    // Bookmark episode default custom URL sync
-    const form = formRef.current
-    const createEpisodeNode = form?.['createEpisodeURL']
-    if (!createEpisodeNode.checked || createEpisodeNode.value === prevBookmarkURLValue) {
-      createEpisodeNode.value = ev.currentTarget.value
-      if (!customEpisodeURLChecked) setEpisodeURLValue(ev.currentTarget.value)
-    }
-    setPrevBookmarkURLValue(ev.currentTarget.value)
-  }, [formRef, prevBookmarkURLValue, customEpisodeURLChecked, setEpisodeURLValue])
-
-  useEffect(() => {
-    // Initial bookmark URL set
-    setPrevBookmarkURLValue(b?.url)
-  }, [b?.url])
-
-  const handleCustomEpisodeURLInput = useCallback((/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
-    if (customEpisodeURLChecked) setEpisodeURLValue(ev.currentTarget.value)
-  }, [customEpisodeURLChecked, setEpisodeURLValue])
+  }, [formRef, setCustomEpisodeURLChecked])
 
   const handlePreviewRefresh = useCallback(async (/** @type {Event} */ev) => {
-    // Preview refresh event handler
+    // Preview refresh: read the current URL from the form rather than mirroring
+    // input state into Preact — keeps form state in the DOM (uncontrolled).
     ev.preventDefault()
+    const form = formRef.current
+    if (form) {
+      const url = customEpisodeURLChecked
+        ? form?.['createEpisodeURL']?.value
+        : form?.['url']?.value
+      if (url) setEpisodeURLValue(url)
+    }
     setPreviewVersion(v => v + 1)
-  }, [setPreviewVersion])
+  }, [customEpisodeURLChecked, formRef, setEpisodeURLValue, setPreviewVersion])
 
   const handleSave = useCallback(async (/** @type {SubmitEvent} */ev) => {
     ev.preventDefault()
@@ -307,7 +292,7 @@ export const BookmarkEdit = ({
         <div>
           <label class='block'>
             url:
-            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" onInput="${handleBookmarkURLInput}" />
+            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" />
           </label>
         </div>
 
@@ -500,7 +485,7 @@ export const BookmarkEdit = ({
           <input class="${cn({
             'bc-bookmark-edit-create-episode-url': true,
             'bc-bookmark-edit-create-episode-url-hidden': !customEpisodeURLChecked,
-          })}" type="url" name="createEpisodeURL" defaultValue="${b?.url}" onInput="${handleCustomEpisodeURLInput}" />
+          })}" type="url" name="createEpisodeURL" defaultValue="${b?.url}" />
 
           ${episodePreviewLoading ? html`<div class="bc-help-text">Episode preview loading...</div>` : null}
           ${episodePreview

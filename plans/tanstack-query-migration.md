@@ -226,6 +226,41 @@ bcomnes asked (2862821624, now re-opened per 2868485019) whether `email-field.js
 
 ---
 
+#### `bookmark-edit.js` — prefer uncontrolled form inputs (no DOM state shadowing)
+
+**Context:** `BookmarkEdit` currently uses several `useState` variables that shadow DOM input values into Preact state for the sole purpose of feeding the episode preview TanStack query key:
+
+- `episodeURLValue` — mirrors the current episode URL input value (updated on every keystroke via `onInput`)
+- `prevBookmarkURLValue` — mirrors the previous bookmark URL value to drive `createEpisodeURL` sync
+- `customEpisodeURLChecked` — mirrors the checkbox (OK — this is view/control state, not input mirroring)
+- `episodeMediumSelect` — mirrors the radio selection (OK — low-frequency event, not per-keystroke)
+- `createEpisodeChecked` — mirrors the checkbox (OK — view/control state)
+
+The form submission path (`handleSave`) already reads all values directly from `formRef.current` (uncontrolled). The state shadowing is only needed to keep the TanStack query key reactive for live-as-you-type episode preview updates.
+
+**Assessment:** `prevBookmarkURLValue` and the `handleBookmarkURLInput` / `handleCustomEpisodeURLInput` handlers are the primary offenders — they fire on every keystroke to keep `episodeURLValue` in sync with what the user is typing. The user preference is that input state should live in the DOM, not be mirrored into Preact state.
+
+**Proposed solution:**
+
+1. Remove `handleBookmarkURLInput` — no more live-sync of the bookmark URL field into `episodeURLValue` on every keystroke
+2. Remove `handleCustomEpisodeURLInput` — no more live-sync of the custom episode URL field on every keystroke
+3. Remove `prevBookmarkURLValue` state — only existed to support the sync logic in `handleBookmarkURLInput`
+4. Keep `episodeURLValue` in state but only update it on **explicit user actions**:
+   - Create-episode checkbox toggle (`handleCreateEpisodeCheckbox`): reads `form?.['url'].value` at that moment (same as current)
+   - Medium radio change (`handleEpisodeMediumSelect`): reads from form ref (same as current, no change needed)
+   - "Refresh preview" button click (`handlePreviewRefresh`): update `episodeURLValue` by reading from `form?.['createEpisodeURL'].value` or `form?.['url'].value` based on `customEpisodeURLChecked` before bumping `previewVersion`
+5. The `createEpisodeURL` input's DOM value is already initialized to `defaultValue="${b?.url}"` — when the user toggles "custom URL" off, reset the input's DOM value directly via `ref` (no state needed)
+
+**Trade-off:** Preview no longer auto-updates as the user types the URL — they must click "Refresh preview." This is acceptable given the "Refresh preview" button already exists and is the primary affordance.
+
+**State changes summary:**
+- Remove: `prevBookmarkURLValue`, `setPrevBookmarkURLValue`
+- Remove: `handleBookmarkURLInput`, `handleCustomEpisodeURLInput`
+- Keep: `episodeURLValue` (still needed in query key, just updated less frequently)
+- Keep: `createEpisodeChecked`, `customEpisodeURLChecked`, `episodeMediumSelect`, `previewVersion`
+
+---
+
 #### Remove schema store usage in `put-user.js`
 
 | Comment ID | File:Line | Issue | Proposed Action |
