@@ -134,6 +134,7 @@ export const Page = () => {
               <${ArchiveList}
                 key=${ar.id}
                 archive=${ar}
+                onInvalidate=${reloadArchives}
                 clickForPreview=${true}
               />
             `)

@@ -182,6 +182,7 @@ export const Page = () => {
           ? archives.map(a => html`
               ${tc(ArchiveList, {
                 archive: a,
+                onInvalidate: reload,
               }, a.id)}
             `)
           : null}

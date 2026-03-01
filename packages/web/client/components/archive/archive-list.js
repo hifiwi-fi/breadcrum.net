@@ -8,7 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 
@@ -19,19 +19,13 @@ import { diffUpdate } from '../../lib/diff-update.js'
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient,
  * onDelete?: () => void,
+ * onInvalidate?: () => void,
  * fullView?: boolean
 }>} */
-export const ArchiveList = ({ archive, onDelete, fullView }) => {
+export const ArchiveList = ({ archive, onDelete, onInvalidate, fullView }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
-
-  const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['archives'] })
-    queryClient.invalidateQueries({ queryKey: ['archive-view'] })
-    queryClient.invalidateQueries({ queryKey: ['search-archives'] })
-  }, [queryClient])
 
   const handleEdit = useCallback(() => {
     setEditing(true)
@@ -57,7 +51,7 @@ export const ArchiveList = ({ archive, onDelete, fullView }) => {
     },
     onSuccess: () => {
       setEditing(false)
-      invalidate()
+      onInvalidate?.()
     },
   })
 
@@ -74,7 +68,7 @@ export const ArchiveList = ({ archive, onDelete, fullView }) => {
     },
     onSuccess: () => {
       setDeleted(true)
-      invalidate()
+      onInvalidate?.()
       onDelete?.()
     },
   })

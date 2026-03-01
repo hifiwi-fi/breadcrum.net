@@ -182,6 +182,7 @@ export const Page = () => {
           ? episodes.map(e => html`
               ${tc(EpisodeList, {
                 episode: e,
+                onInvalidate: reload,
               }, e.id)}
             `)
           : null}

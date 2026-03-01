@@ -8,7 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { diffUpdate } from '../../lib/diff-update.js'
@@ -19,6 +19,7 @@ import { EpisodeView } from './episode-view.js'
  * @typedef {object} EpisodeListProps
  * @property {TypeEpisodeReadClient} episode
  * @property {() => void} [onDelete]
+ * @property {() => void} [onInvalidate]
  * @property {boolean | undefined} [clickForPreview]
  * @property {boolean} [showError]
  * @property {boolean} [fullView]
@@ -27,18 +28,10 @@ import { EpisodeView } from './episode-view.js'
 /**
  * @type {FunctionComponent<EpisodeListProps>}
  */
-export const EpisodeList = ({ episode, onDelete, clickForPreview, showError, fullView }) => {
+export const EpisodeList = ({ episode, onDelete, onInvalidate, clickForPreview, showError, fullView }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
-
-  const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['episodes'] })
-    queryClient.invalidateQueries({ queryKey: ['episode-view'] })
-    queryClient.invalidateQueries({ queryKey: ['search-episodes'] })
-    queryClient.invalidateQueries({ queryKey: ['feed-episodes'] })
-  }, [queryClient])
 
   const handleEdit = useCallback(() => {
     setEditing(true)
@@ -64,7 +57,7 @@ export const EpisodeList = ({ episode, onDelete, clickForPreview, showError, ful
     },
     onSuccess: () => {
       setEditing(false)
-      invalidate()
+      onInvalidate?.()
     },
   })
 
@@ -81,7 +74,7 @@ export const EpisodeList = ({ episode, onDelete, clickForPreview, showError, ful
     },
     onSuccess: () => {
       setDeleted(true)
-      invalidate()
+      onInvalidate?.()
       onDelete?.()
     },
   })

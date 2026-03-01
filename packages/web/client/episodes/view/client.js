@@ -99,6 +99,7 @@ export const Page = () => {
         ? tc(EpisodeList, {
             episode,
             onDelete: handleDelete,
+            onInvalidate: reloadEpisode,
             clickForPreview: false,
             showError: true,
             fullView: true,

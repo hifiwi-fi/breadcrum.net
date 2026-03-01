@@ -101,6 +101,7 @@ export const Page = () => {
         <${ArchiveList}
           archive=${archive}
           onDelete=${handleDelete}
+          onInvalidate=${reloadArchive}
           fullView=${true}
         />
       `

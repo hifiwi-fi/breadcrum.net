@@ -7,7 +7,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { BookmarkEdit } from './bookmark-edit.js'
@@ -18,22 +18,16 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
  * @typedef {object} BookmarkListProps
  * @property {TypeBookmarkReadClient} bookmark
  * @property {() => void} [onDelete]
+ * @property {() => void} [onInvalidate]
  */
 
 /**
  * @type {FunctionComponent<BookmarkListProps>}
  */
-export const BookmarkList = ({ bookmark, onDelete }) => {
+export const BookmarkList = ({ bookmark, onDelete, onInvalidate }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
-
-  const invalidate = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['bookmarks'] })
-    queryClient.invalidateQueries({ queryKey: ['bookmark-view'] })
-    queryClient.invalidateQueries({ queryKey: ['search-bookmarks'] })
-  }, [queryClient])
 
   const handleEdit = useCallback(() => {
     setEditing(true)
@@ -61,10 +55,9 @@ export const BookmarkList = ({ bookmark, onDelete }) => {
       }
       return await response.json()
     },
-    onSuccess: (/** @type {{ status: string, data: TypeBookmarkReadClient }} */ result) => {
+    onSuccess: () => {
       setEditing(false)
-      queryClient.setQueryData(['bookmark-view', bookmark.id, state.apiUrl, state.sensitive], result.data)
-      invalidate()
+      onInvalidate?.()
     },
   })
 
@@ -81,7 +74,7 @@ export const BookmarkList = ({ bookmark, onDelete }) => {
     },
     onSuccess: () => {
       setDeleted(true)
-      invalidate()
+      onInvalidate?.()
       onDelete?.()
     },
   })
@@ -98,7 +91,7 @@ export const BookmarkList = ({ bookmark, onDelete }) => {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     },
-    onSuccess: invalidate,
+    onSuccess: () => onInvalidate?.(),
   })
 
   const handleToggleToRead = useCallback(() => {
