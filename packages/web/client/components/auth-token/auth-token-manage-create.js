@@ -25,9 +25,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
   const authTokensQueryKeyPrefix = useMemo(() => (
-    state.user?.id
-      ? ['auth-tokens', state.user.id, state.apiUrl]
-      : ['auth-tokens']
+    ['auth-tokens', state.user?.id, state.apiUrl]
   ), [state.apiUrl, state.user?.id])
   const [newToken, setNewToken] = useState(/** @type {TypeAuthTokenCreateResponseClient | null} */(null))
   const copyButton = useRef()
