@@ -33,6 +33,8 @@ export async function putUserRoute (fastify, _opts) {
               data: schemaUserRead,
             },
           },
+          404: { $ref: 'HttpError' },
+          409: { $ref: 'HttpError' },
         },
       },
     },
