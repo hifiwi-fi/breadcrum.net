@@ -20,7 +20,8 @@
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:unpkg.com)",
       "Bash(xargs cat:*)",
-      "mcp__mcp-server-github__pull_request_read"
+      "mcp__mcp-server-github__pull_request_read",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments)"
     ]
   }
 }

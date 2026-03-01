@@ -44,9 +44,9 @@ export const UsernameField = ({ user }) => {
       }
       return response.json()
     },
-    onSuccess: (/** @type {TypeUserRead} */ data) => {
+    onSuccess: (/** @type {{ status: string, data: TypeUserRead }} */ result) => {
       setEditing(false)
-      queryClient.setQueryData(['user', state.apiUrl], data)
+      queryClient.setQueryData(['user', state.apiUrl], result.data)
     },
   })
 

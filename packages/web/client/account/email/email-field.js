@@ -1,6 +1,5 @@
 /// <reference lib="dom" />
 
-/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
@@ -44,9 +43,9 @@ export const EmailField = ({ user }) => {
       }
       return response.json()
     },
-    onSuccess: (/** @type {TypeUserRead} */ data) => {
+    onSuccess: () => {
       setEditing(false)
-      queryClient.setQueryData(['user', state.apiUrl], data)
+      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
     },
   })
 

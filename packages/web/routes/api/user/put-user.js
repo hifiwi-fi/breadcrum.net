@@ -1,9 +1,11 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
+import { getUser } from './user-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaUserUpdate } from './schemas/schema-user-update.js'
+ * @import { SchemaUserRead } from './schemas/schema-user-read.js'
  */
 
 /**
@@ -28,6 +30,7 @@ export async function putUserRoute (fastify, _opts) {
             additionalProperties: false,
             properties: {
               status: { type: 'string', enum: ['ok'] },
+              data: /** @type {SchemaUserRead} */(fastify.getSchema('schema:breadcrum:user:read')),
             },
           },
         },
@@ -70,9 +73,9 @@ export async function putUserRoute (fastify, _opts) {
           await client.query(query)
         }
 
-        return /** @type {const} */ ({
-          status: 'ok',
-        })
+        const updatedUser = await getUser({ pg: client, fastify, userId })
+        if (!updatedUser) return reply.notFound('User not found')
+        return /** @type {const} */ ({ status: 'ok', data: updatedUser })
       })
     }
   )
