@@ -47,7 +47,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
         body: JSON.stringify({ note, protect }),
       })
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        return response.json()
+        return await response.json()
       }
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },

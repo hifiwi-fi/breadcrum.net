@@ -42,7 +42,7 @@ export const EmailField = ({ user }) => {
       if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
-      return response.json()
+      return await response.json()
     },
     onSuccess: () => {
       setEditing(false)

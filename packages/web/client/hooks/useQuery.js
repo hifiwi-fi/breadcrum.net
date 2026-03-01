@@ -36,8 +36,11 @@ export function useQuery () {
 /**
  * Subscribe to specific URL search param keys and get a stable loop-safe setter.
  *
- * Reading: only the requested keys are returned — unrelated param changes do not
- * cause re-renders in components that use this hook for a narrow set of keys.
+ * Reading: the hook subscribes to the full `querySignal` so any URL param change
+ * will re-run the component function. The `useMemo` inside re-derives only the
+ * requested keys, so downstream renders driven by the returned `params` object
+ * are stable when unrelated keys change — but the component calling this hook
+ * will still re-execute on every URL change.
  *
  * Writing: `setParams` merges updates into the current URL params (set or delete
  * individual keys, leaving all others intact). Defaults to `replaceState` so

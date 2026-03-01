@@ -98,7 +98,7 @@ export function useUser ({
   }, [queryClient, state.apiUrl])
 
   return {
-    user: data ?? state.user,
+    user: data === undefined ? state.user : data,
     reloadUser,
     loading,
     error: error || null,

@@ -21,7 +21,19 @@
       "WebFetch(domain:unpkg.com)",
       "Bash(xargs cat:*)",
       "mcp__mcp-server-github__pull_request_read",
-      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments)"
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments)",
+      "Bash(git add packages/web/client/account/email/email-field.js)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(pnpm test)",
+      "Bash(gh pr list --head tanstack-query --json number,title,url)",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate)",
+      "Bash(python3 -c \":*)",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/issues/690/comments --paginate)",
+      "Bash(gh pr view 690 --json reviews,reviewDecision,reviewRequests)",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id == null\\) | {id, author: .user.login, path, line, body, created_at}]')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id != null\\) | {id, in_reply_to_id, author: .user.login, body}]')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id\\) | {id, in_reply_to_id, author: .user.login, body}]')"
     ]
   }
 }

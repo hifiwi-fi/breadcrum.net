@@ -68,6 +68,8 @@ export const BookmarkEdit = ({
     if (b?.archive_urls?.length) {
       setArchiveURLs([...b.archive_urls])
     }
+  // join(',') produces a stable string dep — prevents re-running if the array
+  // reference changes but content is the same (e.g. new array from re-render).
   }, [b?.archive_urls?.join(',')])
 
   useEffect(() => {

@@ -60,7 +60,7 @@ Original migration was completed, but a post-migration audit found behavioral in
 ### Residual Inconsistencies (Deferred)
 
 - Template binding style (quoted vs unquoted handler/boolean attributes in `htm` templates) is still mixed across older components.
-- `reload` prop patterns inside `BookmarkList`/`ArchiveList`/`EpisodeList` remain (already documented as intentionally not migrated in this plan).
+- ~~`reload` prop patterns inside `BookmarkList`/`ArchiveList`/`EpisodeList` remain~~ — **OUTDATED**: `reload` was fully removed from all three list components and their callers in the 2026-02-28 pass.
 
 ### Phase 2 Checklist
 
@@ -132,6 +132,126 @@ Original migration was completed, but a post-migration audit found behavioral in
 | Migrate to `useMutation` | `admin/redis-cache/client.js:26` | Step 25 |
 | Migrate to `useTanstackQuery` | `admin/stats/client.js:70` | Step 24 |
 | Confirm TanStack Query usage | `admin/users/client.js:25` | Confirmed: `useAdminUsers` hook uses `useTanstackQuery` internally (migrated in Phase 1, Step 3). The page itself delegates to the hook and doesn't need `useTanstackQuery` directly. |
+
+---
+
+## Phase 6: Open PR Review Comments (PR #690)
+
+Captured 2026-03-01. All comments are from the latest review round. Copilot comments are assessed for current-code validity before proposing action.
+
+---
+
+### Stale Copilot Threads (Already Fixed, Need Reply Only)
+
+These comments were valid at review time but the code was subsequently fixed. No code change needed — just close/reply on GitHub.
+
+| Comment ID | File | Copilot Claim | Current Code State |
+|---|---|---|---|
+| 2844380067 | `bookmark-edit.js` | Missing `await` before `response.json()` | `return (await response.json())` on line 106 — **already fixed** |
+| 2844380091 | `search/bookmarks/client.js` | `queryKey.join(',')` in dep array | `useCallback([queryClient, queryKey])` with memoized key — **already fixed** |
+| 2844380105 / 2844380202 | `feeds/client.js` | `queryKey.join(',')` in dep array | `useCallback` deps use memoized `episodesQueryKey`/`feedQueryKey` — **already fixed** |
+| 2844380119 | `archives/view/client.js` | `queryKey.join(',')` in dep array | `useCallback([queryClient, queryKey])` with memoized key — **already fixed** |
+| 2844380212 | `episodes/view/client.js` | `queryKey.join(',')` in dep array | `useCallback([queryClient, queryKey])` with memoized key — **already fixed** |
+| 2844380222 | `bookmarks/view/client.js` | `queryKey.join(',')` in dep array | `useCallback([queryClient, queryKey])` with memoized key — **already fixed** |
+| 2844380231 | `hooks/useAuthTokens.js` | Uses old `prevDataRef`/`prevStatusRef` URL-cleanup pattern | No `prevDataRef` found — migrated to `useSearchParams` in Phase 2 — **already fixed** |
+| 2844380237 | `hooks/use-admin-users.js` | Uses old `prevDataRef`/`prevStatusRef` URL-cleanup pattern | No `prevDataRef` found — migrated to `useSearchParams` in Phase 2 — **already fixed** |
+| 2867096694 | `admin/redis-cache/client.js` | Missing `useUser()` guard | `useUser()` was added back per bcomnes's follow-up — **already fixed** |
+
+---
+
+### Open Copilot Threads (Validity Assessment + Proposed Action)
+
+| Comment ID | File | Copilot Claim | Validity | Proposed Action |
+|---|---|---|---|---|
+| 2867096688 | `layouts/root/root.layout.js:143` | `QueryProvider` uses `getQueryClient()` which caches on `globalThis`, leaking data across SSR requests | **Needs verification.** No `globalThis.__bcQueryClient` found in current code. The singleton in `lib/query-client.js` is client-side only; SSR renders synchronously with no queries fired. Likely a non-issue but worth confirming `root.layout.js` creates a fresh `QueryClient` or passes an empty one for SSR. | Read `lib/query-client.js` and `root.layout.js` to confirm SSR path is safe. If the SSR provider uses the client singleton, create a fresh `QueryClient` for each SSR render call. |
+| 2867096690 | `hooks/useUser.js:101` | `data ?? state.user` falls back to stale auth'd user when `data === null` (logged out), briefly exposing wrong user | **Partially valid.** `data ?? state.user` does fall back when `data === null`. However a `useEffect` on `[data]` sets `state.user = null` when `data === null`, so the stale-user window is short. The cleaner fix `data === undefined ? state.user : data` is correct: it uses the SSR seed only when TanStack hasn't loaded yet (undefined), and trusts `null` immediately. | Change line 101 from `user: data ?? state.user` to `user: data === undefined ? state.user : data`. |
+| 2867096692 | `hooks/useQuery.js:41` | Docstring says "unrelated param changes do not cause re-renders" but the hook subscribes to all of `querySignal.value` | **Valid.** `const allParams = querySignal.value` subscribes to every URL param change. The `useMemo` re-runs on any `allParams` change (re-derives the narrow key subset), and Preact may skip a DOM re-render if the memo result is identical, but the component function still re-executes. The docstring overstates the guarantee. | Update the `useSearchParams` JSDoc to accurately describe behavior: the hook re-runs on any URL param change but only re-computes and signals downstream when the requested keys change. |
+| 2867096697 | `plans/tanstack-query-migration.md:63` | "Residual Inconsistencies" section still says `reload` prop remains in list components, but it was removed | **Valid — plan doc inconsistency.** | Already fixed above (crossed out in Residual Inconsistencies). |
+
+---
+
+### Open bcomnes Threads (Proposed Action)
+
+#### `return response.json()` without `await` — multiple files
+
+bcomnes flagged `return response.json()` (no `await`) in several `mutationFn` bodies. In an `async` function, `return response.json()` is functionally equivalent to `return await response.json()` for the happy path — the outer async wrapper promotes the returned Promise. However `await` is more explicit and ensures the error is thrown within the same async stack frame (better stack traces). The consistent pattern used elsewhere in the codebase is `return await response.json()`.
+
+**Proposed action: Add `await` to all flagged sites for consistency and clarity.**
+
+| Comment ID | File:Line | Current | Fix |
+|---|---|---|---|
+| 2867137279 | `account/email/email-field.js:45` | `return response.json()` | `return await response.json()` |
+| 2867139021 | `account/newsletter/newsletter-field.js:34` | `return response.json()` | `return await response.json()` |
+| 2867139909 | `account/username/username-field.js:45` | `return response.json()` | `return await response.json()` |
+| 2868487233 | `components/auth-token/auth-token-manage-create.js:50` | `return response.json()` | `return await response.json()` |
+
+Note: `bookmark-list.js` `saveMutation` does not return JSON (no `return response.json()` call) so the bcomnes question at ID 2868498055/line 56 may refer to something else — re-read to confirm.
+
+---
+
+#### Update cache from mutation response instead of invalidating
+
+bcomnes asked (2862821624, now re-opened per 2868485019) whether `email-field.js` is actually using `setQueryData` from the mutation response. **It is not** — the current `onSuccess` calls `invalidateQueries`. The plan log (Step 22) claimed it was done, but the current code reverts to `invalidateQueries`. This needs to be fixed or confirmed as intentional.
+
+| Comment ID | File | Current `onSuccess` | Proposed |
+|---|---|---|---|
+| 2862821624 / 2868485019 | `account/email/email-field.js` | `queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })` | `queryClient.setQueryData(['user', state.apiUrl], data.data ?? data)` — but requires confirming the `/user/email` endpoint returns the updated user object |
+| 2868488092 | `components/auth-token/auth-token-manage-create.js:56` | `setNewToken(data)` + `invalidateQueries` | Already updates state with `data` — **may already be correct**; bcomnes says "make sure the api returns this", so verify `/user/auth-tokens` POST returns the token object |
+| 2868499101 | `components/bookmark/bookmark-list.js:65` | `invalidate()` on all bookmark query prefixes | Use `queryClient.setQueryData` to update the single bookmark in-place in the list cache |
+| 2868505635 | `components/user-table/user-row.js:64` | `invalidateQueries` on admin-users and admin-user prefixes | Use `queryClient.setQueryData` with mutation response for the single user — requires confirming `PUT /admin/users/:id` returns the updated user |
+
+---
+
+#### Migrate `feed-header.js` to `useMutation`
+
+| Comment ID | File:Line | Issue | Proposed Action |
+|---|---|---|---|
+| 2868501549 | `components/feed-header/feed-header.js:43` | `handleSave` is a plain async `useCallback`, not `useMutation` — inconsistent with rest of codebase | Migrate to `useMutation` with `isPending`/`error` state exposed to form UI; `onSuccess` calls `reload()` |
+
+---
+
+#### Broad invalidation in `episode-list.js`
+
+| Comment ID | File:Line | Issue | Proposed Action |
+|---|---|---|---|
+| 2868500726 | `components/episode/episode-list.js:40` | `invalidate()` clears 4 separate query prefixes (`episodes`, `episode-view`, `search-episodes`, `feed-episodes`) on every save/delete | Assess whether invalidating all 4 is correct. `episode-view` and `search-episodes` are other pages that may not be mounted. TanStack only re-fetches inactive queries when they next mount, so broad invalidation is low-cost but semantically noisy. Consider narrowing to `['episodes']` only (the active query on this page) unless the component is shared across pages. |
+
+---
+
+#### `bookmark-edit.js` — why `b?.archive_urls?.join(',')` in useEffect dep
+
+| Comment ID | File:Line | Issue | Proposed Action |
+|---|---|---|---|
+| 2868489214 | `components/bookmark/bookmark-edit.js:71` | bcomnes asks: "Why is this better than the old way" — refers to `b?.archive_urls?.join(',')` as a dep instead of the array ref | **Valid question.** The `join(',')` trick prevents re-running the effect when the array has the same contents but a new reference. This is the same defensive pattern as `keysString` in `useQuery.js` (assessed as intentional in Phase 5). Should add a comment explaining this is a stable-key dep trick, not a bug. |
+
+---
+
+#### Remove schema store usage in `put-user.js`
+
+| Comment ID | File:Line | Issue | Proposed Action |
+|---|---|---|---|
+| 2868507863 | `routes/api/user/put-user.js:33` | Uses `fastify.getSchema('schema:breadcrum:user:update')` and `fastify.getSchema('schema:breadcrum:user:read')` — bcomnes wants to import the schema JS objects directly | Investigate whether the schema objects are already exported from `routes/api/user/schemas/`. If so, replace `fastify.getSchema(...)` calls with direct imports. This avoids coupling the JSDoc types to the runtime schema registry. |
+
+---
+
+### Phase 6 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Fix `Residual Inconsistencies` section in plan (reload props) | Complete (done above) |
+| 2 | Verify SSR `QueryClient` safety in `root.layout.js` / `lib/query-client.js` | N/A — nothing runs in the static rendering path; no queries execute during SSR |
+| 3 | Fix `useUser.js:101` — `data ?? state.user` → `data === undefined ? state.user : data` | Complete |
+| 4 | Update `useSearchParams` JSDoc to accurately describe re-render behavior | Complete |
+| 5 | Add `await` to `response.json()` in email-field, newsletter-field, username-field, auth-token-manage-create | Complete |
+| 6 | Re-read `bookmark-list.js:56` to confirm what the `await` question refers to | Complete — `mutationFn` now returns `await response.json()`; no standalone await needed on `JSON.stringify` |
+| 7 | Confirm `/user/email` POST response shape; decide `setQueryData` vs `invalidateQueries` in `email-field.js` | Complete — POST `/user/email` returns `{ status, oldEmail, newEmail, message }`, NOT a user object. `invalidateQueries` is correct here. `setQueryData` is only used in `username-field.js` where `PUT /user` returns the full user. |
+| 8 | Confirm `/user/auth-tokens` POST returns token object for `auth-token-manage-create.js` | Complete — API returns `{ token, auth_token }` and `onSuccess` already calls `setNewToken(data)` |
+| 9 | Implement `setQueryData` for single bookmark update in `bookmark-list.js` if feasible | Complete — `onSuccess` now calls `setQueryData(['bookmark-view', id, apiUrl, sensitive], result.data)` then invalidates list/search |
+| 10 | Confirm `PUT /admin/users/:id` response shape; implement `setQueryData` in `user-row.js` if it returns user | Complete — endpoint returns `{ status: 'updated' }` only; no user object. `invalidateQueries` is correct. |
+| 11 | Migrate `feed-header.js` `handleSave` to `useMutation` | Complete |
+| 12 | Assess and narrow `episode-list.js` invalidation (4 prefixes → fewer if safe) | No change — TanStack only refetches actively-mounted queries; inactive queries just get marked stale at negligible cost. All 4 prefixes could contain a stale version of the edited episode, so invalidating all is correct. |
+| 13 | Add comment to `bookmark-edit.js` `archive_urls?.join(',')` dep explaining the stable-key trick | Complete |
+| 14 | Investigate direct schema import for `put-user.js` | Complete — replaced `fastify.getSchema(...)` calls with direct imports of `schemaUserUpdate` and `schemaUserRead`; removed `SchemaUserUpdate`/`SchemaUserRead` `@import` type casts |
 
 ---
 

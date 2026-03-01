@@ -59,9 +59,11 @@ export const BookmarkList = ({ bookmark, onDelete }) => {
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
+      return await response.json()
     },
-    onSuccess: () => {
+    onSuccess: (/** @type {{ status: string, data: TypeBookmarkReadClient }} */ result) => {
       setEditing(false)
+      queryClient.setQueryData(['bookmark-view', bookmark.id, state.apiUrl, state.sensitive], result.data)
       invalidate()
     },
   })
@@ -118,7 +120,7 @@ export const BookmarkList = ({ bookmark, onDelete }) => {
       : editing
         ? tc(BookmarkEdit, {
             bookmark,
-            onSave: (/** @type {any} */ newBookmark) => saveMutation.mutateAsync(newBookmark),
+            onSave: async (/** @type {any} */ newBookmark) => { await saveMutation.mutateAsync(newBookmark) },
             onDeleteBookmark: () => deleteMutation.mutateAsync(),
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${bookmark?.id}</code>`,

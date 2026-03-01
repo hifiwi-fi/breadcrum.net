@@ -1,11 +1,11 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
 import { getUser } from './user-query.js'
+import { schemaUserUpdate } from './schemas/schema-user-update.js'
+import { schemaUserRead } from './schemas/schema-user-read.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { SchemaUserUpdate } from './schemas/schema-user-update.js'
- * @import { SchemaUserRead } from './schemas/schema-user-read.js'
  */
 
 /**
@@ -23,14 +23,14 @@ export async function putUserRoute (fastify, _opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         tags: ['user'],
-        body: /** @type {SchemaUserUpdate} */(fastify.getSchema('schema:breadcrum:user:update')),
+        body: schemaUserUpdate,
         response: {
           200: {
             type: 'object',
             additionalProperties: false,
             properties: {
               status: { type: 'string', enum: ['ok'] },
-              data: /** @type {SchemaUserRead} */(fastify.getSchema('schema:breadcrum:user:read')),
+              data: schemaUserRead,
             },
           },
         },
