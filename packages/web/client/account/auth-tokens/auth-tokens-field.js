@@ -6,7 +6,7 @@ import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
 import { useAuthTokens } from '../../hooks/useAuthTokens.js'
 import { authTokenList } from '../../components/auth-token/auth-token-list.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { ManageAuthTokenField } from '../../components/auth-token/auth-token-manage.js'
 import { PaginationButtons } from '../../components/pagination-buttons/index.js'
@@ -28,7 +28,7 @@ export const AuthTokens = () => {
     afterParams
   } = useAuthTokens()
 
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
 
   const onPageNav = useCallback((/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()

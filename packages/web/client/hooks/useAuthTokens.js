@@ -8,7 +8,7 @@
 import { useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useSearchParams } from './useQuery.js'
+import { useSearchParams } from './useSearchParms.js'
 import { useLSP } from './useLSP.js'
 
 /**

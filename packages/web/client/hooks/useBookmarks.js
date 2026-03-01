@@ -8,7 +8,7 @@
 import { useCallback, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useQuery, useSearchParams } from './useQuery.js'
+import { useSearchParamsAll, useSearchParams } from './useSearchParms.js'
 import { useLSP } from './useLSP.js'
 
 /**
@@ -22,7 +22,7 @@ import { useLSP } from './useLSP.js'
 export function useBookmarks () {
   const { user } = useUser({ required: false })
   const state = useLSP()
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const { setParams } = useSearchParams(['before', 'after'])
 
   const queryString = useMemo(() => (query ? query.toString() : ''), [query])

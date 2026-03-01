@@ -9,7 +9,7 @@ import { useUser } from '../../hooks/useUser.js'
 // @ts-ignore - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
@@ -20,7 +20,7 @@ import { mountPage } from '../../lib/mount-page.js'
 export const Page = () => {
   const state = useLSP()
   useUser()
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const [bookmark, setBookmark] = useState(/** @type {Partial<TypeBookmarkReadClient> | null} */(null))
   const [newlyCreated, setNewlyCreated] = useState(false)
   const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)

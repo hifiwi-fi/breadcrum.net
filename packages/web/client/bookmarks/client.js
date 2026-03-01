@@ -7,7 +7,7 @@ import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { BookmarkList } from '../components/bookmark/bookmark-list.js'
 import { Search } from '../components/search/index.js'
@@ -22,7 +22,7 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { searchParamsAll: query, pushState } = useSearchParamsAll()
 
   const {
     bookmarksLoading,

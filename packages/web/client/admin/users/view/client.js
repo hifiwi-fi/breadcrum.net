@@ -5,7 +5,7 @@
 import { html } from 'htm/preact'
 import { useEffect } from 'preact/hooks'
 import { useWindow } from '../../../hooks/useWindow.js'
-import { useSearchParams } from '../../../hooks/useQuery.js'
+import { useSearchParams } from '../../../hooks/useSearchParms.js'
 import { useTitle } from '../../../hooks/useTitle.js'
 import { UserTable } from '../../../components/user-table/user-table.js'
 import { useAdminUser } from '../../../hooks/use-admin-user.js'

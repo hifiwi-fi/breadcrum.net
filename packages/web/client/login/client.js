@@ -8,7 +8,7 @@ import { useState, useEffect } from 'preact/hooks'
 import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
 import { mountPage } from '../lib/mount-page.js'
 
@@ -21,7 +21,7 @@ export const Page = () => {
   const [loginError, setLoginError] = useState(/** @type {Error | null} */(null))
   const [passkeyAuthInProgress, setPasskeyAuthInProgress] = useState(false)
   const [passkeyAuthError, setPasskeyAuthError] = useState(/** @type {Error | null} */(null))
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const clearValidationMessage = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget.setCustomValidity('')
   }

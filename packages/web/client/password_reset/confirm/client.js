@@ -6,14 +6,14 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser({ required: false })
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const [resetting, setResetting] = useState(false)
   const [reset, setReset] = useState(false)
   const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))

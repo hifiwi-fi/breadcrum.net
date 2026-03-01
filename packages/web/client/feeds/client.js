@@ -10,7 +10,7 @@ import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useQuery, useSearchParams } from '../hooks/useQuery.js'
+import { useSearchParamsAll, useSearchParams } from '../hooks/useSearchParms.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { FeedHeader } from '../components/feed-header/feed-header.js'
@@ -24,7 +24,7 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
   const { params: feedParams, setParams } = useSearchParams(['feed_id', 'before', 'after'])
   const queryClient = useQueryClient()
   const feedIdParam = feedParams['feed_id']

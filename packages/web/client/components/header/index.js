@@ -10,7 +10,7 @@ import { useIsFetching, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { useFlags } from '../../hooks/useFlags.js'
 import { Sensitive } from '../sensitive/index.js'
 import { ToRead } from '../toread/index.js'
@@ -25,7 +25,7 @@ export const Header = () => {
   const queryClient = useQueryClient()
   const isFetching = useIsFetching()
   const { flags } = useFlags()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
 
   const handleSensitiveToggle = useCallback(() => {
     state.sensitive = !state.sensitive

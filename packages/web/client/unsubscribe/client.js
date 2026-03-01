@@ -5,13 +5,13 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
 import { useLSP } from '../hooks/useLSP.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const [unsubscribing, setUnsubscribing] = useState(false)
   const [unsubscribed, setUnsubscribed] = useState(/** @type {string | null} */(null))
   const [error, setError] = useState(/** @type {Error | null} */(null))

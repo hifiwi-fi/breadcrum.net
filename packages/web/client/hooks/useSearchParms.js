@@ -15,14 +15,14 @@ if (typeof window !== 'undefined') {
 
 /**
  * @returns {{
- *   query: URLSearchParams | null,
+ *   searchParamsAll: URLSearchParams | null,
  *   pushState: (url: string) => void
  * }}
  */
-export function useQuery () {
+export function useSearchParamsAll () {
   const window = useWindow()
 
-  const query = querySignal.value
+  const searchParamsAll = querySignal.value
 
   const pushState = useCallback(/** @param {string} url */ (url) => {
     const searchParams = (new URL(url)).search
@@ -30,7 +30,7 @@ export function useQuery () {
     window?.history.pushState({}, '', url)
   }, [window])
 
-  return { query, pushState }
+  return { searchParamsAll, pushState }
 }
 
 /**

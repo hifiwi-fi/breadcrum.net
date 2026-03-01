@@ -10,7 +10,7 @@ import { tc } from '../../lib/typed-component.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useUser } from '../../hooks/useUser.js'
-import { useQuery, useSearchParams } from '../../hooks/useQuery.js'
+import { useSearchParamsAll, useSearchParams } from '../../hooks/useSearchParms.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
@@ -22,7 +22,7 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
   const { params: searchParams, setParams } = useSearchParams(['query', 'id', 'rank', 'reverse', 'per_page'])
   const queryClient = useQueryClient()
   const queryParam = searchParams['query']

@@ -7,7 +7,7 @@ import { useCallback } from 'preact/hooks'
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
@@ -20,7 +20,7 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   const { user } = useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { searchParamsAll: query, pushState } = useSearchParamsAll()
 
   const {
     episodes,

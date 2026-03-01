@@ -6,7 +6,7 @@ import { html } from 'htm/preact'
 import { useMemo } from 'preact/hooks'
 import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { tc } from '../lib/typed-component.js'
@@ -16,7 +16,7 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
 
   const queryString = useMemo(() => (query ? query.toString() : ''), [query])
   const queryKey = useMemo(() => ([

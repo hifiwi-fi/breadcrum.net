@@ -6,14 +6,14 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParms.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { query } = useQuery()
+  const { searchParamsAll: query } = useSearchParamsAll()
   const { user, error: userError } = useUser()
   const window = useWindow()
   const [confirming, setConfirming] = useState(false)

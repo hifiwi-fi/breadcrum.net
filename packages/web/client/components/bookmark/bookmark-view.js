@@ -10,7 +10,7 @@ import { ToRead } from '../toread/index.js'
 import { Star } from '../star/index.js'
 import { Sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { ExpandText } from '../expand-text/index.js'
 import { ResolveStatus } from '../resolve-status/index.js'
 import cn from 'classnames'
@@ -35,7 +35,7 @@ export const BookmarkView = ({
   onToggleSensitive = () => {},
 }) => {
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
   const isResolving = Boolean(
     b?.done === false ||
     b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||

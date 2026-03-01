@@ -4,7 +4,7 @@
 
 import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { UserTable } from '../../components/user-table/user-table.js'
 import { useAdminUsers } from '../../hooks/use-admin-users.js'
@@ -15,7 +15,7 @@ import { mountPage } from '../../lib/mount-page.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParamsAll()
   const {
     usersLoading,
     usersError,
