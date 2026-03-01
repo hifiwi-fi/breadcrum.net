@@ -23,6 +23,15 @@
   width: 100%;
 }
 
+.bc-quick-add-form fieldset {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  width: 100%;
+  min-inline-size: 0;
+}
+
 .bc-quick-add-label {
   display: inline-flex;
   align-items: center;

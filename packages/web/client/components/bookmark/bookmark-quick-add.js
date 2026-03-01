@@ -77,11 +77,11 @@ export const BookmarkQuickAdd = ({
               ${showCancel
                 ? html`<button type="button" onClick=${handleCancel}>Cancel</button>`
                 : null}
+              <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
+                Adding bookmarks is easier with the bookmarklet!
+              </a>
             </fieldset>
           </form>
-          <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
-            Adding bookmarks is easier with the bookmarklet!
-          </a>
         `
         : showToggle
           ? html`<button type="button" onClick=${handleOpen}>🔖 add +</button>`
