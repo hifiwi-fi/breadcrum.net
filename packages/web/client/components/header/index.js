@@ -5,7 +5,7 @@
  */
 import { html } from 'htm/preact'
 import { useCallback, useMemo } from 'preact/hooks'
-import { useIsFetching } from '@tanstack/preact-query'
+import { useIsFetching, useQueryClient } from '@tanstack/preact-query'
 
 import { useUser } from '../../hooks/useUser.js'
 import { useWindow } from '../../hooks/useWindow.js'
@@ -22,6 +22,7 @@ export const Header = () => {
   const { user } = useUser({ required: false })
   const window = useWindow()
   const state = useLSP()
+  const queryClient = useQueryClient()
   const isFetching = useIsFetching()
   const { flags } = useFlags()
   const { pushState } = useQuery()
@@ -69,7 +70,7 @@ export const Header = () => {
     if (!user || !dismissibleHash) return
 
     const previousUser = user
-    state.user = { ...user, service_notice_dismissed_hash: dismissibleHash }
+    queryClient.setQueryData(['user', state.apiUrl], { ...user, service_notice_dismissed_hash: dismissibleHash })
 
     try {
       const response = await fetch(`${state.apiUrl}/user`, {
@@ -87,9 +88,9 @@ export const Header = () => {
       }
     } catch (err) {
       console.error(err)
-      state.user = previousUser
+      queryClient.setQueryData(['user', state.apiUrl], previousUser)
     }
-  }, [dismissibleHash, state.apiUrl, user])
+  }, [dismissibleHash, queryClient, state.apiUrl, user])
 
   const onPageNav = (/** @type{MouseEvent & {currentTarget: HTMLAnchorElement}} */ ev) => {
     if (window?.location) {

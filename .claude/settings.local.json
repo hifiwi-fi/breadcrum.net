@@ -33,7 +33,8 @@
       "Bash(gh pr view 690 --json reviews,reviewDecision,reviewRequests)",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id == null\\) | {id, author: .user.login, path, line, body, created_at}]')",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id != null\\) | {id, in_reply_to_id, author: .user.login, body}]')",
-      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id\\) | {id, in_reply_to_id, author: .user.login, body}]')"
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id\\) | {id, in_reply_to_id, author: .user.login, body}]')",
+      "WebFetch(domain:tanstack.com)"
     ]
   }
 }

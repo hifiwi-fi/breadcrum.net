@@ -15,8 +15,29 @@ import { useLSP } from './useLSP.js'
 
 /**
  * Hook for managing user authentication state.
- * TanStack Query deduplicates in-flight requests for the same key, so multiple
+ *
+ * ## Architecture
+ *
+ * Auth state lives in cookies and is sent automatically with every request —
+ * this hook never reads or writes cookies directly.
+ *
+ * LSP (localStorage) acts as a write-through cache for the user object:
+ *   - On startup, `initialData` seeds TanStack from LSP to avoid a blank flash
+ *     while the first fetch is in flight.
+ *   - After each fetch, the sync effect writes the result back to LSP so it's
+ *     ready for the next startup.
+ *
+ * TanStack Query is the single source of truth at runtime. All mutations that
+ * change user data (login, logout, profile updates) should call
+ * `queryClient.setQueryData(['user', apiUrl], ...)` so every subscriber
+ * updates atomically. LSP will follow via the sync effect.
+ *
+ * Data flow:
+ *   LSP ──(initialData, startup only)──▶ TanStack ──(sync effect)──▶ LSP
+ *
+ * TanStack deduplicates in-flight requests for the same key, so multiple
  * components calling useUser() share a single fetch — no singleton hack needed.
+ *
  * @param {UseUserParams} [params]
  */
 export function useUser ({
@@ -50,22 +71,15 @@ export function useUser ({
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
+    // Bootstrap from LSP on startup to avoid blank flash while the fetch is in flight.
+    // LSP is write-through (see sync effect below), so this reflects the last known state.
+    initialData: () => state.user ?? undefined,
   })
 
-  // Sync fetched user into LSP state for parts of the app that read state.user directly
+  // Sync TanStack data back into LSP so it's available as initialData on next startup
   useEffect(() => {
     if (data !== undefined) {
-      if (data === null) {
-        if (state.user) state.user = null
-      } else {
-        for (const k of Object.keys(data)) {
-          if (state.user?.[/** @type {keyof TypeUserReadClient} */ (k)] !== data[/** @type {keyof TypeUserReadClient} */ (k)]) {
-            console.log('Updating user state')
-            state.user = data
-            break
-          }
-        }
-      }
+      state.user = data
     }
   }, [data])
 
@@ -98,7 +112,7 @@ export function useUser ({
   }, [queryClient, state.apiUrl])
 
   return {
-    user: data === undefined ? state.user : data,
+    user: data ?? null,
     reloadUser,
     loading,
     error: error || null,
