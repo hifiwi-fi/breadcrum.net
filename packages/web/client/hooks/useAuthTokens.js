@@ -5,8 +5,8 @@
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 
-import { useCallback, useMemo } from 'preact/hooks'
-import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
+import { useMemo } from 'preact/hooks'
+import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useSearchParams } from './useQuery.js'
 import { useLSP } from './useLSP.js'
@@ -23,7 +23,6 @@ export function useAuthTokens () {
   const { user } = useUser({ required: false })
   const state = useLSP()
   const { params: queryParams, setParams } = useSearchParams(['before', 'after', 'per_page', 'sort'])
-  const queryClient = useQueryClient()
   const beforeParam = queryParams['before']
   const afterParam = queryParams['after']
   const perPageParam = queryParams['per_page']
@@ -83,10 +82,6 @@ export function useAuthTokens () {
 
   const { data, error, isPending } = authTokensQuery
 
-  const reloadAuthTokens = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['auth-tokens', user?.id ?? null, state.apiUrl] })
-  }, [queryClient, state.apiUrl, user?.id])
-
   const tokens = data?.tokens ?? null
   const before = data?.before ?? null
   const after = data?.after ?? null
@@ -111,7 +106,6 @@ export function useAuthTokens () {
     tokensLoading,
     tokensError,
     tokens,
-    reloadAuthTokens,
     before,
     after,
     beforeParams,

@@ -3,8 +3,8 @@
 /** @import { SchemaTypeAdminUserReadClient } from '../../routes/api/admin/users/schemas/schema-admin-user-read.js' */
 /** @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query' */
 
-import { useCallback, useMemo } from 'preact/hooks'
-import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
+import { useMemo } from 'preact/hooks'
+import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useSearchParams } from './useQuery.js'
 import { useLSP } from './useLSP.js'
@@ -21,7 +21,6 @@ export function useAdminUsers () {
   const { user } = useUser()
   const state = useLSP()
   const { params: queryParams, setParams } = useSearchParams(['before', 'after', 'per_page', 'username'])
-  const queryClient = useQueryClient()
   const beforeParam = queryParams['before']
   const afterParam = queryParams['after']
   const perPageParam = queryParams['per_page']
@@ -87,10 +86,6 @@ export function useAdminUsers () {
 
   const { data, error, isPending } = adminUsersQuery
 
-  const reloadAdminUsers = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['admin-users', user?.id ?? null, state.apiUrl] })
-  }, [queryClient, state.apiUrl, user?.id])
-
   const users = data?.users
   const before = data?.before ?? null
   const after = data?.after ?? null
@@ -115,7 +110,6 @@ export function useAdminUsers () {
     usersLoading,
     usersError,
     users,
-    reloadAdminUsers,
     before,
     after,
     beforeParams,

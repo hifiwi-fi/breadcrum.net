@@ -9,7 +9,7 @@
  * @property {boolean} [required=true] - When true, redirects to login page if no user is authenticated
  */
 
-import { useEffect, useCallback } from 'preact/hooks'
+import { useEffect } from 'preact/hooks'
 import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from './useLSP.js'
 
@@ -107,13 +107,8 @@ export function useUser ({
     }
   }, [queryClient, state.apiUrl])
 
-  const reloadUser = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
-  }, [queryClient, state.apiUrl])
-
   return {
     user: data ?? null,
-    reloadUser,
     loading,
     error: error || null,
   }

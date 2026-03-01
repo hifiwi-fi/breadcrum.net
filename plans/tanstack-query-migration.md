@@ -290,6 +290,21 @@ The form submission path (`handleSave`) already reads all values directly from `
 
 ---
 
+## Phase 7: Post-Review Cleanup
+
+### Phase 7 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Fix `bookmark-edit.js` `customEpisodeURLChecked` desync — when unchecking custom URL, also call `setEpisodeURLValue(form?.['url'].value)` so the preview query key reflects the reset | Complete |
+| 2 | Delete `useFetch.js` — confirmed zero callers in the codebase | Complete |
+| 3 | Remove dead `reloadUser` + `useCallback` from `useUser.js` return (no call sites found; `useQueryClient` kept for bfcache effect) | Complete |
+| 4 | Remove dead `reloadAuthTokens`, `useCallback`, `useQueryClient` from `useAuthTokens.js` (no call sites) | Complete |
+| 5 | Remove dead `reloadAdminUsers`, `useCallback`, `useQueryClient` from `use-admin-users.js` (no call sites) | Complete |
+| 6 | Remove dead `reloadAdminUser` + `useQueryClient` from `use-admin-user.js` (no call sites; `useCallback` kept for `handleDelete`) | Complete |
+
+---
+
 ## What Was Done
 
 The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryClientProvider`, and three hooks partially migrated (`useBookmarks`, `useArchives`, `useEpisodes`). This migration completed the remaining patterns.

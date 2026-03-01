@@ -4,7 +4,7 @@
 /** @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query' */
 
 import { useCallback, useMemo } from 'preact/hooks'
-import { useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
+import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useLSP } from './useLSP.js'
 import { useWindow } from './useWindow.js'
@@ -17,7 +17,6 @@ export function useAdminUser (userId) {
   const { user: activeUser } = useUser()
   const state = useLSP()
   const window = useWindow()
-  const queryClient = useQueryClient()
 
   const queryKey = useMemo(() => ([
     'admin-user',
@@ -52,10 +51,6 @@ export function useAdminUser (userId) {
 
   const { data: user, error: userError, isPending: userLoading } = adminUserQuery
 
-  const reloadAdminUser = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['admin-user', userId, state.apiUrl] })
-  }, [queryClient, state.apiUrl, userId])
-
   /**
    * Handle user deletion by redirecting to users list
    */
@@ -70,7 +65,6 @@ export function useAdminUser (userId) {
     userLoading,
     userError: userError || null,
     user: user ?? null,
-    reloadAdminUser,
     handleDelete
   }
 }

@@ -161,10 +161,13 @@ export const BookmarkEdit = ({
     const form = formRef.current
     const createEpisodeURLNode = form?.['createEpisodeURL']
     if (!checked && createEpisodeURLNode) {
-      // Reset the DOM input back to the bookmark URL when custom URL is unchecked
-      createEpisodeURLNode.value = form?.['url'].value
+      // Reset the DOM input back to the bookmark URL when custom URL is unchecked.
+      // Also sync episodeURLValue so the preview query key matches the reset DOM value.
+      const bookmarkURL = form?.['url'].value
+      createEpisodeURLNode.value = bookmarkURL
+      if (bookmarkURL) setEpisodeURLValue(bookmarkURL)
     }
-  }, [formRef, setCustomEpisodeURLChecked])
+  }, [formRef, setCustomEpisodeURLChecked, setEpisodeURLValue])
 
   const handlePreviewRefresh = useCallback(async (/** @type {Event} */ev) => {
     // Preview refresh: read the current URL from the form rather than mirroring
@@ -456,7 +459,7 @@ export const BookmarkEdit = ({
                 name="episodeMedium"
                 value="video"
                 defaultChecked
-                onChange="${handleEpisodeMediumSelect}"
+                onChange=${handleEpisodeMediumSelect}
               />
               ${'\n'}
               <span>video</span>
@@ -474,7 +477,7 @@ export const BookmarkEdit = ({
             </label>
             ${'\n'}
             <label>
-              <input type="checkbox" name="custom-episode-url" onChange="${handleCustomEpisodeURLCheckboxChange}" />
+              <input type="checkbox" name="custom-episode-url" onChange=${handleCustomEpisodeURLCheckboxChange} />
               ${'\n'}
               custom url
             </label>
