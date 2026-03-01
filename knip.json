@@ -1,7 +1,7 @@
 {
   "ignore": [],
   "ignoreBinaries": ["flyctl", "eslint"],
-  "ignoreUnresolved": ["dot"],
+  "ignoreUnresolved": ["dot", "lcov"],
   "ignoreDependencies": [],
   "ignoreWorkspaces": [],
   "workspaces": {
