@@ -40,7 +40,7 @@
     "@opentelemetry/sdk-node": "catalog:",
     "abstract-cache-redis": "catalog:",
     "concat-stream": "^2.0.0",
-    "dompurify": "^3.3.0",
+    "dompurify": "^3.3.2",
     "fastify": "catalog:",
     "fastify-cli": "catalog:",
     "fastify-healthcheck": "catalog:",
