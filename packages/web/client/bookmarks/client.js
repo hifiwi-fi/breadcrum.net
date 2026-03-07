@@ -22,7 +22,7 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   useUser()
   const window = useWindow()
-  const { searchParamsAll: query, pushState } = useSearchParamsAll()
+  const { searchParamsAll, pushState } = useSearchParamsAll()
 
   const {
     bookmarksLoading,
@@ -61,7 +61,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
+  const dateParams = new URLSearchParams(searchParamsAll || '')
   const formatDateValue = (/** @type {Date | null} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()
@@ -92,7 +92,7 @@ export const Page = () => {
   const topDateValue = formatDateValue(topBookmarkDate) || formatDateValue(cursorDate)
   const bottomDateValue = formatDateValue(bottomBookmarkDate) || formatDateValue(cursorDate)
 
-  const tagFilterRemovedParams = new URLSearchParams(query || '')
+  const tagFilterRemovedParams = new URLSearchParams(searchParamsAll || '')
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
 

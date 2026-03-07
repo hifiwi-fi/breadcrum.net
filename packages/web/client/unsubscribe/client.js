@@ -5,13 +5,13 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
 import { useLSP } from '../hooks/useLSP.js'
-import { useSearchParamsAll } from '../hooks/useSearchParms.js'
+import { useSearchParams } from '../hooks/useSearchParms.js'
 import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { params } = useSearchParams(['email'])
   const [unsubscribing, setUnsubscribing] = useState(false)
   const [unsubscribed, setUnsubscribed] = useState(/** @type {string | null} */(null))
   const [error, setError] = useState(/** @type {Error | null} */(null))
@@ -55,7 +55,7 @@ export const Page = () => {
   [state.apiUrl, setUnsubscribing, setUnsubscribed, setError])
 
   useEffect(() => {
-    if (query?.get('email')) {
+    if (params['email']) {
       handleUnsubscribe().catch(err => setError(/** @type {Error} */(err)))
     }
   }, [])
@@ -79,7 +79,7 @@ export const Page = () => {
                 </div>
                 <label class="block">
                   Email:
-                  <input class="block" type="email" name="email" defaultValue=${query?.get('email') || ''} />
+                  <input class="block" type="email" name="email" defaultValue=${params['email'] || ''} />
                 </label>
               </div>
               <div class="button-cluster">

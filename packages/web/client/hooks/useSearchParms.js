@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 import { useCallback, useMemo } from 'preact/hooks'
-import { signal } from '@preact/signals'
+import { signal, useComputed } from '@preact/signals'
 import { useWindow } from './useWindow.js'
 
 const querySignal = signal(/** @type {URLSearchParams | null} */ (null))
@@ -36,16 +36,23 @@ export function useSearchParamsAll () {
 /**
  * Subscribe to specific URL search param keys and get a stable loop-safe setter.
  *
- * Reading: the hook subscribes to the full `querySignal` so any URL param change
- * will re-run the component function. The `useMemo` inside re-derives only the
- * requested keys, so downstream renders driven by the returned `params` object
- * are stable when unrelated keys change — but the component calling this hook
- * will still re-execute on every URL change.
+ * Reading: a `computed` signal is derived from only the watched keys. The
+ * component re-renders only when one of those keys actually changes value, not
+ * on every URL param change. Passing `[]` means the component never re-renders
+ * due to URL changes (useful when you only need `pushState`).
  *
- * Writing: `setParams` merges updates into the current URL params (set or delete
- * individual keys, leaving all others intact). Defaults to `replaceState` so
- * cursor-style pagination updates don't pollute browser history. Pass
- * `{ replace: false }` to use `pushState` instead.
+ * Writing — two distinct primitives:
+ *
+ *   `setParams(updates, { replace? })` — surgical merge. Updates only the named
+ *   keys, leaving all other params intact. Defaults to replaceState so
+ *   cursor-style pagination updates don't pollute browser history. Pass
+ *   `{ replace: false }` to push onto the history stack instead. Use this for
+ *   in-page state changes where the destination URL is built incrementally.
+ *
+ *   `pushState(url)` — full-URL navigation. Replaces the entire search string
+ *   with whatever is in the provided URL. Use this when the destination URL has
+ *   already been fully constructed (e.g. from a pre-built anchor href) and you
+ *   want to intercept the click for SPA navigation instead of a full page load.
  *
  * Loop safety: if a write produces the same query string that is already in the
  * signal, no new signal value is emitted and TanStack Query sees no key change.
@@ -53,22 +60,34 @@ export function useSearchParamsAll () {
  * @param {string[]} keys - The param keys to watch and manage
  * @returns {{
  *   params: Record<string, string | null>,
- *   setParams: (updates: Record<string, string | null>, options?: { replace?: boolean }) => void
+ *   setParams: (updates: Record<string, string | null>, options?: { replace?: boolean }) => void,
+ *   pushState: (url: string) => void
  * }}
  */
 export function useSearchParams (keys) {
   const window = useWindow()
-  const allParams = querySignal.value
 
-  const keysString = keys.join(',')
-  const params = useMemo(() => {
+  // Computed signal scoped to the watched keys. It re-evaluates whenever
+  // querySignal changes, but only notifies subscribers when a watched key's
+  // value actually changes. JSON.stringify produces a stable primitive so
+  // Preact's === equality check works correctly.
+  const paramsSignal = useComputed(() => {
+    const allParams = querySignal.value
     /** @type {Record<string, string | null>} */
     const result = {}
     for (const key of keys) {
       result[key] = allParams?.get(key) ?? null
     }
-    return result
-  }, [allParams, keysString])
+    return JSON.stringify(result)
+  })
+
+  // Subscribes the component to paramsSignal — re-renders only when it changes.
+  const paramsJson = paramsSignal.value
+
+  const params = useMemo(
+    () => /** @type {Record<string, string | null>} */ (JSON.parse(paramsJson)),
+    [paramsJson]
+  )
 
   const setParams = useCallback((/** @type {Record<string, string | null>} */ updates, { replace = true } = {}) => {
     const next = new URLSearchParams(querySignal.value?.toString() ?? '')
@@ -91,5 +110,11 @@ export function useSearchParams (keys) {
     }
   }, [window])
 
-  return { params, setParams }
+  const pushState = useCallback(/** @param {string} url */ (url) => {
+    const searchParams = (new URL(url)).search
+    querySignal.value = new URLSearchParams(searchParams)
+    window?.history.pushState({}, '', url)
+  }, [window])
+
+  return { params, setParams, pushState }
 }

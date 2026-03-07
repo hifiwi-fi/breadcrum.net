@@ -20,7 +20,7 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   const { user } = useUser()
   const window = useWindow()
-  const { searchParamsAll: query, pushState } = useSearchParamsAll()
+  const { searchParamsAll, pushState } = useSearchParamsAll()
 
   const {
     archives,
@@ -54,7 +54,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
+  const dateParams = new URLSearchParams(searchParamsAll || '')
   const formatDateValue = (/** @type {Date | null} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()

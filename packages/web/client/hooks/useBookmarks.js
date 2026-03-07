@@ -22,10 +22,10 @@ import { useLSP } from './useLSP.js'
 export function useBookmarks () {
   const { user } = useUser({ required: false })
   const state = useLSP()
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { searchParamsAll } = useSearchParamsAll()
   const { setParams } = useSearchParams(['before', 'after'])
 
-  const queryString = useMemo(() => (query ? query.toString() : ''), [query])
+  const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
   const queryKey = useMemo(() => ([
     'bookmarks',
     user?.id ?? null,
@@ -104,14 +104,14 @@ export function useBookmarks () {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query ?? '')
+    beforeParams = new URLSearchParams(searchParamsAll ?? '')
     beforeParams.set('before', String(before.valueOf()))
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query ?? '')
+    afterParams = new URLSearchParams(searchParamsAll ?? '')
     afterParams.set('after', String(after.valueOf()))
     afterParams.delete('before')
   }

@@ -26,10 +26,10 @@ export function useEpisodes (options = {}) {
   const { enabled = true } = options
   const { user } = useUser({ required: false })
   const state = useLSP()
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { searchParamsAll } = useSearchParamsAll()
   const { setParams } = useSearchParams(['before', 'after'])
 
-  const queryString = useMemo(() => (query ? query.toString() : ''), [query])
+  const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
   const queryKey = useMemo(() => ([
     'episodes',
     user?.id ?? null,
@@ -108,14 +108,14 @@ export function useEpisodes (options = {}) {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query ?? '')
+    beforeParams = new URLSearchParams(searchParamsAll ?? '')
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query ?? '')
+    afterParams = new URLSearchParams(searchParamsAll ?? '')
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }

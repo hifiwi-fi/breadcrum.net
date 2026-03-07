@@ -16,9 +16,9 @@ import { mountPage } from '../lib/mount-page.js'
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { searchParamsAll } = useSearchParamsAll()
 
-  const queryString = useMemo(() => (query ? query.toString() : ''), [query])
+  const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
   const queryKey = useMemo(() => ([
     'tags',
     state.apiUrl,

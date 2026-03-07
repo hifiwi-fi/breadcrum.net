@@ -8,7 +8,7 @@ import { useState, useEffect } from 'preact/hooks'
 import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { useSearchParamsAll } from '../hooks/useSearchParms.js'
+import { useSearchParams } from '../hooks/useSearchParms.js'
 import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
 import { mountPage } from '../lib/mount-page.js'
 
@@ -21,7 +21,7 @@ export const Page = () => {
   const [loginError, setLoginError] = useState(/** @type {Error | null} */(null))
   const [passkeyAuthInProgress, setPasskeyAuthInProgress] = useState(false)
   const [passkeyAuthError, setPasskeyAuthError] = useState(/** @type {Error | null} */(null))
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { params } = useSearchParams(['redirect'])
   const clearValidationMessage = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget.setCustomValidity('')
   }
@@ -55,9 +55,8 @@ export const Page = () => {
   // Redirect when logged in
   useEffect(() => {
     if (user && !loading) {
-      const pageParams = new URLSearchParams(query || '')
       let destination
-      const redirectParam = pageParams.get('redirect')
+      const redirectParam = params['redirect']
       if (redirectParam) {
         // Ensure only a path gets passed and not an open redirect
         const url = new URL(redirectParam, 'https://example.com')

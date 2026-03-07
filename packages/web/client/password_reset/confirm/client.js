@@ -6,14 +6,14 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
+import { useSearchParams } from '../../hooks/useSearchParms.js'
 import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user, loading, error: userError } = useUser({ required: false })
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { params } = useSearchParams(['user_id', 'token'])
   const [resetting, setResetting] = useState(false)
   const [reset, setReset] = useState(false)
   const [errorMessage, setErrorMessage] = useState(/** @type {string | null} */(null))
@@ -33,8 +33,8 @@ export const Page = () => {
     if (!passwordElement) return
 
     const password = passwordElement.value
-    const userId = query?.get('user_id')
-    const token = query?.get('token')
+    const userId = params['user_id']
+    const token = params['token']
 
     if (!userId) throw new Error('Missing userId in reset link. Did you modify the URL?')
     if (!token) throw new Error('Missing token in reset link. Did you modify the URL?')
@@ -48,7 +48,7 @@ export const Page = () => {
         body: JSON.stringify({
           password,
           userId,
-          token: query?.get('token'),
+          token,
         }),
         credentials: 'omit',
       })

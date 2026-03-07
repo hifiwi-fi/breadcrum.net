@@ -20,37 +20,37 @@ import { mountPage } from '../../lib/mount-page.js'
 export const Page = () => {
   const state = useLSP()
   useUser()
-  const { searchParamsAll: query } = useSearchParamsAll()
+  const { searchParamsAll } = useSearchParamsAll()
   const [bookmark, setBookmark] = useState(/** @type {Partial<TypeBookmarkReadClient> | null} */(null))
   const [newlyCreated, setNewlyCreated] = useState(false)
   const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)
   const [bookmarkletVersion, setBookmarkletVersion] = useState(/** @type {string | undefined} */(undefined))
 
   useEffect(() => {
-    if (!query) return
+    if (!searchParamsAll) return
 
     // PWAs send urls as the summary (text) and not the url, in most cases :(
-    const summaryValue = query.get('summary')
-    const pwaTextAsUrl = Boolean(!query.get('url') && summaryValue && URL.canParse(summaryValue))
+    const summaryValue = searchParamsAll.get('summary')
+    const pwaTextAsUrl = Boolean(!searchParamsAll.get('url') && summaryValue && URL.canParse(summaryValue))
 
-    const workingUrl = pwaTextAsUrl ? summaryValue : query.get('url')
+    const workingUrl = pwaTextAsUrl ? summaryValue : searchParamsAll.get('url')
     const workingSummary = pwaTextAsUrl ? undefined : summaryValue
 
     const setFallbackBookmark = () => {
       setBookmark({
         url: workingUrl ?? '',
-        title: query.get('title') || '',
-        note: query.get('note') || '',
+        title: searchParamsAll.get('title') || '',
+        note: searchParamsAll.get('note') || '',
         summary: workingSummary ?? '',
-        tags: query.getAll('tags').filter(t => Boolean(t)),
+        tags: searchParamsAll.getAll('tags').filter(t => Boolean(t)),
       })
     }
 
     const init = async () => {
       setNewlyCreated(false)
-      const ver = query.get('ver')
+      const ver = searchParamsAll.get('ver')
       setBookmarkletVersion(ver || undefined)
-      if (ver !== version || query.get('description')) setBookmarkletUpdateAvailable(true)
+      if (ver !== version || searchParamsAll.get('description')) setBookmarkletUpdateAvailable(true)
 
       if (!workingUrl) {
         setFallbackBookmark()
@@ -58,18 +58,18 @@ export const Page = () => {
       }
 
       const payload = /** @type {any} */ ({ url: workingUrl })
-      const titleValue = query.get('title')
-      const noteValue = query.get('note')
+      const titleValue = searchParamsAll.get('title')
+      const noteValue = searchParamsAll.get('note')
       if (titleValue) payload.title = titleValue
       if (noteValue) payload.note = noteValue
 
       if (workingSummary) payload.summary = workingSummary
-      const queryTags = query.getAll('tags').filter(t => Boolean(t))
+      const queryTags = searchParamsAll.getAll('tags').filter(t => Boolean(t))
       if (queryTags.length > 0) payload.tags = queryTags
 
       const params = new URLSearchParams()
 
-      const serverMeta = query.get('meta')
+      const serverMeta = searchParamsAll.get('meta')
       if (serverMeta === 'false') params.set('meta', 'false')
 
       const response = await fetch(`${state.apiUrl}/bookmarks?${params.toString()}`, {
@@ -98,7 +98,7 @@ export const Page = () => {
       console.error(err)
       setFallbackBookmark()
     })
-  }, [query, state.apiUrl])
+  }, [searchParamsAll, state.apiUrl])
 
   const existingBookmark = Boolean(bookmark?.id)
   const hasPending = Boolean(
@@ -172,7 +172,7 @@ export const Page = () => {
     function finish (/** @type {any} */ responseBody) {
       const { id } = responseBody?.data ?? {}
       const redirectTarget = id ? `/bookmarks/view/?id=${id}` : '/bookmarks'
-      const jumpValue = query?.get('jump')
+      const jumpValue = searchParamsAll?.get('jump')
       if (jumpValue === 'close') {
         try {
           window.close()
