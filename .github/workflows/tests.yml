@@ -53,8 +53,8 @@ jobs:
       - name: Upload lockfile
         uses: actions/upload-artifact@v7
         with:
+          name: pnpm-lock.yaml
           path: pnpm-lock.yaml
-          archive: false
       - run: pnpm run -r generate-default-env
       - run: pnpm run -r migrate
         env:
