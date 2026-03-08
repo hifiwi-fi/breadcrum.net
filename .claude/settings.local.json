@@ -40,7 +40,8 @@
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.user.login == \"\"bcomnes\"\"\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.user.login == \"\"bcomnes\"\" and \\(.id > 2870747446\\)\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.id == 2869723842 or .id == 2869769561\\) | {id: .id, path: .path, line: .original_line, in_reply_to_id: .in_reply_to_id, body: .body, created_at: .created_at}')",
-      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.id == 2869712432 or .id == 2869712429\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')"
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.id == 2869712432 or .id == 2869712429\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')",
+      "Bash(gh api graphql -f query=':*)"
     ]
   }
 }
