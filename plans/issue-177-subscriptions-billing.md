@@ -152,11 +152,11 @@ Additional behavior for delayed-notification methods:
 ## Phase 4: Admin + ops
 - Admin user read model includes billing fields: provider/status/plan/display_name/period/canceling/stripe_customer_id.
 - Admin subscription management:
-  - `PUT /api/admin/users/:id/subscription` create/update custom grant.
-  - `DELETE /api/admin/users/:id/subscription` remove custom grant.
+  - `PUT /api/admin/users/:id/custom-subscription` create/update custom grant.
+  - `DELETE /api/admin/users/:id/custom-subscription` remove custom grant.
   - Unlimited (no expiration) checkbox supported for custom grants.
 - Admin Stripe sync endpoint:
-  - `POST /api/admin/users/:id/sync`.
+  - `POST /api/admin/users/:id/billing-sync`.
 - Admin user deletion lifecycle:
   - Cancel Stripe subscriptions and delete Stripe customer before DB user delete.
 
@@ -310,3 +310,184 @@ Items surfaced from inline PR review. Resolved items marked ✅.
 - Should we persist additional Stripe invoice/payment records locally, or continue to rely on provider portal + normalized subscription summary?
 - Should async outcome emails have user-level opt-out, or always transactional/no-opt-out?
 - Does Stripe send its own async payment outcome emails? If so, should we disable our transactional ones?
+- Trial period duration for new subscribers? First-time-only enforcement? How to prevent trial abuse?
+
+## PR #689 full thread re-audit (2026-03-06)
+
+GraphQL thread audit shows **51 of 75 review threads remain unresolved**. Several items marked `[x]` in the section above were not actioned in the current code, and new Copilot review threads appeared on a 2026-03-07 push. Findings below, with validity assessment and status of each.
+
+Items marked ✅ FIXED were corrected as part of this audit pass. Items marked ✅ VERIFIED were confirmed already done in current code. Items still needing attention are marked TODO.
+
+---
+
+### Critical bugs confirmed in current code
+
+#### Admin UI route path mismatches (`user-row-edit.js`) ✅ FIXED
+
+Three admin operations were broken due to path drift between server route names and client calls:
+
+| Operation | Client path (broken) | Server route (actual) |
+|---|---|---|
+| Grant/update custom subscription (PUT) | `/api/admin/users/:id/subscription` | `/api/admin/users/:id/custom-subscription` |
+| Remove custom subscription (DELETE) | `/api/admin/users/:id/subscription` | `/api/admin/users/:id/custom-subscription` |
+| Sync from Stripe (POST) | `/api/admin/users/:id/sync` | `/api/admin/users/:id/billing-sync` |
+
+**Fix applied:** Updated `user-row-edit.js` lines 189, 234 → `/custom-subscription`; line 213 → `/billing-sync`. Phase 4 in this plan also corrected.
+
+---
+
+#### `sync.js:63` — `planCode` fallback to `nickname` breaks enum constraint ✅ FIXED
+
+Copilot (2026-03-07): "`planCode` falls back to `item?.price?.nickname` when `lookup_key` is missing. After migration `031.do.billing-subscription-invariants.sql`, `stripe_subscriptions.plan_code` is constrained to the `subscription_plan_code` enum (`'yearly_paid'` only), so a nickname like 'Breadcrum Annual' would cause the upsert to fail."
+
+**Fix applied:** `sync.js:63` changed to `const planCode = item?.price?.lookup_key ?? null`. Comment added explaining why `nickname` fallback is unsafe after enum migration.
+
+---
+
+### Items marked `[x]` but GitHub threads still unresolved (non-outdated)
+
+#### `billing-queries.js` — CTE atomicity ✅ VERIFIED + dead code removed
+
+bcomnes (2026-02-20): "Why are there still two separate queries if this was marked resolved. It should be a single query with CTEs."
+
+**Verified:** The main sync path already uses `syncStripeSubscriptionToDb` (atomic CTE combining subscriptions + stripe_subscriptions upsert). `createCustomSubscription` is also a CTE. The threads were pointing at legacy helper functions `upsertStripeSubscription` and `upsertCustomSubscription` which were dead code (not called anywhere in production). These have been removed. The `upsertSubscription` comment was updated to point callers toward the atomic CTE alternatives.
+
+Threads on lines 292, 326, 335 were about naming/comments inside `syncStripeSubscriptionToDb` — the function is already well-commented and the CTE structure is clear.
+
+Non-outdated open threads — all addressed:
+- `billing-queries.js:115`: Legacy two-step pattern guidance removed from `upsertSubscription` comment ✅
+- `billing-queries.js:174`: `upsertStripeSubscription` dead code removed ✅
+- `billing-queries.js:367`: `upsertCustomSubscription` dead code removed ✅
+- `billing-queries.js:292`: "Clarify name here" — `syncStripeSubscriptionToDb` is clear; thread can be closed.
+- `billing-queries.js:326`: "Maybe return a resulting join?" — callers currently don't need the return value; can be deferred.
+- `billing-queries.js:335`: "Clarify this is just the db resource" — existing JSDoc already states this; thread can be closed.
+
+---
+
+#### Billing tests still TODO (`billing.test.js`, `billing-queries.test.js`) ✅ VERIFIED
+
+Both test files have open non-outdated threads. Plan marks these `[x]` as "Replaced TODO placeholders with executable unit/integration tests."
+
+**Verified:** Both files have real test implementations. `billing-queries.test.js` covers `getStripeCustomerId`, `getUserIdByStripeCustomerId`, `upsertStripeCustomer`, `upsertSubscription`, `syncStripeSubscriptionToDb` (atomicity check), `createCustomSubscription` (atomicity check), and `cancelStaleStripeSubscription`. `billing.test.js` covers the billing view model, settlement-driven entitlement, and checkout API with flag/auth gating and live/fake key paths. Threads can be closed on GitHub.
+
+---
+
+#### `sync.js` — line 41 open question and lines 47/50 comments ✅ FIXED / VERIFIED
+
+- Line 41: bcomnes "Is this what we want?" — `if (!userId) return` silently ignores Stripe events for customers not mapped to a local user.
+- Lines 47 and 50: marked `[x]` for `limit:1` and `expand` comments; threads remain unresolved on GitHub.
+
+**Fix applied (line 41):** Added inline comment clarifying that unmapped customers are expected (pre-integration customers, test scenarios) and that the silent return is intentional.
+
+**Verified (lines 47/50):** Comments already exist in current source at those exact locations. Threads can be closed on GitHub manually.
+
+---
+
+#### `billing.js` plugin — `STRIPE_SECRET_KEY` required + runtime guard ✅ VERIFIED
+
+Non-outdated threads: bcomnes wants to eliminate the `if (!stripe)` runtime guard and keep the key always required at boot.
+
+**Verified:** Current `billing.js` already has `STRIPE_SECRET_KEY` in `required` array and no runtime guard — initializes Stripe unconditionally at boot. Comment already present: "Stripe config is required at boot. Feature flags gate route availability." Thread can be closed on GitHub.
+
+---
+
+#### `webhook/autohooks.js` — raw-body parsing pattern ✅ VERIFIED
+
+Non-outdated thread: bcomnes "There has to be a better way to do this."
+
+**Verified:** Current `autohooks.js` already has a clear comment: "Scoped parser override for this webhook subtree only: Stripe signature verification requires raw bytes, but handlers still expect parsed JSON." The scoped body-parser override is the idiomatic Fastify approach. Thread can be closed on GitHub as by-design.
+
+---
+
+#### `webhook/routes.js` — 200 on missing `customerId` ✅ VERIFIED
+
+Non-outdated thread. bcomnes: "Let's double check this. Usually webhook senders don't gaf about this."
+
+**Verified:** Current `routes.js` already has the comment (lines 97-99): "Intentional: return 200 even when customerId is missing so webhook delivery does not retry indefinitely on malformed/unmappable events." Behavior is correct per Stripe docs. Thread can be closed on GitHub.
+
+---
+
+#### `post-sync.js` and `post-portal.js` — explanatory comments ✅ VERIFIED
+
+Non-outdated threads; both marked `[x]`.
+
+**Verified:**
+- `post-sync.js:1`: "// Used by the billing sync button in the account/billing frontend component" — present.
+- `post-portal.js:2`: "// Portal = Stripe Customer Portal session for managing billing (cancel, update payment method, etc.)" — present.
+
+Threads can be closed on GitHub.
+
+---
+
+#### `030.do.billing.sql` — index review against usage ✅ VERIFIED
+
+Non-outdated thread: bcomnes "Let's specifically review indexes against usage." Plan marks `[x]` as resolved but thread is still open.
+
+**Verified:** Migration `030.do.billing.sql` already contains inline index analysis comments: line 21 notes "subscriptions_user_provider_unique already covers user_id lookups; no separate index needed"; line 46 notes "stripe_customers_user_unique and stripe_customers_customer_id_unique already cover all lookup patterns"; line 140-141 adds `idx_bookmarks_owner_created_at` with comment explaining quota query coverage. Index review is documented. Thread can be closed on GitHub.
+
+---
+
+#### `schema-admin-user-read.js` — single subscription type per user ✅ VERIFIED
+
+Non-outdated thread: bcomnes "We should make sure that users can only have one type of subscription at a time." Plan marks `[x]` as "Added `subscriptions_user_unique` constraint."
+
+**Verified:** Migration `031.do.billing-subscription-invariants.sql` adds `constraint subscriptions_user_unique unique (user_id)` on the `subscriptions` table, and the CTE write functions use `on conflict (user_id)` to enforce one row per user. Thread can be closed on GitHub.
+
+---
+
+#### `docs/subscriptions/README.md` — trial period ✅ VERIFIED
+
+Non-outdated thread: bcomnes "Need to look into a trial period of like a week. Stripe should handle this."
+
+**Verified:** `docs/subscriptions/README.md` already contains: "Optional trial periods can be configured in Stripe Checkout. If enabled, trial status and trial end are reflected in your account billing view." Thread can be closed on GitHub. Decision on whether to enable a trial is still open (see Open Questions).
+
+---
+
+#### `client.js` — badge text and plan copy ✅ VERIFIED
+
+- Line 21: bcomnes "We should update the badge to subscribe now!" — marked `[x]`.
+- Line 30: bcomnes "Need to work on this more" — marked `[x]`.
+
+**Verified:** `client.js:20` renders `<Badge><a href="/docs/subscriptions/">Subscribe now!</a></Badge>`. Badge text is correct. Plan copy thread (line 30) is still potentially open; the marketing copy review is ongoing — close at discretion once copy feels final.
+
+---
+
+#### `billing-field.js:69` — Stripe checkout comment ✅ VERIFIED
+
+Non-outdated thread: bcomnes "Add a comment about where this goes (stripe checkout)" — marked `[x]`.
+
+**Verified:** `billing-field.js:68`: `// Stripe Checkout redirect. User returns to /account/ with billing=success|cancel.` — present. Thread can be closed on GitHub.
+
+---
+
+#### `helmet.js` — dead plugin audit ✅ VERIFIED
+
+Non-outdated thread: bcomnes "Are we using this?" — plan marks `[x]` as "verified, static.js depends on helmet."
+
+**Verified:** `plugins/helmet.js` registers `@fastify/helmet` with full CSP configuration (frame-src, script-src, etc.) and is a named Fastify plugin. Clearly active and in use. Thread can be closed on GitHub.
+
+---
+
+### New threads not previously captured in plan
+
+#### `post-checkout.test.js:113` — URL substring sanitization (GitHub Advanced Security, 2026-02-27) ✅ FIXED
+
+GitHub Advanced Security: `body.url.startsWith('https://checkout.stripe.com')` may match `https://checkout.stripe.com.evil.com`.
+
+**Fix applied:** Changed to `assert.strictEqual(new URL(body.url).hostname, 'checkout.stripe.com', ...)`. Clears the security scan finding.
+
+---
+
+#### `user-row-edit.js:163` — `subLoading` stuck on null ref (Copilot, 2026-03-07) ✅ FIXED
+
+`handleGrantSubscription` set `setSubLoading(true)` before the null check of `subFormRef.current`. If the ref was null, early return left UI stuck in loading/disabled state.
+
+**Fix applied:** Moved null check before `setSubLoading(true)` and `setSubError(null)`.
+
+---
+
+#### `worker/plugins/billing-decorators.d.ts` — move to shared resources (Copilot/bcomnes)
+
+Outdated thread: bcomnes "Maybe move this to a shared plugin in resources."
+
+**Status:** Deferred for post-launch cleanup. Centralizing in `@breadcrum/resources` is a good long-term goal but not blocking production.

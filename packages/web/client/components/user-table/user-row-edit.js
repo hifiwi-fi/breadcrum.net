@@ -155,11 +155,11 @@ export const UserRowEdit = ({
   }, [])
 
   const handleGrantSubscription = useCallback(async () => {
-    setSubLoading(true)
-    setSubError(null)
-
     const container = subFormRef.current
     if (!container) return
+
+    setSubLoading(true)
+    setSubError(null)
 
     const displayNameEl = /** @type {HTMLInputElement | null} */ (container.querySelector('[name="sub_display_name"]'))
     const periodEndEl = /** @type {HTMLInputElement | null} */ (container.querySelector('[name="sub_period_end"]'))
@@ -186,7 +186,7 @@ export const UserRowEdit = ({
     }
 
     try {
-      const response = await fetch(`${apiUrl}/admin/users/${u.id}/subscription`, {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/custom-subscription`, {
         method: 'put',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -210,7 +210,7 @@ export const UserRowEdit = ({
     setSubError(null)
 
     try {
-      const response = await fetch(`${apiUrl}/admin/users/${u.id}/sync`, {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/billing-sync`, {
         method: 'post',
       })
 
@@ -231,7 +231,7 @@ export const UserRowEdit = ({
     setSubError(null)
 
     try {
-      const response = await fetch(`${apiUrl}/admin/users/${u.id}/subscription`, {
+      const response = await fetch(`${apiUrl}/admin/users/${u.id}/custom-subscription`, {
         method: 'delete',
       })
 

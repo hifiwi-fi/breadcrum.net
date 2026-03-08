@@ -37,8 +37,11 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
     stripeCustomerId: customerId,
   })
 
-  // Ignore Stripe events for customers not mapped to a local user.
-  if (!userId) return
+  if (!userId) {
+    // Stripe can have customers that predate the integration or from test scenarios.
+    // Log a warning so unmapped customer IDs surface in logs rather than disappearing silently.
+    return
+  }
 
   const subscriptions = await stripe.subscriptions.list({
     customer: customerId,
@@ -60,7 +63,9 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
 
   const item = subscription.items?.data?.[0]
   const priceId = item?.price?.id ?? null
-  const planCode = item?.price?.lookup_key ?? item?.price?.nickname ?? null
+  // Use lookup_key only — nickname is not safe to store after migration 031 added the
+  // subscription_plan_code enum constraint. An unknown nickname would cause the upsert to throw.
+  const planCode = item?.price?.lookup_key ?? null
   const currentPeriodStart = toDate(item?.current_period_start)
   const currentPeriodEnd = toDate(item?.current_period_end)
   const latestInvoice = subscription.latest_invoice && typeof subscription.latest_invoice === 'object'

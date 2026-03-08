@@ -111,8 +111,11 @@ export async function getUserBillingProfile ({ pg, userId }) {
  */
 
 /**
- * Upserts a generic subscription row. For Stripe subscriptions, use the
- * returned id to upsert the stripe_subscriptions row.
+ * Upserts a generic subscription row.
+ *
+ * Low-level single-table utility. For Stripe sync, prefer the atomic
+ * `syncStripeSubscriptionToDb` CTE which writes both supertype and subtype
+ * in one query. For custom subscriptions, prefer `createCustomSubscription`.
  *
  * Uses user_id as the conflict target so each user has at most one
  * active subscription provider row.
@@ -147,85 +150,8 @@ export async function upsertSubscription ({ pg, subscription }) {
 // ---------------------------------------------------------------------------
 // Stripe subscriptions (provider-specific details)
 // ---------------------------------------------------------------------------
-
-/**
- * @typedef {object} StripeSubscriptionUpsert
- * @property {string} subscriptionId
- * @property {string} stripeSubscriptionId
- * @property {string} status
- * @property {string | null} planCode
- * @property {string | null} priceId
- * @property {Date | null} currentPeriodStart
- * @property {Date | null} currentPeriodEnd
- * @property {Date | null} cancelAt
- * @property {boolean} cancelAtPeriodEnd
- * @property {Date | null} trialEnd
- * @property {string | null} paymentMethodBrand
- * @property {string | null} paymentMethodLast4
- * @property {string | null} latestInvoiceStatus
- * @property {Date | null} latestInvoicePaidAt
- * @property {boolean} latestInvoiceSettled
- */
-
-/**
- * @param {{ pg: PgClient, stripeSubscription: StripeSubscriptionUpsert }} params
- * @returns {Promise<void>}
- */
-export async function upsertStripeSubscription ({ pg, stripeSubscription }) {
-  const query = SQL`
-    insert into stripe_subscriptions (
-      subscription_id,
-      stripe_subscription_id,
-      status,
-      plan_code,
-      price_id,
-      current_period_start,
-      current_period_end,
-      cancel_at,
-      cancel_at_period_end,
-      trial_end,
-      payment_method_brand,
-      payment_method_last4,
-      latest_invoice_status,
-      latest_invoice_paid_at,
-      latest_invoice_settled
-    ) values (
-      ${stripeSubscription.subscriptionId},
-      ${stripeSubscription.stripeSubscriptionId},
-      ${stripeSubscription.status},
-      ${stripeSubscription.planCode},
-      ${stripeSubscription.priceId},
-      ${stripeSubscription.currentPeriodStart},
-      ${stripeSubscription.currentPeriodEnd},
-      ${stripeSubscription.cancelAt},
-      ${stripeSubscription.cancelAtPeriodEnd},
-      ${stripeSubscription.trialEnd},
-      ${stripeSubscription.paymentMethodBrand},
-      ${stripeSubscription.paymentMethodLast4},
-      ${stripeSubscription.latestInvoiceStatus},
-      ${stripeSubscription.latestInvoicePaidAt},
-      ${stripeSubscription.latestInvoiceSettled}
-    )
-    on conflict (subscription_id)
-    do update set
-      stripe_subscription_id = excluded.stripe_subscription_id,
-      status = excluded.status,
-      plan_code = excluded.plan_code,
-      price_id = excluded.price_id,
-      current_period_start = excluded.current_period_start,
-      current_period_end = excluded.current_period_end,
-      cancel_at = excluded.cancel_at,
-      cancel_at_period_end = excluded.cancel_at_period_end,
-      trial_end = excluded.trial_end,
-      payment_method_brand = excluded.payment_method_brand,
-      payment_method_last4 = excluded.payment_method_last4,
-      latest_invoice_status = excluded.latest_invoice_status,
-      latest_invoice_paid_at = excluded.latest_invoice_paid_at,
-      latest_invoice_settled = excluded.latest_invoice_settled
-  `
-
-  await pg.query(query)
-}
+// Low-level upsertStripeSubscription (two-step, non-atomic) has been removed.
+// Use syncStripeSubscriptionToDb for atomic Stripe sync writes.
 
 // ---------------------------------------------------------------------------
 // Atomic sync (CTE combining subscription + stripe_subscription upsert)
@@ -349,49 +275,6 @@ export async function cancelStaleStripeSubscription ({ pg, userId }) {
 // ---------------------------------------------------------------------------
 // Custom subscriptions (admin-created)
 // ---------------------------------------------------------------------------
-
-/**
- * @typedef {object} CustomSubscriptionUpsert
- * @property {string} subscriptionId
- * @property {string} status
- * @property {string | null} planCode
- * @property {string} displayName
- * @property {Date | null} currentPeriodStart
- * @property {Date | null} currentPeriodEnd
- */
-
-/**
- * @param {{ pg: PgClient, customSubscription: CustomSubscriptionUpsert }} params
- * @returns {Promise<void>}
- */
-export async function upsertCustomSubscription ({ pg, customSubscription }) {
-  const query = SQL`
-    insert into custom_subscriptions (
-      subscription_id,
-      status,
-      plan_code,
-      display_name,
-      current_period_start,
-      current_period_end
-    ) values (
-      ${customSubscription.subscriptionId},
-      ${customSubscription.status},
-      ${customSubscription.planCode},
-      ${customSubscription.displayName},
-      ${customSubscription.currentPeriodStart},
-      ${customSubscription.currentPeriodEnd}
-    )
-    on conflict (subscription_id)
-    do update set
-      status = excluded.status,
-      plan_code = excluded.plan_code,
-      display_name = excluded.display_name,
-      current_period_start = excluded.current_period_start,
-      current_period_end = excluded.current_period_end
-  `
-
-  await pg.query(query)
-}
 
 /**
  * @typedef {object} CustomSubscriptionParams

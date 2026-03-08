@@ -110,7 +110,7 @@ await suite('POST /api/billing/checkout', async () => {
       assert.strictEqual(res.statusCode, 201, 'Should return 201')
       const body = JSON.parse(res.payload)
       assert.ok(body.url, 'Should return a checkout URL')
-      assert.ok(body.url.startsWith('https://checkout.stripe.com'), 'URL should be a Stripe checkout URL')
+      assert.strictEqual(new URL(body.url).hostname, 'checkout.stripe.com', 'URL should be a Stripe checkout URL')
     })
   })
 })
