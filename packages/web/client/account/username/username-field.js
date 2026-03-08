@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { UsernameEdit } from './username-edit.js'
 import { UsernameView } from './username-view.js'
@@ -13,15 +13,15 @@ import { UsernameView } from './username-view.js'
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
+ *  onSuccess?: (result: { data: TypeUserRead }) => void,
  * }} UsernameFieldProps
  */
 
 /**
  * @type {FunctionComponent<UsernameFieldProps>}
  */
-export const UsernameField = ({ user }) => {
+export const UsernameField = ({ user, onSuccess }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
@@ -46,7 +46,7 @@ export const UsernameField = ({ user }) => {
     },
     onSuccess: (/** @type {{ status: string, data: TypeUserRead }} */ result) => {
       setEditing(false)
-      queryClient.setQueryData(['user', state.apiUrl], result.data)
+      onSuccess?.(result)
     },
   })
 

@@ -36,6 +36,9 @@ export const EmailView = ({ user, onEdit }) => {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
     },
+    onMutate: () => {
+      setError(null)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
     },
@@ -99,12 +102,6 @@ export const EmailView = ({ user, onEdit }) => {
     }
   }, [state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
 
-  const handleCancelEmailUpdate = useCallback((/** @type {Event} */ev) => {
-    ev.preventDefault()
-    setError(null)
-    cancelEmailUpdateMutation.mutate()
-  }, [cancelEmailUpdateMutation])
-
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
     <dd class='email-view-buttons'>
@@ -138,7 +135,7 @@ export const EmailView = ({ user, onEdit }) => {
                 : 'Resend email update confirmation'
             }</button>
           <button
-            onClick=${handleCancelEmailUpdate}
+            onClick=${cancelEmailUpdateMutation.mutate}
             disabled=${cancelEmailUpdateMutation.isPending}
           >
             ${cancelEmailUpdateMutation.isPending ? 'Cancelling email update' : 'Cancel email update'}

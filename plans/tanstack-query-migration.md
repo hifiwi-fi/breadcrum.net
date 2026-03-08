@@ -1,6 +1,6 @@
 # TanStack Query Migration Plan
 
-## Status: PHASE 5 COMPLETE ✅
+## Status: PHASE 8 COMPLETE ✅
 
 Original migration was completed, but a post-migration audit found behavioral inconsistencies and a few correctness bugs. This document now tracks follow-up fixes.
 
@@ -56,6 +56,7 @@ Original migration was completed, but a post-migration audit found behavioral in
 - 2026-02-27: Step 25 complete. `admin/redis-cache/client.js` migrated from manual state to `useMutation`; uses `flushMutation.isPending`/`isSuccess`/`error` for UI state.
 - 2026-02-27: Step 26 complete. Validation passed after phase 5 changes: `pnpm --filter @breadcrum/web run test:eslint`, `test:tsc`, and `test:node` (all ok, 0 failing).
 - 2026-02-28: Migrated `BookmarkList`, `ArchiveList`, `EpisodeList` mutations to `useMutation`. Removed `reload` prop from all three components and all callers. `onDelete` made optional and now only used for view-page navigation. Components self-invalidate their resource's list, view, and search query prefixes on mutation success. Validation passed (eslint, tsc, 340 tests passing, 0 failing).
+- 2026-03-07: Phase 8 complete. Three bcomnes review comments addressed: (1) `email-view.js` — moved `setError(null)` to `onMutate`, removed `handleCancelEmailUpdate` wrapper, `cancelEmailUpdateMutation.mutate` passed directly as `onClick`; (2) Account field components — lifted `useQueryClient`/invalidation out of `newsletter-field`, `email-field`, `username-field` into `account/client.js` via `onSuccess` prop; (3) `admin/flags/client.js` — added comment explaining wrapper is necessary to build typed payload from DOM form elements.
 
 ### Residual Inconsistencies (Deferred)
 
@@ -287,6 +288,108 @@ The form submission path (`handleSave`) already reads all values directly from `
 | 12 | Assess and narrow `episode-list.js` invalidation (4 prefixes → fewer if safe) | No change — TanStack only refetches actively-mounted queries; inactive queries just get marked stale at negligible cost. All 4 prefixes could contain a stale version of the edited episode, so invalidating all is correct. |
 | 13 | Add comment to `bookmark-edit.js` `archive_urls?.join(',')` dep explaining the stable-key trick | Complete |
 | 14 | Investigate direct schema import for `put-user.js` | Complete — replaced `fastify.getSchema(...)` calls with direct imports of `schemaUserUpdate` and `schemaUserRead`; removed `SchemaUserUpdate`/`SchemaUserRead` `@import` type casts |
+
+---
+
+## Phase 8: Latest PR Comment Round (2870xxx)
+
+Three new bcomnes comments from the most recent review pass. All others in the thread are resolved.
+
+---
+
+### Open Comments
+
+#### `email-view.js:102` — wrapper around `cancelEmailUpdateMutation.mutate`
+
+Comment 2870717564: "Is this wrapper around the mutation necessary? Can I just pass the mutate function to the DOM element?"
+
+**Current code:**
+```js
+const handleCancelEmailUpdate = useCallback((/** @type {Event} */ev) => {
+  ev.preventDefault()
+  setError(null)
+  cancelEmailUpdateMutation.mutate()
+}, [cancelEmailUpdateMutation])
+```
+
+**Validity: Partially valid.** The wrapper does two things beyond calling `.mutate()`:
+1. `ev.preventDefault()` — prevents default browser form/link behavior. If the button is `type="button"` (not inside a `<form>`) this is a no-op. Worth removing if so.
+2. `setError(null)` — clears a prior error before the new attempt. This can be moved to `onMutate: () => setError(null)` inside the mutation options.
+
+If both are moved, the onClick can be `cancelEmailUpdateMutation.mutate` directly (no wrapper, no `useCallback`).
+
+**Proposed action:** Move `setError(null)` to `onMutate` in the mutation config. Verify the button is `type="button"` or otherwise doesn't need `preventDefault`. Remove the `handleCancelEmailUpdate` wrapper and pass `cancelEmailUpdateMutation.mutate` directly as the event handler.
+
+**Done —** Added `onMutate: () => setError(null)` to the mutation config. The button is inside a `<div>` (not a `<form>`), so `ev.preventDefault()` was a no-op. Removed `handleCancelEmailUpdate` entirely; button now uses `onClick=${cancelEmailUpdateMutation.mutate}` directly.
+
+---
+
+#### `newsletter-field.js:38` — field components bookkeep parent query key
+
+Comment 2870731081: "These components should not have to bookkeep their data source key. The component that does the request should pass a function that handles this and the child should just call it, not have to bookkeep what the parent key is. This is true for all fields in this page. Fix this."
+
+**Current pattern (newsletter-field.js):**
+```js
+const queryClient = useQueryClient()
+...
+onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+}
+```
+
+The field knows about `['user', state.apiUrl]` — a cache key that belongs to the parent (`account/client.js`). Same problem exists in `email-field.js` (uses `invalidateQueries`) and `username-field.js` (uses `setQueryData`).
+
+**Validity: Valid.** This is exactly the `onInvalidate` / `onSuccess` pattern already established for `EpisodeList`, `ArchiveList`, and `BookmarkList`. The parent owns its query and passes a callback; the child calls it without needing to know the key.
+
+**Proposed action:**
+
+1. **`newsletter-field.js`**: Remove `useQueryClient`, `queryClient`, and the `invalidateQueries` call. Add `onSuccess?: (data: any) => void` prop. Call `props.onSuccess?.(data)` in the mutation's `onSuccess`.
+2. **`email-field.js`**: Same — remove `useQueryClient`/`invalidateQueries` from `onSuccess`, call `props.onSuccess?.(data)` instead.
+3. **`username-field.js`**: Same — remove `useQueryClient`/`setQueryData` from `onSuccess`, call `props.onSuccess?.(data)`. The parent passes `onSuccess: (data) => queryClient.setQueryData(['user', apiUrl], data.data)`.
+4. **`account/client.js`** (parent): Add `useQueryClient`. Construct a single `onSuccess` callback that either `invalidateQueries` (for email) or `setQueryData` (for username/newsletter) and pass it down as a prop to each field component.
+
+**Done —** All four changes applied. `newsletter-field`, `email-field`, and `username-field` each have `useQueryClient` removed and call `onSuccess?.()` / `onSuccess?.(result)` from their mutation `onSuccess`. `account/client.js` adds `useQueryClient` + `useLSP`, builds a stable `userQueryKey`, and passes typed `onSuccess` callbacks: `setQueryData(userQueryKey, result.data)` for `UsernameField`, `invalidateQueries({ queryKey: userQueryKey })` for `EmailField` and `NewsletterField`.
+
+---
+
+#### `admin/flags/client.js:117` — wrapper function around `saveMutation.mutateAsync`
+
+Comment 2870747446: "Is this wrapper function still needed or can we pass the mutation directly."
+
+**Current code:**
+```js
+const handleFlagSave = useCallback((/** @type {Event} */ev) => {
+  ev.preventDefault()
+  const form = formRef.current
+  if (!form) return
+  /** @type {FlagValues} */
+  const payload = {}
+  for (const [flag, flagMeta] of Object.entries(defaultFlags)) {
+    const formElement = form.elements.namedItem(flag)
+    ...
+    payload[flag] = ...
+  }
+  saveMutation.mutateAsync(payload).catch(...)
+}, [...])
+```
+
+**Validity: Not feasible to eliminate.** `saveMutation.mutate` expects a `FlagValues` payload, not a DOM `Event`. The wrapper must read and transform `formRef.current` into that payload before calling the mutation. This cannot be replaced by passing `saveMutation.mutate` directly as the event handler.
+
+The wrapper *could* be simplified slightly (e.g., remove `useCallback` wrapping since `saveMutation` is stable), but it cannot be eliminated.
+
+**Proposed action:** No structural change. Add a brief note in the handler comment explaining why the wrapper is necessary (it transforms the DOM form state into a typed payload). Optionally remove `useCallback` since the deps are stable — but this is cosmetic.
+
+**Done —** Added comment: `// Wrapper is necessary: reads typed values from DOM form elements before calling mutate`. No structural change.
+
+---
+
+### Phase 8 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | `email-view.js` — move `setError(null)` to `onMutate`, remove wrapper if button needs no `preventDefault` | Complete |
+| 2 | Account field components — lift invalidation/cache-update to `account/client.js` via `onSuccess` prop; remove `useQueryClient` from `newsletter-field`, `email-field`, `username-field` | Complete |
+| 3 | `admin/flags/client.js` — document why the wrapper is necessary; no structural change | Complete |
 
 ---
 

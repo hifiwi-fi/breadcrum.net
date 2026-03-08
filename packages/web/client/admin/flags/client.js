@@ -114,6 +114,7 @@ export const Page = () => {
     },
   })
 
+  // Wrapper is necessary: reads typed values from DOM form elements before calling mutate
   const handleFlagSave = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
 

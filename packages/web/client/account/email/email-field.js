@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { EmailEdit } from './email-edit.js'
 import { EmailView } from './email-view.js'
@@ -13,15 +13,15 @@ import { EmailView } from './email-view.js'
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
+ *  onSuccess?: () => void,
  * }} EmailFieldProps
  */
 
 /**
  * @type {FunctionComponent<EmailFieldProps>}
  */
-export const EmailField = ({ user }) => {
+export const EmailField = ({ user, onSuccess }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
@@ -46,7 +46,7 @@ export const EmailField = ({ user }) => {
     },
     onSuccess: () => {
       setEditing(false)
-      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+      onSuccess?.()
     },
   })
 

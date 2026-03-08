@@ -34,7 +34,13 @@
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id == null\\) | {id, author: .user.login, path, line, body, created_at}]')",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id != null\\) | {id, in_reply_to_id, author: .user.login, body}]')",
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '[.[] | select\\(.in_reply_to_id\\) | {id, in_reply_to_id, author: .user.login, body}]')",
-      "WebFetch(domain:tanstack.com)"
+      "WebFetch(domain:tanstack.com)",
+      "Bash(gh pr view 690 --repo hifiwi-fi/breadcrum.net --comments)",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.resolved == false or .resolved == null\\) | {id: .id, path: .path, line: .original_line, body: .body, user: .user.login, created_at: .created_at}')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.user.login == \"\"bcomnes\"\"\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.user.login == \"\"bcomnes\"\" and \\(.id > 2870747446\\)\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.id == 2869723842 or .id == 2869769561\\) | {id: .id, path: .path, line: .original_line, in_reply_to_id: .in_reply_to_id, body: .body, created_at: .created_at}')",
+      "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments --paginate --jq '.[] | select\\(.id == 2869712432 or .id == 2869712429\\) | {id: .id, path: .path, line: .original_line, body: .body, created_at: .created_at}')"
     ]
   }
 }

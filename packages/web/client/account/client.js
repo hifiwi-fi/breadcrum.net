@@ -5,7 +5,9 @@
  */
 
 import { html } from 'htm/preact'
+import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
+import { useLSP } from '../hooks/useLSP.js'
 import { UsernameField } from './username/username-field.js'
 import { PasswordField } from './password/password-field.js'
 import { NewsletterField } from './newsletter/newsletter-field.js'
@@ -18,16 +20,29 @@ import { mountPage } from '../lib/mount-page.js'
 /** @type {FunctionComponent} */
 export const Page = () => {
   const { user } = useUser()
+  const state = useLSP()
+  const queryClient = useQueryClient()
+
+  const userQueryKey = ['user', state.apiUrl]
 
   return html`
     <div>
       <dl>
         <${DisabledField} user=${user} />
-        <${UsernameField} user=${user} />
-        <${EmailField} user=${user} />
+        <${UsernameField}
+          user=${user}
+          onSuccess=${(result) => queryClient.setQueryData(userQueryKey, result.data)}
+        />
+        <${EmailField}
+          user=${user}
+          onSuccess=${() => queryClient.invalidateQueries({ queryKey: userQueryKey })}
+        />
         <${PasswordField} />
         <${PasskeysField} />
-        <${NewsletterField} user=${user} />
+        <${NewsletterField}
+          user=${user}
+          onSuccess=${() => queryClient.invalidateQueries({ queryKey: userQueryKey })}
+        />
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>

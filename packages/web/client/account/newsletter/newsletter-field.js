@@ -5,21 +5,21 @@
 
 import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
-import { useMutation, useQueryClient } from '@tanstack/preact-query'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
+ *  onSuccess?: () => void,
  * }} NewsletterFieldProps
  */
 
 /**
  * @type {FunctionComponent<NewsletterFieldProps>}
  */
-export const NewsletterField = ({ user }) => {
+export const NewsletterField = ({ user, onSuccess }) => {
   const state = useLSP()
-  const queryClient = useQueryClient()
 
   const toggleMutation = useMutation({
     mutationFn: async (/** @type {boolean} */ newSubscriptionState) => {
@@ -34,7 +34,7 @@ export const NewsletterField = ({ user }) => {
       return await response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', state.apiUrl] })
+      onSuccess?.()
     },
   })
 
