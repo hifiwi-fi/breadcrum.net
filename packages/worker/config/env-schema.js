@@ -37,7 +37,7 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     },
     YT_DLP_API_URL: {
       type: 'string',
-      default: 'http://user:pass@127.0.0.1:5000',
+      default: 'http://user:pass@127.0.0.1:3010',
     },
     OTEL_SERVICE_NAME: {
       type: 'string',
