@@ -15,6 +15,7 @@ import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { useReload } from '../../hooks/useReload.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -91,7 +92,7 @@ export const Page = () => {
   }, [window])
 
   const hasPending = Boolean(
-    bookmark && (
+    bookmark && withinResolvingWindow(bookmark?.created_at) && (
       bookmark?.done === false ||
       (bookmark.archives?.some(archive => archive?.ready === false && !archive?.error)) ||
       (bookmark.episodes?.some(episode => episode?.ready === false && !episode?.error))

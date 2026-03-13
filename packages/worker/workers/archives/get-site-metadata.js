@@ -1,5 +1,5 @@
 /**
- * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ * @import { YTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  * @import { ExtractMetaMeta } from '@breadcrum/extract-meta'
  */
 
@@ -8,8 +8,8 @@ import { isYouTubeUrl } from '@bret/is-youtube-url'
 
 /**
  * @param  {object} params
- * @param  {Document} params.document
- * @param  {YTDLPMetadata | undefined} params.media
+ * @param  {Document | undefined} params.document
+ * @param  {YTDLPDiscoveryMetadata | undefined} params.media
  * @param  { URL } params.url
  * @returns { Promise<ExtractMetaMeta> }
  */
@@ -19,7 +19,7 @@ export async function getSiteMetadata ({
   url
 }) {
   // TODO: implement document source overrides in extractMeta maybe.
-  const metadata = extractMeta(document)
+  const metadata = document ? extractMeta(document) : /** @type {ExtractMetaMeta} */ ({})
 
   if (isYouTubeUrl(url) && media) {
     if (media.title) {

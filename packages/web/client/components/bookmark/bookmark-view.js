@@ -13,6 +13,7 @@ import { useWindow } from '../../hooks/useWindow.js'
 import { useQuery } from '../../hooks/useQuery.js'
 import { ExpandText } from '../expand-text/index.js'
 import { ResolveStatus } from '../resolve-status/index.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 import cn from 'classnames'
 
 /**
@@ -37,9 +38,11 @@ export const BookmarkView = ({
   const window = useWindow()
   const { pushState } = useQuery()
   const isResolving = Boolean(
-    b?.done === false ||
-    b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
-    b?.episodes?.some(episode => episode?.ready === false && !episode?.error)
+    withinResolvingWindow(b?.created_at) && (
+      b?.done === false ||
+      b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
+      b?.episodes?.some(episode => episode?.ready === false && !episode?.error)
+    )
   )
   const visibleArchives = (b?.archives ?? []).filter(archive => !archive?.error)
   const visibleEpisodes = (b?.episodes ?? []).filter(episode => !episode?.error)

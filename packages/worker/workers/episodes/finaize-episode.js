@@ -1,5 +1,5 @@
 /**
- * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ * @import { YTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
  */
 
@@ -9,7 +9,7 @@ import { resolveMimeType } from '@breadcrum/resources/episodes/resolve-mime-type
 
 /**
  * @param {object} params
- * @param {YTDLPMetadata} params.media
+ * @param {YTDLPDiscoveryMetadata} params.media
  * @param {string} params.url
  * @param {string | undefined} params.bookmarkTitle
  * @param {string} params.episodeId

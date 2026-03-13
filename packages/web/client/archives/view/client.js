@@ -14,6 +14,7 @@ import { ArchiveList } from '../../components/archive/archive-list.js'
 import { Search } from '../../components/search/index.js'
 import { useReload } from '../../hooks/useReload.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -97,7 +98,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const hasPending = Boolean(archive && archive?.ready === false && !archive?.error)
+  const hasPending = Boolean(archive && archive?.ready === false && !archive?.error && withinResolvingWindow(archive?.created_at))
 
   useResolvePolling({
     enabled: hasPending,

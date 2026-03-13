@@ -14,6 +14,7 @@ import { useQuery } from '../../hooks/useQuery.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 import { tc } from '../../lib/typed-component.js'
 
 /** @type {FunctionComponent} */
@@ -102,7 +103,7 @@ export const Page = () => {
 
   const existingBookmark = Boolean(bookmark?.id)
   const hasPending = Boolean(
-    bookmark?.id && (
+    bookmark?.id && withinResolvingWindow(bookmark?.created_at) && (
       bookmark?.done === false ||
       bookmark?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
       bookmark?.episodes?.some(episode => episode?.ready === false && !episode?.error)

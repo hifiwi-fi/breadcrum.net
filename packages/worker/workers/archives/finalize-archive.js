@@ -21,6 +21,7 @@ export async function finalizeArchive ({
   const archiveData = []
 
   archiveData.push(SQL`done = true`)
+  archiveData.push(SQL`error = NULL`)
 
   if (article) {
     if (article.title != null) archiveData.push(SQL`title = ${article.title}`)

@@ -19,7 +19,9 @@
       "WebFetch(domain:bret.io)",
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:unpkg.com)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Read(//Users/bret/Developer/yt-dlp-api/**)",
+      "Bash(npm test)"
     ]
   }
 }

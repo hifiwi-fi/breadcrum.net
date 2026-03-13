@@ -12,6 +12,7 @@ import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { useArchives } from '../hooks/useArchives.js'
 import { QueryProvider } from '../lib/query-provider.js'
 import { tc } from '../lib/typed-component.js'
@@ -87,7 +88,7 @@ export const Page = () => {
   const bottomDateValue = formatDateValue(bottomArchiveDate) || formatDateValue(cursorDate)
 
   const hasPending = Array.isArray(archives) && archives.some(archive => (
-    archive?.ready === false && !archive?.error
+    archive?.ready === false && !archive?.error && withinResolvingWindow(archive?.created_at)
   ))
 
   useResolvePolling({
