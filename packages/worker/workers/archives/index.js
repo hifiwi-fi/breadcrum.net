@@ -78,8 +78,7 @@ export function makeArchivePgBossP ({ fastify }) {
             and owner_id =${userId};`
           await pg.query(errorQuery)
         }
-        // Accept the failure - don't throw to avoid pg-boss retries
-        // The error has already been logged and stored in the database
+        throw handledError // Let pg-boss handle retry logic
       }
     }
   }

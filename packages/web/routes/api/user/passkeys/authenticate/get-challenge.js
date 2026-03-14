@@ -1,4 +1,4 @@
-import { server } from '@passwordless-id/webauthn'
+import { server } from '@passwordless-id/webauthn/dist/esm/index.js'
 import { storeChallenge } from '../challenge-store.js'
 
 /**

@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
+import { getYTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { schemaEpisodePreview } from '../schemas/episode-preview.js'
 
 /**
@@ -44,7 +45,13 @@ export async function getPreview (fastify, _opts) {
       const { url } = request.query
       /** @type {MediumTypes} */
       const medium = request.query.medium
-      const metadata = await fastify.getYTDLPMetadataWrapper({ url, medium })
+      const metadata = await getYTDLPDiscoveryMetadata({
+        url,
+        medium,
+        ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
+        attempt: 0,
+        cache: fastify.ytdlpCache,
+      })
 
       const {
         title,
@@ -55,12 +62,10 @@ export async function getPreview (fastify, _opts) {
       } = metadata
       const src_type = resolveType(metadata)
 
-      // TODO: what are we doing here
       /** @type{ReturnBody} */
       const returnBody = {
         title: title ?? null,
         ext: ext ?? null,
-        url: metadata.url,
         duration: duration ?? null,
         channel: channel ?? null,
         src_type: src_type ?? null,

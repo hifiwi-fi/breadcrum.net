@@ -140,6 +140,28 @@ export default fp(async function (fastify, _) {
       unit: 's',
     }),
 
+
+    // Stale resolution cleanup metrics
+    staleBookmarksCleanedCounter: meter.createCounter('breadcrum_stale_bookmarks_cleaned_total', {
+      description: 'The number of stale bookmarks marked done by cleanup job',
+    }),
+
+    staleArchivesCleanedCounter: meter.createCounter('breadcrum_stale_archives_cleaned_total', {
+      description: 'The number of stale archives marked done by cleanup job',
+    }),
+
+    staleEpisodesCleanedCounter: meter.createCounter('breadcrum_stale_episodes_cleaned_total', {
+      description: 'The number of stale episodes marked done by cleanup job',
+    }),
+
+    staleResolutionsCleanupJobCounter: meter.createCounter('breadcrum_stale_resolutions_cleanup_job_total', {
+      description: 'The number of times stale resolution cleanup job has run',
+    }),
+
+    staleResolutionsCleanupDuration: meter.createHistogram('breadcrum_stale_resolutions_cleanup_seconds', {
+      description: 'The time it takes to run stale resolution cleanup job',
+      unit: 's',
+    }),
   })
 },
 {

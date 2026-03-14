@@ -2,7 +2,7 @@
  * @import { FastifyInstance } from 'fastify'
  * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveBookmarkData } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
- * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ * @import { YTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  * @import { ExtractMetaMeta } from '@breadcrum/extract-meta'
  * @import { ReadabilityParseResult } from '../archives/extract-archive.js'
  * @import { CreatedEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
@@ -14,7 +14,7 @@ import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
 import { createEpisode } from '@breadcrum/resources/episodes/episode-query-create.js'
 import { createArchive } from '@breadcrum/resources/archives/archive-query-create.js'
-import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { getYTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 
 import { fetchHTML } from '../archives/fetch-html.js'
@@ -63,7 +63,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
       // We perform the expensive network calls, according to input options
       // and use the results to derive associated assets.
 
-      /** @type { YTDLPMetadata | undefined } */
+      /** @type { YTDLPDiscoveryMetadata | undefined } */
       let media
       let retryOptions
       let isYouTube = false
@@ -74,13 +74,13 @@ export function makeBookmarkPgBossP ({ fastify }) {
         retryOptions = isYouTube ? youtubeRetryOptions : undefined
 
         try {
-          // getYTDLPMetadata handles retries internally (3 for YouTube, 0 for others)
-          media = await getYTDLPMetadata({
+          media = await getYTDLPDiscoveryMetadata({
             url,
             medium: 'video',
             ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
             attempt: retryCount,
             cache: fastify.ytdlpCache,
+            maxRetries: isYouTube ? 3 : 0,
           })
         } catch (err) {
           log.warn(err, 'getYTDLPMetadata threw during bookmark resolve')
@@ -135,7 +135,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
 
       /** @type { Document | undefined } */
       let document
-      if (resolveBookmark || resolveArchive /* TODO: && !youtube */) {
+      if ((resolveBookmark || resolveArchive) && !isYouTube) {
         // TODO: Handle xhtml, pdfs etc.
         log.info({ resolveBookmark, resolveArchive }, 'resolving document')
         const fetchStartTime = performance.now()
@@ -168,7 +168,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
 
       /** @type {ExtractMetaMeta | undefined} */
       let pageMetadata
-      if (resolveBookmark && document) {
+      if (resolveBookmark && (document || (isYouTube && media))) {
         const metadataStartTime = performance.now()
         log.info({ }, 'resolving bookmark with document')
         try {
@@ -222,72 +222,67 @@ export function makeBookmarkPgBossP ({ fastify }) {
       }
 
       if (resolveEpisode && media) {
-        const mediaUrlFound = media?.url
         const upcomingData = upcomingCheck({ media })
-        log.info({ upcomingData, mediaUrlFound }, 'resolving episode')
+        log.info({ upcomingData }, 'resolving episode')
         /** @type {CreatedEpisode | undefined} */
         let episodeEntity
         try {
-          if (upcomingData.isUpcoming || mediaUrlFound) {
-            episodeEntity = await createEpisode({
-              client: pg,
-              userId,
-              bookmarkId,
-              type: 'redirect',
-              medium: 'video',
-              url,
-            })
+          episodeEntity = await createEpisode({
+            client: pg,
+            userId,
+            bookmarkId,
+            type: 'redirect',
+            medium: 'video',
+            url,
+          })
 
-            if (upcomingData.isUpcoming) {
-              fastify.otel.episodeUpcomingCounter.add(1)
-              const releaseTimestampDate = new Date(upcomingData.releaseTimestampMs)
+          if (upcomingData.isUpcoming) {
+            fastify.otel.episodeUpcomingCounter.add(1)
+            const releaseTimestampDate = new Date(upcomingData.releaseTimestampMs)
 
-              // Use typed queue wrapper
-              const scheduledJobId = await fastify.pgboss.queues.resolveEpisodeQ.send({
-                data: {
-                  userId,
-                  bookmarkTitle: userProvidedMeta.title,
-                  episodeId: episodeEntity.id,
-                  url,
-                  medium: 'video'
-                },
-                options: {
-                  startAfter: releaseTimestampDate,
-                  ...(retryOptions ?? {})
-                }
-              })
-
-              log.info({
-                episodeEntity,
-                upcomingData,
-                jobId: scheduledJobId,
-                releaseTimestamp: releaseTimestampDate.toLocaleString(),
-              }, 'Upcoming episode for bookmark scheduled')
-            } else if (mediaUrlFound) {
-              let oembed = null
-              try {
-                oembed = await resolveEpisodeEmbed({ fastify, url })
-              } catch (err) {
-                log.warn(err, 'Failed to resolve embed for episode')
-              }
-
-              console.dir({ oembed })
-
-              await finalizeEpisode({
-                pg,
-                media,
+            // Use typed queue wrapper
+            const scheduledJobId = await fastify.pgboss.queues.resolveEpisodeQ.send({
+              data: {
+                userId,
                 bookmarkTitle: userProvidedMeta.title,
                 episodeId: episodeEntity.id,
-                userId,
                 url,
-                oembed,
-              })
+                medium: 'video'
+              },
+              options: {
+                startAfter: releaseTimestampDate,
+                ...(retryOptions ?? {})
+              }
+            })
 
-              log.info(`Episode ${episodeEntity.id} for ${url} is ready.`)
-            } else {
-              throw new Error('An episode was created without a scheduled time or URL')
+            log.info({
+              episodeEntity,
+              upcomingData,
+              jobId: scheduledJobId,
+              releaseTimestamp: releaseTimestampDate.toLocaleString(),
+            }, 'Upcoming episode for bookmark scheduled')
+          } else {
+            let oembed = null
+            try {
+              oembed = await resolveEpisodeEmbed({ fastify, url })
+            } catch (err) {
+              log.warn(err, 'Failed to resolve embed for episode')
             }
-          } // else No media, don't do anything
+
+            console.dir({ oembed })
+
+            await finalizeEpisode({
+              pg,
+              media,
+              bookmarkTitle: userProvidedMeta.title,
+              episodeId: episodeEntity.id,
+              userId,
+              url,
+              oembed,
+            })
+
+            log.info(`Episode ${episodeEntity.id} for ${url} is ready.`)
+          }
         } catch (err) {
           const handledError = err instanceof Error
             ? err
@@ -348,6 +343,17 @@ export function makeBookmarkPgBossP ({ fastify }) {
         }
 
         log.info(`Bookmark ${bookmarkId} for ${url} is ready.`)
+      } else if (resolveBookmark) {
+        // Metadata was unavailable (fetch or extraction failed) — mark done to avoid
+        // permanent done=false. Error column records the failure for diagnostics.
+        await pg.query(SQL`
+          UPDATE bookmarks
+          SET done = true,
+              error = 'Resolution failed: unable to fetch or extract metadata'
+          WHERE id = ${bookmarkId}
+          AND owner_id = ${userId}
+        `)
+        log.warn(`Bookmark ${bookmarkId} for ${url} marked done with error (metadata unavailable).`)
       }
 
       if (resolveArchive && article && article.title && article.content) {

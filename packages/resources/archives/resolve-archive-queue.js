@@ -64,10 +64,17 @@ export async function createResolveArchiveQ ({
   boss,
   queueOptions = defaultQueueOptions
 }) {
-  // Create the queue with merged options (defaults + user overrides)
+  const archiveQueueOptions = {
+    ...defaultQueueOptions,
+    retryLimit: 3,
+    retryDelay: 5,
+    retryBackoff: true,
+  }
+
+  // Create the queue with merged options (defaults + archive-specific + user overrides)
   // Idempotent - safe to call multiple times
   await boss.createQueue(resolveArchiveQName, {
-    ...defaultQueueOptions,
+    ...archiveQueueOptions,
     ...queueOptions
   })
 

@@ -44,7 +44,7 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     // Worker-level (no plugin home)
     YT_DLP_API_URL: {
       type: 'string',
-      default: 'http://user:pass@127.0.0.1:5000',
+      default: 'http://user:pass@127.0.0.1:3010',
     },
     AUTH_TOKEN_RETENTION_DAYS: {
       type: 'integer',

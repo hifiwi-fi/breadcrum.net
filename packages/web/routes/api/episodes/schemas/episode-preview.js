@@ -17,10 +17,6 @@ export const schemaEpisodePreview = /** @type {const} @satisfies {JSONSchema} */
       type: 'string',
       nullable: true
     },
-    url: {
-      type: 'string',
-      nullable: true
-    },
     duration: {
       type: 'number',
       nullable: true

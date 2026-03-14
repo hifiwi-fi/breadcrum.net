@@ -1,14 +1,14 @@
 /**
- * @import { YTDLPMetadata } from './yt-dlp-api-client.js'
+ * @import { YTDLPDiscoveryMetadata } from './yt-dlp-api-client.js'
  */
 
 import { lookup } from 'mime-types'
 
 /**
  * Resolve a mime type from yt-dlp metadata.
- * Prefers the file extension, falling back to the URL.
+ * Uses the file extension only — media URLs are not present in discovery metadata.
  *
- * @param {YTDLPMetadata} media
+ * @param {YTDLPDiscoveryMetadata} media
  * @returns {string | undefined}
  */
 export function resolveMimeType (media) {
@@ -17,11 +17,7 @@ export function resolveMimeType (media) {
     ? lookup(normalizedExt.startsWith('.') ? normalizedExt : `.${normalizedExt}`)
     : false
 
-  const urlLookup = !extLookup && media.url
-    ? lookup(media.url)
-    : false
-
-  const resolved = extLookup || urlLookup
+  const resolved = extLookup
 
   return typeof resolved === 'string' ? resolved : undefined
 }

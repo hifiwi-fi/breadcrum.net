@@ -4,6 +4,7 @@
  * @import { ResolveBookmarkPgBossW } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  * @import { CleanupAuthTokensPgBossW } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
  * @import { SyncSubscriptionPgBossW } from '@breadcrum/resources/billing/sync-subscription-queue.js'
+ * @import { CleanupStaleResolutionsPgBossW } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
  * @import { JSONSchema } from 'json-schema-to-ts'
  */
 import fp from 'fastify-plugin'
@@ -13,6 +14,7 @@ import { resolveArchiveQName, createResolveArchiveQ } from '@breadcrum/resources
 import { resolveBookmarkQName, createResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
 import { cleanupAuthTokensQName, createCleanupAuthTokensQ } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { syncSubscriptionQName, createSyncSubscriptionQ } from '@breadcrum/resources/billing/sync-subscription-queue.js'
+import { cleanupStaleResolutionsQName, createCleanupStaleResolutionsQ } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
 
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
@@ -20,6 +22,7 @@ import { makeArchivePgBossP } from '../workers/archives/index.js'
 import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
 import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
 import { makeSyncSubscriptionP } from '../workers/billing/sync-subscription.js'
+import { makeStaleResolutionCleanupP } from '../workers/stale-resolutions/index.js'
 
 export const pgbossEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   properties: {
@@ -49,13 +52,18 @@ export default fp(async function (fastify, _opts) {
     resolveArchiveQ: await createResolveArchiveQ({ boss }),
     resolveBookmarkQ: await createResolveBookmarkQ({ boss }),
     cleanupAuthTokensQ: await createCleanupAuthTokensQ({ boss }),
-    syncSubscriptionQ: await createSyncSubscriptionQ({ boss })
+    syncSubscriptionQ: await createSyncSubscriptionQ({ boss }),
+    cleanupStaleResolutionsQ: await createCleanupStaleResolutionsQ({ boss }),
   }
   fastify.log.info('pg-boss queues created')
 
   // Schedule auth token cleanup job (runs at 3 AM UTC daily)
   await boss.schedule(cleanupAuthTokensQName, '0 3 * * *', undefined, { tz: 'UTC' })
   fastify.log.info({ jobName: cleanupAuthTokensQName, schedule: '0 3 * * *' }, 'Scheduled auth token cleanup job')
+
+  // Schedule stale resolution cleanup job (runs at 4 AM UTC daily)
+  await boss.schedule(cleanupStaleResolutionsQName, '0 4 * * *', undefined, { tz: 'UTC' })
+  fastify.log.info({ jobName: cleanupStaleResolutionsQName, schedule: '0 4 * * *' }, 'Scheduled stale resolution cleanup job')
 
   // Create pg-boss workers with native processors
   /** @type {ResolveEpisodePgBossW[]} */
@@ -93,12 +101,17 @@ export default fp(async function (fastify, _opts) {
   /** @type {SyncSubscriptionPgBossW} */
   const syncSubscriptionWorker = await boss.work(syncSubscriptionQName, makeSyncSubscriptionP({ fastify }))
 
+  // Create stale resolution cleanup worker (scheduled job)
+  /** @type {CleanupStaleResolutionsPgBossW} */
+  const cleanupStaleResolutionsWorker = await boss.work(cleanupStaleResolutionsQName, makeStaleResolutionCleanupP({ fastify }))
+
   const workers = {
     [resolveEpisodeQName]: episodeWorkers,
     [resolveArchiveQName]: archiveWorkers,
     [resolveBookmarkQName]: bookmarkWorkers,
     [cleanupAuthTokensQName]: [cleanupAuthTokensWorker],
-    [syncSubscriptionQName]: [syncSubscriptionWorker]
+    [syncSubscriptionQName]: [syncSubscriptionWorker],
+    [cleanupStaleResolutionsQName]: [cleanupStaleResolutionsWorker],
   }
 
   const pgboss = {

@@ -17,6 +17,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 import { ArchiveTitle } from '../archive-title/index.js'
 import { useReload } from '../../hooks/useReload.js'
 import { ResolveStatus } from '../resolve-status/index.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /**
  * @typedef {object} BookmarkEditProps
@@ -58,7 +59,7 @@ export const BookmarkEdit = ({
   const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(/** @type {string | undefined} */(b?.url))
   const { signal: previewSignal, reload: previewReload } = useReload()
   const isResolving = Boolean(
-    b?.id && (
+    b?.id && withinResolvingWindow(b?.created_at) && (
       b?.done === false ||
       b?.archives?.some(archive => archive?.ready === false && !archive?.error) ||
       b?.episodes?.some(episode => episode?.ready === false && !episode?.error)
@@ -523,7 +524,7 @@ export const BookmarkEdit = ({
             <span class="bc-help-text bc-episode-preview-title">
               <span>${episodePreview?.src_type === 'video' ? '📼' : episodePreview?.src_type === 'audio' ? '💿' : null}</span>
               ${'\n'}
-              <a onClick=${handleNewWindowLink} target="_blank" href="${episodePreview?.url}">${`${episodePreview?.title}.${episodePreview?.ext}`}</a>
+              <span>${`${episodePreview?.title}.${episodePreview?.ext}`}</span>
               ${'\n'}
               <span>(${format((episodePreview?.duration || 0) * 1000)})</span>
             </span>

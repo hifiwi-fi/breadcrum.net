@@ -3,7 +3,7 @@
  * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  * @import { ResolveEpisodeData } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
  */
-import { getYTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { getYTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { youtubeRetryOptions } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { finalizeEpisode, finalizeEpisodeError } from './finaize-episode.js'
@@ -44,7 +44,7 @@ export function makeEpisodePgBossP ({ fastify }) {
 
       try {
         // Disable internal retries - let pg-boss handle all retries at the job level
-        const media = await getYTDLPMetadata({
+        const media = await getYTDLPDiscoveryMetadata({
           url,
           medium,
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
@@ -52,6 +52,10 @@ export function makeEpisodePgBossP ({ fastify }) {
           cache: fastify.ytdlpCache,
           maxRetries: 0, // pg-boss handles retries
         })
+
+        if (!media.title) {
+          throw new Error(`No media found for ${url}`)
+        }
 
         const upcomingData = upcomingCheck({ media })
 
@@ -72,10 +76,6 @@ export function makeEpisodePgBossP ({ fastify }) {
 
           // Job will be completed (not retried)
           continue
-        }
-
-        if (!media?.url) {
-          throw new Error('No video URL was found in discovery step')
         }
 
         let oembed = null

@@ -15,6 +15,7 @@ import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { ArchiveList } from '../../components/archive/archive-list.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -124,7 +125,7 @@ export const Page = () => {
   }, [window])
 
   const hasPending = Array.isArray(archives) && archives.some(archive => (
-    archive?.ready === false && !archive?.error
+    archive?.ready === false && !archive?.error && withinResolvingWindow(archive?.created_at)
   ))
 
   useResolvePolling({
