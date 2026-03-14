@@ -1,0 +1,1 @@
+-- No-op: cannot restore stuck records to done=false after backfill.

@@ -16,6 +16,7 @@ import { EpisodeList } from '../../components/episode/episode-list.js'
 import { Search } from '../../components/search/index.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { mountPage } from '../../lib/mount-page.js'
+import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -81,7 +82,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const hasPending = Boolean(episode && episode?.ready === false && !episode?.error)
+  const hasPending = Boolean(episode && episode?.ready === false && !episode?.error && withinResolvingWindow(episode?.created_at))
 
   useResolvePolling({
     enabled: hasPending,

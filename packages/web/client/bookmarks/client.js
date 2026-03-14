@@ -14,6 +14,7 @@ import { Search } from '../components/search/index.js'
 import { useBookmarks } from '../hooks/useBookmarks.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { mountPage } from '../lib/mount-page.js'
@@ -100,9 +101,11 @@ export const Page = () => {
   /** @typedef {TypeBookmarkReadClient['episodes'][number] | null | undefined} BookmarkEpisode */
 
   const hasPending = Array.isArray(bookmarks) && bookmarks.some(bookmark => (
-    bookmark?.done === false ||
-    (bookmark.archives?.some(/** @param {BookmarkArchive} archive */(archive) => archive?.ready === false && !archive?.error)) ||
-    (bookmark.episodes?.some(/** @param {BookmarkEpisode} episode */(episode) => episode?.ready === false && !episode?.error))
+    withinResolvingWindow(bookmark?.created_at) && (
+      bookmark?.done === false ||
+      (bookmark.archives?.some(/** @param {BookmarkArchive} archive */(archive) => archive?.ready === false && !archive?.error)) ||
+      (bookmark.episodes?.some(/** @param {BookmarkEpisode} episode */(episode) => episode?.ready === false && !episode?.error))
+    )
   ))
 
   useResolvePolling({

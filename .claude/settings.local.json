@@ -46,7 +46,10 @@
       "Bash(gh api repos/hifiwi-fi/breadcrum.net/pulls/690/comments -X POST -f body=\"The wrapper is still necessary — \\\\`saveMutation.mutate\\\\` expects a typed \\\\`FlagValues\\\\` payload, not a DOM \\\\`Event\\\\`. The wrapper must read and transform \\\\`formRef.current\\\\` form elements into that payload before calling the mutation. Added a comment in the code explaining this.\" -F in_reply_to=2870747446 --jq '.id')",
       "Bash(gh api graphql -f query='mutation { resolveReviewThread\\(input: { threadId: \"\"PRRT_kwDOEzHI585xeJ_i\"\" }\\) { thread { isResolved } } }')",
       "Bash(gh api graphql -f query='mutation { resolveReviewThread\\(input: { threadId: \"\"PRRT_kwDOEzHI585xeMbq\"\" }\\) { thread { isResolved } } }')",
-      "Bash(gh api graphql -f query='mutation { resolveReviewThread\\(input: { threadId: \"\"PRRT_kwDOEzHI585xePKo\"\" }\\) { thread { isResolved } } }')"
+      "Bash(gh api graphql -f query='mutation { resolveReviewThread\\(input: { threadId: \"\"PRRT_kwDOEzHI585xePKo\"\" }\\) { thread { isResolved } } }')",
+      "Read(//Users/bret/Developer/yt-dlp-api/**)",
+      "Bash(npm test)",
+      "Bash(git add .claude/settings.local.json packages/web/client/archives/view/client.js packages/web/client/bookmarks/view/client.js packages/web/client/episodes/view/client.js packages/web/client/search/archives/client.js packages/web/client/search/bookmarks/client.js packages/web/client/search/episodes/client.js)"
     ]
   }
 }

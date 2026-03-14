@@ -12,6 +12,7 @@ import { EpisodeList } from '../components/episode/episode-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { useEpisodes } from '../hooks/useEpisodes.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { mountPage } from '../lib/mount-page.js'
@@ -85,7 +86,7 @@ export const Page = () => {
   const bottomDateValue = formatDateValue(bottomEpisodeDate) || formatDateValue(cursorDate)
 
   const hasPending = Array.isArray(episodes) && episodes.some(episode => (
-    episode?.ready === false && !episode?.error
+    episode?.ready === false && !episode?.error && withinResolvingWindow(episode?.created_at)
   ))
 
   useResolvePolling({

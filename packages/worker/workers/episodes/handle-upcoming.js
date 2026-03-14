@@ -1,10 +1,10 @@
 /**
- * @import { YTDLPMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+ * @import { YTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
  */
 
 /**
  * @param {object} params
- * @param {YTDLPMetadata} params.media
+ * @param {YTDLPDiscoveryMetadata} params.media
  */
 export function upcomingCheck ({
   media

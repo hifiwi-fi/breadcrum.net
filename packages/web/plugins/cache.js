@@ -81,8 +81,8 @@ export default fp(async function (fastify, _) {
    * @param {YTDLPMetaKeyParams} params - The parameters for retrieving the cached value.
    * @returns {Promise<any>} The cached value.
    */
-    async get ({ url, medium, attempt }) {
-      const key = getYTDLPMetaKey({ url, medium, attempt })
+    async get ({ url, medium, attempt, type }) {
+      const key = getYTDLPMetaKey({ url, medium, attempt, type })
       const results = await cache.get(key)
       return results?.item
     },
@@ -92,8 +92,8 @@ export default fp(async function (fastify, _) {
    * @param {any} value - The value to cache.
    * @returns {Promise<void>}
    */
-    set ({ url, medium, attempt }, value) {
-      const key = getYTDLPMetaKey({ url, medium, attempt })
+    set ({ url, medium, attempt, type }, value) {
+      const key = getYTDLPMetaKey({ url, medium, attempt, type })
       return cache.set(key, value, ytdlpTtl)
     },
   })
