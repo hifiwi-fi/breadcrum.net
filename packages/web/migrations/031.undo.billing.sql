@@ -12,4 +12,5 @@ drop table if exists stripe_customers;
 drop trigger if exists set_timestamp_subscriptions on subscriptions;
 drop table if exists subscriptions;
 
+drop type if exists subscription_plan_code;
 drop type if exists subscription_provider;

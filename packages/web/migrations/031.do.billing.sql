@@ -12,13 +12,12 @@ create table subscriptions (
     foreign key (user_id)
       references users(id)
       on delete cascade,
-  constraint subscriptions_user_provider_unique
-    unique (user_id, provider)
+  constraint subscriptions_user_unique
+    unique (user_id)
 );
 
-comment on table subscriptions is 'Provider-generic subscription supertype. One row per user per provider.';
+comment on table subscriptions is 'Provider-generic subscription supertype. One row per user.';
 comment on column subscriptions.provider is 'Subscription provider: stripe or custom';
--- Note: subscriptions_user_provider_unique already covers user_id lookups; no separate index needed.
 
 create trigger set_timestamp_subscriptions
   before update on subscriptions
@@ -50,13 +49,15 @@ create trigger set_timestamp_stripe_customers
   for each row
   execute procedure trigger_set_timestamp();
 
+create type subscription_plan_code as enum ('yearly_paid');
+
 -- Stripe-specific: subscription details from Stripe (1:1 with generic subscriptions row)
 create table stripe_subscriptions (
   id uuid primary key default gen_random_uuid(),
   subscription_id uuid not null,
   stripe_subscription_id text not null,
   status text not null,
-  plan_code text,
+  plan_code subscription_plan_code,
   price_id text,
   current_period_start timestamptz,
   current_period_end timestamptz,
@@ -84,7 +85,7 @@ comment on table stripe_subscriptions is 'Stripe-specific subscription details, 
 comment on column stripe_subscriptions.subscription_id is 'Reference to generic subscriptions table';
 comment on column stripe_subscriptions.stripe_subscription_id is 'Stripe subscription ID (sub_xxx)';
 comment on column stripe_subscriptions.status is 'Stripe subscription status (e.g., active, canceled, trialing, past_due)';
-comment on column stripe_subscriptions.plan_code is 'Stripe-derived internal plan code (lookup key or nickname)';
+comment on column stripe_subscriptions.plan_code is 'Stripe-derived internal plan code';
 comment on column stripe_subscriptions.price_id is 'Stripe price ID';
 comment on column stripe_subscriptions.current_period_start is 'Start of current Stripe billing period (from subscription.items.data[0])';
 comment on column stripe_subscriptions.current_period_end is 'End of current Stripe billing period (from subscription.items.data[0])';
@@ -107,7 +108,7 @@ create table custom_subscriptions (
   id uuid primary key default gen_random_uuid(),
   subscription_id uuid not null,
   status text not null,
-  plan_code text,
+  plan_code subscription_plan_code,
   display_name text not null,
   current_period_start timestamptz,
   current_period_end timestamptz,
@@ -124,7 +125,7 @@ create table custom_subscriptions (
 comment on table custom_subscriptions is 'Custom provider subscription details, 1:1 with generic subscriptions row';
 comment on column custom_subscriptions.subscription_id is 'Reference to generic subscriptions table';
 comment on column custom_subscriptions.status is 'Custom subscription status (e.g., active, canceled)';
-comment on column custom_subscriptions.plan_code is 'Internal plan identifier for custom grants (e.g., yearly_paid)';
+comment on column custom_subscriptions.plan_code is 'Internal plan identifier for custom grants';
 comment on column custom_subscriptions.display_name is 'Human-readable custom label (e.g., Friends & Family, Gift)';
 comment on column custom_subscriptions.current_period_start is 'Start of custom grant period';
 comment on column custom_subscriptions.current_period_end is 'End of custom grant period; NULL means lifetime';
