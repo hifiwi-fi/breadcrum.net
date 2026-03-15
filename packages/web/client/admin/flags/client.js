@@ -3,13 +3,13 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks'
+import { useCallback, useMemo, useRef } from 'preact/hooks'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/preact-query'
 import { defaultFrontendFlags } from '../../../plugins/flags/frontend-flags.js'
 import { defaultBackendFlags } from '../../../plugins/flags/backend-flags.js'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useReload } from '../../hooks/useReload.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 /**
  * @typedef {'boolean' | 'string'} FlagType
@@ -66,11 +66,7 @@ const colorInputFallback = '#ffffff'
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
-  const { reload: reloadFlags, signal: flagsSignal } = useReload()
-
-  const [serverFlags, setServerFlags] = useState(/** @type {FlagValues | null} */(null))
-  const [serverFlagsLoading, setServerFlagsLoading] = useState(false)
-  const [serverFlagsError, setServerFlagsError] = useState(/** @type {Error | null} */(null))
+  const queryClient = useQueryClient()
 
   const formRef = useRef(/** @type {HTMLFormElement | null} */(null))
   const noticeColorFlags = useMemo(
@@ -80,89 +76,76 @@ export const Page = () => {
     []
   )
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function getServerFlags () {
-      setServerFlagsLoading(true)
-      setServerFlagsError(null)
-
+  const { data: serverFlags, isPending: serverFlagsLoading, error: serverFlagsError } = useQuery({
+    queryKey: ['admin-flags', state.apiUrl],
+    queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {
         method: 'get',
-        headers: {
-          'accept-encoding': 'application/json',
-        },
-        signal: controller.signal,
+        headers: { accept: 'application/json' },
+        signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        setServerFlags(body)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-      }
-    }
-
-    if (user) {
-      getServerFlags()
-        .then(() => { console.log('serverFlags done') })
-        .catch(err => { console.error(err); setServerFlagsError(err) })
-        .finally(() => { setServerFlagsLoading(false) })
-    }
-  }, [state.apiUrl, flagsSignal])
-
-  async function handleFlagSave (/** @type {Event} */ev) {
-    ev.preventDefault()
-    setServerFlagsLoading(true)
-    setServerFlagsError(null)
-
-    try {
-      const form = formRef.current
-      if (!form) return
-
-      /** @type {FlagValues} */
-      const payload = {}
-      for (const [flag, flagMeta] of Object.entries(defaultFlags)) {
-        const formElement = form.elements.namedItem(flag)
-        if (!(formElement instanceof HTMLInputElement)) continue
-
-        if (flagMeta.type === 'boolean') {
-          payload[flag] = formElement.checked
-        } else {
-          payload[flag] = formElement.value
-        }
+        return /** @type {FlagValues} */ (await response.json())
       }
 
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+    enabled: Boolean(user),
+  })
+
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {FlagValues} */ payload) => {
       const response = await fetch(`${state.apiUrl}/admin/flags`, {
         method: 'put',
-        headers: {
-          'content-type': 'application/json',
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
-      if (response.ok) {
-        console.log(await response.json())
-      } else {
-        const errorBody = await response.text()
-        console.error(errorBody)
-        setServerFlagsError(new Error(`Server error: ${errorBody}`))
+      if (!response.ok) {
+        throw new Error(`Server error: ${await response.text()}`)
       }
-    } catch (err) {
-      console.error(err)
-      setServerFlagsError(/** @type {Error} */(err))
-    } finally {
-      setServerFlagsLoading(false)
-      reloadFlags()
+
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-flags', state.apiUrl] })
+      queryClient.invalidateQueries({ queryKey: ['flags', state.apiUrl] })
+    },
+  })
+
+  // Wrapper is necessary: reads typed values from DOM form elements before calling mutate
+  const handleFlagSave = useCallback((/** @type {Event} */ev) => {
+    ev.preventDefault()
+
+    const form = formRef.current
+    if (!form) return
+
+    /** @type {FlagValues} */
+    const payload = {}
+    for (const [flag, flagMeta] of Object.entries(defaultFlags)) {
+      const formElement = form.elements.namedItem(flag)
+      if (!(formElement instanceof HTMLInputElement)) continue
+
+      if (flagMeta.type === 'boolean') {
+        payload[flag] = formElement.checked
+      } else {
+        payload[flag] = formElement.value
+      }
     }
-  }
+
+    saveMutation.mutate(payload)
+  }, [saveMutation, formRef])
+
+  const isLoading = serverFlagsLoading || saveMutation.isPending
+  const displayError = serverFlagsError || saveMutation.error
 
   return html`
     <div class="bc-admin-flags">
-      <form ref=${formRef} disabled=${serverFlagsLoading} onsubmit=${handleFlagSave}>
-        <fieldset disabled=${serverFlagsLoading}>
+      <form ref=${formRef} disabled=${isLoading} onsubmit=${handleFlagSave}>
+        <fieldset disabled=${isLoading}>
           <legend class="bc-admin-flags-legend">Admin flags</legend>
-          ${serverFlagsLoading ? html`<p class="bc-admin-flags-status">loading...</p>` : null}
+          ${isLoading ? html`<p class="bc-admin-flags-status">loading...</p>` : null}
           <dl class="bc-admin-flags-list">
             ${Object.entries(defaultFlags)
               .filter(([flag]) => !noticeColorFlags.has(flag))
@@ -178,7 +161,7 @@ export const Page = () => {
                     flag=${flag}
                     flagMeta=${flagMeta}
                     serverValue=${serverFlags?.[flag]}
-                    disabled=${serverFlagsLoading}
+                    disabled=${isLoading}
                     colorFlag=${noticeConfig.colorFlag}
                     colorLabel=${noticeConfig.colorLabel}
                     colorFlagMeta=${colorFlagMeta}
@@ -190,7 +173,7 @@ export const Page = () => {
                   flag=${flag}
                   flagMeta=${flagMeta}
                   serverValue=${serverFlags?.[flag]}
-                  disabled=${serverFlagsLoading}
+                  disabled=${isLoading}
                 />`
               })
             }
@@ -200,7 +183,7 @@ export const Page = () => {
               <input name="submit-button" type="submit" />
             </div>
           </div>
-          ${serverFlagsError ? html`<p class="bc-admin-flags-error">${/** @type {Error} */(serverFlagsError).message}</p>` : null}
+          ${displayError ? html`<p class="bc-admin-flags-error">${/** @type {Error} */(displayError).message}</p>` : null}
       </fieldset>
     </form>
     </div>
@@ -405,9 +388,4 @@ function getNoticeConfig (flag) {
   return null
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

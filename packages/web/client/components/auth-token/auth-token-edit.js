@@ -108,7 +108,7 @@ export const AuthTokenEdit = ({
           <div>
             <label>
               protect:
-              <input class='protect-checkbox' type="checkbox" name="protect" checked="${t?.protect}" />
+              <input class='protect-checkbox' type="checkbox" name="protect" checked=${t?.protect} />
             </label>
             <span class="bc-help-text">
               Protected tokens will not be deleted in bulk cleanup operations.
@@ -118,16 +118,16 @@ export const AuthTokenEdit = ({
           <div class="bc-auth-token-edit-submit-line">
             <div class="button-cluster">
               ${onSave ? html`<span><input name="submit-button" type="submit" /></span>` : null}
-              ${onCancelEdit ? html`<span><button type="button" onClick="${onCancelEdit}">Cancel</button></span>` : null}
+              ${onCancelEdit ? html`<span><button type="button" onClick=${onCancelEdit}>Cancel</button></span>` : null}
             </div>
             <div class="button-cluster">
               ${onDeleteAuthToken
                 ? html`${deleteConfirm
                     ? html`
-                          <span><button type="button" onClick="${handleCancelDelete}">Cancel</button></span>
-                          <span><button type="button" onClick="${handleDeleteAuthToken}">Destroy</button></span>`
+                          <span><button type="button" onClick=${handleCancelDelete}>Cancel</button></span>
+                          <span><button type="button" onClick=${handleDeleteAuthToken}>Destroy</button></span>`
                     : html`
-                      <span><button type="button" disabled="${t?.is_current}" onClick="${handleInitiateDelete}">Delete</button></span>`}
+                      <span><button type="button" disabled=${t?.is_current} onClick=${handleInitiateDelete}>Delete</button></span>`}
                   `
                 : null
               }

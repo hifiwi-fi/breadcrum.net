@@ -1,11 +1,12 @@
 /// <reference lib="dom" />
 
 /** @import { SchemaTypeAdminUserReadClient } from '../../routes/api/admin/users/schemas/schema-admin-user-read.js' */
+/** @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query' */
 
-import { useEffect, useState } from 'preact/hooks'
+import { useCallback, useMemo } from 'preact/hooks'
+import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useLSP } from './useLSP.js'
-import { useReload } from './useReload.js'
 import { useWindow } from './useWindow.js'
 
 /**
@@ -17,71 +18,53 @@ export function useAdminUser (userId) {
   const state = useLSP()
   const window = useWindow()
 
-  const [user, setUser] = useState(/** @type {SchemaTypeAdminUserReadClient | null} */(null))
-  const [userLoading, setUserLoading] = useState(false)
-  const [userError, setUserError] = useState(/** @type {Error | null} */(null))
+  const queryKey = useMemo(() => ([
+    'admin-user',
+    userId,
+    state.apiUrl,
+  ]), [userId, state.apiUrl])
 
-  const { reload: reloadAdminUser, signal: adminUserReloadSignal } = useReload()
+  /** @type {UseQueryResult<SchemaTypeAdminUserReadClient | null, Error>} */
+  const adminUserQuery = useTanstackQuery(/** @type {UseQueryOptions<SchemaTypeAdminUserReadClient | null, Error>} */ ({
+    queryKey,
+    enabled: Boolean(activeUser && userId),
+    /**
+     * @param {{ signal: AbortSignal }} context
+     * @returns {Promise<SchemaTypeAdminUserReadClient | null>}
+     */
+    queryFn: async ({ signal }) => {
+      const response = await fetch(`${state.apiUrl}/admin/users/${userId}`, {
+        method: 'get',
+        headers: {
+          accept: 'application/json',
+        },
+        signal,
+      })
 
-  // Load user
-  useEffect(() => {
-    async function getUser () {
-      if (!userId) return
-
-      setUserLoading(true)
-      setUserError(null)
-
-      const requestParams = new URLSearchParams()
-
-      try {
-        const response = await fetch(`${state.apiUrl}/admin/users/${userId}?${requestParams.toString()}`, {
-          method: 'get',
-          headers: {
-            'accept-encoding': 'application/json',
-          },
-        })
-
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          const body = await response.json()
-          setUser(body)
-        } else {
-          setUser(null)
-          throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-        }
-      } catch (err) {
-        console.error(err)
-        setUserError(/** @type {Error} */(err))
-      } finally {
-        setUserLoading(false)
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        return response.json()
       }
-    }
 
-    if (activeUser && userId) {
-      getUser()
-        .then(() => { console.log('user done') })
-        .catch(err => {
-          console.error(err)
-          setUserError(/** @type {Error} */(err))
-        })
-        .finally(() => { setUserLoading(false) })
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     }
-  }, [userId, state.apiUrl, adminUserReloadSignal, activeUser?.id])
+  }))
+
+  const { data: user, error: userError, isPending: userLoading } = adminUserQuery
 
   /**
    * Handle user deletion by redirecting to users list
    */
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (user && window) {
       const beforeString = new Date(user.created_at).valueOf()
       window.location.replace(`/admin/users/?after=${beforeString}`)
     }
-  }
+  }, [user, window])
 
   return {
     userLoading,
-    userError,
-    user,
-    reloadAdminUser,
+    userError: userError || null,
+    user: user ?? null,
     handleDelete
   }
 }

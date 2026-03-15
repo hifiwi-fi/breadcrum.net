@@ -125,7 +125,7 @@ export const FeedEdit = ({
           <div>
             <label>
               explicit:
-              <input type="checkbox" name="explicit" checked="${f?.explicit}" />
+              <input type="checkbox" name="explicit" checked=${f?.explicit} />
             </label>
           </div>
 

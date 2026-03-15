@@ -8,6 +8,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
+import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { FeedDisplay } from './feed-display.js'
@@ -36,21 +37,25 @@ export const FeedHeader = ({ feed, reload }) => {
     setEditing(false)
   }, [setEditing])
 
-  const handleSave = useCallback(async (/** @type {FeedUpdateData} */newFeed) => {
-    const payload = diffUpdate(feed, newFeed)
+  const saveMutation = useMutation({
+    mutationFn: async (/** @type {FeedUpdateData} */ newFeed) => {
+      const payload = diffUpdate(feed, newFeed)
 
-    const endpoint = `${state.apiUrl}/feeds/${feed.id}`
-    await fetch(endpoint, {
-      method: 'put',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+      const response = await fetch(`${state.apiUrl}/feeds/${feed.id}`, {
+        method: 'put',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-    reload()
-    setEditing(false)
-  }, [feed, state.apiUrl, reload, setEditing])
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
+      }
+    },
+    onSuccess: () => {
+      setEditing(false)
+      reload()
+    },
+  })
 
   const onDeleteFeed = useCallback(async () => {
     // TODO implement this when feed CRUD is added
@@ -63,7 +68,7 @@ export const FeedHeader = ({ feed, reload }) => {
       : editing
         ? tc(FeedEdit, {
             feed,
-            onSave: handleSave,
+            onSave: saveMutation.mutateAsync,
             onDeleteFeed,
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${feed?.id}</code>`,
