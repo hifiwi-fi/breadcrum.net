@@ -27,7 +27,8 @@
       "Bash(xargs:*)",
       "Bash(npm test)",
       "Bash(pnpm:*)",
-      "Read(/Users/bret/Developer/yt-dlp-api/**)"
+      "Read(/Users/bret/Developer/yt-dlp-api/**)",
+      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)"
     ]
   }
 }
