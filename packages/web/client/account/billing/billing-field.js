@@ -119,7 +119,9 @@ export const BillingField = () => {
     ? isCustom && displayName
       ? `Paid (${displayName})`
       : 'Paid (yearly)'
-    : 'Free'
+    : isPendingSettlement
+      ? 'Paid (pending settlement)'
+      : 'Free'
 
   return html`
     <dt>Billing</dt>

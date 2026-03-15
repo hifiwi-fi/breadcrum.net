@@ -558,6 +558,33 @@ Outdated thread: bcomnes "Maybe move this to a shared plugin in resources."
 
 ---
 
+## PR #689 new Copilot threads (2026-03-15)
+
+Three new Copilot review comments posted today. All are non-outdated and initially unresolved.
+
+### Thread 1 — `billing-field.js:48` — sync response not checked on checkout return
+
+Copilot: The `/billing/sync` fetch result isn't checked; a 4xx/5xx response still falls through to `refetch()` and shows "Subscription activated." even if sync failed.
+
+**Assessment:** Not actionable. The comment above the call explicitly marks this as best-effort (`// Best-effort sync; the webhook will reconcile if this times out.`). Showing "Subscription activated." is correct because Stripe confirmed the subscription — local sync failure is transient and self-healing via webhook. Gating the notice on `response.ok` would produce confusing UX when sync is slow or temporarily unavailable. No code change needed; respond and resolve.
+- [x] Respond to thread explaining best-effort design intent; resolve
+
+### Thread 2 — `useQuery.js:38` — `new URL(url)` throws for relative URLs
+
+Copilot: `replaceState` (and `pushState`) call `new URL(url)` which throws for relative URLs. Suggestion: use `new URL(url, window.location.href)`.
+
+**Assessment:** Valid defensive fix. All current callers pass absolute URLs (built with `window.location.origin`), so it's not a live bug, but the API has an invisible precondition. Applying `new URL(url, window.location.href)` makes both helpers robust to relative URLs with no downside.
+- [x] Fix `useQuery.js` `pushState` and `replaceState` to use `new URL(url, window.location.href)`
+- [x] Respond and resolve thread
+
+### Thread 3 — `billing-field.js:122` — `planLabel` shows "Free" during pending settlement
+
+Copilot: `planLabel` is derived from `billing.active` only. When `active === false` but a Stripe subscription is pending settlement, the UI shows "Plan: Free" alongside "Status: Pending settlement" — contradictory.
+
+**Assessment:** Valid UX bug. Fix: derive plan label from `isPendingSettlement` to show "Paid (pending settlement)" instead of "Free" in that state.
+- [x] Fix `billing-field.js`: add `isPendingSettlement` branch to `planLabel`
+- [x] Respond and resolve thread
+
 ## Tooling changes (2026-03-15)
 
 ### Replace `auto-changelog` + `gh-release` with `releasearoni` ✅ DONE

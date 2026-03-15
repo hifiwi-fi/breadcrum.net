@@ -26,13 +26,13 @@ export function useQuery () {
   const query = querySignal.value
 
   const pushState = useCallback(/** @param {string} url */ (url) => {
-    const searchParams = (new URL(url)).search
+    const searchParams = (new URL(url, window?.location.href)).search
     querySignal.value = new URLSearchParams(searchParams)
     window?.history.pushState({}, '', url)
   }, [window])
 
   const replaceState = useCallback(/** @param {string} url */ (url) => {
-    const searchParams = (new URL(url)).search
+    const searchParams = (new URL(url, window?.location.href)).search
     querySignal.value = new URLSearchParams(searchParams)
     window?.history.replaceState({}, '', url)
   }, [window])
