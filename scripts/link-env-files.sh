@@ -3,8 +3,8 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MAIN_WORKTREE="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Main worktree is always the first entry in `git worktree list`
+MAIN_WORKTREE="$(git worktree list | head -1 | awk '{print $1}')"
 
 ENV_FILES=(
   "packages/web/.env"
@@ -40,6 +40,6 @@ while IFS= read -r line; do
       ln -s "$src" "$dst"
     fi
   done
-done < <(git -C "$MAIN_WORKTREE" worktree list)
+done < <(git worktree list)
 
 echo "Done."
