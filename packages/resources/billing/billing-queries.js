@@ -101,53 +101,6 @@ export async function getUserBillingProfile ({ pg, userId }) {
 }
 
 // ---------------------------------------------------------------------------
-// Generic subscriptions
-// ---------------------------------------------------------------------------
-
-/**
- * @typedef {object} SubscriptionUpsert
- * @property {string} userId
- * @property {'stripe' | 'custom'} provider
- */
-
-/**
- * Upserts a generic subscription row.
- *
- * Low-level single-table utility. For Stripe sync, prefer the atomic
- * `syncStripeSubscriptionToDb` CTE which writes both supertype and subtype
- * in one query. For custom subscriptions, prefer `createCustomSubscription`.
- *
- * Uses user_id as the conflict target so each user has at most one
- * active subscription provider row.
- *
- * @param {{ pg: PgClient, subscription: SubscriptionUpsert }} params
- * @returns {Promise<string>} The subscription id
- */
-export async function upsertSubscription ({ pg, subscription }) {
-  const query = SQL`
-    insert into subscriptions (
-      user_id,
-      provider
-    ) values (
-      ${subscription.userId},
-      ${subscription.provider}
-    )
-    on conflict (user_id)
-    do update set
-      provider = excluded.provider
-    returning id
-  `
-
-  /** @type {QueryResult<{ id: string }>} */
-  const results = await pg.query(query)
-  const row = results.rows[0]
-  if (!row?.id) {
-    throw new Error('Failed to upsert subscription')
-  }
-  return row.id
-}
-
-// ---------------------------------------------------------------------------
 // Stripe subscriptions (provider-specific details)
 // ---------------------------------------------------------------------------
 // Low-level upsertStripeSubscription (two-step, non-atomic) has been removed.

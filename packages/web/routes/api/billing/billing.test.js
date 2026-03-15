@@ -103,6 +103,34 @@ await suite('billing view model', async () => {
     assert.equal(isSubscriptionActive(stripeView, new Date('2026-06-01T00:00:00.000Z')), true)
   })
 
+  await test('Stripe trialing subscription also requires settled invoice', async () => {
+    const stripeView = new StripeSubscriptionView({
+      id: 'sub-4',
+      user_id: 'user-4',
+      provider: 'stripe',
+      status: 'trialing',
+      plan_code: 'yearly_paid',
+      display_name: null,
+      current_period_start: new Date('2026-01-01T00:00:00.000Z'),
+      current_period_end: new Date('2027-01-01T00:00:00.000Z'),
+      cancel_at: null,
+      cancel_at_period_end: false,
+      trial_end: new Date('2026-02-01T00:00:00.000Z'),
+      payment_method_brand: null,
+      payment_method_last4: null,
+      latest_invoice_status: 'open',
+      latest_invoice_paid_at: null,
+      latest_invoice_settled: false,
+      created_at: new Date('2026-01-01T00:00:00.000Z'),
+      updated_at: new Date('2026-01-02T00:00:00.000Z'),
+    })
+
+    assert.equal(isSubscriptionActive(stripeView, new Date('2026-01-15T00:00:00.000Z')), false, 'trialing with unsettled invoice is not active')
+
+    stripeView.latest_invoice_settled = true
+    assert.equal(isSubscriptionActive(stripeView, new Date('2026-01-15T00:00:00.000Z')), true, 'trialing with settled invoice is active')
+  })
+
   await test('getMonthlyWindow returns UTC calendar month boundaries', async () => {
     const now = new Date('2026-02-15T12:34:56.000Z')
     const { windowStart, windowEnd } = getMonthlyWindow(now)

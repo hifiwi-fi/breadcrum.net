@@ -192,19 +192,19 @@ export async function insertStripeCustomer (app, t, { userId, stripeCustomerId =
  * @param {Record<string, unknown>} body
  */
 export function assertBillingShape (assert, body) {
-  assert.strictEqual(typeof body.active, 'boolean', 'active should be boolean')
+  assert.strictEqual(typeof body['active'], 'boolean', 'active should be boolean')
   assert.ok('subscription' in body, 'Should have subscription field')
   assert.ok('usage' in body, 'Should have usage field')
 
-  const sub = /** @type {Record<string, unknown>} */ (body.subscription)
+  const sub = /** @type {Record<string, unknown>} */ (body['subscription'])
   assert.ok('provider' in sub, 'subscription should have provider')
   assert.ok('status' in sub, 'subscription should have status')
   assert.ok('current_period_end' in sub, 'subscription should have current_period_end')
   assert.ok('cancel_at_period_end' in sub, 'subscription should have cancel_at_period_end')
 
-  const usage = /** @type {Record<string, unknown>} */ (body.usage)
-  assert.strictEqual(typeof usage.bookmarks_this_month, 'number', 'usage.bookmarks_this_month should be number')
+  const usage = /** @type {Record<string, unknown>} */ (body['usage'])
+  assert.strictEqual(typeof usage['bookmarks_this_month'], 'number', 'usage.bookmarks_this_month should be number')
   assert.ok('bookmarks_limit' in usage, 'usage should have bookmarks_limit')
-  assert.ok(usage.window_start, 'usage should have window_start')
-  assert.ok(usage.window_end, 'usage should have window_end')
+  assert.ok(usage['window_start'], 'usage should have window_start')
+  assert.ok(usage['window_end'], 'usage should have window_end')
 }

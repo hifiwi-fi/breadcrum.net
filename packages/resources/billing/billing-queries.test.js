@@ -7,7 +7,6 @@ import {
   getStripeCustomerId,
   getUserIdByStripeCustomerId,
   upsertStripeCustomer,
-  upsertSubscription,
   syncStripeSubscriptionToDb,
   createCustomSubscription,
   cancelStaleStripeSubscription,
@@ -66,20 +65,6 @@ describe('billing-queries', () => {
     })
 
     assert.equal(customerId, 'cus_saved')
-  })
-
-  it('upsertSubscription returns subscription id from upsert result', async () => {
-    const pg = mockPg(async () => ({ rows: [{ id: 'sub-1' }] }))
-
-    const subscriptionId = await upsertSubscription({
-      pg,
-      subscription: {
-        userId: 'user-1',
-        provider: 'stripe',
-      },
-    })
-
-    assert.equal(subscriptionId, 'sub-1')
   })
 
   it('syncStripeSubscriptionToDb issues one atomic query', async () => {

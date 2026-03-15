@@ -39,7 +39,11 @@ export const BillingField = () => {
     const load = async () => {
       try {
         if (billingParam === 'success') {
-          await fetch(`${state.apiUrl}/billing/sync`, { method: 'post' })
+          // Best-effort sync; the webhook will reconcile if this times out.
+          await fetch(`${state.apiUrl}/billing/sync`, {
+            method: 'post',
+            signal: AbortSignal.timeout(5000),
+          })
           await refetch()
           setNotice('Subscription activated.')
         } else if (billingParam === 'cancel') {

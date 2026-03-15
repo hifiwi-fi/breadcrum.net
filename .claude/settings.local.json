@@ -26,7 +26,9 @@
       "Bash(xargs cat:*)",
       "Bash(npm test)",
       "Bash(pnpm:*)",
-      "Read(/Users/bret/Developer/yt-dlp-api/**)"
+      "Read(/Users/bret/Developer/yt-dlp-api/**)",
+      "Bash(npm view releasearoni versions --json)",
+      "Bash(grep -r \"c8\" /Users/bret/Developer/breadcrum.net/packages/*/package.json)"
     ]
   }
 }

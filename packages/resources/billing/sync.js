@@ -38,8 +38,8 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
   })
 
   if (!userId) {
-    // Stripe can have customers that predate the integration or from test scenarios.
-    // Log a warning so unmapped customer IDs surface in logs rather than disappearing silently.
+    // Stripe can have customers that predate the integration or come from test scenarios.
+    // No local user mapping exists; skip sync silently.
     return
   }
 
@@ -113,6 +113,6 @@ export async function syncStripeSubscription ({ stripe, pg, customerId }) {
  * @returns {Date | null}
  */
 function toDate (epochSeconds) {
-  if (!epochSeconds) return null
+  if (epochSeconds == null) return null
   return new Date(epochSeconds * 1000)
 }

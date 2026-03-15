@@ -23,7 +23,8 @@ export const billingEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
 
 /**
  * Billing provider client. Initializes Stripe using STRIPE_SECRET_KEY.
- * Route-level access is controlled by the billing_enabled backend feature flag.
+ * Route-level access is controlled by the billing_enabled feature flag (a frontend flag,
+ * readable by backend routes via getFlags({ frontend: true })).
  */
 export default fp(async function (fastify, _) {
   /** @type {BillingClient} */

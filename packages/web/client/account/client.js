@@ -15,6 +15,7 @@ import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 import { PasskeysField } from './passkeys/passkeys-field.js'
 import { BillingField } from './billing/billing-field.js'
+import { QueryProvider } from '../lib/query-provider.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -52,6 +53,6 @@ export const Page = () => {
 if (typeof window !== 'undefined') {
   const container = document.querySelector('.bc-main')
   if (container) {
-    render(html`<${Page}/>`, container)
+    render(html`<${QueryProvider}><${Page} /><//>`, container)
   }
 }

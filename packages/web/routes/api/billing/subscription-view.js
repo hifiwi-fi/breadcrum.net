@@ -134,7 +134,9 @@ export class StripeSubscriptionView extends SubscriptionView {
    * @returns {boolean}
    */
   isActive (now = new Date()) {
-    if (this.status === 'active' && !this.latest_invoice_settled) return false
+    // Settlement check applies to all active-ish statuses (active, trialing).
+    // The base class permits both; we require a settled invoice for either.
+    if (!this.latest_invoice_settled) return false
     return super.isActive(now)
   }
 }

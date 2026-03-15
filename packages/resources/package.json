@@ -6,7 +6,7 @@
   "scripts": {
     "test": "run-s test:*",
     "test:eslint": "eslint .",
-    "test:node": "c8 node --test --test-reporter spec",
+    "test:node": "node --experimental-test-coverage --test --test-reporter spec",
     "test:tsc": "tsc"
   },
   "dependencies": {
@@ -28,17 +28,10 @@
     "@types/node": "catalog:",
     "@types/pg": "catalog:",
     "@voxpelli/tsconfig": "catalog:",
-    "c8": "catalog:",
     "eslint": "catalog:",
     "fastify": "catalog:",
     "neostandard": "catalog:",
     "npm-run-all2": "catalog:",
     "typescript": "catalog:"
-  },
-  "c8": {
-    "reporter": [
-      "lcov",
-      "text"
-    ]
   }
 }

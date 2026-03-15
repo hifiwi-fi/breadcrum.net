@@ -293,6 +293,70 @@ Items surfaced from inline PR review. Resolved items marked ✅.
 - [x] **Admin custom subscription schema audit** (`schema-admin-subscription-update.js`): Addressed. Removed `status`/`plan_code` from request body schema and now set canonical values server-side.
 - [x] **Helmet plugin usage audit** (`plugins/helmet.js`): Verified in codebase. Plugin is used (`static.js` depends on `helmet`).
 
+## PR #689 remaining unresolved Copilot threads (2026-03-14)
+
+Three unresolved, non-outdated Copilot threads remain on the PR. All three are valid.
+
+### Thread 1 — `flags/client.js:133` — number flag NaN / empty-input bug
+`Number(formElement.value)` at line 133 produces `NaN` for non-numeric input and `0` for empty string. `JSON.stringify` serializes `NaN` as `null`, silently resetting the flag. `TypeMap` also renders number flags as a plain text `<input>` with no `type="number"`. Fix: use `type="number"` in `TypeMap` for number flags, and add `Number.isFinite` validation in `handleFlagSave` before sending.
+- [x] Fix `TypeMap` to render `type="number"` for number flags
+- [x] Add `Number.isFinite` validation in `handleFlagSave` for number flags
+
+### Thread 2 — `sync.js:42` — comment claims logging that does not happen
+Comment reads: "Log a warning so unmapped customer IDs surface in logs rather than disappearing silently." But no log call exists; the function doesn't receive a logger. Fix: update comment to remove the inaccurate logging claim.
+- [x] Update comment in `sync.js:40-43` to remove "Log a warning" claim
+
+### Thread 3 — `billing.js:26` — comment says "backend feature flag" for a frontend flag
+The plugin JSDoc says: "Route-level access is controlled by the billing_enabled backend feature flag." But `billing_enabled` is a frontend flag, read by backend routes via `getFlags({ frontend: true })`. Fix: clarify wording.
+- [x] Update `billing.js` plugin comment to say "frontend flag" not "backend feature flag"
+
+## PR #689 post-review action items (2026-03-14)
+
+Surfaced from `/review` pass on the subscriptions PR. Items below ordered by severity.
+
+### HIGH
+
+#### `subscription-view.js:137` — settlement check misses `trialing` status
+`StripeSubscriptionView.isActive()` only blocks access when `status === 'active' && !latest_invoice_settled`. The base class `isActive()` also allows `'trialing'`, so a trialing subscription with `latest_invoice_settled: false` would still grant paid access. Fix: remove the `=== 'active'` guard so the settlement check applies regardless of status.
+- [x] Fix `subscription-view.js`: remove `this.status === 'active'` condition from settlement guard
+- [x] Add test: `trialing` + unsettled invoice should return `isActive() === false`
+
+#### `put-bookmarks.js` — no tests for quota enforcement / 402 path
+The primary monetization enforcement block has zero test coverage. Required cases:
+- Free user at limit → 402
+- Free user below limit → creates bookmark
+- Subscribed user at limit → creates bookmark (bypasses quota)
+- `subscriptions_required: false` → no quota regardless of count
+- [x] Add integration tests for quota enforcement in `put-bookmarks`
+
+#### `delete-admin-user.js` — no tests for Stripe cleanup on user deletion
+The Stripe subscription cancellation + customer deletion path is untested. Edge cases:
+- User with no Stripe customer → deletes fine
+- Stripe customer with already-canceled subscriptions → skips cancel, deletes
+- Stripe returning `resource_missing` → treated as clean state, deletion proceeds
+- Stripe error (non-missing) → blocks deletion, returns error
+- [x] Add integration tests for admin user deletion Stripe cleanup
+
+### MEDIUM
+
+#### `sync.js:116` — `toDate(0)` returns null due to falsy coercion
+`if (!epochSeconds) return null` coerces `0` (epoch zero) to null. Change to `if (epochSeconds == null) return null`.
+- [x] Fix `toDate()` in `sync.js`
+
+#### `billing-field.js` — no timeout on success-return sync fetch
+The `await fetch(.../billing/sync)` in the checkout success return `useEffect` has no `AbortSignal` or timeout. If Stripe is slow, the page hangs. The webhook will eventually sync anyway.
+- [x] Add `AbortSignal.timeout()` to success-return sync fetch in `billing-field.js`
+
+#### `billing-queries.js:126` — dead exported `upsertSubscription`
+All production write paths use the atomic CTEs. `upsertSubscription` is exported but never called and is a footgun for future callers. Remove export or delete it.
+- [x] Remove or unexport `upsertSubscription` from `billing-queries.js`
+
+### LOW (deferred)
+
+- `sync.js:46` — `subscriptions.list()` has no status filter; relies on Stripe dashboard "Limit to one subscription" setting. Logic is correct if that setting is on; document the dependency.
+- `put-bookmarks.js:177` — non-atomic quota check vs. insert; concurrent burst can slightly exceed monthly cap. Documented v1 tradeoff.
+- `get-admin-users-query.js` — `DISTINCT ON (user_id)` redundant after migration 031 uniqueness constraint; harmless dead complexity.
+
 ## Next steps (short-term)
 1. Expand billing route integration coverage (checkout/portal/sync/webhook) now that TODO placeholders are removed.
 2. Finalize Stripe dashboard payment-method configuration and persistent webhook endpoints.
@@ -491,3 +555,28 @@ GitHub Advanced Security: `body.url.startsWith('https://checkout.stripe.com')` m
 Outdated thread: bcomnes "Maybe move this to a shared plugin in resources."
 
 **Status:** Deferred for post-launch cleanup. Centralizing in `@breadcrum/resources` is a good long-term goal but not blocking production.
+
+---
+
+## Tooling changes (2026-03-15)
+
+### Replace `auto-changelog` + `gh-release` with `releasearoni` ✅ DONE
+
+- Removed `auto-changelog` and `gh-release` from root `devDependencies`
+- Added `releasearoni: "^0.1.0"`
+- Replaced release scripts with:
+  - `"version": "releasearoni version --template keepachangelog --breaking-pattern 'BREAKING CHANGE:'"` — generates changelog + stages `CHANGELOG.md`
+  - `"prepublishOnly"` / `"release"`: `"git push --follow-tags && releasearoni -y"` — creates GitHub release from changelog
+- Removed `version:changelog` and `version:git` sub-scripts (now handled by `releasearoni version`)
+
+### Replace `c8` with Node built-in test coverage (`--experimental-test-coverage`) ✅ DONE
+
+`c8@10.1.3` pulled in `yargs@17.7.2` which uses `require()` in an ESM context, causing a hard crash on Node ≥25.
+
+- Removed `c8` from `pnpm-workspace.yaml` catalog
+- Removed `c8` from `devDependencies` and removed `"c8"` config blocks in all three `package.json` files (`web`, `worker`, `resources`)
+- Updated `test:node` scripts to use `--experimental-test-coverage` plus multi-reporter flags:
+  - `@breadcrum/resources`: `node --experimental-test-coverage --test --test-reporter spec`
+  - `@breadcrum/web`: `node --experimental-test-coverage --test --test-reporter spec --test-reporter-destination stdout --test-reporter lcov --test-reporter-destination coverage/lcov.info --test-force-exit --test-concurrency 1`
+  - `@breadcrum/worker`: `node --experimental-test-coverage --test --test-reporter spec --test-reporter-destination stdout --test-reporter lcov --test-reporter-destination coverage/lcov.info --test-force-exit --test-concurrency 1`
+- `coverage/lcov.info` output paths match what the Coveralls CI workflow (`tests.yml`) expects at `packages/web/coverage/lcov.info` and `packages/worker/coverage/lcov.info`

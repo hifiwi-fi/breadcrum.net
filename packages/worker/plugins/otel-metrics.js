@@ -140,7 +140,6 @@ export default fp(async function (fastify, _) {
       unit: 's',
     }),
 
-
     // Stale resolution cleanup metrics
     staleBookmarksCleanedCounter: meter.createCounter('breadcrum_stale_bookmarks_cleaned_total', {
       description: 'The number of stale bookmarks marked done by cleanup job',

@@ -130,7 +130,11 @@ export const Page = () => {
         if (flagMeta.type === 'boolean') {
           payload[flag] = formElement.checked
         } else if (flagMeta.type === 'number') {
-          payload[flag] = Number(formElement.value)
+          const parsed = Number(formElement.value)
+          if (!Number.isFinite(parsed)) {
+            throw new Error(`Invalid value for numeric flag "${flag}": "${formElement.value}"`)
+          }
+          payload[flag] = parsed
         } else {
           payload[flag] = formElement.value
         }
@@ -373,6 +377,9 @@ const TypeMap = ({ type, disabled, flag, serverValue, defaultValue }) => {
   switch (type) {
     case 'boolean': {
       return html`<input class="bc-admin-flags-checkbox" id=${flag} disabled=${disabled} type='checkbox' name=${flag} checked=${serverValue ?? defaultValue} />`
+    }
+    case 'number': {
+      return html`<input class="bc-admin-flags-input" id=${flag} disabled=${disabled} type='number' name=${flag} defaultValue=${serverValue ?? defaultValue} />`
     }
     default: {
       return html`<input class="bc-admin-flags-input" id=${flag} disabled=${disabled} name=${flag} defaultValue=${serverValue ?? defaultValue} />`

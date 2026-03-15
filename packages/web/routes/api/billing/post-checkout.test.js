@@ -93,8 +93,8 @@ await suite('POST /api/billing/checkout', async () => {
     }
 
     const app = await build(t, {
-      STRIPE_SECRET_KEY: process.env['STRIPE_SECRET_KEY'],
-      STRIPE_WEBHOOK_SECRET: process.env['STRIPE_WEBHOOK_SECRET'],
+      STRIPE_SECRET_KEY: /** @type {string} */ (process.env['STRIPE_SECRET_KEY']),
+      STRIPE_WEBHOOK_SECRET: /** @type {string} */ (process.env['STRIPE_WEBHOOK_SECRET']),
     })
 
     await t.test('live Stripe checkout', async (t) => {
