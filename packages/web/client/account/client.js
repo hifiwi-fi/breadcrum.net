@@ -2,9 +2,11 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
+ * @import { TypeUserRead } from '../../routes/api/user/schemas/schema-user-read.js'
  */
 
 import { html } from 'htm/preact'
+import { useCallback, useMemo } from 'preact/hooks'
 import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
@@ -23,7 +25,19 @@ export const Page = () => {
   const state = useLSP()
   const queryClient = useQueryClient()
 
-  const userQueryKey = ['user', state.apiUrl]
+  const userQueryKey = useMemo(() => ['user', state.apiUrl], [state.apiUrl])
+
+  const handleUsernameSuccess = useCallback((/** @type {{ data: TypeUserRead }} */ result) => {
+    queryClient.setQueryData(userQueryKey, result.data)
+  }, [queryClient, userQueryKey])
+
+  const handleEmailSuccess = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: userQueryKey })
+  }, [queryClient, userQueryKey])
+
+  const handleNewsletterSuccess = useCallback((/** @type {{ data: TypeUserRead }} */ result) => {
+    queryClient.setQueryData(userQueryKey, result.data)
+  }, [queryClient, userQueryKey])
 
   return html`
     <div>
@@ -31,17 +45,17 @@ export const Page = () => {
         <${DisabledField} user=${user} />
         <${UsernameField}
           user=${user}
-          onSuccess=${(result) => queryClient.setQueryData(userQueryKey, result.data)}
+          onSuccess=${handleUsernameSuccess}
         />
         <${EmailField}
           user=${user}
-          onSuccess=${() => queryClient.invalidateQueries({ queryKey: userQueryKey })}
+          onSuccess=${handleEmailSuccess}
         />
         <${PasswordField} />
         <${PasskeysField} />
         <${NewsletterField}
           user=${user}
-          onSuccess=${() => queryClient.invalidateQueries({ queryKey: userQueryKey })}
+          onSuccess=${handleNewsletterSuccess}
         />
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>

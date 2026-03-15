@@ -9,7 +9,7 @@ import { useUser } from '../../hooks/useUser.js'
 // @ts-ignore - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
-import { useSearchParamsAll } from '../../hooks/useSearchParms.js'
+import { useSearchParamsAll } from '../../hooks/useSearchParams.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'

@@ -24,7 +24,7 @@
       "Bash(python3:*)",
       "Bash(npx tsc:*)",
       "Bash(ls:*)",
-      "Bash(xargs cat:*)",
+      "Bash(xargs:*)",
       "Bash(npm test)",
       "Bash(pnpm:*)",
       "Read(/Users/bret/Developer/yt-dlp-api/**)"

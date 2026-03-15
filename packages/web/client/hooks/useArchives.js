@@ -5,10 +5,10 @@
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 
-import { useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useEffect, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useSearchParamsAll, useSearchParams } from './useSearchParms.js'
+import { useSearchParamsAll, useSearchParams } from './useSearchParams.js'
 import { useLSP } from './useLSP.js'
 
 /**
@@ -79,14 +79,6 @@ export function useArchives (options = {}) {
         const body = await response.json()
         const top = Boolean(body?.pagination?.top)
 
-        if (top) {
-          const hasBefore = pageParams.get('before')
-          const hasAfter = pageParams.get('after')
-          if (hasBefore || hasAfter) {
-            setParams({ before: null, after: null })
-          }
-        }
-
         return {
           archives: body?.data ?? null,
           before: body?.pagination?.before ? new Date(body?.pagination?.before) : null,
@@ -100,6 +92,15 @@ export function useArchives (options = {}) {
   }))
 
   const { data, error, isPending, refetch } = archivesQuery
+
+  // Cursor cleanup: when the server signals we're at the first page, remove stale
+  // before/after params from the URL. Runs in an effect (not queryFn) to keep
+  // queryFn pure. setParams is idempotent — no-op if params already absent.
+  useEffect(() => {
+    if (data?.top) {
+      setParams({ before: null, after: null })
+    }
+  }, [data, setParams])
 
   const reloadArchives = useCallback(async () => {
     await refetch()

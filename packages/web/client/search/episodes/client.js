@@ -4,13 +4,13 @@
 /** @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js' */
 
 import { html } from 'htm/preact'
-import { useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useEffect, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../../lib/typed-component.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useUser } from '../../hooks/useUser.js'
-import { useSearchParams } from '../../hooks/useSearchParms.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
@@ -67,15 +67,20 @@ export const Page = () => {
 
       const body = await response.json()
 
-      if (body?.pagination?.top) {
-        setParams({ id: null, rank: null, reverse: null })
-      }
-
       return body
     },
     enabled: Boolean(user),
     placeholderData: keepPreviousData,
   })
+
+  // Cursor cleanup: when the server signals we're at the first page, remove stale
+  // id/rank/reverse params from the URL. Runs in an effect (not queryFn) to keep
+  // queryFn pure. setParams is idempotent — no-op if params already absent.
+  useEffect(() => {
+    if (data?.pagination?.top) {
+      setParams({ id: null, rank: null, reverse: null })
+    }
+  }, [data, setParams])
 
   const body = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { next?: any, prev?: any } } | undefined} */ (data)
   const episodes = body?.data

@@ -5,7 +5,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
 import { useLSP } from '../hooks/useLSP.js'
-import { useSearchParams } from '../hooks/useSearchParms.js'
+import { useSearchParams } from '../hooks/useSearchParams.js'
 import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */

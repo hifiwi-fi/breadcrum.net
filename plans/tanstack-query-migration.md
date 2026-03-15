@@ -1,6 +1,6 @@
 # TanStack Query Migration Plan
 
-## Status: PHASE 8 COMPLETE ✅
+## Status: COMPLETE
 
 Original migration was completed, but a post-migration audit found behavioral inconsistencies and a few correctness bugs. This document now tracks follow-up fixes.
 
@@ -393,6 +393,102 @@ The wrapper *could* be simplified slightly (e.g., remove `useCallback` wrapping 
 
 ---
 
+## Phase 9: Post-Review Fix-Up (from /review)
+
+Four issues identified during code review pass.
+
+### Phase 9 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Fix TS error in `account/client.js:34` — `result` parameter implicitly has `any` type; add JSDoc type annotation | Complete |
+| 2 | Fix `useUser.js` `pageshow` `useEffect` — missing dep array causes re-registration on every render; add `[queryClient, state.apiUrl]` | Complete — dep array already present in current code; review note was based on an earlier commit |
+| 3 | Rename `useSearchParms.js` → `useSearchParams.js` (typo fix); update all 26 import sites | Complete |
+| 4 | Verify `episodeMediumSelect` default `'video'` in `bookmark-edit.js` — confirm correct initial value for episode preview query | Complete — `'video'` radio has `defaultChecked` in the DOM; state default is consistent, no change needed |
+
+---
+
+## Phase 10: bcomnes Follow-Up (PR #690 thread r2870731081)
+
+bcomnes follow-up question on the newsletter-field thread: "Should we pass any data to the caller?"
+
+**Assessment:** Yes. `newsletter-field.js` calls `PUT /user` (same endpoint as `username-field.js`), which returns the full user object `{ status, data: TypeUserRead }`. The parent (`account/client.js`) currently uses `invalidateQueries` for `NewsletterField` — but it could use `setQueryData(userQueryKey, result.data)` instead (no extra round-trip) if the child passes `result` through. Aligning with the `UsernameField` pattern is the correct approach.
+
+### Phase 10 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | `newsletter-field.js` — change `onSuccess` prop typedef to `(result: { data: TypeUserRead }) => void`; pass `result` from mutation `onSuccess` to `onSuccess?.(result)` | Complete |
+| 2 | `account/client.js` — change `NewsletterField` `onSuccess` from `invalidateQueries` to `setQueryData(userQueryKey, result.data)` | Complete |
+| 3 | Validation pass (tsc + node tests) | Complete |
+
+---
+
+## Phase 11: PR #690 Full Unresolved Comment Pass
+
+17 unresolved threads found via GraphQL (earlier paginated REST call only returned 50 threads and missed newer ones). Grouped by type:
+
+### bcomnes threads
+
+| Thread | File | Comment | Assessment | Action |
+|---|---|---|---|---|
+| PRRT_kwDOEzHI585xeMbq | `newsletter-field.js:38` | "Should we pass any data to the caller?" | Fixed in Phase 10 — reply posted | Resolve thread |
+| PRRT_kwDOEzHI585y1o9l | `account/client.js:38` | "Does TanStack memoize these? If not we should use callback" | Valid — TanStack does NOT memoize inline callbacks. `userQueryKey` is a new array each render; callbacks are new functions each render. Should `useMemo` the key and `useCallback` the three handlers | Fix + reply + resolve |
+
+### Copilot threads
+
+| Thread | File | Comment | Assessment | Action |
+|---|---|---|---|---|
+| PRRT_kwDOEzHI585yyCDA | `useSearchParms.js:1` | Filename typo "Parms" → "Params" | Already fixed in Phase 9 — file renamed and all 26 import sites updated | Reply "fixed" + resolve |
+| PRRT_kwDOEzHI585yyCDQ | `email_confirm/client.js:63` | `params['token']`/`params['update']` in dep array is "fragile" | **Not valid.** `params` is memoized and these are primitive string values. Using property-access expressions in dep arrays is correct React/Preact idiom — they evaluate to primitives, not object refs | Reply explaining + resolve |
+| PRRT_kwDOEzHI585yyCCm / PRRT_kwDOEzHI585y1oyi | `use-admin-users.js:73-74` | `setParams` inside `queryFn` causes double-fetch | **Valid.** Side effect in a pure function. Calling `setParams` mutates the URL signal → changes `queryKey` mid-fetch → triggers second fetch. Fix: move to `useEffect` watching `data`. Loop safety in `setParams` prevents infinite loops | Fix + reply + resolve both threads |
+| PRRT_kwDOEzHI585yyCCu / PRRT_kwDOEzHI585y1oyK | `search/bookmarks/client.js:72` | Same setParams-in-queryFn issue | **Valid** | Fix + reply + resolve both threads |
+| PRRT_kwDOEzHI585yyCC3 / PRRT_kwDOEzHI585y1oya | `search/episodes/client.js:72` | Same | **Valid** | Fix + reply + resolve both threads |
+| PRRT_kwDOEzHI585yyCC9 / PRRT_kwDOEzHI585y1oyd | `search/archives/client.js:72` | Same | **Valid** | Fix + reply + resolve both threads |
+| PRRT_kwDOEzHI585yyCDK / PRRT_kwDOEzHI585y1oyg | `useAuthTokens.js:69-70` | Same | **Valid** | Fix + reply + resolve both threads |
+| PRRT_kwDOEzHI585yyCDF | `useBookmarks.js:78` | Same (root reference for the pattern) | **Valid** | Fix + reply + resolve |
+| PRRT_kwDOEzHI585yyCDX | `useEpisodes.js:82` | Same | **Valid** | Fix + reply + resolve |
+| PRRT_kwDOEzHI585yyCDc | `useArchives.js:87` | Same | **Valid** | Fix + reply + resolve |
+
+### Fix: `setParams` in `queryFn` → `useEffect`
+
+**Root cause:** `setParams` mutates `querySignal`, which is a reactive dependency of `queryKey` (via `searchParamsAll` → `queryString`). Calling it inside `queryFn` changes the key while TanStack has the result in hand → schedules a second fetch. Not an infinite loop (loop-safety in `setParams` prevents re-emission when URL unchanged), but wastes one extra network request per stale-cursor landing.
+
+**Fix pattern:** Move `setParams` out of `queryFn` (pure function) into `useEffect` watching `data`. `setParams` idempotency ensures no infinite loop:
+
+```js
+// Remove from queryFn, add after query result:
+useEffect(() => {
+  if (data?.top) {
+    setParams({ before: null, after: null })
+  }
+}, [data, setParams])
+```
+
+For search pages, `data?.pagination?.top` and `{ id: null, rank: null, reverse: null }`.
+
+Note: The double-fetch still occurs (one extra request when arriving at the first page via a stale cursor), but `queryFn` is now a pure function. This is semantically correct and avoids potential issues with StrictMode double-invocation of queryFn.
+
+### Phase 11 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Resolve `newsletter-field.js` thread (PRRT_kwDOEzHI585xeMbq) — reply already posted | Complete |
+| 2 | `account/client.js` — `useMemo` for `userQueryKey`, `useCallback` for three handlers; reply + resolve thread PRRT_kwDOEzHI585y1o9l | Complete |
+| 3 | Reply to `useSearchParms.js` typo thread (PRRT_kwDOEzHI585yyCDA) — "Fixed in Phase 9"; resolve | Complete |
+| 4 | Reply to `email_confirm/client.js` dep thread (PRRT_kwDOEzHI585yyCDQ) — "not a bug"; resolve | Complete |
+| 5 | `useBookmarks.js` — move `setParams` to `useEffect`; reply + resolve PRRT_kwDOEzHI585yyCDF | Complete |
+| 6 | `useArchives.js` — same; reply + resolve PRRT_kwDOEzHI585yyCDc | Complete |
+| 7 | `useEpisodes.js` — same; reply + resolve PRRT_kwDOEzHI585yyCDX | Complete |
+| 8 | `useAuthTokens.js` — same; reply + resolve PRRT_kwDOEzHI585yyCDK + PRRT_kwDOEzHI585y1oyg | Complete |
+| 9 | `use-admin-users.js` — same; reply + resolve PRRT_kwDOEzHI585yyCCm + PRRT_kwDOEzHI585y1oyi | Complete |
+| 10 | `search/bookmarks/client.js` — same (id/rank/reverse params); reply + resolve PRRT_kwDOEzHI585yyCCu + PRRT_kwDOEzHI585y1oyK | Complete |
+| 11 | `search/archives/client.js` — same; reply + resolve PRRT_kwDOEzHI585yyCC9 + PRRT_kwDOEzHI585y1oyd | Complete |
+| 12 | `search/episodes/client.js` — same; reply + resolve PRRT_kwDOEzHI585yyCC3 + PRRT_kwDOEzHI585y1oya | Complete |
+| 13 | Validation pass (eslint + tsc + node tests) | Complete |
+
+---
+
 ## Phase 7: Post-Review Cleanup
 
 ### Phase 7 Action Checklist
@@ -420,7 +516,7 @@ The codebase already had `@tanstack/preact-query` with a `QueryClient`, `QueryCl
 
 | File | Change |
 |---|---|
-| `hooks/useQuery.js` | Added `useSearchParams(keys)` — scoped URL param subscription + loop-safe `setParams` setter |
+| `hooks/useSearchParams.js` (was `useQuery.js`, renamed from `useSearchParms.js`) | Added `useSearchParams(keys)` — scoped URL param subscription + loop-safe `setParams` setter |
 | `hooks/useAuthTokens.js` | `useState+useEffect` → `useTanstackQuery`, `reloadAuthTokens` → `invalidateQueries` |
 | `hooks/use-admin-users.js` | Same migration, query key `['admin-users', ...]` |
 | `hooks/use-admin-user.js` | Single-item variant, query key `['admin-user', userId, ...]` |

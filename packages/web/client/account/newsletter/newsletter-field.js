@@ -11,7 +11,7 @@ import { useLSP } from '../../hooks/useLSP.js'
 /**
  * @typedef {{
  *  user: TypeUserRead | null,
- *  onSuccess?: () => void,
+ *  onSuccess?: (result: { data: TypeUserRead }) => void,
  * }} NewsletterFieldProps
  */
 
@@ -33,8 +33,8 @@ export const NewsletterField = ({ user, onSuccess }) => {
       }
       return await response.json()
     },
-    onSuccess: () => {
-      onSuccess?.()
+    onSuccess: (/** @type {{ status: string, data: TypeUserRead }} */ result) => {
+      onSuccess?.(result)
     },
   })
 

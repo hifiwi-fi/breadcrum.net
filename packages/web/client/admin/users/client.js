@@ -4,7 +4,7 @@
 
 import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
-import { useSearchParams } from '../../hooks/useSearchParms.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { UserTable } from '../../components/user-table/user-table.js'
 import { useAdminUsers } from '../../hooks/use-admin-users.js'

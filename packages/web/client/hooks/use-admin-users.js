@@ -3,10 +3,10 @@
 /** @import { SchemaTypeAdminUserReadClient } from '../../routes/api/admin/users/schemas/schema-admin-user-read.js' */
 /** @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query' */
 
-import { useMemo } from 'preact/hooks'
+import { useEffect, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
-import { useSearchParams } from './useSearchParms.js'
+import { useSearchParams } from './useSearchParams.js'
 import { useLSP } from './useLSP.js'
 
 /**
@@ -69,9 +69,6 @@ export function useAdminUsers () {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        if (body?.pagination?.top) {
-          setParams({ before: null, after: null })
-        }
         return {
           users: body?.data,
           before: body?.pagination?.before ? new Date(body?.pagination?.before) : null,
@@ -85,6 +82,15 @@ export function useAdminUsers () {
   }))
 
   const { data, error, isPending } = adminUsersQuery
+
+  // Cursor cleanup: when the server signals we're at the first page, remove stale
+  // before/after params from the URL. Runs in an effect (not queryFn) to keep
+  // queryFn pure. setParams is idempotent — no-op if params already absent.
+  useEffect(() => {
+    if (data?.top) {
+      setParams({ before: null, after: null })
+    }
+  }, [data, setParams])
 
   const users = data?.users
   const before = data?.before ?? null
