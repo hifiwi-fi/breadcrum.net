@@ -1,40 +1,85 @@
-@import './components/badge/badge.css';
+@import "./components/badge/badge.css";
 
 .bc-main {
-	max-width: 55em;
+  max-width: 55em;
 }
 
 .bc-marketing {
-	margin-top: 1em;
+  margin-top: 1em;
 }
 
 .bc-marketing-hero {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.bc-marking-hero-title {
-	margin: 0;
-	font-weight: 600;
+.bc-marketing-hero-title {
+  margin: 0;
+  font-weight: 600;
 }
 
-.bc-marking-hero-description {
-	max-width: 440px;
-	text-align: center;
-	color: var(--accent-foreground);
+.bc-marketing-hero-description {
+  max-width: 440px;
+  text-align: center;
+  color: var(--accent-foreground);
+}
+
+.bc-marketing-hero-links {
+  margin: 0.25rem 0 0.75rem;
+  text-align: center;
+}
+
+.bc-marketing-plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  margin: 1.25em 0;
+}
+
+.bc-marketing-plan-card {
+  border: 1px solid var(--accent-midground);
+  background: var(--accent-background);
+  border-radius: 10px;
+  padding: 1em;
+}
+
+.bc-marketing-plan-card h2 {
+  margin: 0 0 0.35em;
+}
+
+.bc-marketing-plan-card p {
+  margin: 0 0 0.6em;
+}
+
+.bc-marketing-plan-card p:last-child {
+  margin-bottom: 0;
+}
+
+.bc-marketing-plan-card-paid {
+  border-color: var(--foreground);
 }
 
 .bc-marketing-feature-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-column-gap: 1em;
+  gap: 1em;
+}
+
+.bc-marketing-feature-block h2 small {
+  display: block;
+  font-size: 0.75em;
+  font-weight: 500;
+  opacity: 0.85;
 }
 
 @media screen and (max-width: 53em) {
+  .bc-marketing-plan-grid {
+    grid-template-columns: 1fr;
+  }
+
   .bc-marketing-feature-grid {
     grid-template-columns: 1fr;
   }
 }
-

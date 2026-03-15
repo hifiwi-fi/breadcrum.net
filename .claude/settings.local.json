@@ -27,7 +27,9 @@
       "Bash(npm test)",
       "Bash(pnpm:*)",
       "Read(/Users/bret/Developer/yt-dlp-api/**)",
-      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)"
+      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)",
+      "Bash(npm view releasearoni versions --json)",
+      "Bash(grep -r \"c8\" /Users/bret/Developer/breadcrum.net/packages/*/package.json)"
     ]
   }
 }

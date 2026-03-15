@@ -92,7 +92,7 @@ jobs:
         with:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: "packages/web/coverage/lcov.info packages/worker/coverage/lcov.info"
+          files: "packages/web/lcov.info packages/worker/lcov.info"
       - name: Save GeoIP cache
         if: always()
         uses: actions/cache/save@v5

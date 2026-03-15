@@ -14,6 +14,8 @@ import { EmailField } from './email/email-field.js'
 import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 import { PasskeysField } from './passkeys/passkeys-field.js'
+import { BillingField } from './billing/billing-field.js'
+import { QueryProvider } from '../lib/query-provider.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -28,6 +30,7 @@ export const Page = () => {
         <${PasswordField} />
         <${PasskeysField} />
         <${NewsletterField} user=${user} reload=${reloadUser} />
+        <${BillingField} />
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
@@ -50,6 +53,6 @@ export const Page = () => {
 if (typeof window !== 'undefined') {
   const container = document.querySelector('.bc-main')
   if (container) {
-    render(html`<${Page}/>`, container)
+    render(html`<${QueryProvider}><${Page} /><//>`, container)
   }
 }

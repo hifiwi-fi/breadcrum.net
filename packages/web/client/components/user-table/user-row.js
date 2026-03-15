@@ -89,6 +89,8 @@ export const UserRow = ({ user, reload, onDelete }) => {
             onSave: handleSave,
             onDelete: handleDelete,
             onCancelEdit: handleCancelEdit,
+            apiUrl: state.apiUrl,
+            reload,
           })
         : tc(UserRowView, {
             user,
