@@ -489,6 +489,32 @@ Note: The double-fetch still occurs (one extra request when arriving at the firs
 
 ---
 
+## Phase 12: Latest Unresolved Comment Pass (PR #690)
+
+5 unresolved threads found, all from `copilot-pull-request-reviewer`.
+
+### Assessment
+
+| Thread | File | Comment Summary | Valid? | Reasoning |
+|---|---|---|---|---|
+| PRRT_kwDOEzHI5850bfqx | `useFlags.js:26` | `state.flags = body` side-effect in `queryFn` | **Valid** | `queryFn` should be pure. The mutation is idempotent (equality-guarded) so no cascade, but it violates the pure-function contract and could misbehave under StrictMode double-invocation. Fix: move to `useEffect` watching `flags`. |
+| PRRT_kwDOEzHI5850bfq4 | `tags/client.js:27` | Query key missing user identifier | **Valid** | `useBookmarks` and `usePasskeys` include `user?.id ?? null`. `tags/client.js` uses `enabled: Boolean(user)` but the key is not user-scoped — a different user logging in without full reload would see cached tags from the prior user. Fix: add `user?.id ?? null`. |
+| PRRT_kwDOEzHI5850bfq9 | `search/bookmarks/client.js:53` | Query key missing user identifier | **Valid** | Same as tags — `enabled: Boolean(user)` does not prevent cache reuse across user sessions. Fix: add `user?.id ?? null`. |
+| PRRT_kwDOEzHI5850bfrG | `search/episodes/client.js:53` | Query key missing user identifier | **Valid** | Same. Fix: add `user?.id ?? null`. |
+| PRRT_kwDOEzHI5850bfrI | `search/archives/client.js:53` | Query key missing user identifier | **Valid** | Same. Fix: add `user?.id ?? null`. |
+
+### Phase 12 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | `useFlags.js` — move `state.flags = body` to `useEffect` watching `flags`; reply + resolve PRRT_kwDOEzHI5850bfqx | Complete |
+| 2 | `tags/client.js` — add `user?.id ?? null` to `queryKey`; reply + resolve PRRT_kwDOEzHI5850bfq4 | Complete |
+| 3 | `search/bookmarks/client.js` — add `user?.id ?? null` to `queryKey`; reply + resolve PRRT_kwDOEzHI5850bfq9 | Complete |
+| 4 | `search/episodes/client.js` — same; reply + resolve PRRT_kwDOEzHI5850bfrG | Complete |
+| 5 | `search/archives/client.js` — same; reply + resolve PRRT_kwDOEzHI5850bfrI | Complete |
+
+---
+
 ## Phase 7: Post-Review Cleanup
 
 ### Phase 7 Action Checklist

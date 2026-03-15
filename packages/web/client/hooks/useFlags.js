@@ -1,5 +1,6 @@
 /// <reference lib="dom" />
 
+import { useEffect } from 'preact/hooks'
 import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useLSP } from './useLSP.js'
 
@@ -18,17 +19,21 @@ export function useFlags () {
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        if (!localFlagsEqualServerFlags(state.flags, body)) {
-          console.log('Updating flag state')
-          state.flags = body
-        }
-        return body
+        return response.json()
       }
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
   })
+
+  // Sync fetched flags into LSP state outside of queryFn to keep queryFn pure.
+  // The equality check prevents spurious state.flags mutations.
+  useEffect(() => {
+    if (flags && !localFlagsEqualServerFlags(state.flags, flags)) {
+      console.log('Updating flag state')
+      state.flags = flags
+    }
+  }, [flags, state])
 
   return { flags: flags ?? state.flags, loading, error: error || null }
 }

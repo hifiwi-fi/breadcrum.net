@@ -21,10 +21,11 @@ export const Page = () => {
   const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
   const queryKey = useMemo(() => ([
     'tags',
+    user?.id ?? null,
     state.apiUrl,
     state.sensitive,
     queryString,
-  ]), [queryString, state.apiUrl, state.sensitive])
+  ]), [queryString, state.apiUrl, state.sensitive, user?.id])
 
   const { data: tags, isPending: tagsLoading, error: tagsError } = useTanstackQuery({
     queryKey,

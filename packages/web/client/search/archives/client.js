@@ -48,9 +48,10 @@ export const Page = () => {
 
   const queryKey = useMemo(() => ([
     'search-archives',
+    user?.id ?? null,
     state.apiUrl,
     queryParams.toString(),
-  ]), [queryParams, state.apiUrl])
+  ]), [queryParams, state.apiUrl, user?.id])
 
   const { data, isPending: archivesLoading, error: archivesError } = useTanstackQuery({
     queryKey,
