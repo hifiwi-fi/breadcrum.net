@@ -200,7 +200,7 @@ importers:
     dependencies:
       '@breadcrum/resources':
         specifier: workspace:*
-        version: link:../resources
+        version: file:packages/resources
       '@bret/is-youtube-url':
         specifier: 'catalog:'
         version: 1.0.5
@@ -289,8 +289,8 @@ importers:
         specifier: 'catalog:'
         version: 0.209.0(@opentelemetry/api@1.9.0)
       '@passwordless-id/webauthn':
-        specifier: ^2.3.1
-        version: 2.3.4
+        specifier: ^2.3.5
+        version: 2.3.5
       '@preact/signals':
         specifier: ^2.3.2
         version: 2.8.0(preact@10.28.3)
@@ -444,7 +444,7 @@ importers:
         version: 2.0.1
       '@breadcrum/resources':
         specifier: workspace:*
-        version: link:../resources
+        version: file:packages/resources
       '@bret/is-youtube-url':
         specifier: 'catalog:'
         version: 1.0.5
@@ -608,6 +608,10 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
+  '@bramus/specificity@2.4.2':
+    resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
+    hasBin: true
+
   '@breadcrum/bookmarklet@1.0.13':
     resolution: {integrity: sha512-FKIdwbAgUThJJsGOZv/YyTe3TIDw9AyE80It+4soo3aU1+MFnRdk8SnPcu6RJnXC/rfX1QSEC+7Usuk5Rfcs6A==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -619,6 +623,9 @@ packages:
   '@breadcrum/extract-meta@2.0.1':
     resolution: {integrity: sha512-PkVEJaZM6w/zew5v7/XAJFYKrFV36Org88yGF7iGUuaPVDQ6fqJtRj0gbW2A3xu1Vd4SrwfnY69/96htHmxcdw==}
     engines: {node: '>=19', npm: '>=8'}
+
+  '@breadcrum/resources@file:packages/resources':
+    resolution: {directory: packages/resources, type: directory}
 
   '@bret/is-youtube-url@1.0.5':
     resolution: {integrity: sha512-dQlb6VUO2oYq53J5+UfsBzsFnUKCpTZbPQyvi6PObdvmwsJGJs4C8JUY265nosfRbqyxgy6L4sxXBCDttmtzmQ==}
@@ -1441,8 +1448,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@passwordless-id/webauthn@2.3.4':
-    resolution: {integrity: sha512-AGEg6RanNcxuyr4mFnqAB9QnWUcuOU+d0Z7KBV1PknsQ0a8/9YDrqM2QDK/Uw6KAFKINRihkobOXY1PtS2KE1Q==}
+  '@passwordless-id/webauthn@2.3.5':
+    resolution: {integrity: sha512-b/Nrsd9nkkLAKDybUmgQOLcjF5eILO3vjo6uVsvmCGD0XDacGB9b8wFnZGMnBMqvu8eDl5wYGrZ9PoaZ1ODlhw==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -2322,6 +2329,10 @@ packages:
 
   cssstyle@5.3.7:
     resolution: {integrity: sha512-7D2EPVltRrsTkhpQmksIu+LxeWAIEk6wRDMJ1qljlv+CKHJM+cJLlfhWIzNA44eAsHXSNe3+vO6DW1yCYx8SuQ==}
+    engines: {node: '>=20'}
+
+  cssstyle@6.0.1:
+    resolution: {integrity: sha512-IoJs7La+oFp/AB033wBStxNOJt4+9hHMxsXUPANcoXL2b3W4DZKghlJ2cI/eyeRZIQ9ysvYEorVhjrcYctWbog==}
     engines: {node: '>=20'}
 
   dashdash@1.14.1:
@@ -3565,6 +3576,15 @@ packages:
 
   jsdom@28.0.0:
     resolution: {integrity: sha512-KDYJgZ6T2TKdU8yBfYueq5EPG/EylMsBvCaenWMJb2OXmjgczzwveRCoJ+Hgj1lXPDyasvrgneSn4GBuR1hYyA==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      canvas: ^3.0.0
+    peerDependenciesMeta:
+      canvas:
+        optional: true
+
+  jsdom@28.1.0:
+    resolution: {integrity: sha512-0+MoQNYyr2rBHqO1xilltfDjV9G7ymYGlAUazgcDLQaUf8JDHbuGwsxN6U9qWaElZ4w1B2r7yEGIL3GdeW3Rug==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
@@ -5480,6 +5500,10 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
+  '@bramus/specificity@2.4.2':
+    dependencies:
+      css-tree: 3.1.0
+
   '@breadcrum/bookmarklet@1.0.13':
     dependencies:
       '@breadcrum/extract-meta': 2.0.0
@@ -5493,6 +5517,24 @@ snapshots:
     dependencies:
       '@types/jsdom': 27.0.0
       '@types/node': 24.10.13
+
+  '@breadcrum/resources@file:packages/resources':
+    dependencies:
+      '@bret/is-youtube-url': 1.0.5
+      '@fastify/postgres': 6.0.2(pg@8.18.0)
+      '@nearform/sql': 1.10.7
+      hyperid: 3.3.0
+      ipaddr.js: 2.3.0
+      jsdom: 28.1.0
+      mime-types: 3.0.2
+      pg: 8.18.0
+      pg-boss: 12.11.2
+      undici: 7.16.0
+    transitivePeerDependencies:
+      - '@noble/hashes'
+      - canvas
+      - pg-native
+      - supports-color
 
   '@bret/is-youtube-url@1.0.5': {}
 
@@ -6410,7 +6452,7 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.17.1':
     optional: true
 
-  '@passwordless-id/webauthn@2.3.4': {}
+  '@passwordless-id/webauthn@2.3.5': {}
 
   '@pinojs/redact@0.4.0': {}
 
@@ -7368,6 +7410,13 @@ snapshots:
       source-map-js: 1.2.1
 
   cssstyle@5.3.7:
+    dependencies:
+      '@asamuzakjp/css-color': 4.1.2
+      '@csstools/css-syntax-patches-for-csstree': 1.0.27
+      css-tree: 3.1.0
+      lru-cache: 11.2.6
+
+  cssstyle@6.0.1:
     dependencies:
       '@asamuzakjp/css-color': 4.1.2
       '@csstools/css-syntax-patches-for-csstree': 1.0.27
@@ -8837,6 +8886,33 @@ snapshots:
       '@asamuzakjp/dom-selector': 6.8.1
       '@exodus/bytes': 1.14.1
       cssstyle: 5.3.7
+      data-urls: 7.0.0
+      decimal.js: 10.6.0
+      html-encoding-sniffer: 6.0.0
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
+      is-potential-custom-element-name: 1.0.1
+      parse5: 8.0.0
+      saxes: 6.0.0
+      symbol-tree: 3.2.4
+      tough-cookie: 6.0.0
+      undici: 7.22.0
+      w3c-xmlserializer: 5.0.0
+      webidl-conversions: 8.0.1
+      whatwg-mimetype: 5.0.0
+      whatwg-url: 16.0.0
+      xml-name-validator: 5.0.0
+    transitivePeerDependencies:
+      - '@noble/hashes'
+      - supports-color
+
+  jsdom@28.1.0:
+    dependencies:
+      '@acemir/cssom': 0.9.31
+      '@asamuzakjp/dom-selector': 6.8.1
+      '@bramus/specificity': 2.4.2
+      '@exodus/bytes': 1.14.1
+      cssstyle: 6.0.1
       data-urls: 7.0.0
       decimal.js: 10.6.0
       html-encoding-sniffer: 6.0.0
