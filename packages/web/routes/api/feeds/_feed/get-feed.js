@@ -7,7 +7,7 @@ import { getFeedUrl, getFeedHtmlUrl, getFeedImageUrl } from '../feed-urls.js'
 import { getFeedTitle, getFeedDescription } from '../feed-defaults.js'
 import { getBookmarksUrl } from '../../bookmarks/bookmarks-urls.js'
 import { getBookmarkUrl } from '../../bookmarks/_id/bookmark-urls.js'
-import { getEpisodeUrl } from './episode/_episode/episode-urls.js'
+import { getEpisodeUrl, getEpisodePermalinkUrl } from './episode/_episode/episode-urls.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -123,11 +123,18 @@ export async function getFeed (fastify, _opts) {
               ? `${ep.src_type}/${ep.ext === 'm4a' ? 'mp4' : ep.ext === 'mp3' ? 'mpeg' : ep.ext}`
               : undefined
 
+            const episodePermalink = getEpisodePermalinkUrl({ transport, host, episodeId: ep.id })
+            const bookmarkPermalink = getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id })
+
+            const baseText = ep.text_content ?? ep.bookmark.note
+            const linkText = `\n\n- Episode source: ${ep.url}\n- Episode page: ${episodePermalink}\n- Bookmark: ${bookmarkPermalink}`
+            const contentText = baseText ? `${baseText}${linkText}` : linkText.trimStart()
+
             return {
               id: ep.id,
-              url: getBookmarkUrl({ transport, host, bookmarkId: ep.bookmark.id }),
+              url: bookmarkPermalink,
               title: ep.display_title,
-              content_text: ep.text_content ?? ep.bookmark.note,
+              content_text: contentText,
               date_published: ep.created_at,
               image: ep.thumbnail,
               // @ts-ignore
