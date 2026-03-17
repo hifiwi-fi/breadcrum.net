@@ -30,15 +30,15 @@ export async function finalizeEpisode ({
 
   videoData.push(SQL`done = true`)
   videoData.push(SQL`url = ${url}`)
-  if ('filesize_approx' in media) videoData.push(SQL`size_in_bytes = ${Math.round(media.filesize_approx)}`)
-  if ('duration' in media) videoData.push(SQL`duration_in_seconds = ${Math.round(media.duration)}`)
-  if ('channel' in media) videoData.push(SQL`author_name = ${media.channel}`)
-  if ('title' in media && 'ext' in media) {
+  if ('filesize_approx' in media && media.filesize_approx != null) videoData.push(SQL`size_in_bytes = ${Math.round(media.filesize_approx)}`)
+  if ('duration' in media && media.duration != null) videoData.push(SQL`duration_in_seconds = ${Math.round(media.duration)}`)
+  if ('channel' in media && media.channel != null) videoData.push(SQL`author_name = ${media.channel}`)
+  if ('title' in media && media.title != null && 'ext' in media) {
     const filename = `${media.title}.${media.ext}`
     videoData.push(SQL`filename = ${filename}`)
   }
 
-  if ('title' in media && media.title !== bookmarkTitle) {
+  if ('title' in media && media.title != null && media.title !== bookmarkTitle) {
     videoData.push(SQL`title = ${media.title.trim().substring(0, 255)}`)
   }
 

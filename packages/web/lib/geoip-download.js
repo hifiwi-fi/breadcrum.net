@@ -24,6 +24,7 @@ const execFileAsync = promisify(execFile)
  * @typedef {object} GeoIpRequestOptions
  * @property {Record<string, string>} [headers]
  * @property {string} [method]
+ * @property {AbortSignal} [signal]
  */
 
 /**
@@ -33,6 +34,7 @@ const execFileAsync = promisify(execFile)
  * @property {string} editionId
  * @property {string} dataDir
  * @property {boolean} [force]
+ * @property {number} [timeout] - Abort the download after this many milliseconds
  * @property {GeoIpDownloadLogger} logger
  */
 
@@ -155,8 +157,10 @@ export async function updateGeoipDatabase ({
   editionId,
   dataDir,
   force = false,
+  timeout,
   logger,
 }) {
+  const signal = timeout != null ? AbortSignal.timeout(timeout) : undefined
   const archiveSuffix = 'tar.gz'
   const shaSuffix = `${archiveSuffix}.sha256`
   const dbFileName = `${editionId}.mmdb`
@@ -218,7 +222,7 @@ export async function updateGeoipDatabase ({
 
   logDebug(logger, `Sending HEAD request to ${archiveUrl.toString()}`, { headers })
 
-  const headResponse = await requestWithRedirects(archiveUrl, { headers, method: 'HEAD' }, logger)
+  const headResponse = await requestWithRedirects(archiveUrl, { headers, method: 'HEAD', ...(signal && { signal }) }, logger)
 
   logDebug(logger, `HEAD response status: ${headResponse.statusCode}`, {
     statusCode: headResponse.statusCode,
@@ -291,7 +295,7 @@ export async function updateGeoipDatabase ({
 
   logDebug(logger, `Sending GET request to ${archiveUrl.toString()}`, { headers })
 
-  const archiveResponse = await requestWithRedirects(archiveUrl, { headers, method: 'GET' }, logger)
+  const archiveResponse = await requestWithRedirects(archiveUrl, { headers, method: 'GET', ...(signal && { signal }) }, logger)
 
   logDebug(logger, `GET response status: ${archiveResponse.statusCode}`, {
     statusCode: archiveResponse.statusCode,
@@ -319,14 +323,15 @@ export async function updateGeoipDatabase ({
   }
 
   const archivePath = join(tmpdir(), `${editionId}-${Date.now()}.${archiveSuffix}`)
-  await pipeline(archiveResponse.body, createWriteStream(archivePath))
+  await pipeline(archiveResponse.body, createWriteStream(archivePath), { signal })
 
   const shaUrl = new URL(archiveUrl)
   shaUrl.searchParams.set('suffix', shaSuffix)
 
   const shaResponse = await requestWithRedirects(shaUrl, {
     headers: { Authorization: `Basic ${authHeader}` },
-    method: 'GET'
+    method: 'GET',
+    ...(signal && { signal }),
   }, logger)
   if (shaResponse.statusCode < 200 || shaResponse.statusCode >= 300) {
     await drainResponse(shaResponse)
@@ -343,7 +348,7 @@ export async function updateGeoipDatabase ({
 
   const extractDir = join(tmpdir(), `${editionId}-${Date.now()}`)
   await mkdir(extractDir, { recursive: true })
-  await execFileAsync('tar', ['-xzf', archivePath, '-C', extractDir])
+  await execFileAsync('tar', ['-xzf', archivePath, '-C', extractDir], { signal })
 
   const extractedPath = await findMmdbFile(extractDir)
   if (!extractedPath) {

@@ -73,6 +73,7 @@ async function geoipPlugin (fastify) {
         licenseKey: MAXMIND_LICENSE_KEY,
         editionId: 'GeoLite2-City',
         dataDir: defaultGeoipDir,
+        timeout: 30_000, // Must be less than pluginTimeout in server-options.js (currently 40_000)
         logger: fastify.log,
       })
     } catch (err) {
