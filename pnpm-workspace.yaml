@@ -30,7 +30,7 @@ catalog:
   fastify-cli: ^7.0.1
   fastify-healthcheck: ^5.0.0
   fastify-plugin: ^5.0.1
-  jsdom: ^28.0.0
+  jsdom: ^28.1.0
   neostandard: ^0.12.0
   npm-run-all2: ^8.0.1
   pg: ^8.16.3
