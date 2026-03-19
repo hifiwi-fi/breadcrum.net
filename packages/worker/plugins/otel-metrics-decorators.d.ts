@@ -44,13 +44,6 @@ declare module 'fastify' {
       authTokensCleanedCounter: Counter;
       authTokensCleanupJobCounter: Counter;
       authTokensCleanupDuration: Histogram;
-
-      // Stale resolution cleanup metrics
-      staleBookmarksCleanedCounter: Counter;
-      staleArchivesCleanedCounter: Counter;
-      staleEpisodesCleanedCounter: Counter;
-      staleResolutionsCleanupJobCounter: Counter;
-      staleResolutionsCleanupDuration: Histogram;
     };
   }
 }
