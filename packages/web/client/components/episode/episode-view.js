@@ -284,7 +284,7 @@ export const EpisodeView = ({
       ${
         e?.text_content // Watch your whitespace here
           ? html`
-            <${ExpandText} children=${e?.text_content} pre=${true} />
+            <${ExpandText} defaultExpandState=${fullView} children=${e?.text_content} pre=${true} />
           `
           : null
       }

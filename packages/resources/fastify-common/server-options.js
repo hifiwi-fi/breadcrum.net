@@ -26,6 +26,7 @@ export function createServerOptions ({ serviceName, disableRequestLogging = fals
   /** @type {ServerOptions} */
   const concreteOptions = {
     trustProxy: true,
+    pluginTimeout: 40_000, // Must exceed any per-plugin timeouts (e.g. geoip update timeout in plugins/geoip.js)
     genReqId: function (/* req */) { return hid() },
     logger: createLoggerOptions({ serviceName }),
     ...(disableRequestLogging && { disableRequestLogging: true }),

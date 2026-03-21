@@ -23,6 +23,7 @@ import cn from 'classnames'
  * @property {() => void} [onToggleToread]
  * @property {() => void} [onToggleStarred]
  * @property {() => void} [onToggleSensitive]
+ * @property {boolean | undefined} [expandSummary]
  */
 
 /**
@@ -34,6 +35,7 @@ export const BookmarkView = ({
   onToggleToread = () => {},
   onToggleStarred = () => {},
   onToggleSensitive = () => {},
+  expandSummary = false,
 }) => {
   const window = useWindow()
   const { pushState } = useSearchParams([])
@@ -88,7 +90,7 @@ export const BookmarkView = ({
         ${b.note ? html`<div class='bc-bookmark-note-display'>${b?.note?.trim()?.split('\n\n').map(note => html`<p>${note}</p>`)}</div>` : null}
         ${b.summary
           ? html`<div class='bc-bookmark-summary-display'>
-              <${ExpandText} children=${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)} />
+              <${ExpandText} defaultExpandState=${expandSummary} children=${b?.summary?.trim()?.split('\n\n').map(summary => html`<p>${summary}</p>`)} />
             </div>`
           : null}
       <div>

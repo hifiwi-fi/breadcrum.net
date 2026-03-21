@@ -5,8 +5,7 @@
  */
 
 import { html } from 'htm/preact'
-import { useCallback, useState, useRef } from 'preact/hooks'
-import { useWindow } from '../../hooks/useWindow.js'
+import { useCallback, useState, useRef, useEffect } from 'preact/hooks'
 import cn from 'classnames'
 
 /**
@@ -26,39 +25,40 @@ export const ExpandText = ({
   classNames = [],
   pre,
 }) => {
-  const window = useWindow()
-  const expandRef = useRef(/** @type {HTMLDivElement | null} */(null))
+  const contentRef = useRef(/** @type {HTMLDivElement | null} */(null))
   const [expanded, setExpanded] = useState(defaultExpandState)
+  const [overflows, setOverflows] = useState(false)
 
-  const getSelectedText = useCallback(() => {
-    const selection = window?.getSelection()
-    if (expandRef.current && selection && expandRef.current.contains(selection.anchorNode)) {
-      return selection.toString()
+  useEffect(() => {
+    const el = contentRef.current
+    if (el) {
+      setOverflows(el.scrollHeight > el.clientHeight)
     }
-    return ''
-  }, [expandRef, window])
+  }, [])
 
-  const handleClick = useCallback(() => {
-    if (getSelectedText() === '') {
-      setExpanded(!expanded)
-    }
-  }, [setExpanded, expanded])
+  const handleToggle = useCallback((/** @type {MouseEvent} */ ev) => {
+    ev.stopPropagation()
+    setExpanded(e => !e)
+  }, [])
 
   return html`
-    <div
-      ref="${expandRef}"
-      onClick="${handleClick}"
-      class="${
-        cn(
-          'bc-epand-text',
-          {
-            'bc-expand-text-expanded': expanded,
-            'bc-expand-text-pre': pre,
-          },
-          ...classNames
-        )
-      }">
+    <div class="${
+      cn(
+        'bc-epand-text',
+        {
+          'bc-expand-text-expanded': expanded,
+          'bc-expand-text-overflows': overflows,
+          'bc-expand-text-pre': pre,
+        },
+        ...classNames
+      )
+    }">
+      <div ref="${contentRef}" class="bc-expand-text-content">
         ${children}
       </div>
+      <button class="bc-expand-text-toggle" onClick="${handleToggle}">
+        ${expanded ? 'show less' : 'show more'}
+      </button>
+    </div>
   `
 }

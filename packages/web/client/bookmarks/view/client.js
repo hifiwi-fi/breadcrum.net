@@ -107,8 +107,9 @@ export const Page = () => {
       ${bookmark
         ? tc(BookmarkList, {
             bookmark,
-            onDelete: handleDelete,
             onInvalidate: reload,
+            onDelete: handleDelete,
+            expandSummary: true,
           })
         : null}
     </div>

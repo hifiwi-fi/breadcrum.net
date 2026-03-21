@@ -84,10 +84,10 @@ export const ArchiveView = ({
       </div>
 
       ${
-        ar?.excerpt && !fullView
+        ar?.excerpt
           ? html`
             <div class="bc-archive-excerpt">
-              <${ExpandText} children=${ar?.excerpt} />
+              <${ExpandText} defaultExpandState=${fullView} children=${ar?.excerpt} />
             </div>
           `
           : null
