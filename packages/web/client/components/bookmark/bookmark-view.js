@@ -23,7 +23,7 @@ import cn from 'classnames'
  * @property {() => void} [onToggleToread]
  * @property {() => void} [onToggleStarred]
  * @property {() => void} [onToggleSensitive]
- * @property {boolean} [expandSummary]
+ * @property {boolean | undefined} [expandSummary]
  */
 
 /**

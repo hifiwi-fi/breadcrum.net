@@ -2,6 +2,7 @@ node_modules
 sandbox.js
 .nyc_output
 coverage
+lcov.info
 public
 ./yt-dlp
 .env
@@ -11,3 +12,4 @@ dependency-graph.html
 tsconfig.tsbuildinfo
 deploy
 packages/web/data/geoip
+.claude/settings.local.json
