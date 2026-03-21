@@ -1,30 +1,54 @@
 
 .bc-epand-text {
-  max-height: 100px; /* default max-height */
-  overflow-y: hidden;
-  cursor: pointer;
-  transition: max-height 0.3s ease-in-out;
-
-  background:
-    /* Shadow covers */
-    linear-gradient(var(--background) 30%, rgba(255,255,255,0)),
-    linear-gradient(rgba(255,255,255,0), var(--background) 70%) 0 100%,
-
-    /* Shadows */
-    radial-gradient(farthest-side at 50% 0, var(--accent-background), rgba(0,0,0,0)),
-    radial-gradient(farthest-side at 50% 100%, var(--accent-background), rgba(0,0,0,0)) 0 100%;
-  background-repeat: no-repeat;
-  background-color: var(--background);
-  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
-
-  /* Opera doesn't support this in the shorthand */
-  background-attachment: local, local, scroll, scroll;
+  /* natural sizing in both states */
 }
 
+.bc-expand-text-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
-.bc-expand-text-expanded {
-  max-height: 9999px;
-  overflow-y: auto;
+.bc-expand-text-overflows .bc-expand-text-content {
+  position: relative;
+}
+
+.bc-expand-text-overflows .bc-expand-text-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(rgba(255,255,255,0), var(--background) 70%);
+  pointer-events: none;
+}
+
+.bc-expand-text-expanded .bc-expand-text-content {
+  display: block;
+  overflow: visible;
+}
+
+.bc-expand-text-expanded .bc-expand-text-content::after {
+  display: none;
+}
+
+.bc-expand-text-toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.8em;
+  opacity: 0.5;
+  margin-top: -0.5em;
+  width: 100%;
+  text-align: center;
+}
+
+.bc-expand-text-overflows .bc-expand-text-toggle {
+  display: block;
 }
 
 .bc-expand-text-pre {

@@ -18,16 +18,19 @@
       "WebFetch(domain:registry.npmjs.org)",
       "WebFetch(domain:unpkg.com)",
       "WebFetch(domain:docs.stripe.com)",
+      "WebFetch(domain:fly.io)",
       "Bash(git:*)",
       "Bash(gh:*)",
-      "Bash(python3:*)",
+      "Bash(fly:*)",
+      "Bash(psql:*)",
+      "Bash(pnpm:*)",
+      "Bash(npm test)",
       "Bash(npx tsc:*)",
+      "Bash(python3:*)",
       "Bash(ls:*)",
       "Bash(xargs cat:*)",
-      "Bash(npm test)",
-      "Bash(pnpm:*)",
-      "Read(/Users/bret/Developer/yt-dlp-api/**)",
-      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)"
+      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)",
+      "Read(/Users/bret/Developer/yt-dlp-api/**)"
     ]
   }
 }
