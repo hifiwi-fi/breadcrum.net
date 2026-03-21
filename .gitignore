@@ -12,3 +12,4 @@ dependency-graph.html
 tsconfig.tsbuildinfo
 deploy
 packages/web/data/geoip
+.claude/settings.local.json

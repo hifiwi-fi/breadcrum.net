@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: 10
       - name: Use Node.js
@@ -50,11 +50,11 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - name: Archive lockfile
-        uses: actions/upload-artifact@v6
+      - name: Upload lockfile
+        uses: actions/upload-artifact@v7
         with:
-          name: pnpm-lock.yaml
           path: pnpm-lock.yaml
+          archive: false
       - run: pnpm run -r generate-default-env
       - run: pnpm run -r migrate
         env:

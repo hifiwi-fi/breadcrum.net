@@ -18,12 +18,13 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
  * @property {TypeBookmarkReadClient} bookmark
  * @property {() => void} reload
  * @property {() => void} onDelete
+ * @property {boolean} [expandSummary]
  */
 
 /**
  * @type {FunctionComponent<BookmarkListProps>}
  */
-export const BookmarkList = ({ bookmark, reload, onDelete }) => {
+export const BookmarkList = ({ bookmark, reload, onDelete, expandSummary }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
@@ -138,6 +139,7 @@ export const BookmarkList = ({ bookmark, reload, onDelete }) => {
             onToggleToread: handleToggleToRead,
             onToggleStarred: handleToggleStarred,
             onToggleSensitive: handleToggleSensitive,
+            expandSummary,
           })
     }
   </div>`
