@@ -13,7 +13,7 @@ Use [🔎 archive search](/search/archives/) when you want to query saved archiv
 
 Archives are created from bookmarks. When an archive is requested, Breadcrum creates an archive record and queues a background job to fetch the page, run readability extraction, and store the result. Extraction uses [@mozilla/readability](https://github.com/mozilla/readability) and sanitizes HTML with [dompurify](https://github.com/cure53/DOMPurify) before saving. While this runs, the archive is not ready. When the job finishes, the archive is marked ready and the content is attached. If extraction fails, the archive stores an error message instead.
 
-Archive URLs on a bookmark are external links ([archive.today](https://archive.today/), [web.archive.org](https://web.archive.org/), etc). See [Archive links](/docs/bookmarks/archive-links/) for how those are stored on bookmarks. Archive resources are the stored readability snapshots inside Breadcrum.
+Archive URLs on a bookmark are external links ([archive.is](https://archive.is/), [web.archive.org](https://web.archive.org/), etc). See [Archive links](/docs/bookmarks/archive-links/) for how those are stored on bookmarks. Archive resources are the stored readability snapshots inside Breadcrum.
 
 ## Create an archive
 

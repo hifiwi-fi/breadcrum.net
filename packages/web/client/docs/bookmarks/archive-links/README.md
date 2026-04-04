@@ -9,11 +9,11 @@ See [🔖 Bookmarks](/bookmarks/) to view and open archive links.
 
 ## How it works
 
-You can store any public archive URLs ([archive.today](https://archive.today/), [web.archive.org](https://web.archive.org/), [ghostarchive.org](https://ghostarchive.org/), [threadreaderapp.com](https://threadreaderapp.com/), etc.). These links live on the bookmark and are displayed alongside it for quick access.
+You can store any public archive URLs ([archive.is](https://archive.is/), [web.archive.org](https://web.archive.org/), [ghostarchive.org](https://ghostarchive.org/), [threadreaderapp.com](https://threadreaderapp.com/), etc.). These links live on the bookmark and are displayed alongside it for quick access.
 
 ## Templates
 
-- [archive.today](https://archive.today/): `https://archive.today/?run=1&url=...`
+- [archive.is](https://archive.is/): `https://archive.is/?run=1&url=...`
 - [ghostarchive.org](https://ghostarchive.org/): `https://ghostarchive.org/search?term=...`
 - [web.archive.org](https://web.archive.org/): `https://web.archive.org/...`
 - [threadreaderapp.com](https://threadreaderapp.com/): `https://threadreaderapp.com/search?q=...`
