@@ -98,8 +98,8 @@ catalogs:
       specifier: ~6.0.3
       version: 6.0.3
     undici:
-      specifier: 7.16.0
-      version: 7.16.0
+      specifier: 8.1.0
+      version: 8.1.0
 
 patchedDependencies:
   giscus@1.6.0:
@@ -154,7 +154,7 @@ importers:
         version: 12.16.0
       undici:
         specifier: 'catalog:'
-        version: 7.16.0
+        version: 8.1.0
     devDependencies:
       '@types/jsdom':
         specifier: 'catalog:'
@@ -344,7 +344,7 @@ importers:
         version: 4.0.42
       undici:
         specifier: 'catalog:'
-        version: 7.16.0
+        version: 8.1.0
       useragent:
         specifier: ^2.3.0
         version: 2.3.0
@@ -513,7 +513,7 @@ importers:
         version: 5.6.0
       undici:
         specifier: 'catalog:'
-        version: 7.16.0
+        version: 8.1.0
       user-agents:
         specifier: ^1.1.669
         version: 1.1.675
@@ -4722,10 +4722,6 @@ packages:
 
   undici-types@7.19.2:
     resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
-
-  undici@7.16.0:
-    resolution: {integrity: sha512-QEg3HPMll0o3t2ourKwOeUAZ159Kn9mx5pnzHRQO8+Wixmh88YdZRiIwat0iNzNNXn0yoEtXJqFpyW7eM8BV7g==}
-    engines: {node: '>=20.18.1'}
 
   undici@7.25.0:
     resolution: {integrity: sha512-xXnp4kTyor2Zq+J1FfPI6Eq3ew5h6Vl0F/8d9XU5zZQf1tX9s2Su1/3PiMmUANFULpmksxkClamIZcaUqryHsQ==}
@@ -9644,8 +9640,6 @@ snapshots:
   undici-types@7.16.0: {}
 
   undici-types@7.19.2: {}
-
-  undici@7.16.0: {}
 
   undici@7.25.0: {}
 
