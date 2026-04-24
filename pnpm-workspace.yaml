@@ -2,40 +2,40 @@ packages:
   - packages/*
 
 injectWorkspacePackages: true
+enableGlobalVirtualStore: true
 
 catalog:
   "@bret/is-youtube-url": ^1.0.5
   "@fastify/autoload": ^6.0.1
-  "@fastify/env": ^5.0.1
-  "@fastify/otel": ^0.16.0
+  "@fastify/env": ^6.0.0
+  "@fastify/otel": ^0.18.1
   "@fastify/postgres": ^6.0.2
   "@fastify/redis": ^7.1.0
   "@fastify/sensible": ^6.0.1
   "@fastify/type-provider-json-schema-to-ts": ^5.0.0
   "@nearform/sql": ^1.10.5
   "@opentelemetry/api": ^1.9.0
-  "@opentelemetry/exporter-prometheus": ^0.209.0
+  "@opentelemetry/exporter-prometheus": ^0.215.0
   "@opentelemetry/host-metrics": ^0.38.0
-  "@opentelemetry/instrumentation-http": ^0.209.0
-  "@opentelemetry/instrumentation-runtime-node": ^0.22.0
-  "@opentelemetry/sdk-node": ^0.209.0
-  "@types/node": ^25.0.8
-  "@types/jsdom": ^27.0.0
+  "@opentelemetry/instrumentation-http": ^0.215.0
+  "@opentelemetry/instrumentation-runtime-node": ^0.28.0
+  "@opentelemetry/sdk-node": ^0.215.0
+  "@types/node": ^25.6.0
+  "@types/jsdom": ^28.0.1
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
   abstract-cache-redis: ^2.0.0
   eslint: ^9.39.1
   fastify: ^5.8.1
-  fastify-cli: ^7.0.1
+  fastify-cli: ^8.0.0
   fastify-healthcheck: ^5.0.0
   fastify-plugin: ^5.0.1
-  jsdom: ^28.0.0
+  jsdom: ^29.0.2
   neostandard: ^0.12.0
   npm-run-all2: ^8.0.1
   pg: ^8.16.3
-  typescript: ~5.9.0
-  # bad type errors above 7.16.0. Hold off a bit
-  undici: 7.16.0
+  typescript: ~6.0.3
+  undici: 8.1.0
 
 ignoredBuiltDependencies:
   - unrs-resolver
