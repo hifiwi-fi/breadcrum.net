@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "releasearoni": "^0.1.0",
-    "knip": "^5.80.2",
+    "knip": "^6.6.2",
     "neostandard": "^0.12.0",
     "npm-run-all2": "^8.0.1"
   },
