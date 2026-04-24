@@ -14,7 +14,7 @@ updates:
     open-pull-requests-limit: 20
     schedule:
       interval: "cron"
-      cron: "0 0 * * *"
+      cronjob: "0 0 * * *"
     groups:
       opentelemetry:
         patterns:
