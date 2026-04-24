@@ -1,8 +1,6 @@
 packages:
   - packages/*
 
-enableGlobalVirtualStore: true
-
 catalog:
   "@bret/is-youtube-url": ^1.0.5
   "@fastify/autoload": ^6.0.1
