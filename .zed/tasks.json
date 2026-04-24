@@ -1,0 +1,7 @@
+[
+  {
+    "label": "setup worktree",
+    "command": "$ZED_MAIN_GIT_WORKTREE/scripts/setup-worktree.sh",
+    "hooks": ["create_worktree"]
+  }
+]
