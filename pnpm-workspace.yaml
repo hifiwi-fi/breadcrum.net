@@ -24,13 +24,13 @@ catalog:
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
   abstract-cache-redis: ^2.0.0
-  eslint: ^9.39.1
+  eslint: ^10.2.1
   fastify: ^5.8.1
   fastify-cli: ^8.0.0
   fastify-healthcheck: ^5.0.0
   fastify-plugin: ^5.0.1
   jsdom: ^29.0.2
-  neostandard: ^0.12.0
+  neostandard: ^0.13.0
   npm-run-all2: ^8.0.1
   pg: ^8.16.3
   typescript: ~6.0.3
