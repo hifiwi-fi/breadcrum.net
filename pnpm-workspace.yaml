@@ -1,9 +1,6 @@
 packages:
   - packages/*
 
-injectWorkspacePackages: true
-enableGlobalVirtualStore: true
-
 catalog:
   "@bret/is-youtube-url": ^1.0.5
   "@fastify/autoload": ^6.0.1
@@ -36,6 +33,11 @@ catalog:
   pg: ^8.16.3
   typescript: ~6.0.3
   undici: 8.1.0
+
+packageExtensions:
+  htm:
+    peerDependencies:
+      preact: "*"
 
 ignoredBuiltDependencies:
   - unrs-resolver
