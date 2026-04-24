@@ -340,8 +340,8 @@ importers:
         specifier: ^6.6.3
         version: 6.6.7(preact@10.29.1)
       resolve-email:
-        specifier: ^4.0.34
-        version: 4.0.42
+        specifier: ^4.0.44
+        version: 4.0.44
       undici:
         specifier: 'catalog:'
         version: 8.1.0
@@ -4252,8 +4252,8 @@ packages:
   requires-port@1.0.0:
     resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
-  resolve-email@4.0.42:
-    resolution: {integrity: sha512-JZ7DOBAswH+rrVJINArEvnHvw1lfeTs0Lc+4vxwnysRXhrNV+NAE+e28SwRbWPulhJFHjiYmsU8D5pYcLC8AIA==}
+  resolve-email@4.0.44:
+    resolution: {integrity: sha512-QfZGQSt1tXK44in6BkErf4nOGUN9z5Lsyl7u3Ne6JxSpDluu7FuF97gCYi+7ad2+uP5IkBieSC0EEegJQdHQnw==}
     engines: {node: '>=22.1.0', npm: '>=10.0.0'}
 
   resolve-from@4.0.0:
@@ -9152,7 +9152,7 @@ snapshots:
 
   requires-port@1.0.0: {}
 
-  resolve-email@4.0.42:
+  resolve-email@4.0.44:
     dependencies:
       tldts: 7.0.28
 
