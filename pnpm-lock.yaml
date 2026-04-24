@@ -53,8 +53,8 @@ catalogs:
       specifier: ^0.215.0
       version: 0.215.0
     '@types/jsdom':
-      specifier: ^27.0.0
-      version: 27.0.0
+      specifier: ^28.0.1
+      version: 28.0.1
     '@types/node':
       specifier: ^25.6.0
       version: 25.6.0
@@ -158,7 +158,7 @@ importers:
     devDependencies:
       '@types/jsdom':
         specifier: 'catalog:'
-        version: 27.0.0
+        version: 28.0.1
       '@types/mime-types':
         specifier: ^3.0.1
         version: 3.0.1
@@ -529,7 +529,7 @@ importers:
         version: 1.4.3
       '@types/jsdom':
         specifier: 'catalog:'
-        version: 27.0.0
+        version: 28.0.1
       '@types/node':
         specifier: 'catalog:'
         version: 25.6.0
@@ -1637,6 +1637,9 @@ packages:
 
   '@types/jsdom@27.0.0':
     resolution: {integrity: sha512-NZyFl/PViwKzdEkQg96gtnB8wm+1ljhdDay9ahn4hgb+SfVtPCbm3TlmDUFXTA+MGN3CijicnMhG18SI5H3rFw==}
+
+  '@types/jsdom@28.0.1':
+    resolution: {integrity: sha512-GJq2QE4TAZ5ajSoCasn5DOFm8u1mI3tIFvM5tIq3W5U/RTB6gsHwc6Yhpl91X9VSDOUVblgXmG+2+sSvFQrdlw==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -4796,6 +4799,9 @@ packages:
   undici-types@7.19.2:
     resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
+  undici-types@7.25.0:
+    resolution: {integrity: sha512-AXNgS1Byr27fTI+2bsPEkV9CxkT8H6xNyRI68b3TatlZo3RkzlqQBLL+w7SmGPVpokjHbcuNVQUWE7FRTg+LRA==}
+
   undici@7.25.0:
     resolution: {integrity: sha512-xXnp4kTyor2Zq+J1FfPI6Eq3ew5h6Vl0F/8d9XU5zZQf1tX9s2Su1/3PiMmUANFULpmksxkClamIZcaUqryHsQ==}
     engines: {node: '>=20.18.1'}
@@ -6164,6 +6170,13 @@ snapshots:
       '@types/node': 25.6.0
       '@types/tough-cookie': 4.0.5
       parse5: 7.3.0
+
+  '@types/jsdom@28.0.1':
+    dependencies:
+      '@types/node': 25.6.0
+      '@types/tough-cookie': 4.0.5
+      parse5: 7.3.0
+      undici-types: 7.25.0
 
   '@types/json-schema@7.0.15': {}
 
@@ -9758,6 +9771,8 @@ snapshots:
   undici-types@7.16.0: {}
 
   undici-types@7.19.2: {}
+
+  undici-types@7.25.0: {}
 
   undici@7.25.0: {}
 

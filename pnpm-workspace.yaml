@@ -20,7 +20,7 @@ catalog:
   "@opentelemetry/instrumentation-runtime-node": ^0.28.0
   "@opentelemetry/sdk-node": ^0.215.0
   "@types/node": ^25.6.0
-  "@types/jsdom": ^27.0.0
+  "@types/jsdom": ^28.0.1
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
   abstract-cache-redis: ^2.0.0
