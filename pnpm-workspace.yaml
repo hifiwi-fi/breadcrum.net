@@ -2,6 +2,7 @@ packages:
   - packages/*
 
 injectWorkspacePackages: true
+enableGlobalVirtualStore: true
 
 catalog:
   "@bret/is-youtube-url": ^1.0.5
