@@ -30,6 +30,10 @@ updates:
           - "eslint"
           - "eslint-*"
           - "@eslint/*"
+      jsdom:
+        patterns:
+          - "jsdom"
+          - "@types/jsdom"
 
   # Worker
   - package-ecosystem: "docker"
