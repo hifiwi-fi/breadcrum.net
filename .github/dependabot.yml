@@ -28,7 +28,6 @@ updates:
           - "eslint"
           - "eslint-*"
           - "@eslint/*"
-          - "neostandard"
 
   # Worker
   - package-ecosystem: "docker"
