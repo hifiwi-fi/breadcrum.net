@@ -23,6 +23,12 @@ updates:
           - "@voxpelli/tsconfig"
           - "@types/node"
           - "typescript"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "neostandard"
 
   # Worker
   - package-ecosystem: "docker"
