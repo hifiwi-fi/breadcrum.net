@@ -11,10 +11,10 @@
     "node": ">=24.0.0"
   },
   "devDependencies": {
-    "releasearoni": "^0.1.0",
     "knip": "^6.6.3",
     "neostandard": "^0.12.0",
-    "npm-run-all2": "^8.0.1"
+    "npm-run-all2": "^8.0.1",
+    "releasearoni": "^0.1.0"
   },
   "funding": {
     "type": "individual",
@@ -32,7 +32,7 @@
     "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm -f pnpm-lock.yaml",
     "prepublishOnly": "git push --follow-tags && releasearoni -y",
     "release": "git push --follow-tags && releasearoni -y",
-    "version": "releasearoni version",
+    "version": "releasearoni version --template keepachangelog --breaking-pattern 'BREAKING CHANGE:'",
     "test": "run-s test:*",
     "test:all": "pnpm run --workspace-concurrency=1 -r test",
     "test:knip": "pnpm run knip",

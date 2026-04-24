@@ -114,6 +114,13 @@ function parseUserAgentString (userAgent) {
  * @property {string | null} registration_ip
  * @property {UserAgentJson | null} registration_user_agent
  * @property {GeoIpRegion | null} registration_geoip
+ * @property {string | null} subscription_provider
+ * @property {string | null} subscription_status
+ * @property {string | null} subscription_plan
+ * @property {string | null} subscription_display_name
+ * @property {Date | null} subscription_period_end
+ * @property {boolean | null} subscription_cancel_at_period_end
+ * @property {string | null} stripe_customer_id
  */
 
 /**
@@ -227,15 +234,65 @@ export const getAdminUsersQuery = ({
       from auth_tokens
       where owner_id in (select id from users_page)
       order by owner_id, last_seen desc
+    ),
+    latest_subscriptions as (
+      select distinct on (user_id)
+        s.user_id,
+        s.provider as subscription_provider,
+        case
+          when s.provider = 'stripe' then ss.status
+          when s.provider = 'custom' then cs.status
+          else null
+        end as subscription_status,
+        case
+          when s.provider = 'stripe' then ss.plan_code
+          when s.provider = 'custom' then cs.plan_code
+          else null
+        end as subscription_plan,
+        cs.display_name as subscription_display_name,
+        case
+          when s.provider = 'stripe' then ss.current_period_end
+          when s.provider = 'custom' then cs.current_period_end
+          else null
+        end as subscription_period_end,
+        case
+          when s.provider = 'stripe' then ss.cancel_at_period_end
+          else false
+        end as subscription_cancel_at_period_end
+      from subscriptions s
+      left join stripe_subscriptions ss
+        on ss.subscription_id = s.id
+        and s.provider = 'stripe'
+      left join custom_subscriptions cs
+        on cs.subscription_id = s.id
+        and s.provider = 'custom'
+      where s.user_id in (select id from users_page)
+      order by s.user_id, s.updated_at desc nulls last, s.created_at desc
+    ),
+    stripe_customer as (
+      select user_id, stripe_customer_id
+      from stripe_customers
+      where user_id in (select id from users_page)
     )
     select
       u.*,
       lt.last_seen,
       lt.ip,
-      lt.user_agent
+      lt.user_agent,
+      ls.subscription_provider,
+      ls.subscription_status,
+      ls.subscription_plan,
+      ls.subscription_display_name,
+      ls.subscription_period_end,
+      ls.subscription_cancel_at_period_end,
+      sc.stripe_customer_id
     from users_page u
     left join latest_tokens lt
     on u.id = lt.owner_id
+    left join latest_subscriptions ls
+    on u.id = ls.user_id
+    left join stripe_customer sc
+    on u.id = sc.user_id
     order by u.created_at desc, u.username desc
   `
 

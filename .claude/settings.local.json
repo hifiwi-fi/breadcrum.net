@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__acp__Bash",
+      "mcp__acp__Edit",
+      "mcp__acp__Write",
+      "mcp__mcp-server-brave-search__brave_web_search",
+      "mcp__mcp-server-context7__*",
+      "mcp__mcp-server-github__*",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:publish.twitter.com)",
+      "WebFetch(domain:developer.x.com)",
+      "WebFetch(domain:developers.dailymotion.com)",
+      "WebFetch(domain:faq.dailymotion.com)",
+      "WebFetch(domain:cedwards.xyz)",
+      "WebFetch(domain:bret.io)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:docs.stripe.com)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(python3:*)",
+      "Bash(npx tsc:*)",
+      "Bash(ls:*)",
+      "Bash(xargs cat:*)",
+      "Bash(npm test)",
+      "Bash(pnpm:*)",
+      "Read(/Users/bret/Developer/yt-dlp-api/**)",
+      "Bash(chmod +x /Users/bret/Developer/breadcrum.net/scripts/link-env-files.sh)",
+      "Bash(npm view releasearoni versions --json)",
+      "Bash(grep -r \"c8\" /Users/bret/Developer/breadcrum.net/packages/*/package.json)"
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import SQL from '@nearform/sql'
  * @import { FastifyRequest } from 'fastify'
  * @import { QueryResult } from 'pg'
  * @import { AuthTokenSource as AuthTokenSourceType } from '../routes/api/user/auth-tokens/schemas/auth-token-base.js'
+ * @import { JSONSchema } from 'json-schema-to-ts'
  */
 
 /**
@@ -23,6 +24,13 @@ import SQL from '@nearform/sql'
 /**
  * @typedef {AuthTokenSourceType} AuthTokenSource
  */
+
+export const jwtEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    JWT_SECRET: { type: 'string' },
+  },
+  required: ['JWT_SECRET'],
+})
 
 /**
  * This plugins adds jwt token support

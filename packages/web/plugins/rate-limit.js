@@ -1,4 +1,14 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
+
+export const rateLimitEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    RATE_LIMITING: { type: 'boolean', default: true },
+  },
+  required: [],
+})
 
 /**
  * This plugins adds fastify/fastify-rate-limit
