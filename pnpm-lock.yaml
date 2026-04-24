@@ -74,8 +74,8 @@ catalogs:
       specifier: ^5.8.1
       version: 5.8.5
     fastify-cli:
-      specifier: ^7.0.1
-      version: 7.4.1
+      specifier: ^8.0.0
+      version: 8.0.0
     fastify-healthcheck:
       specifier: ^5.0.0
       version: 5.1.0
@@ -305,7 +305,7 @@ importers:
         version: 5.8.5
       fastify-cli:
         specifier: 'catalog:'
-        version: 7.4.1
+        version: 8.0.0
       fastify-healthcheck:
         specifier: 'catalog:'
         version: 5.1.0
@@ -492,7 +492,7 @@ importers:
         version: 5.8.5
       fastify-cli:
         specifier: 'catalog:'
-        version: 7.4.1
+        version: 8.0.0
       fastify-healthcheck:
         specifier: 'catalog:'
         version: 5.1.0
@@ -2032,10 +2032,6 @@ packages:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
 
-  chokidar@4.0.3:
-    resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
-    engines: {node: '>= 14.16.0'}
-
   chokidar@5.0.0:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
@@ -2307,10 +2303,6 @@ packages:
 
   dotenv-expand@10.0.0:
     resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
-    engines: {node: '>=12'}
-
-  dotenv@16.6.1:
-    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
   dotenv@17.4.2:
@@ -2636,8 +2628,8 @@ packages:
     resolution: {integrity: sha512-KH6p+Z8AKPXnmA7+Iz2Lh8ARCMr+8WNPVludm1LGkZoD2MjY6LVnRMtTKhkdzI+jr0RzQWXKzKyBJm1zoHEL4Q==}
     engines: {node: '>=0.10.0'}
 
-  fastify-cli@7.4.1:
-    resolution: {integrity: sha512-7Jsfj2uLuGWvnxjrGDrHWpSm65+OcVx0ZbTD2wwkz6Wt6KjGm6+ZYwwpdXdwAlzbJYq+LCEMNvDJc4485AQ1vQ==}
+  fastify-cli@8.0.0:
+    resolution: {integrity: sha512-7Jme/6on3e+IbEGr7D9S1QF1KAahNnsTOcS8rcKzwluCtr54+UA8BetdFxRYyN+zO1yNQnM1NlD00xfwkLYLjw==}
     hasBin: true
 
   fastify-healthcheck@5.1.0:
@@ -4116,10 +4108,6 @@ packages:
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
-
-  readdirp@4.1.2:
-    resolution: {integrity: sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==}
-    engines: {node: '>= 14.18.0'}
 
   readdirp@5.0.0:
     resolution: {integrity: sha512-9u/XQ1pvrQtYyMpZe7DXKv2p5CNvyVwzUB6uhLAnQwHMSgKMBR62lc7AHljaeteeHXn11XTAaLLUVZYVZyuRBQ==}
@@ -6590,10 +6578,6 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  chokidar@4.0.3:
-    dependencies:
-      readdirp: 4.1.2
-
   chokidar@5.0.0:
     dependencies:
       readdirp: 5.0.0
@@ -6836,8 +6820,6 @@ snapshots:
       '@types/trusted-types': 2.0.7
 
   dotenv-expand@10.0.0: {}
-
-  dotenv@16.6.1: {}
 
   dotenv@17.4.2: {}
 
@@ -7320,14 +7302,13 @@ snapshots:
     dependencies:
       reusify: 1.1.0
 
-  fastify-cli@7.4.1:
+  fastify-cli@8.0.0:
     dependencies:
       '@fastify/deepmerge': 3.2.1
       chalk: 4.1.2
-      chokidar: 4.0.3
+      chokidar: 5.0.0
       close-with-grace: 2.5.0
       commist: 3.2.0
-      dotenv: 16.6.1
       fastify: 5.8.5
       fastify-plugin: 5.1.0
       generify: 4.2.0
@@ -8938,8 +8919,6 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.2
-
-  readdirp@4.1.2: {}
 
   readdirp@5.0.0: {}
 
