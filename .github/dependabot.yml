@@ -11,8 +11,10 @@ updates:
 
   - package-ecosystem: "npm"
     directory: "/" # Covers all workspaces
+    open-pull-requests-limit: 20
     schedule:
-      interval: "daily"
+      interval: "cron"
+      cron: "0 0 * * *"
     groups:
       opentelemetry:
         patterns:
