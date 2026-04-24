@@ -20,8 +20,6 @@ async function envPlugin (fastify, opts) {
     schema: /** @type {EnvSchemaType} */ (fastify.getSchema('schema:dotenv')),
     dotenv: {
       path: opts.dotEnvPath,
-      debug: false,
-      quiet: true,
     }
   }
 
