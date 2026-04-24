@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v6
         with:
           version: 10
       - name: Use Node.js
@@ -92,7 +92,7 @@ jobs:
         with:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: "packages/web/lcov.info packages/worker/lcov.info"
+          files: "packages/web/lcov.info packages/worker/lcov.info packages/resources/lcov.info"
       - name: Save GeoIP cache
         if: always()
         uses: actions/cache/save@v5

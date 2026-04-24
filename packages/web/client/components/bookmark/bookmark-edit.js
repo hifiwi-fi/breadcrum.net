@@ -402,7 +402,7 @@ export const BookmarkEdit = ({
 
             <div class="bc-help-text">
               ↬:
-              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://archive.today/?run=1&url=${encodeURIComponent(b?.url ?? '')}`}">archive.today</a>,
+              <a onClick=${handleNewWindowLink} target="_blank" href="${`https://archive.is/?run=1&url=${encodeURIComponent(b?.url ?? '')}`}">archive.is</a>,
               ${'\n'}
               <a onClick=${handleNewWindowLink} target="_blank" href="${`https://ghostarchive.org/search?term=${encodeURIComponent(b?.url ?? '')}`}">ghostarchive.org</a>,
               ${'\n'}
@@ -414,7 +414,7 @@ export const BookmarkEdit = ({
 
             ${archiveURLs.length > 0
               ? html`${archiveURLs.map(
-                  (url, i) => html`<input key=${i} class='bc-bookmark-archive-url-edit' placeHolder='https://archive.today/...' type="url" name="${`archive-url-${i}`}" defaultValue="${url}" />`
+                  (url, i) => html`<input key=${i} class='bc-bookmark-archive-url-edit' placeHolder='https://archive.is/...' type="url" name="${`archive-url-${i}`}" defaultValue="${url}" />`
                 )
             }`
               : null

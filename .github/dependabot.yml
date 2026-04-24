@@ -11,8 +11,10 @@ updates:
 
   - package-ecosystem: "npm"
     directory: "/" # Covers all workspaces
+    open-pull-requests-limit: 20
     schedule:
-      interval: "daily"
+      interval: "cron"
+      cronjob: "0 0 * * *"
     groups:
       opentelemetry:
         patterns:
@@ -23,6 +25,15 @@ updates:
           - "@voxpelli/tsconfig"
           - "@types/node"
           - "typescript"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+      jsdom:
+        patterns:
+          - "jsdom"
+          - "@types/jsdom"
 
   # Worker
   - package-ecosystem: "docker"

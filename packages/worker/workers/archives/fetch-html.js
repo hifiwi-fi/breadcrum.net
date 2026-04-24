@@ -26,7 +26,7 @@ export async function fetchHTML ({ url }) {
   const requestURL = url
   const ua = uaHacks[requestURL.hostname] ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'
 
-  const client = new Client(requestURL.origin).compose(
+  const client = new Client(requestURL.origin, { autoSelectFamily: true }).compose(
     interceptors.redirect({ maxRedirections: 3 })
   )
 
@@ -38,8 +38,6 @@ export async function fetchHTML ({ url }) {
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'user-agent': ua,
       },
-      // @ts-expect-error Not in the types for some reason
-      autoSelectFamily: true,
       headersTimeout: 15000,
       bodyTimeout: 15000,
     })
