@@ -1,9 +1,11 @@
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password/password-hash.js'
+import { getUser } from './user-query.js'
+import { schemaUserUpdate } from './schemas/schema-user-update.js'
+import { schemaUserRead } from './schemas/schema-user-read.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { SchemaUserUpdate } from './schemas/schema-user-update.js'
  */
 
 /**
@@ -21,15 +23,18 @@ export async function putUserRoute (fastify, _opts) {
       preHandler: fastify.auth([fastify.verifyJWT]),
       schema: {
         tags: ['user'],
-        body: /** @type {SchemaUserUpdate} */(fastify.getSchema('schema:breadcrum:user:update')),
+        body: schemaUserUpdate,
         response: {
           200: {
             type: 'object',
             additionalProperties: false,
             properties: {
               status: { type: 'string', enum: ['ok'] },
+              data: schemaUserRead,
             },
           },
+          404: { $ref: 'HttpError' },
+          409: { $ref: 'HttpError' },
         },
       },
     },
@@ -70,9 +75,9 @@ export async function putUserRoute (fastify, _opts) {
           await client.query(query)
         }
 
-        return /** @type {const} */ ({
-          status: 'ok',
-        })
+        const updatedUser = await getUser({ pg: client, fastify, userId })
+        if (!updatedUser) return reply.notFound('User not found')
+        return /** @type {const} */ ({ status: 'ok', data: updatedUser })
       })
     }
   )

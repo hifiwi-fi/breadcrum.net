@@ -4,73 +4,48 @@
  * @import { TypePasskeyReadClient } from '../../routes/api/user/passkeys/schemas/schema-passkey-read.js'
  */
 
-import { useEffect, useState, useCallback } from 'preact/hooks'
+import { useCallback } from 'preact/hooks'
+import { useQuery as useTanstackQuery, useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useUser } from './useUser.js'
 import { useLSP } from './useLSP.js'
-import { useReload } from './useReload.js'
 import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
 
 export function usePasskeys () {
   const { user } = useUser({ required: false })
   const state = useLSP()
+  const queryClient = useQueryClient()
 
-  const [passkeys, setPasskeys] = useState(/** @type {TypePasskeyReadClient[] | null} */(null))
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(/** @type {Error | null} */(null))
+  const passkeysQuery = useTanstackQuery({
+    queryKey: ['passkeys', user?.id ?? null, state.apiUrl],
+    enabled: Boolean(user),
+    queryFn: async ({ signal }) => {
+      const response = await fetch(`${state.apiUrl}/user/passkeys`, {
+        method: 'GET',
+        headers: {
+          accept: 'application/json'
+        },
+        signal,
+      })
 
-  const { reload: reloadPasskeys, signal: passkeysReloadSignal } = useReload()
-
-  // Load passkeys
-  useEffect(() => {
-    async function getPasskeys () {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const response = await fetch(`${state.apiUrl}/user/passkeys`, {
-          method: 'GET',
-          headers: {
-            accept: 'application/json'
-          }
-        })
-
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          const body = await response.json()
-          setPasskeys(body)
-        } else {
-          throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-        }
-      } catch (err) {
-        console.error('Failed to load passkeys:', err)
-        setError(/** @type {Error} */(err))
-      } finally {
-        setLoading(false)
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        return /** @type {TypePasskeyReadClient[]} */ (await response.json())
       }
-    }
 
-    if (user) {
-      getPasskeys()
-    }
-  }, [user?.id, state.apiUrl, passkeysReloadSignal])
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+  })
 
-  /**
-   * Register a new passkey
-   * @param {string} name - Name for the passkey
-   * @returns {Promise<void>}
-   */
-  const registerPasskey = useCallback(async (/** @type {string} */ name) => {
-    try {
-      // I don think we actually need this:
-      // Dynamic import to avoid loading WebAuthn library unless needed
-      // const { client } = await import('@passwordless-id/webauthn/dist/esm/index.js')
+  const invalidatePasskeys = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['passkeys', user?.id ?? null, state.apiUrl] })
+  }, [queryClient, state.apiUrl, user?.id])
 
-      // Check if WebAuthn is available
+  const registerMutation = useMutation({
+    mutationFn: async (/** @type {string} */ name) => {
       const isAvailable = client.isAvailable()
       if (!isAvailable) {
         throw new Error('WebAuthn is not available in this browser')
       }
 
-      // Get challenge from server
       const challengeResponse = await fetch(`${state.apiUrl}/user/passkeys/register/challenge`, {
         method: 'POST'
       })
@@ -81,7 +56,6 @@ export function usePasskeys () {
 
       const { challenge } = await challengeResponse.json()
 
-      // Register with authenticator
       if (!user?.username) {
         throw new Error('Username required to register a passkey')
       }
@@ -98,7 +72,6 @@ export function usePasskeys () {
         attestation: false
       })
 
-      // Verify registration with server
       const verifyResponse = await fetch(`${state.apiUrl}/user/passkeys/register/verify`, {
         method: 'POST',
         headers: {
@@ -117,23 +90,15 @@ export function usePasskeys () {
         const errorText = await verifyResponse.text()
         throw new Error(`Failed to verify registration: ${verifyResponse.status} ${verifyResponse.statusText} - ${errorText}`)
       }
-
-      // Reload passkeys list
-      reloadPasskeys()
-    } catch (err) {
+    },
+    onSuccess: invalidatePasskeys,
+    onError: (/** @type {Error} */ err) => {
       console.error('Failed to register passkey:', err)
-      throw err
-    }
-  }, [state.apiUrl, user?.username, reloadPasskeys])
+    },
+  })
 
-  /**
-   * Update a passkey's name
-   * @param {string} id - Passkey ID
-   * @param {string} name - New name
-   * @returns {Promise<void>}
-   */
-  const updatePasskey = useCallback(async (/** @type {string} */ id, /** @type {string} */ name) => {
-    try {
+  const updateMutation = useMutation({
+    mutationFn: async (/** @type {{ id: string, name: string }} */ { id, name }) => {
       const response = await fetch(`${state.apiUrl}/user/passkeys/${id}`, {
         method: 'PATCH',
         headers: {
@@ -146,22 +111,15 @@ export function usePasskeys () {
         const errorText = await response.text()
         throw new Error(`Failed to update passkey: ${response.status} ${response.statusText} - ${errorText}`)
       }
-
-      // Reload passkeys list
-      reloadPasskeys()
-    } catch (err) {
+    },
+    onSuccess: invalidatePasskeys,
+    onError: (/** @type {Error} */ err) => {
       console.error('Failed to update passkey:', err)
-      throw err
-    }
-  }, [state.apiUrl, reloadPasskeys])
+    },
+  })
 
-  /**
-   * Delete a passkey
-   * @param {string} id - Passkey ID
-   * @returns {Promise<void>}
-   */
-  const deletePasskey = useCallback(async (/** @type {string} */ id) => {
-    try {
+  const deleteMutation = useMutation({
+    mutationFn: async (/** @type {string} */ id) => {
       const response = await fetch(`${state.apiUrl}/user/passkeys/${id}`, {
         method: 'DELETE'
       })
@@ -170,22 +128,48 @@ export function usePasskeys () {
         const errorText = await response.text()
         throw new Error(`Failed to delete passkey: ${response.status} ${response.statusText} - ${errorText}`)
       }
-
-      // Reload passkeys list
-      reloadPasskeys()
-    } catch (err) {
+    },
+    onSuccess: invalidatePasskeys,
+    onError: (/** @type {Error} */ err) => {
       console.error('Failed to delete passkey:', err)
-      throw err
-    }
-  }, [state.apiUrl, reloadPasskeys])
+    },
+  })
+
+  /**
+   * Register a new passkey
+   * @param {string} name - Name for the passkey
+   * @returns {Promise<void>}
+   */
+  const registerPasskey = useCallback(async (/** @type {string} */ name) => {
+    await registerMutation.mutateAsync(name)
+  }, [registerMutation])
+
+  /**
+   * Update a passkey's name
+   * @param {string} id - Passkey ID
+   * @param {string} name - New name
+   * @returns {Promise<void>}
+   */
+  const updatePasskey = useCallback(async (/** @type {string} */ id, /** @type {string} */ name) => {
+    await updateMutation.mutateAsync({ id, name })
+  }, [updateMutation])
+
+  /**
+   * Delete a passkey
+   * @param {string} id - Passkey ID
+   * @returns {Promise<void>}
+   */
+  const deletePasskey = useCallback(async (/** @type {string} */ id) => {
+    await deleteMutation.mutateAsync(id)
+  }, [deleteMutation])
 
   return {
-    passkeys,
-    loading,
-    error,
+    passkeys: passkeysQuery.data ?? null,
+    loading: passkeysQuery.isPending,
+    error: passkeysQuery.error || null,
     registerPasskey,
     updatePasskey,
     deletePasskey,
-    reloadPasskeys
+    reloadPasskeys: invalidatePasskeys,
   }
 }

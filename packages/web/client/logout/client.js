@@ -3,14 +3,16 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useEffect } from 'preact/hooks'
+import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const { user } = useUser({ required: false })
 
   useEffect(() => {
@@ -20,6 +22,7 @@ export const Page = () => {
           method: 'post',
         })
       } finally {
+        queryClient.setQueryData(['user', state.apiUrl], null)
         state.user = null
         window.location.replace('/')
       }
@@ -46,9 +49,4 @@ export const Page = () => {
 `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

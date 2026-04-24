@@ -9,13 +9,13 @@
 
 import { html } from 'htm/preact'
 import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
+import { useQuery } from '@tanstack/preact-query'
 import cn from 'classnames'
 import format from 'format-duration'
 import { useWindow } from '../../hooks/useWindow.js'
 import { EpisodeTitle } from '../episode-title/index.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { ArchiveTitle } from '../archive-title/index.js'
-import { useReload } from '../../hooks/useReload.js'
 import { ResolveStatus } from '../resolve-status/index.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
@@ -52,12 +52,9 @@ export const BookmarkEdit = ({
   const [archiveURLs, setArchiveURLs] = useState(/** @type {(string | undefined)[]} */(b?.archive_urls?.length ? [...b.archive_urls] : [undefined]))
   const [createEpisodeChecked, setCreateEpisodeChecked] = useState(false)
   const [customEpisodeURLChecked, setCustomEpisodeURLChecked] = useState(false)
-  const [episodeMediumSelect, setEpisodeMediumSelect] = useState(/** @type {string | null} */(null))
-  const [episodePreviewLoading, setEpisodePreviewLoading] = useState(false)
-  const [episodePreview, setEpisodePreview] = useState(/** @type {TypeEpisodePreview | null} */(null))
-  const [episodePreviewError, setEpisodePreviewError] = useState(/** @type {Error | null} */(null))
-  const [prevBookmarkURLValue, setPrevBookmarkURLValue] = useState(/** @type {string | undefined} */(b?.url))
-  const { signal: previewSignal, reload: previewReload } = useReload()
+  const [episodeMediumSelect, setEpisodeMediumSelect] = useState(/** @type {string} */('video'))
+  const [episodeURLValue, setEpisodeURLValue] = useState(/** @type {string} */(b?.url ?? ''))
+  const [previewVersion, setPreviewVersion] = useState(0)
   const isResolving = Boolean(
     b?.id && withinResolvingWindow(b?.created_at) && (
       b?.done === false ||
@@ -71,7 +68,9 @@ export const BookmarkEdit = ({
     if (b?.archive_urls?.length) {
       setArchiveURLs([...b.archive_urls])
     }
-  }, [...(b?.archive_urls ?? [])])
+  // join(',') produces a stable string dep — prevents re-running if the array
+  // reference changes but content is the same (e.g. new array from re-render).
+  }, [b?.archive_urls?.join(',')])
 
   useEffect(() => {
     // Keyboard handler for ctl-enter saving
@@ -94,53 +93,27 @@ export const BookmarkEdit = ({
     }
   }, [formRef])
 
-  useEffect(() => {
-    // Episode preview trigger
-    const controller = new AbortController()
-    const getPreview = async () => {
-      setEpisodePreviewLoading(true)
-      setEpisodePreview(null)
-      setEpisodePreviewError(null)
-      try {
-        const form = /** @type {HTMLFormElement | null} */ (/** @type {unknown} */ (formRef.current))
-        const searchParams = new URLSearchParams()
-        searchParams.set('url', form?.['createEpisodeURL'].value)
-        searchParams.set('medium', form?.['episodeMedium'].value)
-        const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
-          headers: {
-            'content-type': 'application/json',
-          },
-          signal: controller.signal,
-        })
+  const { data: episodePreview, isPending: episodePreviewLoading, error: episodePreviewError } = useQuery({
+    queryKey: ['episode-preview', state.apiUrl, episodeURLValue, episodeMediumSelect, previewVersion],
+    queryFn: async ({ signal }) => {
+      const searchParams = new URLSearchParams()
+      searchParams.set('url', episodeURLValue)
+      searchParams.set('medium', episodeMediumSelect)
+      const response = await fetch(`${state.apiUrl}/episodes/preview?${searchParams}`, {
+        headers: { accept: 'application/json' },
+        signal,
+      })
 
-        if (response.ok) {
-          /** @type {TypeEpisodePreview} */
-          const body = await response.json()
-          setEpisodePreview(body)
-        } else {
-          const err = await response.json()
-          setEpisodePreviewError(new Error(`${err.message}`))
-        }
-      } catch (err) {
-        const error = /** @type {Error} */(err)
-        if (error.name !== 'AbortError') {
-          console.error(error)
-          setEpisodePreviewError(error)
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setEpisodePreviewLoading(false)
-        }
+      if (response.ok) {
+        return /** @type {TypeEpisodePreview} */ (await response.json())
       }
-    }
-    if (createEpisodeChecked) {
-      getPreview()
-    }
 
-    return () => {
-      controller.abort()
-    }
-  }, [createEpisodeChecked, episodeMediumSelect, previewSignal])
+      const err = await response.json()
+      throw new Error(`${err.message}`)
+    },
+    enabled: createEpisodeChecked && Boolean(episodeURLValue),
+    retry: 0,
+  })
 
   const handleInitiateDelete = useCallback(() => {
     // Enter delete modal
@@ -169,11 +142,17 @@ export const BookmarkEdit = ({
     // Create episode checkbox clicked
     const checked = ev.currentTarget.checked
     setCreateEpisodeChecked(checked)
-  }, [setCreateEpisodeChecked])
+    if (checked) {
+      const form = formRef.current
+      const urlValue = form?.['createEpisodeURL']?.value ?? form?.['url']?.value ?? ''
+      setEpisodeURLValue(urlValue)
+    }
+  }, [setCreateEpisodeChecked, formRef, setEpisodeURLValue])
 
   const handleEpisodeMediumSelect = useCallback(async () => {
     // Episode medium selected
-    setEpisodeMediumSelect(formRef?.current?.['episodeMedium'].value)
+    const medium = formRef?.current?.['episodeMedium'].value
+    if (medium) setEpisodeMediumSelect(medium)
   }, [setEpisodeMediumSelect, formRef])
 
   const handleCustomEpisodeURLCheckboxChange = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
@@ -183,33 +162,27 @@ export const BookmarkEdit = ({
     const form = formRef.current
     const createEpisodeURLNode = form?.['createEpisodeURL']
     if (!checked && createEpisodeURLNode) {
-      if (createEpisodeURLNode.value !== form?.['url'].value) {
-        createEpisodeURLNode.value = form?.['url'].value
-        previewReload()
-      }
+      // Reset the DOM input back to the bookmark URL when custom URL is unchecked.
+      // Also sync episodeURLValue so the preview query key matches the reset DOM value.
+      const bookmarkURL = form?.['url'].value
+      createEpisodeURLNode.value = bookmarkURL
+      if (bookmarkURL) setEpisodeURLValue(bookmarkURL)
     }
-  }, [formRef, setCustomEpisodeURLChecked, previewReload])
-
-  const handleBookmarkURLInput = useCallback(async (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
-    // Bookmark episode default custom URL sync
-    const form = formRef.current
-    const createEpisodeNode = form?.['createEpisodeURL']
-    if (!createEpisodeNode.checked || createEpisodeNode.value === prevBookmarkURLValue) {
-      createEpisodeNode.value = ev.currentTarget.value
-    }
-    setPrevBookmarkURLValue(ev.currentTarget.value)
-  }, [formRef, prevBookmarkURLValue])
-
-  useEffect(() => {
-    // Initial bookmark URL set
-    setPrevBookmarkURLValue(b?.url)
-  }, [b?.url])
+  }, [formRef, setCustomEpisodeURLChecked, setEpisodeURLValue])
 
   const handlePreviewRefresh = useCallback(async (/** @type {Event} */ev) => {
-    // Preview refresh event handler
+    // Preview refresh: read the current URL from the form rather than mirroring
+    // input state into Preact — keeps form state in the DOM (uncontrolled).
     ev.preventDefault()
-    previewReload()
-  }, [])
+    const form = formRef.current
+    if (form) {
+      const url = customEpisodeURLChecked
+        ? form?.['createEpisodeURL']?.value
+        : form?.['url']?.value
+      if (url) setEpisodeURLValue(url)
+    }
+    setPreviewVersion(v => v + 1)
+  }, [customEpisodeURLChecked, formRef, setEpisodeURLValue, setPreviewVersion])
 
   const handleSave = useCallback(async (/** @type {SubmitEvent} */ev) => {
     ev.preventDefault()
@@ -288,7 +261,7 @@ export const BookmarkEdit = ({
       setDisabled(false)
       setError(/** @type {Error} */(err))
     }
-  }, [setDisabled, setError, formRef?.current, onSave, createEpisodeChecked, customEpisodeURLChecked, archiveURLs])
+  }, [setDisabled, setError, onSave, createEpisodeChecked, customEpisodeURLChecked, archiveURLs])
 
   const handleAddArchiveURL = useCallback((/** @type {Event} */ev) => {
     // Adding a new archive URL row
@@ -323,7 +296,7 @@ export const BookmarkEdit = ({
         <div>
           <label class='block'>
             url:
-            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" onInput="${handleBookmarkURLInput}" />
+            <input class='block bc-bookmark-url-edit' type="url" name="url" defaultValue="${b?.url}" />
           </label>
         </div>
 
@@ -487,7 +460,7 @@ export const BookmarkEdit = ({
                 name="episodeMedium"
                 value="video"
                 defaultChecked
-                onChange="${handleEpisodeMediumSelect}"
+                onChange=${handleEpisodeMediumSelect}
               />
               ${'\n'}
               <span>video</span>
@@ -505,12 +478,12 @@ export const BookmarkEdit = ({
             </label>
             ${'\n'}
             <label>
-              <input type="checkbox" name="custom-episode-url" onChange="${handleCustomEpisodeURLCheckboxChange}" />
+              <input type="checkbox" name="custom-episode-url" onChange=${handleCustomEpisodeURLCheckboxChange} />
               ${'\n'}
               custom url
             </label>
             ${'\n'}
-            <button type="button" onClick="${handlePreviewRefresh}">refresh preview</button>
+            <button type="button" onClick=${handlePreviewRefresh}>refresh preview</button>
           </div>
 
           <input class="${cn({

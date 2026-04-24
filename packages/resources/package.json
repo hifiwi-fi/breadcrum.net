@@ -6,7 +6,7 @@
   "scripts": {
     "test": "run-s test:*",
     "test:eslint": "eslint .",
-    "test:node": "node --experimental-test-coverage --test --test-reporter spec --test-reporter-destination stdout --test-reporter lcov --test-reporter-destination lcov.info",
+    "test:node": "node --test --experimental-test-coverage --test-reporter dot --test-reporter-destination stdout --test-reporter lcov --test-reporter-destination lcov.info",
     "test:tsc": "tsc"
   },
   "dependencies": {
