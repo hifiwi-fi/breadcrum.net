@@ -515,6 +515,38 @@ Note: The double-fetch still occurs (one extra request when arriving at the firs
 
 ---
 
+## Phase 13: Final Unresolved Comment (PR #690)
+
+One unresolved thread remains after the master merge, filed by `copilot-pull-request-reviewer` on 2026-03-15.
+
+### Unresolved Thread
+
+| Thread | File | Line | Comment Summary |
+|---|---|---|---|
+| PRRT (2026-03-15) | `layouts/root/root.layout.js` | 127 | `QueryProvider` wraps the SSR layout render and `getQueryClient()` caches a `QueryClient` on `globalThis.__bcQueryClient`. Copilot warns this could cause cross-request/cross-user cache leakage in a long-lived server process. |
+
+### Assessment: Not a Valid Concern for This Codebase
+
+**Architecture reality:** `root.layout.js` is a `LayoutFunction` consumed by `@domstack/static` — a **build-time static site generator**. The `render()` call happens once per page during `npm run build`, not on incoming HTTP requests. There is no "server process handling multiple requests" in this path.
+
+**Why the `QueryClient` singleton is safe here:**
+
+1. `preact-render-to-string`'s `render()` is **synchronous** and never executes `useQuery` fetch effects. Query functions do not fire during static rendering.
+2. Every `useQuery` call in every page component is gated by `enabled: Boolean(user)`. Server-side, `user` is always null (no cookie, no fetch), so all queries stay disabled.
+3. Even if (1) and (2) were not true, the static build renders each page synchronously one at a time, so there is no concurrent request interleaving.
+
+**The singleton concern IS valid** for a true SSR server where multiple concurrent requests share the same Node.js process and query results could bleed between users. If this app ever moves to request-time SSR, `getQueryClient()` must be scoped per request. A `typeof window === 'undefined'` branch that returns a fresh `new QueryClient()` (without caching) would be the correct fix at that point.
+
+**Resolution:** Reply to thread explaining the static-build context and mark resolved. No code change needed.
+
+### Phase 13 Action Checklist
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Reply to PRRT thread on `root.layout.js:127` explaining static-build context; resolve thread | Complete |
+
+---
+
 ## Phase 7: Post-Review Cleanup
 
 ### Phase 7 Action Checklist
