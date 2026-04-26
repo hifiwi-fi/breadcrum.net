@@ -50,7 +50,7 @@
     "json-schema-to-ts": "^3.1.1",
     "type-fest": "^5.2.0",
     "undici": "catalog:",
-    "user-agents": "^2.1.40"
+    "user-agents": "^2.1.41"
   },
   "devDependencies": {
     "@types/user-agents": "^1.0.4",
