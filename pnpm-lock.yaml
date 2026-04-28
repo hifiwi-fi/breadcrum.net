@@ -151,8 +151,8 @@ importers:
         specifier: 'catalog:'
         version: 8.20.0
       pg-boss:
-        specifier: ^12.17.0
-        version: 12.17.0
+        specifier: ^12.18.1
+        version: 12.18.1
       undici:
         specifier: 'catalog:'
         version: 8.1.0
@@ -3944,8 +3944,8 @@ packages:
   performance-now@2.1.0:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
 
-  pg-boss@12.17.0:
-    resolution: {integrity: sha512-28PlWt33gwgmEVh8DDqzveiRBK3sHmUd+Np6PTueLRA/VZPJ1nvDSXlw7qlPnPx2M/Bv1dbi7E13svRxQHopsg==}
+  pg-boss@12.18.1:
+    resolution: {integrity: sha512-eh7rRSTxUbPguKNDChWunKd//t4CuPFLqg9mL93sq9fai4YiGMe2HrSDqGF8gQ1Kn7VMxnB5IGRkPGDoMm4yrg==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -8751,7 +8751,7 @@ snapshots:
 
   performance-now@2.1.0: {}
 
-  pg-boss@12.17.0:
+  pg-boss@12.18.1:
     dependencies:
       cron-parser: 5.5.0
       pg: 8.20.0
