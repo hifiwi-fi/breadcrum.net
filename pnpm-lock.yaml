@@ -287,8 +287,8 @@ importers:
         specifier: ^2.3.2
         version: 2.9.0(preact@10.29.1)
       '@tanstack/preact-query':
-        specifier: ^5.100.5
-        version: 5.100.5(preact@10.29.1)
+        specifier: ^5.100.6
+        version: 5.100.6(preact@10.29.1)
       abstract-cache-redis:
         specifier: 'catalog:'
         version: 2.0.0
@@ -1604,13 +1604,13 @@ packages:
     peerDependencies:
       acorn: ^8.9.0
 
-  '@tanstack/preact-query@5.100.5':
-    resolution: {integrity: sha512-gxpcvbgwQ1kfBUrfMYdL8boapZJB2fKqbqoHN6I1j/WzHiZgl2sBo9GUGcSGXFevfkc2In4ZYfXE31WzdDJH7w==}
+  '@tanstack/preact-query@5.100.6':
+    resolution: {integrity: sha512-31KyrfGezItKDlG0HIrMyx/Xq2VREzrd7wBvxrln1BUv7jepDRuA1UDwaMlXZZ94MfkS47A0Ifi4roFOtUZpBw==}
     peerDependencies:
       preact: ^10.0.0
 
-  '@tanstack/query-core@5.100.5':
-    resolution: {integrity: sha512-t20KrhKkf0HXzqQkPbJ5erhFesup68BAbwFgYmTrS7bxMF7O5MdmL8jUkik4thsG7Hg00fblz30h6yF1d5TxGg==}
+  '@tanstack/query-core@5.100.6':
+    resolution: {integrity: sha512-Os2CPUr98to98RYm+D4qGqGkiffn7MGSyl2547a4MljVkHE30AMJRqTiyCqBfMwzAx/I91vCkAxp5tHSla6Twg==}
 
   '@textlint/ast-node-types@13.4.1':
     resolution: {integrity: sha512-qrZyhCh8Ekk6nwArx3BROybm9BnX6vF7VcZbijetV/OM3yfS4rTYhoMWISmhVEP2H2re0CtWEyMl/XF+WdvVLQ==}
@@ -6114,12 +6114,12 @@ snapshots:
     dependencies:
       acorn: 8.16.0
 
-  '@tanstack/preact-query@5.100.5(preact@10.29.1)':
+  '@tanstack/preact-query@5.100.6(preact@10.29.1)':
     dependencies:
-      '@tanstack/query-core': 5.100.5
+      '@tanstack/query-core': 5.100.6
       preact: 10.29.1
 
-  '@tanstack/query-core@5.100.5': {}
+  '@tanstack/query-core@5.100.6': {}
 
   '@textlint/ast-node-types@13.4.1': {}
 
