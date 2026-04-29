@@ -22,7 +22,7 @@ catalog:
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
   abstract-cache-redis: ^2.0.0
-  eslint: ^9.39.1
+  eslint: ^10.2.1
   fastify: ^5.8.1
   fastify-cli: ^8.0.0
   fastify-healthcheck: ^5.0.0
