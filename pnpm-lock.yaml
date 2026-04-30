@@ -516,8 +516,8 @@ importers:
         specifier: 'catalog:'
         version: 8.1.0
       user-agents:
-        specifier: ^2.1.43
-        version: 2.1.43
+        specifier: ^2.1.45
+        version: 2.1.45
     devDependencies:
       '@fastify/type-provider-json-schema-to-ts':
         specifier: 'catalog:'
@@ -4827,8 +4827,8 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  user-agents@2.1.43:
-    resolution: {integrity: sha512-0kO6cit4L2OLw4WVnEEhu9+tlw9rNzelMPQ4TsYZoROIHkjCqR/c5bxJyksDu2vNJiXDvdDG2zbNEFruFMwsWg==}
+  user-agents@2.1.45:
+    resolution: {integrity: sha512-gSVwPoahaO1XHmp6ZomPQYDnPP6pOoWWLJIatLshZrIa3Zc4Ez6qqrgbQp/rq2rMXVpmrgI0voswu802MMvB8w==}
     engines: {node: '>=18'}
 
   useragent@2.3.0:
@@ -4843,7 +4843,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -9790,7 +9790,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  user-agents@2.1.43: {}
+  user-agents@2.1.45: {}
 
   useragent@2.3.0:
     dependencies:
