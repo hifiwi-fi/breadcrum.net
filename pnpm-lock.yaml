@@ -151,8 +151,8 @@ importers:
         specifier: 'catalog:'
         version: 8.20.0
       pg-boss:
-        specifier: ^12.18.1
-        version: 12.18.1
+        specifier: ^12.18.2
+        version: 12.18.2
       undici:
         specifier: 'catalog:'
         version: 8.1.0
@@ -3944,8 +3944,8 @@ packages:
   performance-now@2.1.0:
     resolution: {integrity: sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==}
 
-  pg-boss@12.18.1:
-    resolution: {integrity: sha512-eh7rRSTxUbPguKNDChWunKd//t4CuPFLqg9mL93sq9fai4YiGMe2HrSDqGF8gQ1Kn7VMxnB5IGRkPGDoMm4yrg==}
+  pg-boss@12.18.2:
+    resolution: {integrity: sha512-06kXeWvVWY+BUNsOt2me1okg6NXx2DBnAQHTurA9jtrvbAO9qUOSE3/0ERERQDrokI+FREFM2Twha+JbrFT/8Q==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
@@ -4843,7 +4843,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -8751,7 +8751,7 @@ snapshots:
 
   performance-now@2.1.0: {}
 
-  pg-boss@12.18.1:
+  pg-boss@12.18.2:
     dependencies:
       cron-parser: 5.5.0
       pg: 8.20.0
