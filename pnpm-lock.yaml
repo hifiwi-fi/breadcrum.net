@@ -97,8 +97,8 @@ catalogs:
       specifier: ~6.0.3
       version: 6.0.3
     undici:
-      specifier: 8.1.0
-      version: 8.1.0
+      specifier: 8.2.0
+      version: 8.2.0
 
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
@@ -155,7 +155,7 @@ importers:
         version: 12.18.1
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.2.0
     devDependencies:
       '@types/jsdom':
         specifier: 'catalog:'
@@ -345,7 +345,7 @@ importers:
         version: 4.0.45
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.2.0
       useragent:
         specifier: ^2.3.0
         version: 2.3.0
@@ -514,7 +514,7 @@ importers:
         version: 5.6.0
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.2.0
       user-agents:
         specifier: ^2.1.43
         version: 2.1.43
@@ -4802,6 +4802,10 @@ packages:
     resolution: {integrity: sha512-E9MkTS4xXLnRPYqxH2e6Hr2/49e7WFDKczKcCaFH4VaZs2iNvHMqeIkyUAD9vM8kujy9TjVrRlQ5KkdEJxB2pw==}
     engines: {node: '>=22.19.0'}
 
+  undici@8.2.0:
+    resolution: {integrity: sha512-Z+4Hx9GE26Lh9Upwfnc8C7SsrpBPGaM/Gm6kMFtiG7c+5IvQKlXi/t+9x9DrrCh29cww5TSP9YdVaBcnLDs5fQ==}
+    engines: {node: '>=22.19.0'}
+
   unicorn-magic@0.1.0:
     resolution: {integrity: sha512-lRfVq8fE8gz6QMBuDM6a+LO3IAzTi05H6gCVaUpir2E1Rwpo4ZUog45KpNXKC/Mn3Yb9UDuHumeFTo9iV/D9FQ==}
     engines: {node: '>=18'}
@@ -4843,7 +4847,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -9751,6 +9755,8 @@ snapshots:
   undici@7.25.0: {}
 
   undici@8.1.0: {}
+
+  undici@8.2.0: {}
 
   unicorn-magic@0.1.0: {}
 
