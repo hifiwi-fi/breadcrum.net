@@ -341,8 +341,8 @@ importers:
         specifier: ^6.6.3
         version: 6.6.7(preact@10.29.1)
       resolve-email:
-        specifier: ^4.0.45
-        version: 4.0.45
+        specifier: ^4.0.48
+        version: 4.0.48
       undici:
         specifier: 'catalog:'
         version: 8.1.0
@@ -4252,8 +4252,8 @@ packages:
   requires-port@1.0.0:
     resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
-  resolve-email@4.0.45:
-    resolution: {integrity: sha512-ypYUv5N+Y2IkdrJeBBcOQapXWKaYqC5d1Yu8OKaZyAfw523L3hKKisTEuk7mtsTtQjguWCudgPS9Dq4As1jqPg==}
+  resolve-email@4.0.48:
+    resolution: {integrity: sha512-q+9035a0ckvsIDCMlbObYoBBOdZfmPRqnnb+ESkRWxLsQjluV+jYb/aZljll606O6ryvTrloUn/ghMsxRw9N+g==}
     engines: {node: '>=22.1.0', npm: '>=10.0.0'}
 
   resolve-from@4.0.0:
@@ -4642,8 +4642,15 @@ packages:
   tldts-core@7.0.28:
     resolution: {integrity: sha512-7W5Efjhsc3chVdFhqtaU0KtK32J37Zcr9RKtID54nG+tIpcY79CQK/veYPODxtD/LJ4Lue66jvrQzIX2Z2/pUQ==}
 
+  tldts-core@7.0.30:
+    resolution: {integrity: sha512-uiHN8PIB1VmWyS98eZYja4xzlYqeFZVjb4OuYlJQnZAuJhMw4PbKQOKgHKhBdJR3FE/t5mUQ1Kd80++B+qhD1Q==}
+
   tldts@7.0.28:
     resolution: {integrity: sha512-+Zg3vWhRUv8B1maGSTFdev9mjoo8Etn2Ayfs4cnjlD3CsGkxXX4QyW3j2WJ0wdjYcYmy7Lx2RDsZMhgCWafKIw==}
+    hasBin: true
+
+  tldts@7.0.30:
+    resolution: {integrity: sha512-ELrFxuqsDdHUwoh0XxDbxuLD3Wnz49Z57IFvTtvWy1hJdcMZjXLIuonjilCiWHlT2GbE4Wlv1wKVTzDFnXH1aw==}
     hasBin: true
 
   tmp@0.0.33:
@@ -4843,7 +4850,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -9140,9 +9147,9 @@ snapshots:
 
   requires-port@1.0.0: {}
 
-  resolve-email@4.0.45:
+  resolve-email@4.0.48:
     dependencies:
-      tldts: 7.0.28
+      tldts: 7.0.30
 
   resolve-from@4.0.0: {}
 
@@ -9601,9 +9608,15 @@ snapshots:
 
   tldts-core@7.0.28: {}
 
+  tldts-core@7.0.30: {}
+
   tldts@7.0.28:
     dependencies:
       tldts-core: 7.0.28
+
+  tldts@7.0.30:
+    dependencies:
+      tldts-core: 7.0.30
 
   tmp@0.0.33:
     dependencies:
