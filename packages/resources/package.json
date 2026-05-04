@@ -14,7 +14,7 @@
     "@fastify/postgres": "catalog:",
     "@nearform/sql": "catalog:",
     "hyperid": "^4.0.0",
-    "ipaddr.js": "^2.3.0",
+    "ipaddr.js": "^2.4.0",
     "jsdom": "catalog:",
     "mime-types": "^3.0.2",
     "pg": "catalog:",
