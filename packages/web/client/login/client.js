@@ -4,22 +4,24 @@
 /** @import { TypeTokenWithUserClient } from '../../routes/api/user/schemas/user-base.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
+import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParams } from '../hooks/useSearchParams.js'
 import { client } from '@passwordless-id/webauthn/dist/esm/index.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
+  const queryClient = useQueryClient()
   const { user, loading, error: userError } = useUser({ required: false })
   const [loggingIn, setLoggingIn] = useState(false)
   const [loginError, setLoginError] = useState(/** @type {Error | null} */(null))
   const [passkeyAuthInProgress, setPasskeyAuthInProgress] = useState(false)
   const [passkeyAuthError, setPasskeyAuthError] = useState(/** @type {Error | null} */(null))
-  const { query } = useQuery()
+  const { params } = useSearchParams(['redirect'])
   const clearValidationMessage = (/** @type {Event & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget.setCustomValidity('')
   }
@@ -53,9 +55,8 @@ export const Page = () => {
   // Redirect when logged in
   useEffect(() => {
     if (user && !loading) {
-      const pageParams = new URLSearchParams(query || '')
       let destination
-      const redirectParam = pageParams.get('redirect')
+      const redirectParam = params['redirect']
       if (redirectParam) {
         // Ensure only a path gets passed and not an open redirect
         const url = new URL(redirectParam, 'https://example.com')
@@ -145,6 +146,7 @@ export const Page = () => {
         if (verifyResponse.ok && verifyResponse.status === 201) {
           /** @type {TypeTokenWithUserClient} */
           const body = await verifyResponse.json()
+          queryClient.setQueryData(['user', state.apiUrl], body.user)
           state.user = body.user
           // Redirect will happen via the user effect
         } else {
@@ -193,6 +195,7 @@ export const Page = () => {
       if (response.ok && response.status === 201) {
         /** @type {TypeTokenWithUserClient} */
         const body = await response.json()
+        queryClient.setQueryData(['user', state.apiUrl], body.user)
         state.user = body.user
       } else {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
@@ -273,9 +276,4 @@ export const Page = () => {
 `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

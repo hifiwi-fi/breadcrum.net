@@ -4,11 +4,10 @@
 /** @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useCallback } from 'preact/hooks'
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParams.js'
 import { useWindow } from '../hooks/useWindow.js'
 import { BookmarkList } from '../components/bookmark/bookmark-list.js'
 import { Search } from '../components/search/index.js'
@@ -17,14 +16,14 @@ import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
-import { QueryProvider } from '../lib/query-provider.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { searchParamsAll, pushState } = useSearchParamsAll()
 
   const {
     bookmarksLoading,
@@ -63,7 +62,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
+  const dateParams = new URLSearchParams(searchParamsAll || '')
   const formatDateValue = (/** @type {Date | null} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()
@@ -94,7 +93,7 @@ export const Page = () => {
   const topDateValue = formatDateValue(topBookmarkDate) || formatDateValue(cursorDate)
   const bottomDateValue = formatDateValue(bottomBookmarkDate) || formatDateValue(cursorDate)
 
-  const tagFilterRemovedParams = new URLSearchParams(query || '')
+  const tagFilterRemovedParams = new URLSearchParams(searchParamsAll || '')
   const tagFilter = tagFilterRemovedParams.get('tag')
   tagFilterRemovedParams.delete('tag')
 
@@ -155,8 +154,7 @@ export const Page = () => {
 
           const bookmarkNode = tc(BookmarkList, {
             bookmark,
-            reload: reloadBookmarks,
-            onDelete: reloadBookmarks
+            onInvalidate: reloadBookmarks,
           }, bookmark.id)
 
           if (isGroupEnd) {
@@ -251,9 +249,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${QueryProvider}><${Page} /><//>`, container)
-  }
-}
+mountPage(Page)

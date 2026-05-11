@@ -5,149 +5,125 @@
 /** @import { TypeFeedRead } from '../../routes/api/feeds/schemas/schema-feed-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
-import { useEffect, useCallback, useState } from 'preact/hooks'
+import { useMemo, useCallback } from 'preact/hooks'
+import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../lib/typed-component.js'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParams } from '../hooks/useSearchParams.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { EpisodeList } from '../components/episode/episode-list.js'
 import { FeedHeader } from '../components/feed-header/feed-header.js'
 import { Search } from '../components/search/index.js'
-import { useReload } from '../hooks/useReload.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
-  const { reload: reloadEpisodes, signal: episodesReload } = useReload()
-  const { reload: reloadFeed, signal: feedReload } = useReload()
+  const { params: feedParams, setParams, pushState } = useSearchParams(['feed_id', 'before', 'after'])
+  const queryClient = useQueryClient()
+  const feedIdParam = feedParams['feed_id']
+  const beforeParam = feedParams['before']
+  const afterParam = feedParams['after']
 
-  const [episodes, setEpisodes] = useState(/** @type {TypeEpisodeReadClient[] | undefined} */(undefined))
-  const [episodesLoading, setEpisodesLoading] = useState(false)
-  const [episodesError, setEpisodesError] = useState(/** @type {Error | null} */(null))
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams()
+    if (feedIdParam) params.set('feed_id', feedIdParam)
+    if (beforeParam) params.set('before', beforeParam)
+    if (afterParam) params.set('after', afterParam)
+    return params.toString()
+  }, [afterParam, beforeParam, feedIdParam])
+  const feedId = feedIdParam
 
-  const [feed, setFeed] = useState(/** @type {TypeFeedRead | undefined} */(undefined))
-  const [feedLoading, setFeedLoading] = useState(false)
-  const [feedError, setFeedError] = useState(/** @type {Error | null} */(null))
+  const episodesQueryKey = useMemo(() => ([
+    'feed-episodes',
+    state.apiUrl,
+    state.sensitive,
+    queryString,
+  ]), [queryString, state.apiUrl, state.sensitive])
 
-  const [before, setBefore] = useState(/** @type {Date | undefined} */(undefined))
-  const [after, setAfter] = useState(/** @type {Date | undefined} */(undefined))
-
-  // Load episodes
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function getEpisodes () {
-      setEpisodesLoading(true)
-      setEpisodesError(null)
-      const pageParams = new URLSearchParams(query || '')
+  const { data: episodesData, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
+    queryKey: episodesQueryKey,
+    queryFn: async ({ signal }) => {
+      const requestParams = new URLSearchParams(queryString)
 
       // Transform date string to date object
-      const beforeParam = pageParams.get('before')
-      const afterParam = pageParams.get('after')
-      if (beforeParam) pageParams.set('before', (new Date(+beforeParam)).toISOString())
-      if (afterParam) pageParams.set('after', (new Date(+afterParam)).toISOString())
+      const beforeParam = requestParams.get('before')
+      const afterParam = requestParams.get('after')
+      if (beforeParam) requestParams.set('before', (new Date(+beforeParam)).toISOString())
+      if (afterParam) requestParams.set('after', (new Date(+afterParam)).toISOString())
 
-      pageParams.set('sensitive', state.sensitive.toString())
+      requestParams.set('sensitive', state.sensitive.toString())
+      requestParams.set('ready', 'true')
 
-      pageParams.set('ready', 'true')
-
-      if (!pageParams.get('feed_id')) {
-        pageParams.set('default_feed', 'true')
+      if (!requestParams.get('feed_id')) {
+        requestParams.set('default_feed', 'true')
       }
 
-      const response = await fetch(`${state.apiUrl}/episodes?${pageParams.toString()}`, {
+      const response = await fetch(`${state.apiUrl}/episodes?${requestParams.toString()}`, {
         method: 'get',
-        headers: {
-          'accept-encoding': 'application/json',
-        },
-        signal: controller.signal,
+        headers: { accept: 'application/json' },
+        signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        setEpisodes(body?.data)
-        setBefore(body?.pagination?.before ? new Date(body?.pagination?.before) : undefined)
-        setAfter(body?.pagination?.after ? new Date(body?.pagination?.after) : undefined)
 
-        if (body?.pagination?.top && window) {
-          const newParams = new URLSearchParams(query || '')
-          let modified = false
-          if (newParams.get('before')) {
-            newParams.delete('before')
-            modified = true
-          }
-          if (newParams.get('after')) {
-            newParams.delete('after')
-            modified = true
-          }
-
-          if (modified) {
-            const qs = newParams.toString()
-            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-          }
+        if (body?.pagination?.top) {
+          setParams({ before: null, after: null })
         }
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+
+        return body
       }
-    }
 
-    if (user) {
-      getEpisodes()
-        .then(() => { console.log('episodes done') })
-        .catch(err => {
-          console.error(err)
-          setEpisodesError(/** @type {Error} */(err))
-        })
-        .finally(() => { setEpisodesLoading(false) })
-    }
-  }, [query, state.apiUrl, state.sensitive, episodesReload])
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+    enabled: Boolean(user),
+    placeholderData: keepPreviousData,
+  })
 
-  // Get Feed
-  useEffect(() => {
-    const controller = new AbortController()
+  const feedQueryKey = useMemo(() => ([
+    'feed-details',
+    state.apiUrl,
+    feedId,
+  ]), [feedId, state.apiUrl])
 
-    async function getFeed () {
-      setFeedLoading(true)
-      setFeedError(null)
-      const pageParams = new URLSearchParams(query || '')
-
-      const requestURL = pageParams.get('feed_id')
-        ? `/feeds/${pageParams.get('feed_id')}/details/`
+  const { data: feedData, isPending: feedLoading, error: feedError } = useTanstackQuery({
+    queryKey: feedQueryKey,
+    queryFn: async ({ signal }) => {
+      const requestURL = feedId
+        ? `/feeds/${feedId}/details/`
         : '/feeds/default-feed/details'
 
       const response = await fetch(`${state.apiUrl}${requestURL}`, {
         method: 'get',
-        headers: {
-          'accept-encoding': 'application/json',
-        },
-        signal: controller.signal,
+        headers: { accept: 'application/json' },
+        signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        setFeed(body?.data)
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+        return body?.data
       }
-    }
 
-    if (user) {
-      getFeed()
-        .then(() => { console.log('feed done') })
-        .catch(err => {
-          console.error(err)
-          setFeedError(/** @type {Error} */(err))
-        })
-        .finally(() => { setFeedLoading(false) })
-    }
-  }, [state.apiUrl, feedReload])
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+    enabled: Boolean(user),
+  })
+
+  const reloadFeed = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: feedQueryKey })
+  }, [feedQueryKey, queryClient])
+
+  const episodesBody = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { before?: string, after?: string, top?: boolean } } | undefined} */ (episodesData)
+  const episodes = episodesBody?.data
+  const feed = /** @type {TypeFeedRead | undefined} */ (feedData)
+  const before = episodesBody?.pagination?.before ? new Date(episodesBody.pagination.before) : undefined
+  const after = episodesBody?.pagination?.after ? new Date(episodesBody.pagination.after) : undefined
 
   const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
@@ -165,14 +141,14 @@ export const Page = () => {
     }
   }, [window, pushState])
 
-  const handleSearch = useCallback((/** @type {string} */query) => {
+  const handleSearch = useCallback((/** @type {string} */q) => {
     if (window) {
-      window.location.replace(`/search/episodes/?query=${encodeURIComponent(query)}`)
+      window.location.replace(`/search/episodes/?query=${encodeURIComponent(q)}`)
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
-  const formatDateValue = (/** @type {Date | null} */ date) => {
+  const dateParams = new URLSearchParams(queryString)
+  const formatDateValue = (/** @type {Date | null | undefined} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -194,9 +170,7 @@ export const Page = () => {
 
   const hasEpisodes = Array.isArray(episodes) && episodes.length > 0
   const topEpisodeCreatedAt = hasEpisodes ? episodes[0]?.created_at : null
-  const bottomEpisodeCreatedAt = hasEpisodes
-    ? episodes[episodes.length - 1]?.created_at
-    : null
+  const bottomEpisodeCreatedAt = hasEpisodes ? episodes[episodes.length - 1]?.created_at : null
   const topEpisodeDate = topEpisodeCreatedAt ? new Date(topEpisodeCreatedAt) : null
   const bottomEpisodeDate = bottomEpisodeCreatedAt ? new Date(bottomEpisodeCreatedAt) : null
   const topDateValue = formatDateValue(topEpisodeDate) || formatDateValue(cursorDate)
@@ -204,14 +178,14 @@ export const Page = () => {
 
   let beforeParams
   if (before) {
-    beforeParams = new URLSearchParams(query || '')
+    beforeParams = new URLSearchParams(queryString)
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
   if (after) {
-    afterParams = new URLSearchParams(query || '')
+    afterParams = new URLSearchParams(queryString)
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')
   }
@@ -234,7 +208,7 @@ export const Page = () => {
       <div>
         ${feed ? tc(FeedHeader, { feed, reload: reloadFeed }) : null}
         ${feedLoading ? html`<div>Loading feed...</div>` : null}
-        ${feedError ? html`<div>${feedError.message}</div>` : null}
+        ${feedError ? html`<div>${/** @type {Error} */(feedError).message}</div>` : null}
       </div>
       ${showEmptyState
 ? null
@@ -254,13 +228,12 @@ export const Page = () => {
         ${showLoadingPlaceholder
           ? tc(LoadingPlaceholder, { label: 'Loading episodes' })
           : null}
-        ${episodesError ? html`<div>${episodesError.message}</div>` : null}
+        ${episodesError ? html`<div>${/** @type {Error} */(episodesError).message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-feeds-empty">Bookmark some media!</div>` : null}
         ${Array.isArray(episodes)
           ? episodes.map(e => tc(EpisodeList, {
               episode: e,
-              reload: reloadEpisodes,
-              onDelete: reloadEpisodes,
+              onInvalidate: reloadFeed,
               clickForPreview: true
             }, e.id))
           : null}
@@ -283,9 +256,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

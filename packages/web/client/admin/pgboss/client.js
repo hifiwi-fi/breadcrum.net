@@ -4,89 +4,60 @@
 /** @import { TypeDashboardDataRead } from '../../../routes/api/admin/pgboss/schemas/schema-dashboard-data.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useQuery, useQueryClient } from '@tanstack/preact-query'
+import { useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
+  const queryClient = useQueryClient()
 
-  const [dashboardData, setDashboardData] = useState(/** @type {TypeDashboardDataRead | undefined} */(undefined))
-  const [dashboardLoading, setDashboardLoading] = useState(false)
-  const [dashboardError, setDashboardError] = useState(/** @type {Error | null} */(null))
+  const { data: dashboardData, isPending: dashboardLoading, error: dashboardError } = useQuery({
+    queryKey: ['pgboss-dashboard', state.apiUrl],
+    queryFn: async ({ signal }) => {
+      const [summaryRes, statesRes, jobsRes, maintenanceRes] = await Promise.all([
+        fetch(`${state.apiUrl}/admin/pgboss/summary`, {
+          method: 'get',
+          headers: { accept: 'application/json' },
+          signal,
+        }),
+        fetch(`${state.apiUrl}/admin/pgboss/states`, {
+          method: 'get',
+          headers: { accept: 'application/json' },
+          signal,
+        }),
+        fetch(`${state.apiUrl}/admin/pgboss/jobs?limit=50`, {
+          method: 'get',
+          headers: { accept: 'application/json' },
+          signal,
+        }),
+        fetch(`${state.apiUrl}/admin/pgboss/maintenance`, {
+          method: 'get',
+          headers: { accept: 'application/json' },
+          signal,
+        }),
+      ])
 
-  useEffect(() => {
-    async function getDashboard () {
-      setDashboardLoading(true)
-      setDashboardError(/** @type {Error | null} */(null))
-
-      try {
-        const [summaryRes, statesRes, jobsRes, maintenanceRes] = await Promise.all([
-          fetch(`${state.apiUrl}/admin/pgboss/summary`, {
-            method: 'get',
-            headers: {
-              'accept-encoding': 'application/json',
-            },
-          }),
-          fetch(`${state.apiUrl}/admin/pgboss/states`, {
-            method: 'get',
-            headers: {
-              'accept-encoding': 'application/json',
-            },
-          }),
-          fetch(`${state.apiUrl}/admin/pgboss/jobs?limit=50`, {
-            method: 'get',
-            headers: {
-              'accept-encoding': 'application/json',
-            },
-          }),
-          fetch(`${state.apiUrl}/admin/pgboss/maintenance`, {
-            method: 'get',
-            headers: {
-              'accept-encoding': 'application/json',
-            },
-          })
-        ])
-
-        if (summaryRes.ok && statesRes.ok && jobsRes.ok && maintenanceRes.ok) {
-          const summary = await summaryRes.json()
-          const states = await statesRes.json()
-          const jobs = await jobsRes.json()
-          const maintenance = await maintenanceRes.json()
-          setDashboardData({ summary, states, jobs, maintenance })
-        } else {
-          throw new Error('Failed to load dashboard data')
-        }
-      } catch (err) {
-        console.error(err)
-        setDashboardError(/** @type {Error} */(err))
-      } finally {
-        setDashboardLoading(false)
+      if (summaryRes.ok && statesRes.ok && jobsRes.ok && maintenanceRes.ok) {
+        const summary = await summaryRes.json()
+        const states = await statesRes.json()
+        const jobs = await jobsRes.json()
+        const maintenance = await maintenanceRes.json()
+        return /** @type {TypeDashboardDataRead} */ ({ summary, states, jobs, maintenance })
       }
-    }
 
-    if (user) {
-      getDashboard()
-        .then(() => { console.log('dashboard done') })
-        .catch(err => {
-          console.error(err)
-          setDashboardError(/** @type {Error} */(err))
-        })
-        .finally(() => { setDashboardLoading(false) })
-    }
-  }, [state.apiUrl, user?.id])
+      throw new Error('Failed to load dashboard data')
+    },
+    enabled: Boolean(user),
+  })
 
-  if (!dashboardData && !dashboardLoading) {
-    return html`
-      <div class="bc-pgboss-dashboard">
-        <h1>🎯 pg-boss Queue Dashboard</h1>
-        <p>No data available</p>
-      </div>
-    `
-  }
+  const reload = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['pgboss-dashboard', state.apiUrl] })
+  }, [queryClient, state.apiUrl])
 
   if (dashboardLoading) {
     return html`
@@ -101,7 +72,16 @@ export const Page = () => {
     return html`
       <div class="bc-pgboss-dashboard">
         <h1>🎯 pg-boss Queue Dashboard</h1>
-        <p class="error">Error: ${dashboardError?.message}</p>
+        <p class="error">Error: ${/** @type {Error} */(dashboardError).message}</p>
+      </div>
+    `
+  }
+
+  if (!dashboardData) {
+    return html`
+      <div class="bc-pgboss-dashboard">
+        <h1>🎯 pg-boss Queue Dashboard</h1>
+        <p>No data available</p>
       </div>
     `
   }
@@ -109,6 +89,7 @@ export const Page = () => {
   return html`
     <div class="bc-pgboss-dashboard">
       <h1>🎯 pg-boss Queue Dashboard</h1>
+      <button onClick=${reload}>Refresh</button>
 
       <div class="bc-pgboss-summary">
         <h2>Overview</h2>
@@ -265,9 +246,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

@@ -61,24 +61,27 @@ export const BookmarkQuickAdd = ({
       ${open
         ? html`
           <form class="bc-quick-add-form" onSubmit=${handleSubmit}>
-            <label class="bc-quick-add-label">
-              🔖
-              <input
-                ref=${inputRef}
-                type="url"
-                name="url"
-                placeholder="Paste a URL to bookmark"
-                required
-              />
-            </label>
-            <button type="submit">Add</button>
-            ${showCancel
-              ? html`<button type="button" onClick=${handleCancel}>Cancel</button>`
-              : null}
+            <fieldset>
+              <legend>add bookmark:</legend>
+              <label class="bc-quick-add-label">
+                🔖
+                <input
+                  ref=${inputRef}
+                  type="url"
+                  name="url"
+                  placeholder="Paste a URL to bookmark"
+                  required
+                />
+              </label>
+              <button type="submit">Add</button>
+              ${showCancel
+                ? html`<button type="button" onClick=${handleCancel}>Cancel</button>`
+                : null}
+              <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
+                Adding bookmarks is easier with the bookmarklet!
+              </a>
+            </fieldset>
           </form>
-          <a class="bc-help-text bc-quick-add-help" href="/docs/bookmarks/bookmarklets/">
-            Adding bookmarks is easier with the bookmarklet!
-          </a>
         `
         : showToggle
           ? html`<button type="button" onClick=${handleOpen}>🔖 add +</button>`

@@ -3,11 +3,11 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useCallback } from 'preact/hooks'
 import { tc } from '../../lib/typed-component.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { BookmarkQuickAdd } from '../../components/bookmark/bookmark-quick-add.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -33,9 +33,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

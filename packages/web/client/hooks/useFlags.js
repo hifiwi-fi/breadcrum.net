@@ -1,47 +1,41 @@
 /// <reference lib="dom" />
 
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect } from 'preact/hooks'
+import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
 import { useLSP } from './useLSP.js'
 
 export function useFlags () {
   const state = useLSP()
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(/** @type{Error | null} */(null))
-
-  useEffect(() => {
-    setLoading(true)
-    setError(null)
-    const controller = new AbortController()
-
-    const getFlags = async () => {
+  const { data: flags, isPending: loading, error } = useTanstackQuery({
+    queryKey: ['flags', state.apiUrl],
+    queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/flags`, {
         method: 'get',
         headers: {
-          'accept-encoding': 'application/json',
+          accept: 'application/json',
         },
-        signal: controller.signal,
+        signal,
       })
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        if (!localFlagsEqualServerFlags(state.flags, body)) {
-          console.log('Updating flag state')
-          state.flags = body
-        }
-      } else {
-        throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+        return response.json()
       }
-    }
 
-    getFlags().catch(err => {
-      console.error(err)
-      setError(err)
-    }).finally(() => {
-      setLoading(false)
-    })
-  }, [state.apiUrl])
-  return { flags: state.flags, loading, error }
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+  })
+
+  // Sync fetched flags into LSP state outside of queryFn to keep queryFn pure.
+  // The equality check prevents spurious state.flags mutations.
+  useEffect(() => {
+    if (flags && !localFlagsEqualServerFlags(state.flags, flags)) {
+      console.log('Updating flag state')
+      state.flags = flags
+    }
+  }, [flags, state])
+
+  return { flags: flags ?? state.flags, loading, error: error || null }
 }
 
 /**

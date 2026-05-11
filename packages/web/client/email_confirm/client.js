@@ -3,17 +3,17 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useState, useEffect } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParams } from '../hooks/useSearchParams.js'
 import { useWindow } from '../hooks/useWindow.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
-  const { query } = useQuery()
+  const { params } = useSearchParams(['token', 'update'])
   const { user, error: userError } = useUser()
   const window = useWindow()
   const [confirming, setConfirming] = useState(false)
@@ -25,13 +25,12 @@ export const Page = () => {
       setConfirming(true)
       setErrorMessage(null)
 
-      const token = query?.get('token')
+      const token = params['token']
 
       if (!token) throw new Error('Missing email confirmation token')
       if (token.length !== 64) throw new Error('Invalid token')
 
-      const updateParam = query?.get('update')
-      const update = updateParam ? JSON.parse(updateParam) : null
+      const update = params['update'] ? JSON.parse(params['update']) : null
 
       try {
         const response = await fetch(`${state.apiUrl}/user/email:verify`, {
@@ -56,32 +55,25 @@ export const Page = () => {
       }
     }
 
-    if (query) {
-      confirmEmail().catch(err => {
-        console.error(err)
-        setErrorMessage(/** @type {Error} */(err).message)
-        setConfirming(false)
-      })
-    }
-  }, [query, state.apiUrl])
+    confirmEmail().catch(err => {
+      console.error(err)
+      setErrorMessage(/** @type {Error} */(err).message)
+      setConfirming(false)
+    })
+  }, [params['token'], params['update'], state.apiUrl])
 
   return html`
     ${user
       ? confirmed
         ? html`
           <div>
-            ${query && query.get('update') && JSON.parse(query.get('update') || '{}') ? 'Email address successfully updated!' : 'Email address confirmed!'}
+            ${params['update'] && JSON.parse(params['update']) ? 'Email address successfully updated!' : 'Email address confirmed!'}
           </div>
         `
         : html`
           <div class="bc-confirm-email">
-            ${query
-              ? html`
-                ${!query.get('token') ? html`<div>Missing email confirm token</div>` : null}
-                ${query.get('token')?.length !== 64 ? html`<div>Invalid email confirmation token</div>` : null}
-              `
-              : null
-            }
+            ${!params['token'] ? html`<div>Missing email confirm token</div>` : null}
+            ${params['token'] && params['token'].length !== 64 ? html`<div>Invalid email confirmation token</div>` : null}
             ${confirming ? html`<div>Confirming email address...</div>` : null}
             ${errorMessage || userError
                   ? html`<div class="error-box">${errorMessage} ${userError}</div>`
@@ -99,9 +91,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

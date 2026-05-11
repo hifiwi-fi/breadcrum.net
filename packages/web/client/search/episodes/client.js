@@ -4,17 +4,18 @@
 /** @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
-import { useEffect, useCallback, useState } from 'preact/hooks'
+import { useCallback, useEffect, useMemo } from 'preact/hooks'
+import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '../../lib/typed-component.js'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { useUser } from '../../hooks/useUser.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 import { useTitle } from '../../hooks/useTitle.js'
 import { Search } from '../../components/search/index.js'
 import { EpisodeList } from '../../components/episode/episode-list.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
+import { mountPage } from '../../lib/mount-page.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 
 /** @type {FunctionComponent} */
@@ -22,90 +23,74 @@ export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { params: searchParams, setParams, pushState } = useSearchParams(['query', 'id', 'rank', 'reverse', 'per_page'])
+  const queryClient = useQueryClient()
+  const queryParam = searchParams['query']
+  const idParam = searchParams['id']
+  const rankParam = searchParams['rank']
+  const reverseParam = searchParams['reverse']
+  const perPageParam = searchParams['per_page']
 
-  const [episodes, setEpisodes] = useState(/** @type {TypeEpisodeReadClient[] | undefined} */(undefined))
-  const [episodesLoading, setEpisodesLoading] = useState(false)
-  const [episodesError, setEpisodesError] = useState(/** @type {Error | null} */(null))
+  const queryValue = queryParam ?? ''
 
-  const [next, setNext] = useState(/** @type {any} */(undefined))
-  const [prev, setPrev] = useState(/** @type {any} */(undefined))
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams()
+    if (perPageParam) params.set('per_page', perPageParam)
+    params.set('query', queryParam ?? '')
+    if (idParam) params.set('id', idParam)
+    if (rankParam) params.set('rank', rankParam)
+    if (reverseParam) params.set('reverse', reverseParam)
+    params.set('sensitive', state.sensitive.toString())
+    params.set('toread', state.toread.toString())
+    params.set('starred', state.starred.toString())
+    return params
+  }, [idParam, perPageParam, queryParam, rankParam, reverseParam, state.sensitive, state.toread, state.starred])
 
-  const [dataReload, setDataReload] = useState(0)
-  const reload = useCallback(() => {
-    setDataReload(dataReload + 1)
-  }, [dataReload, setDataReload])
+  const queryKey = useMemo(() => ([
+    'search-episodes',
+    user?.id ?? null,
+    state.apiUrl,
+    queryParams.toString(),
+  ]), [queryParams, state.apiUrl, user?.id])
 
-  const pageParams = new URLSearchParams(query || '')
-  const queryValue = pageParams.get('query') ?? ''
-
-  // Search episodes
-  useEffect(() => {
-    async function getEpisodes () {
-      console.log('loading episode results')
-      setEpisodesLoading(true)
-      setEpisodesError(null)
-
-      const queryParams = new URLSearchParams()
-
-      if (pageParams.get('per_page')) queryParams.set('per_page', pageParams.get('per_page') ?? '')
-      queryParams.set('query', pageParams.get('query') ?? '')
-      if (pageParams.get('id')) queryParams.set('id', pageParams.get('id') ?? '')
-      if (pageParams.get('rank')) queryParams.set('rank', pageParams.get('rank') ?? '')
-      if (pageParams.get('reverse')) queryParams.set('reverse', pageParams.get('reverse') ?? '')
-      queryParams.set('sensitive', state.sensitive.toString())
-      queryParams.set('toread', state.toread.toString())
-      queryParams.set('starred', state.starred.toString())
-
+  const { data, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
+    queryKey,
+    queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/search/episodes?${queryParams.toString()}`, {
         method: 'get',
-        headers: {
-          'accept-encoding': 'application/json',
-        },
+        headers: { accept: 'application/json' },
+        signal,
       })
 
-      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-        const body = await response.json()
-        setEpisodes(body?.data)
-        setNext(body?.pagination?.next)
-        setPrev(body?.pagination?.prev)
-
-        if (body?.pagination?.top && window) {
-          const newParams = new URLSearchParams(query || '')
-          let modified = false
-          if (newParams.get('id')) {
-            newParams.delete('id')
-            modified = true
-          }
-          if (newParams.get('rank')) {
-            newParams.delete('rank')
-            modified = true
-          }
-          if (newParams.get('reverse')) {
-            newParams.delete('reverse')
-            modified = true
-          }
-
-          if (modified) {
-            const qs = newParams.toString()
-            window.history.replaceState(null, '', qs ? `.?${qs}` : '.')
-          }
-        }
-      } else {
+      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
         throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
       }
-    }
 
-    if (user) {
-      getEpisodes()
-        .then(() => { console.log('episodes done') })
-        .catch(err => {
-          console.error(err)
-          setEpisodesError(/** @type {Error} */(err))
-        })
-        .finally(() => { setEpisodesLoading(false) })
+      const body = await response.json()
+
+      return body
+    },
+    enabled: Boolean(user),
+    placeholderData: keepPreviousData,
+  })
+
+  // Cursor cleanup: when the server signals we're at the first page, remove stale
+  // id/rank/reverse params from the URL. Runs in an effect (not queryFn) to keep
+  // queryFn pure. setParams is idempotent — no-op if params already absent.
+  useEffect(() => {
+    if (data?.pagination?.top) {
+      setParams({ id: null, rank: null, reverse: null })
     }
-  }, [query, state.apiUrl, state.sensitive, state.starred, state.toread, dataReload])
+  }, [data, setParams])
+
+  const body = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { next?: any, prev?: any } } | undefined} */ (data)
+  const episodes = body?.data
+  const next = body?.pagination?.next
+  const prev = body?.pagination?.prev
+
+  const reload = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey })
+  }, [queryClient, queryKey])
 
   const title = queryValue ? ['📼', queryValue, '|', 'Episodes Search'] : []
   useTitle(...title)
@@ -118,11 +103,18 @@ export const Page = () => {
     }
   }, [window, pushState])
 
-  const handleSearch = useCallback((/** @type {string} */ query) => {
-    if (window) {
-      window.location.replace(`./?query=${encodeURIComponent(query)}`)
-    }
-  }, [window])
+  const handleSearch = useCallback((/** @type {string} */ q) => {
+    setParams(
+      {
+        query: q || null,
+        id: null,
+        rank: null,
+        reverse: null,
+      },
+      { replace: false }
+    )
+    window?.scrollTo({ top: 0 })
+  }, [setParams, window])
 
   const hasPending = Array.isArray(episodes) && episodes.some(episode => (
     episode?.ready === false && !episode?.error && withinResolvingWindow(episode?.created_at)
@@ -135,7 +127,8 @@ export const Page = () => {
 
   let nextParams
   if (next) {
-    nextParams = new URLSearchParams(query || '')
+    nextParams = new URLSearchParams()
+    if (perPageParam) nextParams.set('per_page', perPageParam)
     nextParams.set('query', next.query)
     nextParams.set('rank', next.rank)
     nextParams.set('id', next.id)
@@ -144,7 +137,8 @@ export const Page = () => {
 
   let prevParams
   if (prev) {
-    prevParams = new URLSearchParams(query || '')
+    prevParams = new URLSearchParams()
+    if (perPageParam) prevParams.set('per_page', perPageParam)
     prevParams.set('query', prev.query)
     prevParams.set('rank', prev.rank)
     prevParams.set('id', prev.id)
@@ -181,7 +175,7 @@ export const Page = () => {
 
       <div class=${resultsClassName}>
         ${episodesLoading && !Array.isArray(episodes) ? html`<div>...</div>` : null}
-        ${episodesError ? html`<div>${episodesError.message}</div>` : null}
+        ${episodesError ? html`<div>${/** @type {Error} */(episodesError).message}</div>` : null}
         ${showEmptyState
           ? html`
             <div class="bc-search-empty">
@@ -194,8 +188,7 @@ export const Page = () => {
           ? episodes.map(e => html`
               ${tc(EpisodeList, {
                 episode: e,
-                reload,
-                onDelete: reload
+                onInvalidate: reload,
               }, e.id)}
             `)
           : null}
@@ -209,9 +202,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

@@ -4,10 +4,10 @@
 /** @import { TypeAdminStatsReadClient } from '../../../routes/api/admin/stats/schemas/schema-admin-stats-read.js' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useQuery } from '@tanstack/preact-query'
 import { useUser } from '../../hooks/useUser.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 const countFormatter = new Intl.NumberFormat('en-US')
 
@@ -15,10 +15,6 @@ const countFormatter = new Intl.NumberFormat('en-US')
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
-
-  const [stats, setStats] = useState(/** @type {TypeAdminStatsReadClient | null} */(null))
-  const [statsLoading, setStatsLoading] = useState(false)
-  const [statsError, setStatsError] = useState(/** @type {Error | null} */(null))
 
   /** @param {string | number | null | undefined} value */
   const formatCount = (value) => {
@@ -50,6 +46,24 @@ export const Page = () => {
     return null
   }
 
+  const { data: stats, isPending: statsLoading, error: statsError } = useQuery({
+    queryKey: ['admin-stats', state.apiUrl],
+    queryFn: async ({ signal }) => {
+      const response = await fetch(`${state.apiUrl}/admin/stats`, {
+        method: 'get',
+        headers: { accept: 'application/json' },
+        signal,
+      })
+
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        return /** @type {TypeAdminStatsReadClient} */ (await response.json())
+      }
+
+      throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+    },
+    enabled: Boolean(user),
+  })
+
   const bookmarkStats = Array.isArray(stats?.bookmarkStats) ? stats.bookmarkStats : []
   const cumulativeCounts = Array.isArray(stats?.cumulativeCounts) ? stats.cumulativeCounts : []
   const totalUsersCount = getTotalUsersCount(stats?.totalUsers)
@@ -61,50 +75,11 @@ export const Page = () => {
       .sort((a, b) => Number(a) - Number(b))
     : []
 
-  useEffect(() => {
-    async function getStats () {
-      setStatsLoading(true)
-      setStatsError(null)
-
-      try {
-        const response = await fetch(`${state.apiUrl}/admin/stats`, {
-          method: 'get',
-          headers: {
-            'accept-encoding': 'application/json',
-          },
-        })
-
-        if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-          /** @type {TypeAdminStatsReadClient} */
-          const body = await response.json()
-          setStats(body)
-        } else {
-          throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-        }
-      } catch (err) {
-        console.error(err)
-        setStatsError(/** @type {Error} */(err))
-      } finally {
-        setStatsLoading(false)
-      }
-    }
-
-    if (user) {
-      getStats()
-        .then(() => { console.log('stats done') })
-        .catch(err => {
-          console.error(err)
-          setStatsError(/** @type {Error} */(err))
-        })
-        .finally(() => { setStatsLoading(false) })
-    }
-  }, [state.apiUrl, user?.id])
-
   return html`
     <div class="bc-admin-stats">
       <h1>Stats</h1>
       ${statsLoading ? html`<p class="bc-admin-stats-loading">Loading stats...</p>` : null}
-      ${statsError ? html`<p class="bc-admin-stats-error">${statsError.message}</p>` : null}
+      ${statsError ? html`<p class="bc-admin-stats-error">${/** @type {Error} */(statsError).message}</p>` : null}
       ${stats
         ? html`
         <section class="bc-admin-stats-summary">
@@ -177,9 +152,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)
