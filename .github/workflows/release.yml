@@ -104,7 +104,7 @@ jobs:
             echo "NEW_VERSION=${{ github.event.inputs.newversion }}" >> $GITHUB_ENV
           fi
           echo $NEW_VERSION
-      - uses: bcomnes/npm-bump@v2
+      - uses: bcomnes/npm-bump@v3
         with:
           git_email: bcomnes@gmail.com
           git_username: ${{ github.actor }}
