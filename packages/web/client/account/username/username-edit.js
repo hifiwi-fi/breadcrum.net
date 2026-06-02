@@ -11,13 +11,14 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  *  user: TypeUserRead | null,
  *  onSave?: (formState: { username: string }) => Promise<void> | void,
  *  onCancelEdit?: () => void,
+ *  disabled?: boolean,
  * }} UsernameEditProps
  */
 
 /**
  * @type {FunctionComponent<UsernameEditProps>}
  */
-export const UsernameEdit = ({ user, onSave, onCancelEdit }) => {
+export const UsernameEdit = ({ user, onSave, onCancelEdit, disabled: disabledProp = false }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
@@ -49,7 +50,7 @@ export const UsernameEdit = ({ user, onSave, onCancelEdit }) => {
   return html`
     <div class='bc-account-username-edit'>
       <form ref=${formRef} class="bc-account-username-edit-form" id="bc-account-username-edit-form" onsubmit=${handleSave}>
-      <fieldset disabled=${disabled}>
+      <fieldset disabled=${disabledProp || disabled}>
         <legend class="bc-account-username-edit-legend">Edit username</legend>
       <div>
           <label class='block'>

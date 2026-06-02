@@ -11,12 +11,23 @@ import { useLSP } from '../hooks/useLSP.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { tc } from '../lib/typed-component.js'
 import { mountPage } from '../lib/mount-page.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../hooks/useOfflineReadSync.js'
+import { useOfflineTags } from '../hooks/useOfflineTags.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../lib/offline/offline-db.js'
+
+/** @typedef {{ name: string, count: number }} TagSummary */
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const { searchParamsAll } = useSearchParamsAll()
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = searchParamsAll?.get('offline_db_spike') === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
   const queryKey = useMemo(() => ([
@@ -27,7 +38,11 @@ export const Page = () => {
     queryString,
   ]), [queryString, state.apiUrl, state.sensitive, user?.id])
 
-  const { data: tags, isPending: tagsLoading, error: tagsError } = useTanstackQuery({
+  const {
+    data: networkTags,
+    isPending: networkTagsLoading,
+    error: networkTagsError,
+  } = useTanstackQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const pageParams = new URLSearchParams(queryString)
@@ -43,15 +58,23 @@ export const Page = () => {
 
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
-        return /** @type {Array<{name: string, count: number}>} */(body?.data ?? [])
+        return /** @type {TagSummary[]} */(body?.data ?? [])
       }
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !useOfflineData,
   })
+  const {
+    tags: offlineTags,
+    tagsLoading: offlineTagsLoading,
+    tagsError: offlineTagsError,
+  } = useOfflineTags({ enabled: showOfflineDbSpike })
+  const tags = useOfflineData ? offlineTags : networkTags
+  const tagsLoading = useOfflineData ? offlineTagsLoading : networkTagsLoading
+  const tagsError = useOfflineData ? offlineTagsError : networkTagsError
   const hasTagsData = Array.isArray(tags)
-  const tagsList = /** @type {Array<{name: string, count: number}>} */ (hasTagsData ? tags : [])
+  const tagsList = /** @type {TagSummary[]} */ (hasTagsData ? tags : [])
 
   let minCount = 0
   let maxCount = 0
@@ -75,6 +98,7 @@ export const Page = () => {
   }
 
   const showEmptyState = hasTagsData && tagsList.length === 0 && !tagsLoading && !tagsError
+  const emptyStateText = useOfflineData ? 'No synced tags available.' : 'Tag some bookmarks!'
   const showLoadingPlaceholder = tagsLoading && (!hasTagsData || tagsList.length === 0)
   const resultsClassName = (showEmptyState || showLoadingPlaceholder)
     ? 'bc-tags-results bc-tags-results-empty'
@@ -87,7 +111,7 @@ export const Page = () => {
           ? tc(LoadingPlaceholder, { label: 'Loading tags' })
           : null}
         ${tagsError ? html`<div>${tagsError.message}</div>` : null}
-        ${showEmptyState ? html`<div class="bc-tags-empty">Tag some bookmarks!</div>` : null}
+        ${showEmptyState ? html`<div class="bc-tags-empty">${emptyStateText}</div>` : null}
         ${hasTagsData
           ? html`
             <div class="bc-tags-list">
@@ -99,4 +123,4 @@ export const Page = () => {
 `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

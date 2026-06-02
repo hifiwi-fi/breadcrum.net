@@ -103,9 +103,7 @@ catalogs:
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
 patchedDependencies:
-  giscus@1.6.0:
-    hash: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
-    path: patches/giscus@1.6.0.patch
+  giscus@1.6.0: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
 
 importers:
 
@@ -256,6 +254,9 @@ importers:
       '@fastify/swagger-ui':
         specifier: ^5.0.1
         version: 5.2.6
+      '@journeyapps/wa-sqlite':
+        specifier: ^1.7.0
+        version: 1.7.0
       '@maxmind/geoip2-node':
         specifier: ^6.3.4
         version: 6.3.4
@@ -286,9 +287,24 @@ importers:
       '@preact/signals':
         specifier: ^2.3.2
         version: 2.9.0(preact@10.29.1)
+      '@tanstack/browser-db-sqlite-persistence':
+        specifier: ^0.1.11
+        version: 0.1.11(@journeyapps/wa-sqlite@1.7.0)(typescript@6.0.3)
+      '@tanstack/db':
+        specifier: ^0.6.7
+        version: 0.6.7(typescript@6.0.3)
       '@tanstack/preact-query':
         specifier: ^5.91.0
         version: 5.100.1(preact@10.29.1)
+      '@tanstack/query-core':
+        specifier: ^5.100.1
+        version: 5.100.1
+      '@tanstack/query-db-collection':
+        specifier: ^1.0.38
+        version: 1.0.38(@tanstack/query-core@5.100.1)(typescript@6.0.3)
+      '@tanstack/react-db':
+        specifier: ^0.1.85
+        version: 0.1.85(@preact/compat@18.3.2(preact@10.29.1))(typescript@6.0.3)
       abstract-cache-redis:
         specifier: 'catalog:'
         version: 2.0.0
@@ -340,6 +356,9 @@ importers:
       preact-render-to-string:
         specifier: ^6.6.3
         version: 6.6.7(preact@10.29.1)
+      react:
+        specifier: npm:@preact/compat@^18.3.1
+        version: '@preact/compat@18.3.2(preact@10.29.1)'
       resolve-email:
         specifier: ^4.0.34
         version: 4.0.44
@@ -1018,6 +1037,9 @@ packages:
     resolution: {integrity: sha512-AokJm4tuBHillT+FpMtxQ60n8ObyXBatq7jD2/JA9dxbDDokKQm8KMht5ibGzLVU9IJDIKK4TPKgMHEYMn3lMg==}
     engines: {node: '>=18'}
 
+  '@journeyapps/wa-sqlite@1.7.0':
+    resolution: {integrity: sha512-xQZ670aKDo4FWxIFpLqY0AGDpURr09aYIO08UkLdWvFw8C018nCiqY0ILJudGRhRdXORhv7K2xD2OXZ2QxU39w==}
+
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
@@ -1568,6 +1590,11 @@ packages:
     resolution: {integrity: sha512-h104Kh26rR8tm+a3Qkc5S4VLYint3FE48as7+/5oCEcKR2idC/pF1G6AhIXKI+eHPJa/3J9i5z0Al47IeGHPkA==}
     engines: {node: '>=12'}
 
+  '@preact/compat@18.3.2':
+    resolution: {integrity: sha512-5vSl55K5yLMvocT7PBKxDOHGgYPjMrKQqqr6roSNjIXcJOtSgDDMjpiCAF3s7klRdmGrN75b/Przmjw8gmlg/w==}
+    peerDependencies:
+      preact: '*'
+
   '@preact/signals-core@1.14.1':
     resolution: {integrity: sha512-vxPpfXqrwUe9lpjqfYNjAF/0RF/eFGeLgdJzdmIIZjpOnTmGmAB4BjWone562mJGMRP4frU6iZ6ei3PDsu52Ng==}
 
@@ -1609,6 +1636,9 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@stylistic/eslint-plugin@2.11.0':
     resolution: {integrity: sha512-PNRHbydNG5EH8NK4c+izdJlxajIR6GxcUhzsYNRsn6Myep4dsZt0qFCz3rCPnkvgO5FYibDcMqgNHUT+zvjYZw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -1620,6 +1650,31 @@ packages:
     peerDependencies:
       acorn: ^8.9.0
 
+  '@tanstack/browser-db-sqlite-persistence@0.1.11':
+    resolution: {integrity: sha512-pVplzJNwG2spZjDwy3dJr7fCsqAKtg0w96JhzsIqq4Ttsi/eUh9YM/AKWxEiD4szsJtwFLlpNIz5dSxEp3bbnQ==}
+    peerDependencies:
+      '@journeyapps/wa-sqlite': ^1.4.1
+      typescript: '>=4.7'
+
+  '@tanstack/db-ivm@0.1.18':
+    resolution: {integrity: sha512-+pZJiRKdoKRM5Epq9T7otD9ZJl82pRFauo7LKuJGrarjVKQ7r+QQlPe3kGdN9LEKSnuNGIWjX9OOY4M8kH4eLw==}
+    peerDependencies:
+      typescript: '>=4.7'
+
+  '@tanstack/db-sqlite-persistence-core@0.1.11':
+    resolution: {integrity: sha512-HZyJBU64VL6M4vGTmaDVi+sVOhLyZiHKxGj0UdpWokcPBtbTHrSRrpXTE8HJCoQf6gDdbybj7OG2UBXWxJzHLg==}
+    peerDependencies:
+      typescript: '>=4.7'
+
+  '@tanstack/db@0.6.7':
+    resolution: {integrity: sha512-nCwOhNXogu3JHdkNPXX6+B8aL0F4wVe0CwLvNS7ccCQ6m9147L8qJewL4IZVyACQDsLGs5MKg91x+VUiD+MplQ==}
+    peerDependencies:
+      typescript: '>=4.7'
+
+  '@tanstack/pacer-lite@0.2.2':
+    resolution: {integrity: sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw==}
+    engines: {node: '>=18'}
+
   '@tanstack/preact-query@5.100.1':
     resolution: {integrity: sha512-kt/IbD1jiTi2JvKM3d/yy54s6Yu6x12gQyeuOTPb+uBQrTG8o7L5aVgNXGRT9fnh+Qbdy5z98rYmHozf67oElg==}
     peerDependencies:
@@ -1627,6 +1682,17 @@ packages:
 
   '@tanstack/query-core@5.100.1':
     resolution: {integrity: sha512-awvQhOO/2TrSCHE5LKKsXcvvj6WSBncwEcMFCB/ez0Qs0b17iyyivoGArNV3HFfXryZwCpnb/olsaBBKrIbtSw==}
+
+  '@tanstack/query-db-collection@1.0.38':
+    resolution: {integrity: sha512-cHD951MBgOvzI+/6367Bf3S88z5n9demxZ7+MfqxRJdXxaogF73h8Pjg+iB9Lnb4WZB8oU6g9eDexaZakLeiBA==}
+    peerDependencies:
+      '@tanstack/query-core': ^5.0.0
+      typescript: '>=4.7'
+
+  '@tanstack/react-db@0.1.85':
+    resolution: {integrity: sha512-OaZCTiCxAag8opGF0As8iRSrbFfGg/ggLWuXYdvMufoNHnDYsc/n2sULgGhFT1U1/1Q4zbkayz445NlDhC/5vg==}
+    peerDependencies:
+      react: '>=16.8.0'
 
   '@textlint/ast-node-types@13.4.1':
     resolution: {integrity: sha512-qrZyhCh8Ekk6nwArx3BROybm9BnX6vF7VcZbijetV/OM3yfS4rTYhoMWISmhVEP2H2re0CtWEyMl/XF+WdvVLQ==}
@@ -2870,6 +2936,10 @@ packages:
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
+
+  fractional-indexing@3.2.0:
+    resolution: {integrity: sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==}
+    engines: {node: ^14.13.1 || >=16.0.0}
 
   fragmentions@1.1.4:
     resolution: {integrity: sha512-S0G8reVbBlWS/1H6BNzHX4GV0YpO+rPmaJK+36hUbjdzlwMQaq1nz9Po4GZfDtbBntAFVvkx5ySVoFQQgVI3TA==}
@@ -4470,6 +4540,9 @@ packages:
     resolution: {integrity: sha512-aSbHV0DaBcr7u0PVHXzM6NbZNAtrr9sF6+Qfs9UUVG7Ll3jQ6hHi8F/xqIIcn2rvIVbr0v/2zyjSdwSV47AgLQ==}
     engines: {node: '>=12'}
 
+  sorted-btree@1.8.1:
+    resolution: {integrity: sha512-395+XIP+wqNn3USkFSrNz7G3Ss/MXlZEqesxvzCRFwL14h6e8LukDHdLBePn5pwbm5OQ9vGu8mDyz2lLDIqamQ==}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -4851,6 +4924,11 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
+  use-sync-external-store@1.6.0:
+    resolution: {integrity: sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   user-agents@2.1.40:
     resolution: {integrity: sha512-wyCKhm4d8m4QArnMWBf+58xGLT2wYBg2UfeM96MGqDOE3nme5rzhhOWe2FHg+trcauUt2muIV0uKluJY9Val9Q==}
     engines: {node: '>=18'}
@@ -4867,7 +4945,7 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -5559,6 +5637,8 @@ snapshots:
 
   '@isaacs/cliui@9.0.0': {}
 
+  '@journeyapps/wa-sqlite@1.7.0': {}
+
   '@js-sdsl/ordered-map@4.4.2': {}
 
   '@lit-labs/ssr-dom-shim@1.5.1': {}
@@ -6090,6 +6170,10 @@ snapshots:
       '@pnpm/network.ca-file': 1.0.2
       config-chain: 1.1.13
 
+  '@preact/compat@18.3.2(preact@10.29.1)':
+    dependencies:
+      preact: 10.29.1
+
   '@preact/signals-core@1.14.1': {}
 
   '@preact/signals@2.9.0(preact@10.29.1)':
@@ -6122,6 +6206,8 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
+  '@standard-schema/spec@1.1.0': {}
+
   '@stylistic/eslint-plugin@2.11.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/utils': 8.59.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.3)
@@ -6138,12 +6224,54 @@ snapshots:
     dependencies:
       acorn: 8.16.0
 
+  '@tanstack/browser-db-sqlite-persistence@0.1.11(@journeyapps/wa-sqlite@1.7.0)(typescript@6.0.3)':
+    dependencies:
+      '@journeyapps/wa-sqlite': 1.7.0
+      '@tanstack/db-sqlite-persistence-core': 0.1.11(typescript@6.0.3)
+      typescript: 6.0.3
+
+  '@tanstack/db-ivm@0.1.18(typescript@6.0.3)':
+    dependencies:
+      fractional-indexing: 3.2.0
+      sorted-btree: 1.8.1
+      typescript: 6.0.3
+
+  '@tanstack/db-sqlite-persistence-core@0.1.11(typescript@6.0.3)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      '@tanstack/db': 0.6.7(typescript@6.0.3)
+      typescript: 6.0.3
+
+  '@tanstack/db@0.6.7(typescript@6.0.3)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      '@tanstack/db-ivm': 0.1.18(typescript@6.0.3)
+      '@tanstack/pacer-lite': 0.2.2
+      typescript: 6.0.3
+
+  '@tanstack/pacer-lite@0.2.2': {}
+
   '@tanstack/preact-query@5.100.1(preact@10.29.1)':
     dependencies:
       '@tanstack/query-core': 5.100.1
       preact: 10.29.1
 
   '@tanstack/query-core@5.100.1': {}
+
+  '@tanstack/query-db-collection@1.0.38(@tanstack/query-core@5.100.1)(typescript@6.0.3)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      '@tanstack/db': 0.6.7(typescript@6.0.3)
+      '@tanstack/query-core': 5.100.1
+      typescript: 6.0.3
+
+  '@tanstack/react-db@0.1.85(@preact/compat@18.3.2(preact@10.29.1))(typescript@6.0.3)':
+    dependencies:
+      '@tanstack/db': 0.6.7(typescript@6.0.3)
+      react: '@preact/compat@18.3.2(preact@10.29.1)'
+      use-sync-external-store: 1.6.0(@preact/compat@18.3.2(preact@10.29.1))
+    transitivePeerDependencies:
+      - typescript
 
   '@textlint/ast-node-types@13.4.1': {}
 
@@ -7596,6 +7724,8 @@ snapshots:
   forwarded-parse@2.1.2: {}
 
   forwarded@0.2.0: {}
+
+  fractional-indexing@3.2.0: {}
 
   fragmentions@1.1.4: {}
 
@@ -9419,6 +9549,8 @@ snapshots:
     dependencies:
       is-plain-obj: 4.1.0
 
+  sorted-btree@1.8.1: {}
+
   source-map-js@1.2.1: {}
 
   source-map@0.6.1: {}
@@ -9813,6 +9945,10 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  use-sync-external-store@1.6.0(@preact/compat@18.3.2(preact@10.29.1)):
+    dependencies:
+      react: '@preact/compat@18.3.2(preact@10.29.1)'
 
   user-agents@2.1.40: {}
 

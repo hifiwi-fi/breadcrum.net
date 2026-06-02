@@ -3,13 +3,18 @@
 /**
  * @import { TypeBookmarkReadClient } from '../../routes/api/bookmarks/schemas/schema-bookmark-read.js';
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
+ * @import { OfflineRefetchTarget } from './useOfflineReadSync.js'
  */
 
 import { useCallback, useEffect, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
+import { useLiveQuery } from '@tanstack/react-db'
 import { useUser } from './useUser.js'
 import { useSearchParamsAll, useSearchParams } from './useSearchParams.js'
 import { useLSP } from './useLSP.js'
+import { useOnlineStatus } from './useOnlineStatus.js'
+import { getBookmarksCollection } from '../lib/offline/bookmarks-collection.js'
+import { refetchOfflineTarget } from './useOfflineReadSync.js'
 
 /**
  * @typedef {object} BookmarksQueryData
@@ -19,13 +24,23 @@ import { useLSP } from './useLSP.js'
  * @property {boolean} top
  */
 
-export function useBookmarks () {
+/**
+ * @param {{ enabled?: boolean }} [options]
+ */
+export function useBookmarks (options = {}) {
+  const { enabled = true } = options
   const { user } = useUser({ required: false })
   const state = useLSP()
   const { searchParamsAll } = useSearchParamsAll()
   const { setParams } = useSearchParams(['before', 'after'])
+  const online = useOnlineStatus()
 
   const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
+  const offlineDbEnabled = useMemo(() => {
+    const params = new URLSearchParams(queryString)
+    return params.get('offline_db_spike') === 'true'
+  }, [queryString])
+  const useOfflineData = offlineDbEnabled && !online
   const queryKey = useMemo(() => ([
     'bookmarks',
     user?.id ?? null,
@@ -39,7 +54,7 @@ export function useBookmarks () {
   /** @type {UseQueryResult<BookmarksQueryData, Error>} */
   const bookmarksQuery = useTanstackQuery(/** @type {UseQueryOptions<BookmarksQueryData, Error>} */ ({
     queryKey,
-    enabled: Boolean(user),
+    enabled: Boolean(user) && enabled && !useOfflineData,
     placeholderData: keepPreviousData,
     /**
      * @param {{ signal: AbortSignal }} context
@@ -83,6 +98,40 @@ export function useBookmarks () {
   }))
 
   const { data, error, isPending, refetch } = bookmarksQuery
+  const bookmarksCollection = useMemo(() => getBookmarksCollection({
+    apiUrl: state.apiUrl,
+    userId: offlineDbEnabled && user ? user.id : null,
+    sensitive: state.sensitive,
+    toread: state.toread,
+    starred: state.starred,
+  }), [offlineDbEnabled, state.apiUrl, state.sensitive, state.starred, state.toread, user])
+  const {
+    data: offlineData,
+    isLoading: offlineLoading,
+    isError: offlineError,
+  } = useLiveQuery(
+    (query) => query.from({ bookmark: bookmarksCollection }),
+    [bookmarksCollection]
+  )
+
+  const offlineBookmarks = useMemo(() => {
+    if (!offlineDbEnabled || !Array.isArray(offlineData)) return null
+
+    return [...offlineData].sort((a, b) => {
+      const createdAtCompare = b.created_at.localeCompare(a.created_at)
+      if (createdAtCompare !== 0) return createdAtCompare
+
+      const titleCompare = (b.title ?? '').localeCompare(a.title ?? '')
+      if (titleCompare !== 0) return titleCompare
+
+      return b.url.localeCompare(a.url)
+    })
+  }, [offlineData, offlineDbEnabled])
+
+  const reloadOfflineBookmarks = useCallback(async () => {
+    const refetchTarget = /** @type {OfflineRefetchTarget} */ (/** @type {unknown} */ (bookmarksCollection))
+    await refetchOfflineTarget(refetchTarget)
+  }, [bookmarksCollection])
 
   // Cursor cleanup: when the server signals we're at the first page, remove stale
   // before/after params from the URL. Runs in an effect (not queryFn) to keep
@@ -94,24 +143,78 @@ export function useBookmarks () {
   }, [data, setParams])
 
   const reloadBookmarks = useCallback(async () => {
-    await refetch()
-  }, [refetch])
+    if (useOfflineData) {
+      await reloadOfflineBookmarks()
+      return
+    }
 
-  const bookmarks = data?.bookmarks ?? null
-  const before = data?.before ?? null
-  const after = data?.after ?? null
-  const bookmarksError = error || null
-  const bookmarksLoading = isPending
+    await refetch()
+  }, [refetch, reloadOfflineBookmarks, useOfflineData])
+
+  useEffect(() => {
+    if (!enabled || !offlineDbEnabled || !online || !user) return
+
+    let cancelled = false
+
+    reloadOfflineBookmarks().catch(err => {
+      if (!cancelled) {
+        console.error('Offline bookmarks sync failed:', err)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [enabled, offlineDbEnabled, online, reloadOfflineBookmarks, user])
+
+  useEffect(() => {
+    if (!enabled || !online || !user || typeof window === 'undefined') return
+
+    let cancelled = false
+    const revalidate = () => {
+      if (cancelled) return
+
+      /** @type {Array<Promise<unknown>>} */
+      const tasks = [refetch()]
+      if (offlineDbEnabled) tasks.push(reloadOfflineBookmarks())
+
+      Promise.all(tasks).catch(err => {
+        if (!cancelled) {
+          console.error('Bookmarks revalidation failed:', err)
+        }
+      })
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') revalidate()
+    }
+
+    window.addEventListener('pageshow', revalidate)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('pageshow', revalidate)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [enabled, offlineDbEnabled, online, refetch, reloadOfflineBookmarks, user])
+
+  const bookmarks = useOfflineData ? offlineBookmarks : data?.bookmarks ?? null
+  const before = useOfflineData ? null : data?.before ?? null
+  const after = useOfflineData ? null : data?.after ?? null
+  const bookmarksError = useOfflineData
+    ? offlineError ? new Error('Offline bookmarks sync failed') : null
+    : error || null
+  const bookmarksLoading = useOfflineData ? offlineLoading : isPending
 
   let beforeParams
-  if (before) {
+  if (!useOfflineData && before) {
     beforeParams = new URLSearchParams(searchParamsAll ?? '')
     beforeParams.set('before', String(before.valueOf()))
     beforeParams.delete('after')
   }
 
   let afterParams
-  if (after) {
+  if (!useOfflineData && after) {
     afterParams = new URLSearchParams(searchParamsAll ?? '')
     afterParams.set('after', String(after.valueOf()))
     afterParams.delete('before')

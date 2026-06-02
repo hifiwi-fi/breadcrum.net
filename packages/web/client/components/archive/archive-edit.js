@@ -18,14 +18,16 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  * onSave?: (formState: ArchiveFormState) => Promise<void>,
  * onDeleteArchive?: () => Promise<void>,
  * onCancelEdit?: () => void,
- * legend?: string | ComponentChild
-}>} */
+ * legend?: string | ComponentChild,
+ * disabled?: boolean
+ * }>} */
 export const ArchiveEdit = ({
   archive: ar,
   onSave,
   onDeleteArchive,
   onCancelEdit,
   legend,
+  disabled: disabledProp = false,
 } = {}) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -83,7 +85,7 @@ export const ArchiveEdit = ({
   return html`
     <div class='bc-archive-edit'>
       <form ref=${formRef} class="add-archive-form" id="add-archive-form" onsubmit=${handleSave}>
-        <fieldset disabled=${disabled || initializing}>
+        <fieldset disabled=${disabledProp || disabled || initializing}>
           ${legend ? html`<legend class="bc-archive-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>

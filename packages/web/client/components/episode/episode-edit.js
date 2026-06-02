@@ -21,6 +21,7 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  * @property {() => Promise<void>} [onDeleteEpisode]
  * @property {() => void} [onCancelEdit]
  * @property {string | ComponentChild} [legend]
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -32,6 +33,7 @@ export const EpisodeEdit = ({
   onDeleteEpisode,
   onCancelEdit,
   legend,
+  disabled: disabledProp = false,
 }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -91,7 +93,7 @@ export const EpisodeEdit = ({
   return html`
     <div class='bc-episode-edit'>
       <form ref=${formRef} class="add-episode-form" id="add-episode-form" onsubmit=${handleSave}>
-        <fieldset disabled=${disabled || initializing}>
+        <fieldset disabled=${disabledProp || disabled || initializing}>
           ${legend ? html`<legend class="bc-episode-legend">${legend}</legend>` : null}
           <div>
             <label class='block'>

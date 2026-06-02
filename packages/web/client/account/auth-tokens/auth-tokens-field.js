@@ -12,13 +12,13 @@ import { ManageAuthTokenField } from '../../components/auth-token/auth-token-man
 import { PaginationButtons } from '../../components/pagination-buttons/index.js'
 
 /**
- * @typedef {{}} AuthTokensProps
+ * @typedef {{ disabled?: boolean }} AuthTokensProps
  */
 
 /**
  * @type {FunctionComponent<AuthTokensProps>}
  */
-export const AuthTokens = () => {
+export const AuthTokens = ({ disabled = false }) => {
   const window = useWindow()
   const {
     tokensError,
@@ -43,7 +43,7 @@ export const AuthTokens = () => {
         Manage auth tokens for web and API sessions. Auth tokens are like a password so keep them safe.
       </div>
 
-      <${ManageAuthTokenField} />
+      <${ManageAuthTokenField} disabled=${disabled} />
 
       <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />
 
@@ -51,7 +51,7 @@ export const AuthTokens = () => {
       ${tokensError ? html`<div>${tokensError.message}</div>` : null}
 
       ${Array.isArray(tokens)
-        ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} />`)
+          ? tokens.map(t => html`<${authTokenList} key=${t.jti} authToken=${t} disabled=${disabled} />`)
         : null}
 
         <${PaginationButtons} onPageNav=${onPageNav} beforeParams=${beforeParams} afterParams=${afterParams} />

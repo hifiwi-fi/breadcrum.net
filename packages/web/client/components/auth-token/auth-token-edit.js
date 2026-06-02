@@ -16,6 +16,7 @@ import { useRef, useState, useCallback } from 'preact/hooks'
  * @property {() => Promise<void>} [onDeleteAuthToken]
  * @property {() => void} [onCancelEdit]
  * @property {string | ComponentChild} [legend]
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -26,7 +27,8 @@ export const AuthTokenEdit = ({
   onSave,
   onDeleteAuthToken,
   onCancelEdit,
-  legend
+  legend,
+  disabled: disabledProp = false
 }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -88,7 +90,7 @@ export const AuthTokenEdit = ({
   return html`
     <div class='bc-auth-token-edit'>
       <form ref=${formRef} class="edit-auth-token-form" id="edit-auth-token-form" onsubmit=${handleSave}>
-        <fieldset disabled=${disabled}>
+        <fieldset disabled=${disabledProp || disabled}>
           ${legend
 ? html`<legend class="bc-auth-token-legend">${
             typeof legend === 'string'

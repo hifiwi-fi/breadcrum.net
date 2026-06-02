@@ -3,13 +3,19 @@
 /**
  * @import { TypeEpisodeReadClient } from '../../routes/api/episodes/schemas/schema-episode-read.js'
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
+ * @import { OfflineRefetchTarget } from './useOfflineReadSync.js'
  */
 
 import { useCallback, useEffect, useMemo } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery } from '@tanstack/preact-query'
+import { useLiveQuery } from '@tanstack/react-db'
 import { useUser } from './useUser.js'
 import { useSearchParamsAll, useSearchParams } from './useSearchParams.js'
 import { useLSP } from './useLSP.js'
+import { useOnlineStatus } from './useOnlineStatus.js'
+import { getBookmarksCollection } from '../lib/offline/bookmarks-collection.js'
+import { refetchOfflineTarget } from './useOfflineReadSync.js'
+import { deriveOfflineEpisodes } from './useOfflineEpisodes.js'
 
 /**
  * @typedef {object} EpisodesQueryData
@@ -28,8 +34,14 @@ export function useEpisodes (options = {}) {
   const state = useLSP()
   const { searchParamsAll } = useSearchParamsAll()
   const { setParams } = useSearchParams(['before', 'after'])
+  const online = useOnlineStatus()
 
   const queryString = useMemo(() => (searchParamsAll ? searchParamsAll.toString() : ''), [searchParamsAll])
+  const offlineDbEnabled = useMemo(() => {
+    const params = new URLSearchParams(queryString)
+    return params.get('offline_db_spike') === 'true'
+  }, [queryString])
+  const useOfflineData = offlineDbEnabled && !online
   const queryKey = useMemo(() => ([
     'episodes',
     user?.id ?? null,
@@ -41,7 +53,7 @@ export function useEpisodes (options = {}) {
   /** @type {UseQueryResult<EpisodesQueryData, Error>} */
   const episodesQuery = useTanstackQuery(/** @type {UseQueryOptions<EpisodesQueryData, Error>} */ ({
     queryKey,
-    enabled: Boolean(user) && enabled,
+    enabled: Boolean(user) && enabled && !useOfflineData,
     placeholderData: keepPreviousData,
     /**
      * @param {{ signal: AbortSignal }} context
@@ -87,6 +99,33 @@ export function useEpisodes (options = {}) {
   }))
 
   const { data, error, isPending, refetch } = episodesQuery
+  const offlineBookmarkId = useMemo(() => {
+    const params = new URLSearchParams(queryString)
+    return params.get('bid')
+  }, [queryString])
+  const bookmarksCollection = useMemo(() => getBookmarksCollection({
+    apiUrl: state.apiUrl,
+    userId: offlineDbEnabled && user ? user.id : null,
+    sensitive: state.sensitive,
+    toread: false,
+    starred: false,
+  }), [offlineDbEnabled, state.apiUrl, state.sensitive, user])
+  const {
+    data: offlineBookmarks,
+    isLoading: offlineLoading,
+    isError: offlineError,
+  } = useLiveQuery(
+    (query) => query.from({ bookmark: bookmarksCollection }),
+    [bookmarksCollection]
+  )
+  const offlineEpisodes = useMemo(() => {
+    if (!offlineDbEnabled) return null
+    return deriveOfflineEpisodes(offlineBookmarks, { bookmarkId: offlineBookmarkId })
+  }, [offlineBookmarkId, offlineBookmarks, offlineDbEnabled])
+  const reloadOfflineEpisodes = useCallback(async () => {
+    const refetchTarget = /** @type {OfflineRefetchTarget} */ (/** @type {unknown} */ (bookmarksCollection))
+    await refetchOfflineTarget(refetchTarget)
+  }, [bookmarksCollection])
 
   // Cursor cleanup: when the server signals we're at the first page, remove stale
   // before/after params from the URL. Runs in an effect (not queryFn) to keep
@@ -98,24 +137,78 @@ export function useEpisodes (options = {}) {
   }, [data, setParams])
 
   const reloadEpisodes = useCallback(async () => {
-    await refetch()
-  }, [refetch])
+    if (useOfflineData) {
+      await reloadOfflineEpisodes()
+      return
+    }
 
-  const episodes = data?.episodes ?? null
-  const before = data?.before ?? null
-  const after = data?.after ?? null
-  const episodesError = error
-  const episodesLoading = isPending
+    await refetch()
+  }, [refetch, reloadOfflineEpisodes, useOfflineData])
+
+  useEffect(() => {
+    if (!enabled || !offlineDbEnabled || !online || !user) return
+
+    let cancelled = false
+
+    reloadOfflineEpisodes().catch(err => {
+      if (!cancelled) {
+        console.error('Offline episodes sync failed:', err)
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [enabled, offlineDbEnabled, online, reloadOfflineEpisodes, user])
+
+  useEffect(() => {
+    if (!enabled || !online || !user || typeof window === 'undefined') return
+
+    let cancelled = false
+    const revalidate = () => {
+      if (cancelled) return
+
+      /** @type {Array<Promise<unknown>>} */
+      const tasks = [refetch()]
+      if (offlineDbEnabled) tasks.push(reloadOfflineEpisodes())
+
+      Promise.all(tasks).catch(err => {
+        if (!cancelled) {
+          console.error('Episodes revalidation failed:', err)
+        }
+      })
+    }
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') revalidate()
+    }
+
+    window.addEventListener('pageshow', revalidate)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    return () => {
+      cancelled = true
+      window.removeEventListener('pageshow', revalidate)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [enabled, offlineDbEnabled, online, refetch, reloadOfflineEpisodes, user])
+
+  const episodes = useOfflineData ? offlineEpisodes : data?.episodes ?? null
+  const before = useOfflineData ? null : data?.before ?? null
+  const after = useOfflineData ? null : data?.after ?? null
+  const episodesError = useOfflineData
+    ? offlineError ? new Error('Offline episodes sync failed') : null
+    : error
+  const episodesLoading = useOfflineData ? offlineLoading : isPending
 
   let beforeParams
-  if (before) {
+  if (!useOfflineData && before) {
     beforeParams = new URLSearchParams(searchParamsAll ?? '')
     beforeParams.set('before', before.valueOf().toString())
     beforeParams.delete('after')
   }
 
   let afterParams
-  if (after) {
+  if (!useOfflineData && after) {
     afterParams = new URLSearchParams(searchParamsAll ?? '')
     afterParams.set('after', after.valueOf().toString())
     afterParams.delete('before')

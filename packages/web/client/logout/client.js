@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
 import { mountPage } from '../lib/mount-page.js'
+import { clearOfflineData } from '../lib/offline/offline-cleanup.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
@@ -17,11 +18,19 @@ export const Page = () => {
 
   useEffect(() => {
     const logout = async () => {
+      const userId = state.user?.id ?? user?.id ?? null
+
       try {
         await fetch(`${state.apiUrl}/logout`, {
           method: 'post',
         })
       } finally {
+        await clearOfflineData({
+          apiUrl: state.apiUrl,
+          userId,
+          queryClient,
+        })
+        queryClient.clear()
         queryClient.setQueryData(['user', state.apiUrl], null)
         state.user = null
         window.location.replace('/')

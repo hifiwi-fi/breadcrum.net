@@ -18,12 +18,13 @@ import { diffUpdate } from '../../lib/diff-update.js'
 /**
  * @typedef {object} AuthTokenListProps
  * @property {TypeAuthTokenReadClient} authToken
+ * @property {boolean} [disabled]
  */
 
 /**
  * @type {FunctionComponent<AuthTokenListProps>}
  */
-export const authTokenList = ({ authToken }) => {
+export const authTokenList = ({ authToken, disabled = false }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
   const authTokensQueryKeyPrefix = useMemo(() => (
@@ -38,8 +39,9 @@ export const authTokenList = ({ authToken }) => {
   const [deleted, setDeleted] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (disabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [disabled, setEditing])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -106,14 +108,16 @@ export const authTokenList = ({ authToken }) => {
         ? tc(AuthTokenEdit, {
             authToken,
             onSave: handleSave,
-            onDeleteAuthToken: handleDeleteAuthToken,
-            onCancelEdit: handleCancelEdit,
-            legend: html`edit: <code>${authToken.jti}</code>`,
-          })
+              onDeleteAuthToken: handleDeleteAuthToken,
+              onCancelEdit: handleCancelEdit,
+              legend: html`edit: <code>${authToken.jti}</code>`,
+              disabled,
+            })
         : tc(AuthTokenView, {
-            authToken,
-            onEdit: handleEdit,
-          })
+              authToken,
+              onEdit: handleEdit,
+              disabled,
+            })
     }
   </div>`
 }

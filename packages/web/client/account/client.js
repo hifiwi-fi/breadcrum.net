@@ -6,10 +6,11 @@
  */
 
 import { html } from 'htm/preact'
-import { useCallback, useMemo } from 'preact/hooks'
+import { useCallback, useMemo, useState } from 'preact/hooks'
 import { useQueryClient } from '@tanstack/preact-query'
 import { useUser } from '../hooks/useUser.js'
 import { useLSP } from '../hooks/useLSP.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
 import { UsernameField } from './username/username-field.js'
 import { PasswordField } from './password/password-field.js'
 import { NewsletterField } from './newsletter/newsletter-field.js'
@@ -18,12 +19,16 @@ import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 import { PasskeysField } from './passkeys/passkeys-field.js'
 import { mountPage } from '../lib/mount-page.js'
+import { clearOfflineData } from '../lib/offline/offline-cleanup.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const { user } = useUser()
   const state = useLSP()
+  const online = useOnlineStatus()
   const queryClient = useQueryClient()
+  const [clearingOfflineData, setClearingOfflineData] = useState(false)
+  const [offlineDataMessage, setOfflineDataMessage] = useState('')
 
   const userQueryKey = useMemo(() => ['user', state.apiUrl], [state.apiUrl])
 
@@ -39,24 +44,69 @@ export const Page = () => {
     queryClient.setQueryData(userQueryKey, result.data)
   }, [queryClient, userQueryKey])
 
+  const handleClearOfflineData = useCallback(async () => {
+    if (!user) return
+
+    if (
+      typeof window !== 'undefined' &&
+      !window.confirm('Clear offline data for this account on this device?')
+    ) {
+      return
+    }
+
+    setClearingOfflineData(true)
+    setOfflineDataMessage('')
+
+    try {
+      const result = await clearOfflineData({
+        apiUrl: state.apiUrl,
+        userId: user.id,
+        queryClient,
+      })
+
+      setOfflineDataMessage(result.persistentDataDeleted
+        ? 'Offline data cleared.'
+        : 'Offline cache cleared.')
+    } catch (err) {
+      console.error('Failed to clear offline data:', err)
+      setOfflineDataMessage('Offline data could not be cleared.')
+    } finally {
+      setClearingOfflineData(false)
+    }
+  }, [queryClient, state.apiUrl, user])
+
   return html`
     <div>
       <dl>
         <${DisabledField} user=${user} />
-        <${UsernameField}
-          user=${user}
-          onSuccess=${handleUsernameSuccess}
-        />
-        <${EmailField}
-          user=${user}
-          onSuccess=${handleEmailSuccess}
-        />
-        <${PasswordField} />
-        <${PasskeysField} />
-        <${NewsletterField}
-          user=${user}
-          onSuccess=${handleNewsletterSuccess}
-        />
+          <${UsernameField}
+            user=${user}
+            onSuccess=${handleUsernameSuccess}
+            disabled=${!online}
+          />
+          <${EmailField}
+            user=${user}
+            onSuccess=${handleEmailSuccess}
+            disabled=${!online}
+          />
+          <${PasswordField} disabled=${!online} />
+          <${PasskeysField} disabled=${!online} />
+          <${NewsletterField}
+            user=${user}
+            onSuccess=${handleNewsletterSuccess}
+            disabled=${!online}
+          />
+        <dt>offline data</dt>
+        <dd class="bc-account-offline-data">
+          <button
+            type="button"
+            onClick=${handleClearOfflineData}
+            disabled=${!user || clearingOfflineData}
+          >
+            ${clearingOfflineData ? 'Clearing...' : 'Clear offline data'}
+          </button>
+          ${offlineDataMessage ? html`<span>${offlineDataMessage}</span>` : null}
+        </dd>
         <dt>created at</dt>
         <dd><time datetime="${user?.created_at}">${user?.created_at ? (new Date(user.created_at)).toLocaleDateString() : null}</time></dd>
         <dt>updated at</dt>
@@ -70,7 +120,7 @@ export const Page = () => {
           `
           : null
         }
-        <${AuthTokens} />
+        <${AuthTokens} disabled=${!online} />
       </dl>
     </div>
 `

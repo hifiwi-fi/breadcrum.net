@@ -48,3 +48,9 @@ onlyBuiltDependencies:
 
 patchedDependencies:
   giscus@1.6.0: patches/giscus@1.6.0.patch
+
+allowBuilds:
+  '@journeyapps/wa-sqlite': true
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true

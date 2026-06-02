@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
  *  openOnMount?: boolean,
  *  showToggle?: boolean,
  *  showCancel?: boolean,
+ *  disabled?: boolean,
  * }} BookmarkQuickAddProps
  */
 
@@ -24,6 +25,7 @@ export const BookmarkQuickAdd = ({
   openOnMount = false,
   showToggle = true,
   showCancel = true,
+  disabled = false,
 }) => {
   const [open, setOpen] = useState(openOnMount || !showToggle)
   const inputRef = useRef(/** @type {HTMLInputElement | null} */(null))
@@ -36,17 +38,19 @@ export const BookmarkQuickAdd = ({
 
   const handleSubmit = useCallback((/** @type {Event & {currentTarget: HTMLFormElement}} */ev) => {
     ev.preventDefault()
+    if (disabled) return
     const form = ev.currentTarget
     if (!form.reportValidity()) return
     const urlElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('url'))
     const url = urlElement?.value.trim()
     if (!url) return
     onSubmitUrl(url)
-  }, [onSubmitUrl])
+  }, [disabled, onSubmitUrl])
 
   const handleOpen = useCallback(() => {
+    if (disabled) return
     setOpen(true)
-  }, [])
+  }, [disabled])
 
   const handleCancel = useCallback(() => {
     if (!showToggle) return
@@ -61,7 +65,7 @@ export const BookmarkQuickAdd = ({
       ${open
         ? html`
           <form class="bc-quick-add-form" onSubmit=${handleSubmit}>
-            <fieldset>
+            <fieldset disabled=${disabled}>
               <legend>add bookmark:</legend>
               <label class="bc-quick-add-label">
                 🔖
@@ -84,7 +88,7 @@ export const BookmarkQuickAdd = ({
           </form>
         `
         : showToggle
-          ? html`<button type="button" onClick=${handleOpen}>🔖 add +</button>`
+          ? html`<button type="button" onClick=${handleOpen} disabled=${disabled}>🔖 add +</button>`
           : null
       }
     </div>

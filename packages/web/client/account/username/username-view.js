@@ -9,18 +9,19 @@ import { html } from 'htm/preact'
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
+ *  disabled?: boolean,
  * }} UsernameViewProps
  */
 
 /**
  * @type {FunctionComponent<UsernameViewProps>}
  */
-export const UsernameView = ({ user, onEdit }) => {
+export const UsernameView = ({ user, onEdit, disabled = false }) => {
   return html`
     <dt>username</dt>
     <dd class="username-view">
       <span>${user?.username}</span>
-      <span><button onClick=${onEdit}>Edit</button></span>
+      <span><button onClick=${onEdit} disabled=${disabled}>Edit</button></span>
     </dd>
   `
 }

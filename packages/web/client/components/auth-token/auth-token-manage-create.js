@@ -16,12 +16,13 @@ import { AuthTokenEdit } from './auth-token-edit.js'
 /**
  * @typedef {object} AuthTokenManageCreateFieldProps
  * @property {() => void} handleCancelEditMode
+ * @property {boolean} [disabled]
  */
 
 /**
  * @type {FunctionComponent<AuthTokenManageCreateFieldProps>}
  */
-export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
+export const ManageAuthTokenCreateField = ({ handleCancelEditMode, disabled = false }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
   const authTokensQueryKeyPrefix = useMemo(() => (
@@ -56,8 +57,9 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
   })
 
   const handleCreateSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */ update) => {
+    if (disabled) return
     await createMutation.mutateAsync(update)
-  }, [createMutation])
+  }, [createMutation, disabled])
 
   const handleNewTokenSelect = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget?.select()
@@ -102,11 +104,12 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
   }
 
   ${!newToken
-    ? tc(AuthTokenEdit, {
-              onSave: handleCreateSave,
-              onCancelEdit: handleCancelEditMode,
-              legend: 'Create Auth Token'
-          })
+        ? tc(AuthTokenEdit, {
+                onSave: handleCreateSave,
+                onCancelEdit: handleCancelEditMode,
+                legend: 'Create Auth Token',
+                disabled,
+            })
     : null
   }`
 }

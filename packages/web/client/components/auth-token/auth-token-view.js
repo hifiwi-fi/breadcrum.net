@@ -31,6 +31,7 @@ function formatGeoip (geoip) {
  * @typedef {object} AuthTokenViewProps
  * @property {TypeAuthTokenReadClient} authToken
  * @property {() => void} [onEdit]
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -39,6 +40,7 @@ function formatGeoip (geoip) {
 export const AuthTokenView = ({
   authToken: t,
   onEdit = () => {},
+  disabled = false,
 }) => {
   const geoip = formatGeoip(t.geoip)
 
@@ -110,7 +112,7 @@ export const AuthTokenView = ({
         </div>
       </div>
       <div>
-        <button type="button" onClick=${onEdit}>Edit</button>
+        <button type="button" onClick=${onEdit} disabled=${disabled}>Edit</button>
       </div>
     </div>`
 }

@@ -14,19 +14,21 @@ import { EmailView } from './email-view.js'
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onSuccess?: () => void,
+ *  disabled?: boolean,
  * }} EmailFieldProps
  */
 
 /**
  * @type {FunctionComponent<EmailFieldProps>}
  */
-export const EmailField = ({ user, onSuccess }) => {
+export const EmailField = ({ user, onSuccess, disabled = false }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (disabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [disabled, setEditing])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -54,14 +56,16 @@ export const EmailField = ({ user, onSuccess }) => {
   ${
     editing
     ? html`<${EmailEdit}
-        user=${user}
-        onSave=${saveMutation.mutateAsync}
-        onCancelEdit=${handleCancelEdit}
-      />`
+          user=${user}
+          onSave=${saveMutation.mutateAsync}
+          onCancelEdit=${handleCancelEdit}
+          disabled=${disabled}
+        />`
     : html`<${EmailView}
-        user=${user}
-        onEdit=${handleEdit}
-      />`
+          user=${user}
+          onEdit=${handleEdit}
+          disabled=${disabled}
+        />`
   }
   `
 }

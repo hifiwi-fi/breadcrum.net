@@ -7,10 +7,11 @@ import { QueryProvider } from '../lib/query-provider.js'
 
 suite('Account page tests', () => {
   test('Account page component renders without errors', async () => {
-    let rendered
+    let rendered = ''
     assert.doesNotThrow(() => {
       rendered = render(html`<${QueryProvider}><${Page} /><//>`)
     }, 'page renders without error')
     assert.strictEqual(typeof rendered, 'string', 'page renders to string')
+    assert.match(rendered, /Clear offline data/)
   })
 })

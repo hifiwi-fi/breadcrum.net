@@ -17,21 +17,44 @@ import { ArchiveList } from '../../components/archive/archive-list.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { mountPage } from '../../lib/mount-page.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../../hooks/useOfflineReadSync.js'
+import { useOfflineArchiveSearch } from '../../hooks/useOfflineArchiveSearch.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../../lib/offline/offline-db.js'
+
+/**
+ * @typedef {object} SearchPaginationCursor
+ * @property {string} rank
+ * @property {string} id
+ * @property {string} query
+ * @property {boolean} reverse
+ */
+
+/**
+ * @typedef {object} SearchArchivesBody
+ * @property {TypeArchiveReadClient[]} [data]
+ * @property {{ top?: boolean, next?: SearchPaginationCursor, prev?: SearchPaginationCursor }} [pagination]
+ */
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { params: searchParams, setParams, pushState } = useSearchParams(['query', 'id', 'rank', 'reverse', 'per_page'])
+  const { params: searchParams, setParams, pushState } = useSearchParams(['query', 'id', 'rank', 'reverse', 'per_page', 'offline_db_spike'])
   const queryClient = useQueryClient()
   const queryParam = searchParams['query']
   const idParam = searchParams['id']
   const rankParam = searchParams['rank']
   const reverseParam = searchParams['reverse']
   const perPageParam = searchParams['per_page']
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = searchParams['offline_db_spike'] === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
 
   const queryValue = queryParam ?? ''
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams()
@@ -53,7 +76,11 @@ export const Page = () => {
     queryParams.toString(),
   ]), [queryParams, state.apiUrl, user?.id])
 
-  const { data, isPending: archivesLoading, error: archivesError } = useTanstackQuery({
+  const {
+    data,
+    isPending: networkArchivesLoading,
+    error: networkArchivesError,
+  } = useTanstackQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/search/archives?${queryParams.toString()}`, {
@@ -70,7 +97,7 @@ export const Page = () => {
 
       return body
     },
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !useOfflineData,
     placeholderData: keepPreviousData,
   })
 
@@ -83,14 +110,29 @@ export const Page = () => {
     }
   }, [data, setParams])
 
-  const body = /** @type {{ data?: TypeArchiveReadClient[], pagination?: { next?: any, prev?: any } } | undefined} */ (data)
-  const archives = body?.data
-  const next = body?.pagination?.next
-  const prev = body?.pagination?.prev
+  const {
+    archives: offlineArchives,
+    archivesLoading: offlineArchivesLoading,
+    archivesError: offlineArchivesError,
+    reloadArchives: reloadOfflineArchives,
+  } = useOfflineArchiveSearch(queryValue, { enabled: showOfflineDbSpike })
 
-  const reload = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey])
+  const body = /** @type {SearchArchivesBody | undefined} */ (data)
+  const networkArchives = body?.data
+  const archives = useOfflineData ? offlineArchives : networkArchives
+  const archivesLoading = useOfflineData ? offlineArchivesLoading : networkArchivesLoading
+  const archivesError = useOfflineData ? offlineArchivesError : networkArchivesError
+  const next = useOfflineData ? undefined : body?.pagination?.next
+  const prev = useOfflineData ? undefined : body?.pagination?.prev
+
+  const reload = useCallback(async () => {
+    if (useOfflineData) {
+      await reloadOfflineArchives()
+      return
+    }
+
+    await queryClient.invalidateQueries({ queryKey })
+  }, [queryClient, queryKey, reloadOfflineArchives, useOfflineData])
 
   const title = queryValue ? ['🗄️', queryValue, '|', 'Archives Search'] : []
   useTitle(...title)
@@ -121,7 +163,7 @@ export const Page = () => {
   ))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reload,
   })
 
@@ -132,7 +174,7 @@ export const Page = () => {
     nextParams.set('query', next.query)
     nextParams.set('rank', next.rank)
     nextParams.set('id', next.id)
-    nextParams.set('reverse', next.reverse)
+    nextParams.set('reverse', String(next.reverse))
   }
 
   let prevParams
@@ -142,10 +184,13 @@ export const Page = () => {
     prevParams.set('query', prev.query)
     prevParams.set('rank', prev.rank)
     prevParams.set('id', prev.id)
-    prevParams.set('reverse', prev.reverse)
+    prevParams.set('reverse', String(prev.reverse))
   }
 
   const showEmptyState = Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
+  const emptyStateText = useOfflineData && queryValue
+    ? 'No synced archives found.'
+    : queryValue ? 'No archives found.' : 'Search for archives.'
   const resultsClassName = showEmptyState
     ? 'bc-search-results bc-search-results-empty'
     : 'bc-search-results'
@@ -179,7 +224,7 @@ export const Page = () => {
         ${showEmptyState
           ? html`
             <div class="bc-search-empty">
-              ${queryValue ? 'No archives found.' : 'Search for archives.'}
+              ${emptyStateText}
             </div>
           `
           : null}
@@ -202,4 +247,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

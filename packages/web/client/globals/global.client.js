@@ -22,6 +22,17 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js')
     .then(registration => {
       console.log('Service Worker registered successfully:', registration.scope)
+
+      registration.addEventListener('updatefound', () => {
+        const installingWorker = registration.installing
+        if (!installingWorker) return
+
+        installingWorker.addEventListener('statechange', () => {
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            console.log('Service Worker update ready')
+          }
+        })
+      })
     })
     .catch(error => {
       console.error('Service Worker registration failed:', error)

@@ -10,13 +10,13 @@ import { PasskeyRegisterForm } from '../../components/passkey/passkey-register-f
 import { tc } from '../../lib/typed-component.js'
 
 /**
- * @typedef {{}} PasskeysFieldProps
+ * @typedef {{ disabled?: boolean }} PasskeysFieldProps
  */
 
 /**
  * @type {FunctionComponent<PasskeysFieldProps>}
  */
-export const PasskeysField = () => {
+export const PasskeysField = ({ disabled = false }) => {
   const {
     passkeys,
     loading,
@@ -32,17 +32,19 @@ export const PasskeysField = () => {
   const canAddMore = passkeyCount < 10
 
   const handleStartCreate = useCallback(() => {
+    if (disabled) return
     setIsCreating(true)
-  }, [])
+  }, [disabled])
 
   const handleCancelCreate = useCallback(() => {
     setIsCreating(false)
   }, [])
 
   const handleRegister = useCallback(async (/** @type {string} */ name) => {
+    if (disabled) return
     await registerPasskey(name)
     setIsCreating(false)
-  }, [registerPasskey])
+  }, [disabled, registerPasskey])
 
   return html`
     <dt>Passkeys</dt>
@@ -54,14 +56,14 @@ export const PasskeysField = () => {
 
       <div class="bc-passkey-manage">
         ${isCreating && canAddMore
-          ? tc(PasskeyRegisterForm, { onRegister: handleRegister, onCancel: handleCancelCreate })
+            ? tc(PasskeyRegisterForm, { onRegister: handleRegister, onCancel: handleCancelCreate, disabled })
           : null
         }
 
         ${!isCreating && canAddMore
           ? html`
             <div class="button-gap">
-              <button type="button" onClick=${handleStartCreate}>Add passkey</button>
+                <button type="button" onClick=${handleStartCreate} disabled=${disabled}>Add passkey</button>
             </div>
           `
           : null
@@ -89,10 +91,11 @@ export const PasskeysField = () => {
 
       ${Array.isArray(passkeys) && passkeys.length > 0
         ? tc(PasskeyList, {
-          passkeys,
-          onUpdate: updatePasskey,
-          onDelete: deletePasskey,
-        })
+            passkeys,
+            onUpdate: updatePasskey,
+            onDelete: deletePasskey,
+            disabled,
+          })
         : null
       }
     </dd>

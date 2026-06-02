@@ -12,13 +12,14 @@ import { useLSP } from '../../hooks/useLSP.js'
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onEdit?: () => void,
+ *  disabled?: boolean,
  * }} EmailViewProps
  */
 
 /**
  * @type {FunctionComponent<EmailViewProps>}
  */
-export const EmailView = ({ user, onEdit }) => {
+export const EmailView = ({ user, onEdit, disabled = false }) => {
   const state = useLSP()
   const queryClient = useQueryClient()
   const [error, setError] = useState(/** @type { Error | null } */(null))
@@ -50,6 +51,7 @@ export const EmailView = ({ user, onEdit }) => {
 
   const handleEmailConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
+    if (disabled) return
     setRequestingEmailVerification(true)
     setError(null)
 
@@ -73,10 +75,11 @@ export const EmailView = ({ user, onEdit }) => {
     } finally {
       setRequestingEmailVerification(false)
     }
-  }, [state.apiUrl, setRequestingEmailVerification, setError, setEmailVerificationRequested])
+  }, [disabled, state.apiUrl, setRequestingEmailVerification, setError, setEmailVerificationRequested])
 
   const handleEmailUpdateConfirmRequest = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()
+    if (disabled) return
     setRequestingEmailUpdateVerification(true)
     setError(null)
 
@@ -100,19 +103,19 @@ export const EmailView = ({ user, onEdit }) => {
     } finally {
       setRequestingEmailUpdateVerification(false)
     }
-  }, [state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
+  }, [disabled, state.apiUrl, setRequestingEmailUpdateVerification, setError, setEmailUpdateVerificationRequested])
 
   return html`
     <dt>email ${user?.email_confirmed === false ? html`<span> (unconfirmed)</span>` : null}</dt>
     <dd class='email-view-buttons'>
       <div class='email-view-edit-line'>
         <span>${user?.email}</span>
-        ${!user?.pending_email_update ? html`<span><button onClick=${onEdit}>Edit</button></span>` : null}
+        ${!user?.pending_email_update ? html`<span><button onClick=${onEdit} disabled=${disabled}>Edit</button></span>` : null}
       </div>
       ${user?.email_confirmed === false && !user?.pending_email_update
         ? html`<div><button
           onClick=${handleEmailConfirmRequest}
-          disabled=${requestingEmailVerification || emailVerificationRequested || user?.disabled_email}>
+            disabled=${disabled || requestingEmailVerification || emailVerificationRequested || user?.disabled_email}>
           ${
             emailVerificationRequested
               ? 'Email verification resent'
@@ -129,14 +132,14 @@ export const EmailView = ({ user, onEdit }) => {
         <div class="reset-buttons-state">
           <button
             onClick=${handleEmailUpdateConfirmRequest}
-            disabled=${requestingEmailUpdateVerification || emailUpdateVerificationRequested}>${
+            disabled=${disabled || requestingEmailUpdateVerification || emailUpdateVerificationRequested}>${
               emailUpdateVerificationRequested
                 ? 'Email update verification resent'
                 : 'Resend email update confirmation'
             }</button>
           <button
             onClick=${cancelEmailUpdateMutation.mutate}
-            disabled=${cancelEmailUpdateMutation.isPending}
+            disabled=${disabled || cancelEmailUpdateMutation.isPending}
           >
             ${cancelEmailUpdateMutation.isPending ? 'Cancelling email update' : 'Cancel email update'}
           </button>
