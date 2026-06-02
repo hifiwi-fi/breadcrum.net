@@ -17,15 +17,24 @@ import { Search } from '../../components/search/index.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { mountPage } from '../../lib/mount-page.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../../hooks/useOfflineReadSync.js'
+import { useOfflineEpisode } from '../../hooks/useOfflineEpisodes.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { params } = useSearchParams(['id'])
+  const { params } = useSearchParams(['id', 'offline_db_spike'])
   const queryClient = useQueryClient()
   const episodeId = params['id']
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = params['offline_db_spike'] === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   useEffect(() => {
     if (!window) return
@@ -41,7 +50,11 @@ export const Page = () => {
     state.sensitive,
   ]), [episodeId, state.apiUrl, state.sensitive])
 
-  const { data: episode, isPending: episodeLoading, error: episodeError } = useQuery({
+  const {
+    data: networkEpisode,
+    isPending: networkEpisodeLoading,
+    error: networkEpisodeError,
+  } = useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams()
@@ -60,12 +73,28 @@ export const Page = () => {
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user) && Boolean(episodeId),
+    enabled: Boolean(user) && Boolean(episodeId) && !useOfflineData,
   })
 
-  const reloadEpisode = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey])
+  const {
+    episode: offlineEpisode,
+    episodeLoading: offlineEpisodeLoading,
+    episodeError: offlineEpisodeError,
+    reloadEpisode: reloadOfflineEpisode,
+  } = useOfflineEpisode(episodeId, { enabled: showOfflineDbSpike })
+
+  const episode = useOfflineData ? offlineEpisode : networkEpisode
+  const episodeLoading = useOfflineData ? offlineEpisodeLoading : networkEpisodeLoading
+  const episodeError = useOfflineData ? offlineEpisodeError : networkEpisodeError
+
+  const reloadEpisode = useCallback(async () => {
+    if (useOfflineData) {
+      await reloadOfflineEpisode()
+      return
+    }
+
+    await queryClient.invalidateQueries({ queryKey })
+  }, [queryClient, queryKey, reloadOfflineEpisode, useOfflineData])
 
   const handleDelete = useCallback(() => {
     if (episode?.bookmark?.id && window) {
@@ -85,9 +114,11 @@ export const Page = () => {
   const hasPending = Boolean(episode && episode?.ready === false && !episode?.error && withinResolvingWindow(episode?.created_at))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadEpisode,
   })
+
+  const showOfflineMissing = useOfflineData && !episodeLoading && !episodeError && !episode
 
   return html`
     <div>
@@ -108,8 +139,9 @@ export const Page = () => {
         : null}
       ${episodeLoading && !episode ? html`<div>...</div>` : null}
       ${episodeError ? html`<div>${/** @type {Error} */(episodeError).message}</div>` : null}
+      ${showOfflineMissing ? html`<div>No synced episode available.</div>` : null}
     </div>
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

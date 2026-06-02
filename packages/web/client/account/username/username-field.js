@@ -14,19 +14,21 @@ import { UsernameView } from './username-view.js'
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onSuccess?: (result: { data: TypeUserRead }) => void,
+ *  disabled?: boolean,
  * }} UsernameFieldProps
  */
 
 /**
  * @type {FunctionComponent<UsernameFieldProps>}
  */
-export const UsernameField = ({ user, onSuccess }) => {
+export const UsernameField = ({ user, onSuccess, disabled = false }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (disabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [disabled, setEditing])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -54,14 +56,16 @@ export const UsernameField = ({ user, onSuccess }) => {
   ${
     editing
     ? html`<${UsernameEdit}
-        user=${user}
-        onSave=${saveMutation.mutateAsync}
-        onCancelEdit=${handleCancelEdit}
-      />`
+          user=${user}
+          onSave=${saveMutation.mutateAsync}
+          onCancelEdit=${handleCancelEdit}
+          disabled=${disabled}
+        />`
     : html`<${UsernameView}
-        user=${user}
-        onEdit=${handleEdit}
-      />`
+          user=${user}
+          onEdit=${handleEdit}
+          disabled=${disabled}
+        />`
   }
   `
 }

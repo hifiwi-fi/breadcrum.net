@@ -16,12 +16,17 @@ import { useArchives } from '../hooks/useArchives.js'
 import { tc } from '../lib/typed-component.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { mountPage } from '../lib/mount-page.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
-  const { user } = useUser()
+  useUser()
   const window = useWindow()
   const { searchParamsAll, pushState } = useSearchParamsAll()
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = searchParamsAll?.get('offline_db_spike') === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
 
   const {
     archives,
@@ -30,7 +35,7 @@ export const Page = () => {
     reloadArchives,
     beforeParams,
     afterParams,
-  } = useArchives({ enabled: Boolean(user) })
+  } = useArchives()
 
   const onPageNav = useCallback((/** @type {Event} */ ev) => {
     ev.preventDefault()
@@ -91,13 +96,14 @@ export const Page = () => {
   ))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadArchives,
   })
 
-  const showEmptyState = Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
+  const showEmptyState = !useOfflineData && Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
+  const showOfflineEmptyState = useOfflineData && Array.isArray(archives) && archives.length === 0 && !archivesLoading && !archivesError
   const showLoadingPlaceholder = archivesLoading && (!Array.isArray(archives) || archives.length === 0)
-  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
+  const resultsClassName = (showEmptyState || showOfflineEmptyState || showLoadingPlaceholder)
     ? 'bc-archives-results bc-archives-results-empty'
     : 'bc-archives-results'
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
@@ -110,7 +116,7 @@ export const Page = () => {
         onSearch: handleSearch,
         autofocus: true,
       })}
-      ${showEmptyState
+      ${showEmptyState || showOfflineEmptyState
 ? null
 : html`
         <div class="bc-archives-pagination bc-archives-pagination-top">
@@ -130,6 +136,7 @@ export const Page = () => {
           : null}
         ${archivesError ? html`<div>${archivesError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-archives-empty">Bookmark some articles!</div>` : null}
+        ${showOfflineEmptyState ? html`<div class="bc-archives-empty">No synced archives available.</div>` : null}
         ${Array.isArray(archives)
           ? archives.map(ar => html`
               <${ArchiveList}
@@ -141,7 +148,7 @@ export const Page = () => {
             `)
           : null}
       </div>
-      ${showEmptyState
+      ${showEmptyState || showOfflineEmptyState
 ? null
 : html`
         <div class="bc-archives-pagination bc-archives-pagination-bottom">
@@ -159,4 +166,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

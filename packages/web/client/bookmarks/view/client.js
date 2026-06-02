@@ -17,15 +17,24 @@ import { Search } from '../../components/search/index.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { mountPage } from '../../lib/mount-page.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../../hooks/useOfflineReadSync.js'
+import { useOfflineBookmark } from '../../hooks/useOfflineBookmark.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { params } = useSearchParams(['id'])
+  const { params } = useSearchParams(['id', 'offline_db_spike'])
   const queryClient = useQueryClient()
   const bookmarkId = params['id']
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = params['offline_db_spike'] === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   useEffect(() => {
     if (!window) return
@@ -41,7 +50,11 @@ export const Page = () => {
     state.sensitive,
   ]), [bookmarkId, state.apiUrl, state.sensitive])
 
-  const { data: bookmark, isPending: bookmarkLoading, error: bookmarkError } = useQuery({
+  const {
+    data: networkBookmark,
+    isPending: networkBookmarkLoading,
+    error: networkBookmarkError,
+  } = useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams()
@@ -59,12 +72,28 @@ export const Page = () => {
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user) && Boolean(bookmarkId),
+    enabled: Boolean(user) && Boolean(bookmarkId) && !useOfflineData,
   })
 
-  const reload = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey])
+  const {
+    bookmark: offlineBookmark,
+    bookmarkLoading: offlineBookmarkLoading,
+    bookmarkError: offlineBookmarkError,
+    reloadBookmark: reloadOfflineBookmark,
+  } = useOfflineBookmark(bookmarkId, { enabled: showOfflineDbSpike })
+
+  const bookmark = useOfflineData ? offlineBookmark : networkBookmark
+  const bookmarkLoading = useOfflineData ? offlineBookmarkLoading : networkBookmarkLoading
+  const bookmarkError = useOfflineData ? offlineBookmarkError : networkBookmarkError
+
+  const reload = useCallback(async () => {
+    if (useOfflineData) {
+      await reloadOfflineBookmark()
+      return
+    }
+
+    await queryClient.invalidateQueries({ queryKey })
+  }, [queryClient, queryKey, reloadOfflineBookmark, useOfflineData])
 
   const handleDelete = useCallback(() => {
     if (bookmark && window) {
@@ -91,9 +120,11 @@ export const Page = () => {
   )
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reload,
   })
+
+  const showOfflineMissing = useOfflineData && !bookmarkLoading && !bookmarkError && !bookmark
 
   return html`
     <div>
@@ -104,6 +135,7 @@ export const Page = () => {
       />
       ${bookmarkLoading && !bookmark ? html`<div>...</div>` : null}
       ${bookmarkError ? html`<div>${/** @type {Error} */(bookmarkError).message}</div>` : null}
+      ${showOfflineMissing ? html`<div>No synced bookmark available.</div>` : null}
       ${bookmark
         ? tc(BookmarkList, {
             bookmark,
@@ -116,4 +148,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

@@ -18,17 +18,27 @@ import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { mountPage } from '../lib/mount-page.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../hooks/useOfflineReadSync.js'
+import { useOfflineFeed } from '../hooks/useOfflineFeeds.js'
+import { useOfflineEpisodes } from '../hooks/useOfflineEpisodes.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { params: feedParams, setParams, pushState } = useSearchParams(['feed_id', 'before', 'after'])
+  const { params: feedParams, setParams, pushState } = useSearchParams(['feed_id', 'before', 'after', 'offline_db_spike'])
   const queryClient = useQueryClient()
   const feedIdParam = feedParams['feed_id']
   const beforeParam = feedParams['before']
   const afterParam = feedParams['after']
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = feedParams['offline_db_spike'] === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams()
@@ -46,7 +56,11 @@ export const Page = () => {
     queryString,
   ]), [queryString, state.apiUrl, state.sensitive])
 
-  const { data: episodesData, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
+  const {
+    data: episodesData,
+    isPending: networkEpisodesLoading,
+    error: networkEpisodesError,
+  } = useTanstackQuery({
     queryKey: episodesQueryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams(queryString)
@@ -82,7 +96,7 @@ export const Page = () => {
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !useOfflineData,
     placeholderData: keepPreviousData,
   })
 
@@ -92,7 +106,11 @@ export const Page = () => {
     feedId,
   ]), [feedId, state.apiUrl])
 
-  const { data: feedData, isPending: feedLoading, error: feedError } = useTanstackQuery({
+  const {
+    data: feedData,
+    isPending: networkFeedLoading,
+    error: networkFeedError,
+  } = useTanstackQuery({
     queryKey: feedQueryKey,
     queryFn: async ({ signal }) => {
       const requestURL = feedId
@@ -112,18 +130,54 @@ export const Page = () => {
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !useOfflineData,
   })
 
-  const reloadFeed = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: feedQueryKey })
-  }, [feedQueryKey, queryClient])
+  const {
+    feed: offlineFeed,
+    feedLoading: offlineFeedLoading,
+    feedError: offlineFeedError,
+    reloadFeed: reloadOfflineFeed,
+  } = useOfflineFeed(feedId, { enabled: showOfflineDbSpike })
+  const offlineFeedId = feedId ?? offlineFeed?.id ?? ''
+  const {
+    episodes: offlineEpisodes,
+    episodesLoading: offlineEpisodesLoading,
+    episodesError: offlineEpisodesError,
+    reloadEpisodes: reloadOfflineEpisodes,
+  } = useOfflineEpisodes({
+    enabled: showOfflineDbSpike,
+    readyOnly: true,
+    listFilters: false,
+    feedId: offlineFeedId,
+  })
+
+  const reloadFeed = useCallback(async () => {
+    if (useOfflineData) {
+      await Promise.all([
+        reloadOfflineFeed(),
+        reloadOfflineEpisodes(),
+      ])
+      return
+    }
+
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: feedQueryKey }),
+      queryClient.invalidateQueries({ queryKey: episodesQueryKey }),
+    ])
+  }, [episodesQueryKey, feedQueryKey, queryClient, reloadOfflineEpisodes, reloadOfflineFeed, useOfflineData])
 
   const episodesBody = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { before?: string, after?: string, top?: boolean } } | undefined} */ (episodesData)
-  const episodes = episodesBody?.data
-  const feed = /** @type {TypeFeedRead | undefined} */ (feedData)
-  const before = episodesBody?.pagination?.before ? new Date(episodesBody.pagination.before) : undefined
-  const after = episodesBody?.pagination?.after ? new Date(episodesBody.pagination.after) : undefined
+  const networkEpisodes = episodesBody?.data
+  const networkFeed = /** @type {TypeFeedRead | undefined} */ (feedData)
+  const episodes = useOfflineData ? offlineEpisodes : networkEpisodes
+  const feed = useOfflineData ? offlineFeed : networkFeed
+  const episodesLoading = useOfflineData ? (offlineFeedLoading || offlineEpisodesLoading) : networkEpisodesLoading
+  const episodesError = useOfflineData ? (offlineFeedError || offlineEpisodesError) : networkEpisodesError
+  const feedLoading = useOfflineData ? offlineFeedLoading : networkFeedLoading
+  const feedError = useOfflineData ? offlineFeedError : networkFeedError
+  const before = useOfflineData || !episodesBody?.pagination?.before ? undefined : new Date(episodesBody.pagination.before)
+  const after = useOfflineData || !episodesBody?.pagination?.after ? undefined : new Date(episodesBody.pagination.after)
 
   const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
@@ -192,11 +246,13 @@ export const Page = () => {
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
   const afterParamsValue = afterParams ? afterParams.toString() : undefined
 
-  const showEmptyState = Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
+  const showEmptyState = !useOfflineData && Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
+  const showOfflineEmptyState = useOfflineData && Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
   const showLoadingPlaceholder = episodesLoading && (!Array.isArray(episodes) || episodes.length === 0)
-  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
+  const resultsClassName = (showEmptyState || showOfflineEmptyState || showLoadingPlaceholder)
     ? 'bc-feeds-results bc-feeds-results-empty'
     : 'bc-feeds-results'
+  const showOfflineMissingFeed = useOfflineData && !feedLoading && !feedError && !feed
 
   return html`
     <div class="bc-feeds-page">
@@ -209,10 +265,11 @@ export const Page = () => {
         ${feed ? tc(FeedHeader, { feed, reload: reloadFeed }) : null}
         ${feedLoading ? html`<div>Loading feed...</div>` : null}
         ${feedError ? html`<div>${/** @type {Error} */(feedError).message}</div>` : null}
+        ${showOfflineMissingFeed ? html`<div>No synced feed available.</div>` : null}
       </div>
-      ${showEmptyState
-? null
-: html`
+      ${showEmptyState || showOfflineEmptyState
+        ? null
+        : html`
         <div class="bc-feeds-pagination bc-feeds-pagination-top">
           ${tc(PaginationButtons, {
             onPageNav,
@@ -230,6 +287,7 @@ export const Page = () => {
           : null}
         ${episodesError ? html`<div>${/** @type {Error} */(episodesError).message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-feeds-empty">Bookmark some media!</div>` : null}
+        ${showOfflineEmptyState ? html`<div class="bc-feeds-empty">No synced feed episodes available.</div>` : null}
         ${Array.isArray(episodes)
           ? episodes.map(e => tc(EpisodeList, {
               episode: e,
@@ -238,9 +296,9 @@ export const Page = () => {
             }, e.id))
           : null}
       </div>
-      ${showEmptyState
-? null
-: html`
+      ${showEmptyState || showOfflineEmptyState
+        ? null
+        : html`
         <div class="bc-feeds-pagination bc-feeds-pagination-bottom">
           ${tc(PaginationButtons, {
             onPageNav,
@@ -256,4 +314,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

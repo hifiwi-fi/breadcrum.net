@@ -16,17 +16,19 @@ import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**
  * @typedef {object} AuthTokenManageFieldProps
+ * @property {boolean} [disabled]
  */
 
 /**
  * @type {FunctionComponent<AuthTokenManageFieldProps>}
  */
-export const ManageAuthTokenField = () => {
+export const ManageAuthTokenField = ({ disabled = false }) => {
   const [editMode, setEditMode] = useState(/** @type {EditMode} */(null))
 
   const handleCreateMode = useCallback(() => {
+    if (disabled) return
     setEditMode('creating')
-  }, [setEditMode])
+  }, [disabled, setEditMode])
 
   const handleCleanMode = useCallback(() => {
     setEditMode('cleaning')
@@ -39,16 +41,17 @@ export const ManageAuthTokenField = () => {
   return html`
   <div class='auth-token-manage'>
     ${editMode === 'creating'
-      ? tc(ManageAuthTokenCreateField, {
-          handleCancelEditMode,
-        })
+        ? tc(ManageAuthTokenCreateField, {
+            handleCancelEditMode,
+            disabled,
+          })
       : null
     }
 
     ${!editMode
       ? html`
         <div class='button-gap'>
-          <button type="button" onClick=${handleCreateMode}>Create auth token</button>
+            <button type="button" onClick=${handleCreateMode} disabled=${disabled}>Create auth token</button>
           <!-- <button type="button" onClick="${handleCleanMode}">Cleanup old tokens</button> -->
         </div>
       `

@@ -12,6 +12,7 @@ import { formatRelativeTime } from '../../lib/format-relative-time.js'
  * @property {TypePasskeyReadClient} passkey - Passkey to display
  * @property {(id: string, name: string) => Promise<void>} onUpdate - Callback to update passkey
  * @property {(id: string) => Promise<void>} onDelete - Callback to delete passkey
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -27,7 +28,7 @@ function formatTransports (transports) {
 /**
  * @type {FunctionComponent<PasskeyItemProps>}
  */
-export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
+export const PasskeyItem = ({ passkey, onUpdate, onDelete, disabled = false }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState(passkey.name)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -36,11 +37,12 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
 
   const handleEdit = useCallback(() => {
+    if (disabled) return
     setIsEditing(true)
     setEditName(passkey.name)
     setError(null)
     setShowDeleteConfirm(false)
-  }, [passkey.name])
+  }, [disabled, passkey.name])
 
   const handleCancelEdit = useCallback(() => {
     setIsEditing(false)
@@ -57,6 +59,7 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
 
   const handleSave = useCallback(async (/** @type {Event} */ ev) => {
     ev.preventDefault()
+    if (disabled) return
 
     if (!editName.trim()) {
       setError(new Error('Name cannot be empty'))
@@ -80,18 +83,20 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
     } finally {
       setIsUpdating(false)
     }
-  }, [passkey.id, editName, onUpdate])
+  }, [disabled, passkey.id, editName, onUpdate])
 
   const handleInitiateDelete = useCallback(() => {
+    if (disabled) return
     setShowDeleteConfirm(true)
     setError(null)
-  }, [])
+  }, [disabled])
 
   const handleCancelDelete = useCallback(() => {
     setShowDeleteConfirm(false)
   }, [])
 
   const handleDelete = useCallback(async () => {
+    if (disabled) return
     setIsDeleting(true)
     setError(null)
 
@@ -103,7 +108,7 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
       setIsDeleting(false)
       setShowDeleteConfirm(false)
     }
-  }, [passkey.id, onDelete])
+  }, [disabled, passkey.id, onDelete])
 
   // View mode
   if (!isEditing) {
@@ -126,7 +131,7 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
         </div>
 
         <div class="bc-passkey-actions">
-          <button type="button" onClick=${handleEdit}>Edit</button>
+            <button type="button" onClick=${handleEdit} disabled=${disabled}>Edit</button>
         </div>
       </div>
     `
@@ -136,7 +141,7 @@ export const PasskeyItem = ({ passkey, onUpdate, onDelete }) => {
   return html`
     <div class="bc-passkey-item">
       <form onSubmit=${handleSave}>
-        <fieldset disabled=${isUpdating || isDeleting}>
+        <fieldset disabled=${disabled || isUpdating || isDeleting}>
           <legend>Edit Passkey</legend>
           <div>
             <label class="block">

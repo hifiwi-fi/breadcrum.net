@@ -13,6 +13,7 @@ import { TextIcon } from '../text-icon/index.js'
  * @typedef {object} FeedDisplayProps
  * @property {TypeFeedRead} [feed]
  * @property {() => void} [onEdit]
+ * @property {boolean} [writeDisabled]
  */
 
 /**
@@ -21,6 +22,7 @@ import { TextIcon } from '../text-icon/index.js'
 export const FeedDisplay = ({
   feed: f = {},
   onEdit = () => {},
+  writeDisabled = false,
 }) => {
   const copyButtonRef = useRef(/** @type {HTMLButtonElement | null} */(null))
 
@@ -65,7 +67,7 @@ export const FeedDisplay = ({
           ${f.explicit
             ? html`<${TextIcon} value="Explicit" />`
             : null}
-          <button onClick=${onEdit}>Edit</button>
+          <button onClick=${onEdit} disabled=${writeDisabled}>Edit</button>
         </div>
 
         <div class='bc-feed-description'>

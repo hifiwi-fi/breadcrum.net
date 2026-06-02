@@ -8,14 +8,16 @@ import { html } from 'htm/preact'
 
 /** @type{FunctionComponent<{
  * sensitive: boolean,
- * onToggleSensitive: (ev: MouseEvent) => void
+ * onToggleSensitive: (ev: MouseEvent) => void,
+ * disabled?: boolean
 }>} */
 export const Sensitive = ({
   sensitive = false,
   onToggleSensitive = () => {},
+  disabled = false,
 }) => {
   return html`
-    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${onToggleSensitive}>
+    <span class="${sensitive ? 'bc-sensitive' : 'bc-unsensitive'}" onClick=${disabled ? undefined : onToggleSensitive} aria-disabled=${disabled ? 'true' : undefined}>
       ${sensitive
         ? '🤫'
         : '🫥'

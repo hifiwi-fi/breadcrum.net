@@ -9,13 +9,14 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  * @typedef {{
  *  onSave?: (formState: { password: string }) => Promise<void> | void,
  *  onCancelEdit?: () => void,
+ *  disabled?: boolean,
  * }} PasswordEditProps
  */
 
 /**
  * @type {FunctionComponent<PasswordEditProps>}
  */
-export const PasswordEdit = ({ onSave, onCancelEdit }) => {
+export const PasswordEdit = ({ onSave, onCancelEdit, disabled: disabledProp = false }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
   const formRef = useRef()
@@ -56,7 +57,7 @@ export const PasswordEdit = ({ onSave, onCancelEdit }) => {
   return html`
     <div class='bc-account-password-edit'>
       <form ref=${formRef} class="bc-account-password-edit-form" id="bc-account-password-edit-form" onsubmit=${handleSave}>
-      <fieldset disabled=${disabled}>
+      <fieldset disabled=${disabledProp || disabled}>
         <legend class="bc-account-password-edit-legend">Edit password</legend>
         <div>
           <label class='block'>

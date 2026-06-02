@@ -16,15 +16,24 @@ import { Search } from '../../components/search/index.js'
 import { useResolvePolling } from '../../hooks/useResolvePolling.js'
 import { mountPage } from '../../lib/mount-page.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
+import { useOfflineReadSync } from '../../hooks/useOfflineReadSync.js'
+import { useOfflineArchive } from '../../hooks/useOfflineArchives.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   const { user } = useUser()
   const window = useWindow()
-  const { params } = useSearchParams(['id'])
+  const { params } = useSearchParams(['id', 'offline_db_spike'])
   const queryClient = useQueryClient()
   const archiveId = params['id']
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = params['offline_db_spike'] === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+
+  useOfflineReadSync({ enabled: showOfflineDbSpike })
 
   useEffect(() => {
     if (!window) return
@@ -40,7 +49,11 @@ export const Page = () => {
     state.sensitive,
   ]), [archiveId, state.apiUrl, state.sensitive])
 
-  const { data: archive, isPending: archiveLoading, error: archiveError } = useQuery({
+  const {
+    data: networkArchive,
+    isPending: networkArchiveLoading,
+    error: networkArchiveError,
+  } = useQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams()
@@ -59,12 +72,28 @@ export const Page = () => {
 
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
     },
-    enabled: Boolean(user) && Boolean(archiveId),
+    enabled: Boolean(user) && Boolean(archiveId) && !useOfflineData,
   })
 
-  const reloadArchive = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey })
-  }, [queryClient, queryKey])
+  const {
+    archive: offlineArchive,
+    archiveLoading: offlineArchiveLoading,
+    archiveError: offlineArchiveError,
+    reloadArchive: reloadOfflineArchive,
+  } = useOfflineArchive(archiveId, { enabled: showOfflineDbSpike })
+
+  const archive = useOfflineData ? offlineArchive : networkArchive
+  const archiveLoading = useOfflineData ? offlineArchiveLoading : networkArchiveLoading
+  const archiveError = useOfflineData ? offlineArchiveError : networkArchiveError
+
+  const reloadArchive = useCallback(async () => {
+    if (useOfflineData) {
+      await reloadOfflineArchive()
+      return
+    }
+
+    await queryClient.invalidateQueries({ queryKey })
+  }, [queryClient, queryKey, reloadOfflineArchive, useOfflineData])
 
   const handleDelete = useCallback(() => {
     if (window && archive?.bookmark?.id) {
@@ -84,9 +113,11 @@ export const Page = () => {
   const hasPending = Boolean(archive && archive?.ready === false && !archive?.error && withinResolvingWindow(archive?.created_at))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadArchive,
   })
+
+  const showOfflineMissing = useOfflineData && !archiveLoading && !archiveError && !archive
 
   return html`
     <div>
@@ -97,6 +128,7 @@ export const Page = () => {
       />
       ${archiveLoading && !archive ? html`<div>...</div>` : null}
       ${archiveError ? html`<div>${/** @type {Error} */(archiveError).message}</div>` : null}
+      ${showOfflineMissing ? html`<div>No synced archive available.</div>` : null}
       ${archive
 ? html`
         <${ArchiveList}
@@ -111,4 +143,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

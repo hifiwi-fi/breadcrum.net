@@ -9,6 +9,7 @@ import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
 import { tc } from '../../lib/typed-component.js'
 import { BookmarkEdit } from './bookmark-edit.js'
 import { BookmarkView } from './bookmark-view.js'
@@ -18,7 +19,7 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
  * @typedef {object} BookmarkListProps
  * @property {TypeBookmarkReadClient} bookmark
  * @property {() => void} onInvalidate
- * @property {() => void} onDelete
+ * @property {() => void} [onDelete]
  * @property {boolean} [expandSummary]
  */
 
@@ -27,12 +28,15 @@ import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
  */
 export const BookmarkList = ({ bookmark, onInvalidate, onDelete, expandSummary }) => {
   const state = useLSP()
+  const online = useOnlineStatus()
+  const writeDisabled = !online
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (writeDisabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [setEditing, writeDisabled])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -96,16 +100,19 @@ export const BookmarkList = ({ bookmark, onInvalidate, onDelete, expandSummary }
   })
 
   const handleToggleToRead = useCallback(() => {
+    if (writeDisabled) return
     toggleMutation.mutate({ toread: !bookmark.toread })
-  }, [toggleMutation, bookmark.toread])
+  }, [toggleMutation, bookmark.toread, writeDisabled])
 
   const handleToggleStarred = useCallback(() => {
+    if (writeDisabled) return
     toggleMutation.mutate({ starred: !bookmark.starred })
-  }, [toggleMutation, bookmark.starred])
+  }, [toggleMutation, bookmark.starred, writeDisabled])
 
   const handleToggleSensitive = useCallback(() => {
+    if (writeDisabled) return
     toggleMutation.mutate({ sensitive: !bookmark.sensitive })
-  }, [toggleMutation, bookmark.sensitive])
+  }, [toggleMutation, bookmark.sensitive, writeDisabled])
 
   return html`
   <div class="bc-bookmark">
@@ -118,6 +125,7 @@ export const BookmarkList = ({ bookmark, onInvalidate, onDelete, expandSummary }
             onDeleteBookmark: () => deleteMutation.mutateAsync(),
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${bookmark?.id}</code>`,
+            disabled: writeDisabled,
           })
         : tc(BookmarkView, {
             bookmark,
@@ -126,6 +134,7 @@ export const BookmarkList = ({ bookmark, onInvalidate, onDelete, expandSummary }
             onToggleStarred: handleToggleStarred,
             onToggleSensitive: handleToggleSensitive,
             expandSummary,
+            writeDisabled,
           })
     }
   </div>`

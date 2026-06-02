@@ -17,13 +17,22 @@ import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { BookmarkQuickAdd } from '../components/bookmark/bookmark-quick-add.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
+import { OfflineBookmarksDbSpike } from '../components/offline-db-spike/offline-bookmarks-spike.js'
 import { mountPage } from '../lib/mount-page.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   useUser()
   const window = useWindow()
   const { searchParamsAll, pushState } = useSearchParamsAll()
+  const online = useOnlineStatus()
+  const tagFilterRemovedParams = new URLSearchParams(searchParamsAll || '')
+  const tagFilter = tagFilterRemovedParams.get('tag')
+  const showOfflineDbSpike = tagFilterRemovedParams.get('offline_db_spike') === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
+  tagFilterRemovedParams.delete('tag')
 
   const {
     bookmarksLoading,
@@ -93,10 +102,6 @@ export const Page = () => {
   const topDateValue = formatDateValue(topBookmarkDate) || formatDateValue(cursorDate)
   const bottomDateValue = formatDateValue(bottomBookmarkDate) || formatDateValue(cursorDate)
 
-  const tagFilterRemovedParams = new URLSearchParams(searchParamsAll || '')
-  const tagFilter = tagFilterRemovedParams.get('tag')
-  tagFilterRemovedParams.delete('tag')
-
   /** @typedef {TypeBookmarkReadClient['archives'][number] | null | undefined} BookmarkArchive */
   /** @typedef {TypeBookmarkReadClient['episodes'][number] | null | undefined} BookmarkEpisode */
 
@@ -109,7 +114,7 @@ export const Page = () => {
   ))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadBookmarks,
   })
 
@@ -175,28 +180,30 @@ export const Page = () => {
         return rows
       })()
     : null
-  const showEmptyState = Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
+  const showEmptyState = !useOfflineData && Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
+  const showOfflineEmptyState = useOfflineData && Array.isArray(bookmarks) && bookmarks.length === 0 && !bookmarksLoading && !bookmarksError
   const showLoadingPlaceholder = bookmarksLoading && (!Array.isArray(bookmarks) || bookmarks.length === 0)
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
   const afterParamsValue = afterParams ? afterParams.toString() : undefined
-  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
+  const resultsClassName = (showEmptyState || showOfflineEmptyState || showLoadingPlaceholder)
     ? 'bc-bookmarks-results bc-bookmarks-results-empty'
     : 'bc-bookmarks-results'
 
   return html`
     <div class="bc-bookmarks-page">
+      ${showOfflineDbSpike ? tc(OfflineBookmarksDbSpike, {}) : null}
       ${tc(Search, {
         placeholder: 'Search Bookmarks...',
         onSearch: handleSearch,
         autofocus: true,
       })}
       <div class="bc-bookmarks-actions">
-        ${showEmptyState
+        ${showEmptyState || !online
           ? null
           : tc(BookmarkQuickAdd, { onSubmitUrl: handleQuickAdd })}
         ${tagFilter ? html`<span class='bc-tag-filter-remove'>🏷${tagFilter}<a onClick=${onPageNav} href=${`./?${tagFilterRemovedParams}`}><sub>⊖</sub></a></span>` : null}
       </div>
-      ${showEmptyState
+      ${showEmptyState || showOfflineEmptyState
 ? null
 : html`
         <div class="bc-bookmarks-pagination bc-bookmarks-pagination-top">
@@ -229,9 +236,16 @@ export const Page = () => {
             </div>
           `
           : null}
+        ${showOfflineEmptyState
+          ? html`
+            <div class="bc-bookmarks-empty-state">
+              <div class="bc-bookmarks-empty">No synced bookmarks available.</div>
+            </div>
+          `
+          : null}
         ${bookmarkRows}
       </div>
-      ${showEmptyState
+      ${showEmptyState || showOfflineEmptyState
 ? null
 : html`
         <div class="bc-bookmarks-pagination bc-bookmarks-pagination-bottom">
@@ -249,4 +263,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })

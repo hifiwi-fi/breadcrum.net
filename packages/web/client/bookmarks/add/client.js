@@ -6,9 +6,10 @@
 import { html } from 'htm/preact'
 import { useEffect, useState, useCallback } from 'preact/hooks'
 import { useUser } from '../../hooks/useUser.js'
-// @ts-ignore - version is a string from bookmarklet package
+// @ts-expect-error - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
 import { useSearchParamsAll } from '../../hooks/useSearchParams.js'
 import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
 import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
@@ -17,11 +18,26 @@ import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
 import { tc } from '../../lib/typed-component.js'
 import { mountPage } from '../../lib/mount-page.js'
 
+/**
+ * @typedef {object} BookmarkCreatePayload
+ * @property {string} url
+ * @property {string} [title]
+ * @property {string} [note]
+ * @property {string} [summary]
+ * @property {string[]} [tags]
+ */
+
+/**
+ * @typedef {object} BookmarkSaveResponse
+ * @property {{ id?: string }} [data]
+ */
+
 /** @type {FunctionComponent} */
 export const Page = () => {
   const state = useLSP()
   useUser()
   const { searchParamsAll } = useSearchParamsAll()
+  const online = useOnlineStatus()
   const [bookmark, setBookmark] = useState(/** @type {Partial<TypeBookmarkReadClient> | null} */(null))
   const [newlyCreated, setNewlyCreated] = useState(false)
   const [bookmarkletUpdateAvailable, setBookmarkletUpdateAvailable] = useState(false)
@@ -58,7 +74,13 @@ export const Page = () => {
         return
       }
 
-      const payload = /** @type {any} */ ({ url: workingUrl })
+      if (!online) {
+        setFallbackBookmark()
+        return
+      }
+
+      /** @type {BookmarkCreatePayload} */
+      const payload = { url: workingUrl }
       const titleValue = searchParamsAll.get('title')
       const noteValue = searchParamsAll.get('note')
       if (titleValue) payload.title = titleValue
@@ -99,7 +121,7 @@ export const Page = () => {
       console.error(err)
       setFallbackBookmark()
     })
-  }, [searchParamsAll, state.apiUrl])
+  }, [online, searchParamsAll, state.apiUrl])
 
   const existingBookmark = Boolean(bookmark?.id)
   const hasPending = Boolean(
@@ -133,11 +155,13 @@ export const Page = () => {
   }, [bookmark?.id, state.apiUrl, state.sensitive])
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadBookmark,
   })
 
   async function handleSaveBookmark (/** @type {TypeBookmarkReadClient} */ newBookmark) {
+    if (!online) throw new Error('Bookmark writes require a network connection.')
+
     // Clean request for updates
     const payload = (existingBookmark && bookmark)
       ? diffUpdate(bookmark, newBookmark, {
@@ -170,7 +194,7 @@ export const Page = () => {
       throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
     }
 
-    function finish (/** @type {any} */ responseBody) {
+    function finish (/** @type {BookmarkSaveResponse | undefined} */ responseBody) {
       const { id } = responseBody?.data ?? {}
       const redirectTarget = id ? `/bookmarks/view/?id=${id}` : '/bookmarks'
       const jumpValue = searchParamsAll?.get('jump')
@@ -193,6 +217,7 @@ export const Page = () => {
       bookmarkletUpdateAvailable,
       ...(bookmarkletVersion !== undefined && { bookmarkletVersion }),
       onSave: handleSaveBookmark,
+      disabled: !online,
       legend: existingBookmark
         ? newlyCreated
           ? html`created: <code>${bookmark?.id}</code>`

@@ -22,6 +22,7 @@ import { useState, useRef, useCallback } from 'preact/hooks'
  * @property {() => Promise<void>} [onDeleteFeed]
  * @property {() => void} [onCancelEdit]
  * @property {string | ComponentChild} [legend]
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -33,6 +34,7 @@ export const FeedEdit = ({
   onDeleteFeed,
   onCancelEdit,
   legend,
+  disabled: disabledProp = false,
 }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
@@ -92,7 +94,7 @@ export const FeedEdit = ({
   return html`
     <div class='bc-feed-edit'>
       <form ref=${formRef} class="add-feed-form" id="add-feed-form" onsubmit=${handleSave}>
-        <fieldset disabled=${disabled || initializing}>
+        <fieldset disabled=${disabledProp || disabled || initializing}>
           ${legend ? html`<legend class="bc-feed-legend">${legend}</legend>` : null}
 
           <div>

@@ -24,6 +24,7 @@ import cn from 'classnames'
  * @property {() => void} [onToggleStarred]
  * @property {() => void} [onToggleSensitive]
  * @property {boolean | undefined} [expandSummary]
+ * @property {boolean} [writeDisabled]
  */
 
 /**
@@ -36,6 +37,7 @@ export const BookmarkView = ({
   onToggleStarred = () => {},
   onToggleSensitive = () => {},
   expandSummary = false,
+  writeDisabled = false,
 }) => {
   const window = useWindow()
   const { pushState } = useSearchParams([])
@@ -68,11 +70,11 @@ export const BookmarkView = ({
   return html`
     <div class="bc-bookmark-view">
       <div class="bc-bookmark-title-line">
-        <${ToRead} toread=${b.toread} onToggleRead=${onToggleToread} />
+        <${ToRead} toread=${b.toread} onToggleRead=${onToggleToread} disabled=${writeDisabled} />
         ${'\n'}
-        <${Star} starred=${b.starred} onToggleStar=${onToggleStarred} />
+        <${Star} starred=${b.starred} onToggleStar=${onToggleStarred} disabled=${writeDisabled} />
         ${'\n'}
-        <${Sensitive} sensitive=${b.sensitive} onToggleSensitive=${onToggleSensitive} />
+        <${Sensitive} sensitive=${b.sensitive} onToggleSensitive=${onToggleSensitive} disabled=${writeDisabled} />
         ${'\n'}
         <span>
           <a class="${cn({
@@ -129,7 +131,7 @@ export const BookmarkView = ({
         </a>
       </div>
       <div>
-        <button onClick=${onEdit}>Edit</button>
+        <button onClick=${onEdit} disabled=${writeDisabled}>Edit</button>
       </div>
     </div>
     `

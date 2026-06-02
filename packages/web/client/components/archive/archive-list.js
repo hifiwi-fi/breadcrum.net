@@ -10,6 +10,7 @@ import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
+import { useOnlineStatus } from '../../hooks/useOnlineStatus.js'
 import { tc } from '../../lib/typed-component.js'
 
 import { ArchiveEdit } from './archive-edit.js'
@@ -24,12 +25,15 @@ import { diffUpdate } from '../../lib/diff-update.js'
 }>} */
 export const ArchiveList = ({ archive, onDelete, onInvalidate, fullView }) => {
   const state = useLSP()
+  const online = useOnlineStatus()
+  const writeDisabled = !online
   const [editing, setEditing] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (writeDisabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [setEditing, writeDisabled])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -84,6 +88,7 @@ export const ArchiveList = ({ archive, onDelete, onInvalidate, fullView }) => {
             onDeleteArchive: () => deleteMutation.mutateAsync(),
             onCancelEdit: handleCancelEdit,
             legend: html`edit: <code>${archive?.id}</code>`,
+            disabled: writeDisabled,
           })
         : tc(ArchiveView, {
             archive,

@@ -28,6 +28,7 @@ import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
  * @property {() => Promise<void>} [onDeleteBookmark]
  * @property {() => void} [onCancelEdit]
  * @property {string | ComponentChild} [legend]
+ * @property {boolean} [disabled]
  */
 
 /**
@@ -41,6 +42,7 @@ export const BookmarkEdit = ({
   onDeleteBookmark,
   onCancelEdit,
   legend,
+  disabled: disabledProp = false,
 }) => {
   const window = useWindow()
   const state = useLSP()
@@ -290,7 +292,7 @@ export const BookmarkEdit = ({
   return html`
     <div class='bc-bookmark-edit'>
       <form ref=${formRef} class="add-bookmark-form" id="add-bookmark-form" onSubmit=${handleSave}>
-      <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabled || initializing}>
+      <fieldset class='bc-bookmark-edit-fieldset' disabled=${disabledProp || disabled || initializing}>
         ${legend ? html`<legend class="bc-bookmark-legend">${legend}</legend>` : null}
         <!-- Bookmark URL -->
         <div>

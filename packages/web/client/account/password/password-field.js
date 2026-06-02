@@ -9,19 +9,20 @@ import { PasswordEdit } from './password-edit.js'
 import { PasswordView } from './password-view.js'
 
 /**
- * @typedef {{}} PasswordFieldProps
+ * @typedef {{ disabled?: boolean }} PasswordFieldProps
  */
 
 /**
  * @type {FunctionComponent<PasswordFieldProps>}
  */
-export const PasswordField = () => {
+export const PasswordField = ({ disabled = false }) => {
   const state = useLSP()
   const [editing, setEditing] = useState(false)
 
   const handleEdit = useCallback(() => {
+    if (disabled) return
     setEditing(true)
-  }, [setEditing])
+  }, [disabled, setEditing])
 
   const handleCancelEdit = useCallback(() => {
     setEditing(false)
@@ -49,12 +50,14 @@ export const PasswordField = () => {
   ${
     editing
     ? html`<${PasswordEdit}
-        onSave=${handleSave}
-        onCancelEdit=${handleCancelEdit}
-      />`
+          onSave=${handleSave}
+          onCancelEdit=${handleCancelEdit}
+          disabled=${disabled}
+        />`
     : html`<${PasswordView}
-        onEdit=${handleEdit}
-      />`
+          onEdit=${handleEdit}
+          disabled=${disabled}
+        />`
   }
   `
 }

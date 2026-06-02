@@ -9,18 +9,20 @@ import { useState, useCallback } from 'preact/hooks'
  * @typedef {Object} PasskeyRegisterFormProps
  * @property {(name: string) => Promise<void>} onRegister - Callback to register passkey
  * @property {() => void} [onCancel] - Optional callback to cancel registration
+ * @property {boolean} [disabled]
  */
 
 /**
  * @type {FunctionComponent<PasskeyRegisterFormProps>}
  */
-export const PasskeyRegisterForm = ({ onRegister, onCancel }) => {
+export const PasskeyRegisterForm = ({ onRegister, onCancel, disabled = false }) => {
   const [name, setName] = useState('')
   const [registering, setRegistering] = useState(false)
   const [error, setError] = useState(/** @type {string | null} */(null))
 
   const handleSubmit = useCallback(async (/** @type {Event} */ ev) => {
     ev.preventDefault()
+    if (disabled) return
 
     if (!name.trim()) {
       setError('Please enter a name for your passkey')
@@ -46,7 +48,7 @@ export const PasskeyRegisterForm = ({ onRegister, onCancel }) => {
     } finally {
       setRegistering(false)
     }
-  }, [name, onRegister])
+  }, [disabled, name, onRegister])
 
   const handleNameChange = useCallback((/** @type {Event} */ ev) => {
     const target = /** @type {HTMLInputElement} */ (ev.target)
@@ -56,7 +58,7 @@ export const PasskeyRegisterForm = ({ onRegister, onCancel }) => {
 
   return html`
     <form class="bc-passkey-register-form" onSubmit=${handleSubmit}>
-      <fieldset disabled=${registering}>
+      <fieldset disabled=${disabled || registering}>
         <legend>Add Passkey</legend>
         <div>
           <label class="block">
@@ -86,7 +88,7 @@ export const PasskeyRegisterForm = ({ onRegister, onCancel }) => {
               name="submit-button"
               type="submit"
               value=${registering ? 'Registering...' : 'Register Passkey'}
-              disabled=${registering || !name.trim()}
+                disabled=${disabled || registering || !name.trim()}
             />
           </span>
           ${onCancel

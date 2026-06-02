@@ -82,6 +82,7 @@ function loadBlueskyEmbed () {
  * @property {() => void} [onEdit]
  * @property {boolean} [showError]
  * @property {boolean} [fullView]
+ * @property {boolean} [writeDisabled]
  */
 
 /**
@@ -93,6 +94,7 @@ export const EpisodeView = ({
   onEdit = () => {},
   showError = false,
   fullView = false,
+  writeDisabled = false,
 }) => {
   const mediaLink = e?.podcast_feed_id && e?.id ? `/api/feeds/${e?.podcast_feed_id}/episode/${e.id}` : null
   const rawEmbedHtml = typeof e?.oembed?.html === 'string' ? e.oembed.html : null
@@ -308,7 +310,7 @@ export const EpisodeView = ({
       }
 
       <div>
-        <button onClick=${onEdit}>Edit</button>
+        <button onClick=${onEdit} disabled=${writeDisabled}>Edit</button>
       </div>
 
       ${showFooter

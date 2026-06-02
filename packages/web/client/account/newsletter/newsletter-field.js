@@ -12,13 +12,14 @@ import { useLSP } from '../../hooks/useLSP.js'
  * @typedef {{
  *  user: TypeUserRead | null,
  *  onSuccess?: (result: { data: TypeUserRead }) => void,
+ *  disabled?: boolean,
  * }} NewsletterFieldProps
  */
 
 /**
  * @type {FunctionComponent<NewsletterFieldProps>}
  */
-export const NewsletterField = ({ user, onSuccess }) => {
+export const NewsletterField = ({ user, onSuccess, disabled = false }) => {
   const state = useLSP()
 
   const toggleMutation = useMutation({
@@ -40,14 +41,15 @@ export const NewsletterField = ({ user, onSuccess }) => {
 
   const handleToggle = useCallback((/** @type {Event} */ev) => {
     ev.preventDefault()
+    if (disabled) return
     toggleMutation.mutate(!user?.newsletter_subscription)
-  }, [toggleMutation, user?.newsletter_subscription])
+  }, [disabled, toggleMutation, user?.newsletter_subscription])
 
   return html`
   <dt>Newsletter</dt>
   <dd>
     <label>
-      <input class="newsletter-label" onClick=${handleToggle} type="checkbox" name="newsletter-subscription" disabled=${toggleMutation.isPending} indeterminate=${toggleMutation.isPending} checked=${user?.newsletter_subscription} />
+      <input class="newsletter-label" onClick=${handleToggle} type="checkbox" name="newsletter-subscription" disabled=${disabled || toggleMutation.isPending} indeterminate=${toggleMutation.isPending} checked=${user?.newsletter_subscription} />
       <span>Subscribed</span>
     </label>
     ${toggleMutation.error ? html`<div class="error-box">${/** @type {Error} */(toggleMutation.error).message}</div>` : null}

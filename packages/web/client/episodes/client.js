@@ -16,12 +16,17 @@ import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { useEpisodes } from '../hooks/useEpisodes.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
 import { mountPage } from '../lib/mount-page.js'
+import { useOnlineStatus } from '../hooks/useOnlineStatus.js'
+import { prepareOfflinePersistenceForCurrentUser } from '../lib/offline/offline-db.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
-  const { user } = useUser()
+  useUser()
   const window = useWindow()
   const { searchParamsAll, pushState } = useSearchParamsAll()
+  const online = useOnlineStatus()
+  const showOfflineDbSpike = searchParamsAll?.get('offline_db_spike') === 'true'
+  const useOfflineData = showOfflineDbSpike && !online
 
   const {
     episodes,
@@ -30,7 +35,7 @@ export const Page = () => {
     reloadEpisodes,
     beforeParams,
     afterParams,
-  } = useEpisodes({ enabled: Boolean(user) })
+  } = useEpisodes()
 
   const onPageNav = useCallback((/** @type {MouseEvent & {currentTarget: HTMLAnchorElement}} */ev) => {
     ev.preventDefault()
@@ -90,13 +95,14 @@ export const Page = () => {
   ))
 
   useResolvePolling({
-    enabled: hasPending,
+    enabled: hasPending && online,
     onPoll: reloadEpisodes,
   })
 
-  const showEmptyState = Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
+  const showEmptyState = !useOfflineData && Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
+  const showOfflineEmptyState = useOfflineData && Array.isArray(episodes) && episodes.length === 0 && !episodesLoading && !episodesError
   const showLoadingPlaceholder = episodesLoading && (!Array.isArray(episodes) || episodes.length === 0)
-  const resultsClassName = (showEmptyState || showLoadingPlaceholder)
+  const resultsClassName = (showEmptyState || showOfflineEmptyState || showLoadingPlaceholder)
     ? 'bc-episodes-results bc-episodes-results-empty'
     : 'bc-episodes-results'
   const beforeParamsValue = beforeParams ? beforeParams.toString() : undefined
@@ -109,9 +115,9 @@ export const Page = () => {
         onSearch: handleSearch,
         autofocus: true,
       })}
-      ${showEmptyState
-? null
-: html`
+      ${showEmptyState || showOfflineEmptyState
+        ? null
+        : html`
         <div class="bc-episodes-pagination bc-episodes-pagination-top">
           ${tc(PaginationButtons, {
             onPageNav,
@@ -129,6 +135,7 @@ export const Page = () => {
           : null}
         ${episodesError ? html`<div>${episodesError.message}</div>` : null}
         ${showEmptyState ? html`<div class="bc-episodes-empty">Bookmark some media!</div>` : null}
+        ${showOfflineEmptyState ? html`<div class="bc-episodes-empty">No synced episodes available.</div>` : null}
         ${Array.isArray(episodes)
           ? episodes.map(e => tc(EpisodeList, {
               episode: e,
@@ -137,9 +144,9 @@ export const Page = () => {
             }, e.id))
           : null}
       </div>
-      ${showEmptyState
-? null
-: html`
+      ${showEmptyState || showOfflineEmptyState
+        ? null
+        : html`
         <div class="bc-episodes-pagination bc-episodes-pagination-bottom">
           ${tc(PaginationButtons, {
             onPageNav,
@@ -155,4 +162,4 @@ export const Page = () => {
   `
 }
 
-mountPage(Page)
+mountPage(Page, { beforeMount: prepareOfflinePersistenceForCurrentUser })
