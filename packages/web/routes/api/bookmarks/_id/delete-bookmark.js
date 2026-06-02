@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deleteBookmarkById } from '../bookmark-delete-action.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -34,20 +34,16 @@ export async function deleteBookmark (fastify, _opts) {
     },
   },
   async function deleteBookmarkHandler (request, reply) {
-    const userId = request.user.id
-    const bookmarkId = request.params.id
+    const result = await deleteBookmarkById(fastify, {
+      userId: request.user.id,
+      bookmarkId: request.params.id,
+    })
 
-    const query = SQL`
-      DELETE from bookmarks
-      WHERE id = ${bookmarkId}
-        AND owner_id =${userId};
-      `
-
-    // TODO: check results
-    await fastify.pg.query(query)
+    if (!result.ok) {
+      return reply.notFound(result.message)
+    }
 
     reply.status(202)
-    fastify.otel.bookmarkDeleteCounter.add(1)
     return /** @type {const} */ ({
       status: 'ok',
     })

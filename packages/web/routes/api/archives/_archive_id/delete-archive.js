@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deleteArchiveById } from '../archive-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -45,23 +45,16 @@ export async function deleteArchiveRoute (fastify, _opts) {
     const ownerId = request.user.id
     const archiveId = request.params.archive_id
 
-    const query = SQL`
-      delete from archives
-      where id = ${archiveId}
-        and owner_id = ${ownerId}
-    `
+    const result = await deleteArchiveById(fastify, { userId: ownerId, archiveId })
 
-    const result = await fastify.pg.query(query)
-
-    if (result.rowCount === 0) {
+    if (!result.ok) {
       return reply.status(404).send(/** @type {const} */({
         status: 'error',
-        message: 'Archive not found or you do not have permission to delete it',
+        message: result.message,
       }))
     }
 
     reply.status(202)
-    fastify.otel.episodeDeleteCounter.add(1)
 
     return /** @type {const} */({
       status: 'ok',

@@ -7,7 +7,7 @@ import { Reader, AddressNotFoundError, ValueError } from '@maxmind/geoip2-node'
 import { constants as fsConstants } from 'node:fs'
 import { access } from 'node:fs/promises'
 import { join } from 'node:path'
-import { updateGeoipDatabase } from '../lib/geoip-download.js'
+import { updateGeoipDatabase } from '#lib/geoip-download.js'
 
 const defaultGeoipPath = join(process.cwd(), 'data', 'geoip', 'GeoLite2-City.mmdb')
 const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')

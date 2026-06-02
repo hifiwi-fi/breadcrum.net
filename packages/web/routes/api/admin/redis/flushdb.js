@@ -2,6 +2,8 @@
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 
+import { flushRedisCache } from './redis-actions.js'
+
 /**
  * Flushes all keys in the Redis cache database.
  *
@@ -31,13 +33,7 @@ export async function flushCache (fastify) {
       },
     },
     async function flushCacheHandler (_request, _reply) {
-      const cacheRedis = fastify.redis['cache']
-      if (!cacheRedis) throw new Error('Missing redis cluent')
-      await cacheRedis.flushdb()
-      return {
-        status: 'cache cleared',
-        cleared: true,
-      }
+      return flushRedisCache(fastify)
     }
   )
 }

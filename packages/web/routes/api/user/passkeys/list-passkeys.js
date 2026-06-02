@@ -1,10 +1,8 @@
-import SQL from '@nearform/sql'
 import { schemaPasskeyRead } from './schemas/schema-passkey-read.js'
+import { listPasskeysForUser } from './passkey-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { QueryResult } from 'pg'
- * @import { TypePasskeyReadSerialize } from './schemas/schema-passkey-read.js'
  */
 
 /**
@@ -34,26 +32,9 @@ export async function listPasskeys (fastify, _opts) {
     },
     async function listPasskeysHandler (request, reply) {
       const userId = request.user.id
+      const passkeys = await listPasskeysForUser(fastify, { userId })
 
-      const query = SQL`
-        select
-          id,
-          credential_id,
-          name,
-          created_at,
-          updated_at,
-          last_used,
-          transports::text[],
-          aaguid
-        from passkeys
-        where user_id = ${userId}
-        order by created_at desc
-      `
-
-      /** @type {QueryResult<TypePasskeyReadSerialize>} */
-      const result = await fastify.pg.query(query)
-
-      return reply.code(200).send(result.rows)
+      return reply.code(200).send(passkeys)
     }
   )
 }

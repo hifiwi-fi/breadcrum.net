@@ -1,9 +1,8 @@
-import SQL from '@nearform/sql'
-
 import {
   tokenWithUserProps,
   userEditableUserProps,
 } from '../user/schemas/user-base.js'
+import { loginWithPassword } from '../auth/session.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -46,42 +45,11 @@ export default async function loginRoutes (fastify, _opts) {
     async function loginRouteHandler (request, reply) {
       // TODO: fail if logged in
 
-      const user = request.body.user
-      const password = request.body.password
+      const session = await loginWithPassword(fastify, reply, request.body)
+      if (!session) return fastify.httpErrors.unauthorized()
 
-      const isEmail = user.includes('@')
-
-      const query = SQL`
-      select
-        id,
-        email,
-        username,
-        email_confirmed,
-        newsletter_subscription,
-        admin,
-        created_at,
-        updated_at
-      from users
-      where ${isEmail ? SQL`email = ${user}` : SQL`username = ${user}`}
-      and password = crypt(${password}, password)
-      limit 1;
-      `
-
-      const { rows } = await fastify.pg.query(query)
-
-      const foundUser = rows.length > 0
-
-      if (foundUser) {
-        const user = rows.pop()
-
-        const token = await reply.createJWTToken({ id: user.id, username: user.username }, 'web')
-        reply.setJWTCookie(token)
-
-        reply.statusCode = 201
-        return { user, token }
-      } else {
-        return fastify.httpErrors.unauthorized()
-      }
+      reply.statusCode = 201
+      return session
     }
   )
 }

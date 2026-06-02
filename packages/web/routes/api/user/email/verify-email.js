@@ -1,5 +1,4 @@
-import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
-import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
+import { confirmEmail } from './verify-email-action.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -55,29 +54,30 @@ export async function verifyEmailRoute (fastify, _opts) {
       },
     },
     async function verifyEmailHandler (request, reply) {
-      return fastify.pg.transact(async client => {
-        const now = new Date()
-        const userId = request.user.id
-        const { token, update } = request.body
-
-        if (update) {
-          return await verifyEmailUpdateHandler({
-            userId,
-            client,
-            reply,
-            token,
-            now,
-          })
-        } else {
-          return await verifyEmailConfirmHandler({
-            userId,
-            client,
-            token,
-            reply,
-            now,
-          })
-        }
+      const result = await confirmEmail(fastify, {
+        userId: request.user.id,
+        token: request.body.token,
+        update: request.body.update,
       })
+
+      if (!result.ok) {
+        if (result.statusCode === 422) {
+          return reply.unprocessableEntity(result.message)
+        }
+
+        return reply.forbidden(result.message)
+      }
+
+      reply.code(202)
+      const response = {
+        status: 'ok',
+        email: result.email,
+        confirmed: result.confirmed,
+      }
+
+      return result.updated
+        ? { ...response, updated: true }
+        : response
     }
   )
 }

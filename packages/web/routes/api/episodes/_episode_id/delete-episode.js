@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deleteEpisodeById } from '../episode-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -27,20 +27,9 @@ export async function deleteEpisode (fastify, _opts) {
     const ownerId = request.user.id
     const episodeId = request.params.episode_id
 
-    const query = SQL`
-      delete from episodes
-      where id = ${episodeId}
-        and owner_id = ${ownerId}
-    `
-
-    // TODO: check results
-    await fastify.pg.query(query)
-
+    const result = await deleteEpisodeById(fastify, { userId: ownerId, episodeId })
     reply.status(202)
-    fastify.otel.episodeDeleteCounter.add(1)
 
-    return {
-      status: 'ok',
-    }
+    return result
   })
 }

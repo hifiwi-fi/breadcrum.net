@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { listTags } from './tag-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -48,21 +48,8 @@ export async function getTags (fastify, _opts) {
       const userId = request.user.id
       const { sensitive } = request.query
 
-      const query = SQL`
-        select tags.name, tags.created_at, count(bookmarks_tags.tag_id) as count
-        from tags
-        left outer join bookmarks_tags on (tags.id = bookmarks_tags.tag_id)
-        left outer join bookmarks on (bookmarks_tags.bookmark_id = bookmarks.id)
-        where tags.owner_id = ${userId}
-        ${!sensitive ? SQL`AND sensitive = false` : SQL``}
-        group by (tags.name, tags.created_at)
-        order by tags.created_at desc;
-      `
-
-      const results = await fastify.pg.query(query)
-
       return {
-        data: results.rows,
+        data: await listTags(fastify, { userId, sensitive }),
       }
     }
   )

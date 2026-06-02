@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deleteAuthTokenByJti } from '../auth-token-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -41,20 +41,17 @@ export async function deleteAuthToken (fastify, _opts) {
       const { id: userId, jti: currentJti } = request.user
       const { jti } = request.params
 
-      // Prevent users from deleting their current session
-      if (jti === currentJti) {
-        return reply.badRequest('Cannot delete the current session token')
+      const result = await deleteAuthTokenByJti(fastify, {
+        userId,
+        currentJti,
+        jti,
+      })
+
+      if (!result.ok && result.statusCode === 400) {
+        return reply.badRequest(result.message)
       }
 
-      const query = SQL`
-        DELETE FROM auth_tokens
-        WHERE jti = ${jti}
-          AND owner_id = ${userId}
-      `
-
-      const result = await fastify.pg.query(query)
-
-      if (result.rowCount === 0) {
+      if (!result.ok) {
         return reply.notFound('Auth token not found')
       }
 

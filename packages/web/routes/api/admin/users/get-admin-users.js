@@ -1,6 +1,5 @@
 import { userEditableUserProps } from '../../user/schemas/user-base.js'
-import { getAdminUsers } from './get-admin-users-query.js'
-import { addMillisecond } from '../../bookmarks/addMillisecond.js'
+import { listAdminUsersForAdmin } from './admin-user-actions.js'
 import { schemaAdminUsersRead } from './schemas/schema-admin-user-read.js'
 
 /**
@@ -68,56 +67,19 @@ export async function getAdminUsersRoute (fastify, _opts) {
           username,
         } = request.query
 
-        const results = await getAdminUsers({
+        const result = await listAdminUsersForAdmin({
           fastify,
           pg: client,
           before,
           after,
-          perPage: perPage + 1,
+          perPage,
           username,
         })
 
-        const top = Boolean(
-          (!before && !after) ||
-          (after && results.length <= perPage)
-        )
-        const bottom = Boolean(
-          (before && results.length <= perPage) ||
-          (!before && !after && results.length <= perPage)
-        )
-
-        if (results.length > perPage) {
-          if (after) {
-            results.shift()
-          } else {
-            results.pop()
-          }
-        }
-
-        const nextPage = bottom ? null : results.at(-1)?.created_at ?? null
-        const prevPage = top ? null : addMillisecond(results[0]?.created_at) ?? null
-
-        const geoipLookup = fastify.geoip?.lookup
-
-        const users = results.map(user => ({
-          ...user,
-          geoip: geoipLookup && user.ip
-            ? geoipLookup(user.ip)
-            : null,
-          registration_geoip: geoipLookup && user.registration_ip
-            ? geoipLookup(user.registration_ip)
-            : null,
-        }))
-
         /** @type {ReturnBody} */
         const returnData = {
-          data: users,
-          pagination: {
-            before: nextPage,
-            after: prevPage,
-            top,
-            bottom,
-          },
+          data: result.data,
+          pagination: result.pagination,
         }
 
         return reply.code(200).send(returnData)

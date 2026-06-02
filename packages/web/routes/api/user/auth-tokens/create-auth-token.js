@@ -1,11 +1,9 @@
 import { schemaAuthTokenCreate } from './schemas/schema-auth-token-create.js'
 import { schemaAuthTokenCreateResponse } from './schemas/schema-auth-token-create-response.js'
-import { getSingleAuthToken } from './_jti/get-single-auth-token-query.js'
+import { createAuthTokenForReply } from './auth-token-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { JwtUserWithTokenId } from '../../../../plugins/jwt.js'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
  */
 
 /**
@@ -39,40 +37,15 @@ export async function createAuthToken (fastify, _opts) {
       const { id: userId, username, jti: currentJti } = request.user
       const { note, protect } = request.body
 
-      // Create the JWT token using the decorated function with note and protect
-      const token = await reply.createJWTToken({
-        id: userId,
-        username,
-        note,
-        protect
-      }, 'api')
-
-      // Decode the token to get the jti
-      /** @type {JwtUserWithTokenId | null} */
-      const decodedToken = fastify.jwt.decode(token)
-      if (!decodedToken) {
-        throw new Error('Failed to decode JWT token')
-      }
-      const newJti = decodedToken.jti
-
-      // Get the full auth token details
-
-      /** @type { ExtractResponseType<typeof reply.code<201>>['auth_token'] | undefined } */
-      const authToken = await getSingleAuthToken({
-        fastify,
+      const result = await createAuthTokenForReply(fastify, reply, {
         userId,
-        jti: newJti,
+        username,
         currentJti,
+        note,
+        protect,
       })
 
-      if (!authToken) {
-        throw new Error('Failed to retrieve created auth token')
-      }
-
-      return reply.code(201).send({
-        token,
-        auth_token: authToken,
-      })
+      return reply.code(201).send(result)
     }
   )
 }

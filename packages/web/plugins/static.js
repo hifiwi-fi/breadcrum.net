@@ -21,23 +21,7 @@ export default fp(async function (fastify, _) {
     prefix: '/',
     ...staticOpts,
   })
-
-  // Admin Routes auth protection
-  fastify.register(async function (fastify, _) {
-    fastify.addHook('preHandler', fastify.auth([
-      fastify.verifyJWT,
-      fastify.verifyAdmin,
-    ], {
-      relation: 'and',
-    }))
-    fastify.register(import('@fastify/static'), {
-      logLevel: 'silent',
-      root: path.join(__dirname, '../public/admin'),
-      prefix: '/',
-      ...staticOpts,
-    })
-  }, { prefix: '/admin' })
 }, {
   name: 'static',
-  dependencies: ['compress', 'auth', 'jwt', 'helmet'],
+  dependencies: ['compress', 'env', 'helmet'],
 })

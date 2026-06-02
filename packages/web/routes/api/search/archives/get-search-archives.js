@@ -1,4 +1,4 @@
-import { getSearchArchivesQuery } from './get-search-archives-query.js'
+import { searchArchives } from './search-archives-action.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
@@ -159,66 +159,22 @@ export async function getSearchArchives (fastify, _opts) {
         reverse,
       } = request.query
 
-      const archivesQuery = getSearchArchivesQuery({
+      const results = await searchArchives(fastify, {
+        userId,
         query,
-        ownerId: userId,
+        perPage,
         sensitive,
         starred,
         toread,
-        perPage: perPage + 1,
-        lastRank: rank,
-        lastId: id,
+        rank,
+        id,
         reverse,
       })
 
-      const results = await fastify.pg.query(archivesQuery)
-
-      const top = !rank || (!rank && !id) || (reverse && results.rows.length <= perPage)
-      const bottom = !reverse && results.rows.length <= perPage
-
-      if (!reverse && !bottom) {
-        results.rows.pop()
-      }
-
-      if (reverse && !top) {
-        results.rows.shift()
-      }
-
-      /** @type {PaginationType} */
-      const pagination = {
-        top,
-        bottom,
-      }
-
-      if (!top) {
-        const firstResult = results.rows.at(0)
-        if (firstResult) {
-          pagination.prev = {
-            rank: firstResult.rank,
-            id: firstResult.id,
-            reverse: true,
-            query,
-          }
-        }
-      }
-
-      if (!bottom) {
-        const lastResult = results.rows.at(-1)
-        if (lastResult) {
-          pagination.next = {
-            rank: lastResult.rank,
-            id: lastResult.id,
-            reverse: false,
-            query,
-          }
-        }
-      }
-
       /** @type {ReturnBody} */
       const response = {
-        // TODO: Fix ANY
-        data: /** @type {any} */ (results.rows),
-        pagination,
+        data: /** @type {any} */ (results.data),
+        pagination: /** @type {PaginationType} */ (results.pagination),
       }
       return reply.code(200).send(response)
     }

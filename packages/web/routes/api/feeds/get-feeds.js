@@ -1,7 +1,5 @@
-import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { feedProps, feedReadProps } from './schemas/feed-base.js'
-import { getFeedsQuery } from './feeds-query.js'
-import { getFeedWithDefaults } from './feed-defaults.js'
+import { listFeeds } from './feed-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -45,26 +43,8 @@ export async function getFeeds (fastify, _opts) {
       },
     },
     async function getFeedsHandler (request, _reply) {
-      return fastify.pg.transact(async client => {
-        const userId = request.user.id
-
-        // Ensure default feed exists
-        await getOrCreateDefaultFeed({ userId, client })
-
-        const feedsQuery = getFeedsQuery({ userId })
-
-        const [feedsResults] = await Promise.all([
-          client.query(feedsQuery),
-        ])
-
-        const transport = fastify.config.TRANSPORT
-        const host = fastify.config.HOST
-
-        const resultsWithDefaults = feedsResults.rows.map(feed => getFeedWithDefaults({ feed, transport, host }))
-
-        return {
-          data: resultsWithDefaults,
-        }
-      })
+      return {
+        data: /** @type {any} */ (await listFeeds(fastify, { userId: request.user.id })),
+      }
     })
 }

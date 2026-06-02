@@ -22,15 +22,15 @@ export function getFeedsQuery ({
           pf.description,
           pf.image_url,
           pf.explicit,
+          pf.token,
           (pf.id = users.default_podcast_feed_id) as default_feed,
-          count(ep.id) as episode_count
+          count(ep.id)::int as episode_count
         from podcast_feeds pf
-        left outer join users
-        on users.default_podcast_feed_id = pf.id
+        join users
+        on users.id = pf.owner_id
         left outer join episodes ep
-        on (pf.id = ep.podcast_feed_id)
+        on (pf.id = ep.podcast_feed_id and ep.owner_id = ${userId})
         where pf.owner_id = ${userId}
-        and ep.owner_id = ${userId}
         group by (
           pf.id,
           pf.created_at,
@@ -39,6 +39,7 @@ export function getFeedsQuery ({
           pf.description,
           pf.image_url,
           pf.explicit,
+          pf.token,
           default_feed
         )
         order by pf.created_at asc;

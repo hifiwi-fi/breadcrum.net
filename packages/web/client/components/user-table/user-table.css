@@ -1,8 +1,0 @@
-@import "./user-row.css";
-
-.bc-admin-users-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin: 1rem 0;
-}

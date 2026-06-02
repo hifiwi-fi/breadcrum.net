@@ -1,6 +1,5 @@
-/* eslint-disable camelcase */
-import SQL from '@nearform/sql'
 import { feedProps, feedReadProps } from '../schemas/feed-base.js'
+import { updateFeedDetails } from '../feed-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -60,40 +59,20 @@ export async function putFeed (fastify, _opts) {
         },
       },
     },
-    async function putFeedHandler (request, _reply) {
-      return fastify.pg.transact(async client => {
-        const userId = request.user.id
-        const { feed: feedId } = request.params
-        const {
-          title,
-          description,
-          image_url,
-          explicit,
-        } = request.body
-
-        const updates = []
-
-        if (title != null) updates.push(SQL`title = ${title}`)
-        if (description != null) updates.push(SQL`description = ${description}`)
-        if (image_url != null) updates.push(SQL`image_url = ${image_url}`)
-        if (explicit != null) updates.push(SQL`explicit = ${explicit}`)
-
-        if (updates.length > 0) {
-          const query = SQL`
-          update podcast_feeds
-          set ${SQL.glue(updates, ' , ')}
-          where id = ${feedId}
-          and owner_id =${userId};
-          `
-
-          await client.query(query)
-
-          fastify.otel.podcastFeedEditCounter.add(1)
-        }
-
-        return {
-          status: 'ok',
-        }
+    async function putFeedHandler (request, reply) {
+      const result = await updateFeedDetails(fastify, {
+        userId: request.user.id,
+        feedId: request.params.feed,
+        input: request.body,
       })
+
+      if (!result.ok) {
+        if (result.statusCode === 404) return reply.notFound(result.message)
+        return reply.unprocessableEntity(result.message)
+      }
+
+      return {
+        status: 'ok',
+      }
     })
 }

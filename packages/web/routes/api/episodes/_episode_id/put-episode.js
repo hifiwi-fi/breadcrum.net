@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { updateEpisode } from '../episode-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -30,36 +30,13 @@ export async function putEpisode (fastify, _opts) {
     },
   },
   async function putEpisodeHandler (request, _reply) {
-    return fastify.pg.transact(async client => {
-      const ownerId = request.user.id
-      const { episode_id: episodeId } = request.params
-      const episode = request.body
+    const ownerId = request.user.id
+    const { episode_id: episodeId } = request.params
 
-      const updates = []
-
-      // if (episode.url != null) updates.push(SQL`url = ${episode.url}`)
-      if (episode.title != null) updates.push(SQL`title = ${episode.title}`)
-      if (episode.explicit != null) updates.push(SQL`explicit = ${episode.explicit}`)
-      // TODO: description editing
-      // TODO: change medium or type?
-      // TODO: re-run create episode steps
-
-      if (updates.length > 0) {
-        const query = SQL`
-          update episodes
-          set ${SQL.glue(updates, ' , ')}
-          where id = ${episodeId}
-          and owner_id =${ownerId};
-          `
-
-        await client.query(query)
-      }
-
-      fastify.otel.episodeEditCounter.add(1)
-
-      return {
-        status: 'ok',
-      }
+    return updateEpisode(fastify, {
+      userId: ownerId,
+      episodeId,
+      episode: request.body,
     })
   })
 }

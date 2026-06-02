@@ -1,24 +1,30 @@
 /**
- * @import { FastifyReply } from 'fastify'
  * @import { PgClient } from '@breadcrum/resources/types/pg-client.js'
+ * @import { QueryResult } from 'pg'
+ * @import { EmailConfirmResult } from './verify-email-action.js'
  */
 import SQL from '@nearform/sql'
+
+/**
+ * @typedef {object} AccountEmailConfirmUser
+ * @property {string} id
+ * @property {string} email
+ * @property {string} username
+ * @property {boolean} email_confirmed
+ * @property {string | null} email_verify_token
+ * @property {Date | null} email_verify_token_exp
+ */
 
 /**
  * @param  {object} params
  * @param  {string} params.userId
  * @param  {PgClient} params.client
- * @param  {FastifyReply} params.reply  [description]
  * @param  {string} params.token
  * @param  {Date} params.now
- * @returns {Promise<{
- *  status: 'ok'
- *  email: string
- *  confirmed: boolean
- * }>}
+ * @returns {Promise<EmailConfirmResult>}
  */
 export async function verifyEmailConfirmHandler ({
-  userId, client, token, reply, now,
+  userId, client, token, now,
 }) {
   const verifyQuery = SQL`
     select id, email, username, email_confirmed, email_verify_token, email_verify_token_exp
@@ -27,20 +33,24 @@ export async function verifyEmailConfirmHandler ({
     fetch first row only;
   `
 
+  /** @type {QueryResult<AccountEmailConfirmUser>} */
   const results = await client.query(verifyQuery)
-  const user = results.rows.pop()
+  const user = results.rows[0]
+
+  if (!user) {
+    return emailConfirmFailure(403, 'Invalid email confirmation token, or a token for another user account.')
+  }
 
   if (user.email_confirmed) {
-    return reply.unprocessableEntity('Email is already confirmed')
+    return emailConfirmFailure(422, 'Email is already confirmed')
   }
 
-  if (user.email_verify_token !== token ||
-        user.email_verify_token === null) {
-    return reply.forbidden('Invalid email confirmation token, or a token for another user account.')
+  if (user.email_verify_token !== token || user.email_verify_token === null) {
+    return emailConfirmFailure(403, 'Invalid email confirmation token, or a token for another user account.')
   }
 
-  if (now > user.email_verify_token_exp) {
-    return reply.forbidden('Expired email confirmation token')
+  if (!user.email_verify_token_exp || now > user.email_verify_token_exp) {
+    return emailConfirmFailure(403, 'Expired email confirmation token')
   }
 
   const updates = [
@@ -53,17 +63,29 @@ export async function verifyEmailConfirmHandler ({
   ]
 
   const confirmQuery = SQL`
-            update users
-            set ${SQL.glue(updates, ' , ')}
-            where id = ${userId}
-          `
+    update users
+    set ${SQL.glue(updates, ' , ')}
+    where id = ${userId}
+  `
 
   await client.query(confirmQuery)
 
-  reply.code(202)
   return {
-    status: 'ok',
+    ok: true,
     email: user.email,
     confirmed: true,
+  }
+}
+
+/**
+ * @param {403 | 422} statusCode
+ * @param {string} message
+ * @returns {EmailConfirmResult}
+ */
+function emailConfirmFailure (statusCode, message) {
+  return {
+    ok: false,
+    statusCode,
+    message,
   }
 }

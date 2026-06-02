@@ -1,7 +1,6 @@
-import SQL from '@nearform/sql'
 import { schemaAuthTokenRead } from '../schemas/schema-auth-token-read.js'
 import { schemaAuthTokenUpdate } from '../schemas/schema-auth-token-update.js'
-import { getSingleAuthToken } from './get-single-auth-token-query.js'
+import { updateAuthToken } from '../auth-token-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -47,52 +46,19 @@ export async function putAuthToken (fastify, _opts) {
       const { jti } = request.params
       const { note, protect } = request.body
 
-      // Check if token exists and belongs to user
-      const checkQuery = SQL`
-        SELECT jti
-        FROM auth_tokens
-        WHERE jti = ${jti}
-          AND owner_id = ${userId}
-      `
+      const result = await updateAuthToken(fastify, {
+        userId,
+        currentJti,
+        jti,
+        note,
+        protect,
+      })
 
-      const checkResult = await fastify.pg.query(checkQuery)
-
-      if (checkResult.rowCount === 0) {
+      if (!result.ok) {
         return reply.notFound('Auth token not found')
       }
 
-      // Build update fields dynamically
-      const updateFields = []
-      if (note !== undefined) {
-        updateFields.push(SQL`note = ${note}`)
-      }
-      if (protect !== undefined) {
-        updateFields.push(SQL`protect = ${protect}`)
-      }
-
-      // Update the note and/or protect status
-      const updateQuery = SQL`
-        UPDATE auth_tokens
-        SET ${SQL.glue(updateFields, ', ')}
-        WHERE jti = ${jti}
-          AND owner_id = ${userId}
-      `
-
-      await fastify.pg.query(updateQuery)
-
-      // Return the updated token
-      const updatedToken = await getSingleAuthToken({
-        fastify,
-        userId,
-        jti,
-        currentJti,
-      })
-
-      if (!updatedToken) {
-        throw new Error('Failed to retrieve updated token')
-      }
-
-      return reply.code(200).send(updatedToken)
+      return reply.code(200).send(result.authToken)
     }
   )
 }

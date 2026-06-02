@@ -1,5 +1,4 @@
-import { defaultFrontendFlags } from '../../../../plugins/flags/frontend-flags.js'
-import { defaultBackendFlags } from '../../../../plugins/flags/backend-flags.js'
+import { defaultAdminFlags, getAdminFlagValues } from './flag-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -26,8 +25,7 @@ export async function getAdminFlags (fastify) {
           200: {
             type: 'object',
             properties: {
-              ...defaultFrontendFlags,
-              ...defaultBackendFlags,
+              ...defaultAdminFlags,
             },
           },
         },
@@ -35,8 +33,7 @@ export async function getAdminFlags (fastify) {
     },
     // Get admin flags
     async function getAdminFlagsHandler (_request, _reply) {
-      const adminFlags = await fastify.getFlags({ frontend: true, backend: true })
-      return adminFlags
+      return getAdminFlagValues(fastify)
     }
   )
 }

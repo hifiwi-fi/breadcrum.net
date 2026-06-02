@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deleteTagByName } from '../tag-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -27,15 +27,15 @@ export async function deleteTag (fastify, _opts) {
     },
     async function deleteTagHandler (request, reply) {
       const userId = request.user.id
-      const tagName = request.params.name
+      const result = await deleteTagByName(fastify, {
+        userId,
+        name: request.params.name,
+      })
 
-      const query = SQL`
-        delete from tags
-        where name = ${tagName}
-          AND owner_id =${userId};
-      `
-
-      await fastify.pg.query(query)
+      if (!result.ok) {
+        if (result.statusCode === 404) return reply.notFound(result.message)
+        return reply.unprocessableEntity(result.message)
+      }
 
       reply.status(202)
       return {

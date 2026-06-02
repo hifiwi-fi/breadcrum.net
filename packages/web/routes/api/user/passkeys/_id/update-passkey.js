@@ -1,10 +1,8 @@
-import SQL from '@nearform/sql'
 import { schemaPasskeyRead } from '../schemas/schema-passkey-read.js'
+import { updatePasskeyName } from '../passkey-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { QueryResult } from 'pg'
- * @import { TypePasskeyReadSerialize } from '../schemas/schema-passkey-read.js'
  */
 
 /**
@@ -58,37 +56,17 @@ export async function updatePasskey (fastify, _opts) {
       const { id } = request.params
       const { name } = request.body
 
-      const query = SQL`
-        update passkeys
-        set
-          name = ${name},
-          updated_at = now()
-        where id = ${id}
-          and user_id = ${userId}
-        returning
-          id,
-          credential_id,
-          name,
-          created_at,
-          updated_at,
-          last_used,
-          transports::text[],
-          aaguid
-      `
+      const result = await updatePasskeyName(fastify, {
+        userId,
+        id,
+        name,
+      })
 
-      /** @type {QueryResult<TypePasskeyReadSerialize>} */
-      const result = await fastify.pg.query(query)
-
-      if (result.rowCount === 0) {
-        return reply.notFound('Passkey not found')
+      if (!result.ok) {
+        return reply.notFound(result.message)
       }
 
-      const passkey = result.rows[0]
-      if (!passkey) {
-        return reply.notFound('Passkey not found')
-      }
-
-      return reply.code(200).send(passkey)
+      return reply.code(200).send(result.passkey)
     }
   )
 }

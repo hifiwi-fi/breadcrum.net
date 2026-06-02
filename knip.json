@@ -11,14 +11,12 @@
     "packages/web": {
       "entry": [
         "app.js",
-        "client/**/*.js",
         "plugins/**/*.js",
         "routes/**/{routes,autohooks}.js",
         "scripts/**/*.js",
         "test/**/*.js",
         "otel.js"
       ],
-      "ignoreDependencies": ["highlight.js"],
       "ignoreBinaries": [],
       "project": ["**/*.js"]
     },

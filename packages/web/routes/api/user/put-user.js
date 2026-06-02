@@ -1,5 +1,4 @@
-import SQL from '@nearform/sql'
-import { getPasswordHashQuery } from './password/password-hash.js'
+import { updateUser } from './user-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -34,45 +33,17 @@ export async function putUserRoute (fastify, _opts) {
       },
     },
     async function putUserHandler (request, reply) {
-      return fastify.pg.transact(async client => {
-        const userId = request.user.id
-        const user = request.body
+      const result = await updateUser(fastify, {
+        userId: request.user.id,
+        user: request.body,
+      })
 
-        const updates = []
+      if (!result.ok) {
+        return reply.conflict(result.message)
+      }
 
-        if ('username' in user) {
-          const usernameQuery = SQL`
-            select u.username
-            from users u
-            where u.username = ${user.username}
-            fetch first 1 row only;
-        `
-
-          const usernameResults = await client.query(usernameQuery)
-
-          if (usernameResults.rows.length > 0) {
-            return reply.conflict('Username is already taken.')
-          }
-          updates.push(SQL`username = ${user.username}`)
-        }
-        if ('password' in user) updates.push(SQL`password = ${getPasswordHashQuery(user.password)}`)
-        if ('newsletter_subscription' in user) updates.push(SQL`newsletter_subscription = ${user.newsletter_subscription}`)
-        if ('service_notice_dismissed_hash' in user) {
-          updates.push(SQL`service_notice_dismissed_hash = ${user.service_notice_dismissed_hash}`)
-        }
-
-        if (updates.length > 0) {
-          const query = SQL`
-            update users
-            set ${SQL.glue(updates, ' , ')}
-            where id = ${userId}
-          `
-          await client.query(query)
-        }
-
-        return /** @type {const} */ ({
-          status: 'ok',
-        })
+      return /** @type {const} */ ({
+        status: 'ok',
       })
     }
   )

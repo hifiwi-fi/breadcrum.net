@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { updateArchive } from '../archive-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -34,34 +34,13 @@ export async function putArchiveRoute (fastify, _opts) {
     },
   },
   async function putArchiveHandler (request, _reply) {
-    // TODO: limit editing to a much smaller set. Finish implementing
-    return fastify.pg.transact(async client => {
-      const ownerId = request.user.id
-      const { archive_id: archiveId } = request.params
-      const archive = request.body
+    const ownerId = request.user.id
+    const { archive_id: archiveId } = request.params
 
-      const updates = []
-
-      // if (archive.url != null) updates.push(SQL`url = ${archive.url}`)
-      if (archive.title != null) updates.push(SQL`title = ${archive.title}`)
-      // TODO: the rest
-
-      if (updates.length > 0) {
-        const query = SQL`
-          update archives
-          set ${SQL.glue(updates, ' , ')}
-          where id = ${archiveId}
-          and owner_id =${ownerId};
-          `
-
-        await client.query(query)
-      }
-
-      fastify.otel.archiveEditCounter.add(1)
-
-      return {
-        status: 'ok',
-      }
+    return updateArchive(fastify, {
+      userId: ownerId,
+      archiveId,
+      archive: request.body,
     })
   })
 }

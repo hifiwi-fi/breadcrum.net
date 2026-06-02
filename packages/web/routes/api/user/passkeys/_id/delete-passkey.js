@@ -1,4 +1,4 @@
-import SQL from '@nearform/sql'
+import { deletePasskeyById } from '../passkey-actions.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -41,16 +41,13 @@ export async function deletePasskey (fastify, _opts) {
       const userId = request.user.id
       const { id } = request.params
 
-      const query = SQL`
-        delete from passkeys
-        where id = ${id}
-          and user_id = ${userId}
-      `
+      const result = await deletePasskeyById(fastify, {
+        userId,
+        id,
+      })
 
-      const result = await fastify.pg.query(query)
-
-      if (result.rowCount === 0) {
-        return reply.notFound('Passkey not found')
+      if (!result.ok) {
+        return reply.notFound(result.message)
       }
 
       return reply.code(204).send(null)

@@ -1,5 +1,5 @@
-import SQL from '@nearform/sql'
 import { userEditableUserProps } from '../../schemas/user-base.js'
+import { unsubscribeEmail } from './unsubscribe-action.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -39,23 +39,12 @@ export default async function unsubscribeEmailRoute (fastify, _opts) {
         },
       },
     },
-    handler: async function unsubscribeEmailHandler (request, _reply) {
-      return fastify.pg.transact(async client => {
-        const { email } = request.query
+    handler: async function unsubscribeEmailHandler (request, reply) {
+      await unsubscribeEmail(fastify, request.query.email)
+      reply.code(202)
 
-        const query = SQL`
-        update users
-        set newsletter_subscription = false
-        where email = ${email}
-        `
-
-        await client.query(query)
-
-        // TODO: log rows unsubscribing
-
-        return /** @type {const} */({
-          status: 'ok',
-        })
+      return /** @type {const} */({
+        status: 'ok',
       })
     },
   })
