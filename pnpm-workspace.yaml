@@ -45,3 +45,6 @@ onlyBuiltDependencies:
 
 patchedDependencies:
   giscus@1.6.0: patches/giscus@1.6.0.patch
+
+minimumReleaseAgeExclude:
+  - '@domstack/fastify@0.0.2'

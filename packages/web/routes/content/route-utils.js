@@ -1,25 +1,6 @@
 /**
  * @import { FastifyRequest } from 'fastify'
- * @import { AppFragmentId } from '#views/context.js'
  */
-
-import { fragmentIdFromTarget, isHtmxRequest } from '#lib/htmx.js'
-
-const contentTargetFragments = /** @type {const} */ ({
-  'bc-main': 'main',
-})
-
-/**
- * @param {FastifyRequest} request
- * @returns {{ fragmentId: AppFragmentId } | undefined}
- */
-export function contentRenderOptions (request) {
-  const fragmentId = isHtmxRequest(request)
-    ? fragmentIdFromTarget(request, contentTargetFragments, 'main')
-    : null
-
-  return fragmentId ? { fragmentId } : undefined
-}
 
 /**
  * @param {FastifyRequest} request

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getPasswordHashQuery } from './password-hash.js'
 import { PASSWORD_RESET_EXP, PASSWORD_RESET_TOKEN } from './password-reset-token.js'

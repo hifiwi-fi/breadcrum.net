@@ -1,5 +1,5 @@
 import AutoLoad from '@fastify/autoload'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { envSchema } from './config/env-schema.js'
 
 // Re-exporting the options object
@@ -11,6 +11,7 @@ export { options } from './config/server-options.js'
  */
 
 const __dirname = import.meta.dirname
+const routesDir = join(__dirname, 'routes')
 
 /**
  * @type {FastifyPluginAsync<AppOptions>}
@@ -28,7 +29,7 @@ export default async function App (fastify, opts) {
   // any routes try to reference them.
   // Use fp to ensure load order correctness.
   fastify.register(AutoLoad, {
-    dir: join(__dirname, 'routes'),
+    dir: routesDir,
     matchFilter: /^.*[a-zA-Z0-9_-]+\.schema(\.js|\.cjs|\.mjs)$/i,
     indexPattern: /(?!.*)/, // Disable index files for schema.
     dirNameRoutePrefix: false,
@@ -50,9 +51,10 @@ export default async function App (fastify, opts) {
   // associated autoHooks (route scoped plugins).
   // Routes do not need to be wrapped in fp, but autoHooks do.
   fastify.register(AutoLoad, {
-    dir: join(__dirname, 'routes'),
+    dir: routesDir,
     indexPattern: /^.*routes(?:\.ts|\.js|\.cjs|\.mjs)$/,
     ignorePattern: /^.*(\.js|\.cjs|\.mjs)$/,
+    ignoreFilter: ignoreDomstackOwnedRoutePlugin,
     autoHooksPattern: /.*hooks(\.js|\.cjs|\.mjs)$/i,
     autoHooks: true,
     cascadeHooks: true,
@@ -60,4 +62,24 @@ export default async function App (fastify, opts) {
     routeParams: true,
     options: { ...opts },
   })
+}
+
+/**
+ * Domstack-fastify now owns the htmx HTML route modules. Keep Fastify autoload
+ * for API route plugins.
+ *
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+function ignoreDomstackOwnedRoutePlugin (filePath) {
+  const normalizedPath = filePath.replaceAll('\\', '/')
+  const normalizedRoutesDir = routesDir.replaceAll('\\', '/')
+  const relname = normalizedPath.startsWith(`${normalizedRoutesDir}/`)
+    ? relative(routesDir, filePath).replaceAll('\\', '/')
+    : normalizedPath.replace(/^\/+/, '')
+  if (!relname.endsWith('routes.js')) return false
+
+  return !(
+    relname.startsWith('api/')
+  )
 }

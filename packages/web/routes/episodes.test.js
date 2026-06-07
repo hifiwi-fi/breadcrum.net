@@ -417,12 +417,12 @@ async function createReadyEpisode (app, params) {
       params.textContent ?? null,
       params.embedHtml
         ? JSON.stringify({
-            html: params.embedHtml,
-            provider_name: 'Example',
-            provider_url: 'https://media.example.com',
-            width: 640,
-            height: 360,
-          })
+          html: params.embedHtml,
+          provider_name: 'Example',
+          provider_url: 'https://media.example.com',
+          width: 640,
+          height: 360,
+        })
         : null,
     ]
   )

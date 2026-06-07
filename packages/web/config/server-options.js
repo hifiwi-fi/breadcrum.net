@@ -24,5 +24,8 @@ const applicationOptions = /** @type {const} */ ({
 
 export const options = /** @type {AppOptions} */ ({
   ...fastifyOptions,
+  routerOptions: {
+    ignoreTrailingSlash: true,
+  },
   ...applicationOptions,
 })

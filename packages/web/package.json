@@ -11,6 +11,7 @@
   "dependencies": {
     "@breadcrum/resources": "workspace:*",
     "@bret/is-youtube-url": "catalog:",
+    "@domstack/fastify": "0.0.2",
     "@fastify/accepts": "^5.0.1",
     "@fastify/auth": "^5.0.1",
     "@fastify/autoload": "catalog:",
@@ -85,8 +86,9 @@
     "node": ">=23.0.0"
   },
   "scripts": {
-    "build": "run-s clean build:assets",
+    "build": "run-s clean build:*",
     "build:assets": "node scripts/build-assets.js",
+    "build:domstack": "node scripts/build-domstack.js",
     "clean": "rm -rf public && mkdir -p public",
     "migrate": "postgrator",
     "generate-default-env": "node scripts/generate-default-env.js",

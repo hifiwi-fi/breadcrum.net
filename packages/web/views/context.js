@@ -26,6 +26,13 @@ import { getUser } from '../routes/api/user/user-query.js'
  */
 
 /**
+ * @typedef {object} DefaultViewConfig
+ * @property {string} transport
+ * @property {string} host
+ * @property {string} version
+ */
+
+/**
  * @typedef {object} ViewUser
  * @property {string} id
  * @property {string} username
@@ -74,20 +81,17 @@ export const defaultViewFrontendFlags = {
 }
 
 /**
- * @param {FastifyInstance} fastify
+ * @param {DefaultViewConfig} config
  * @returns {Omit<ViewContext, 'currentPath' | 'htmx' | 'title'>}
  */
-export function createDefaultViewContext (fastify) {
-  const transport = fastify.config.TRANSPORT
-  const host = fastify.config.HOST
-
+export function createDefaultViewContextFromConfig (config) {
   return {
     siteName: 'Breadcrum',
     siteDescription: 'Personal private bookmarking with video, audio, and text archiving and podcasting tools.',
-    baseUrl: `${transport}://${host}`,
-    host,
-    transport,
-    version: String(fastify.pkg.version ?? '0.0.0'),
+    baseUrl: `${config.transport}://${config.host}`,
+    host: config.host,
+    transport: config.transport,
+    version: config.version,
     mastodonUrl: 'https://fosstodon.org/@breadcrum',
     discordUrl: 'https://discord.gg/pYJdTvNdZN',
     siteTwitterUrl: 'http://x.com/breadcrum_',
@@ -97,6 +101,18 @@ export function createDefaultViewContext (fastify) {
     user: null,
     flags: defaultViewFrontendFlags,
   }
+}
+
+/**
+ * @param {FastifyInstance} fastify
+ * @returns {Omit<ViewContext, 'currentPath' | 'htmx' | 'title'>}
+ */
+export function createDefaultViewContext (fastify) {
+  return createDefaultViewContextFromConfig({
+    transport: fastify.config.TRANSPORT,
+    host: fastify.config.HOST,
+    version: String(fastify.pkg.version ?? '0.0.0'),
+  })
 }
 
 /**

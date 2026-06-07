@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { getOrCreateDefaultFeed } from '@breadcrum/resources/feeds/default-feed-query.js'
 import { getFeedsQuery } from './feeds-query.js'

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'

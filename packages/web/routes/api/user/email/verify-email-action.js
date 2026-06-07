@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { verifyEmailConfirmHandler } from './verify-email-confirm-handler.js'
 import { verifyEmailUpdateHandler } from './verify-email-update-handler.js'
 
@@ -41,16 +40,16 @@ export async function confirmEmail (fastify, input) {
     const now = new Date()
     return input.update
       ? verifyEmailUpdateHandler({
-          userId: input.userId,
-          client,
-          token: input.token,
-          now,
-        })
+        userId: input.userId,
+        client,
+        token: input.token,
+        now,
+      })
       : verifyEmailConfirmHandler({
-          userId: input.userId,
-          client,
-          token: input.token,
-          now,
-        })
+        userId: input.userId,
+        client,
+        token: input.token,
+        now,
+      })
   })
 }

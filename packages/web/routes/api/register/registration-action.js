@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import SQL from '@nearform/sql'
 import { request as undiciRequest } from 'undici'
 import { resolveEmail } from 'resolve-email'
