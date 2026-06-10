@@ -9,7 +9,7 @@ ARG NODE_ENV=production
 ARG NODE_VERSION=24
 ARG TRANSPORT=https
 
-FROM alpine:3.23 AS base
+FROM alpine:3.24 AS base
 
 LABEL maintainer="HifiWifi LLC"
 LABEL fly_launch_runtime="Fastify"
