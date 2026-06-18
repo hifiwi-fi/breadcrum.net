@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 import SQL from '@nearform/sql'
 import { schemaQueueStatesRead } from './schemas/schema-queue-states-read.js'
@@ -54,7 +54,7 @@ export async function getQueueStates (fastify, _opts) {
       },
     },
     async function getQueueStatesHandler (_request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Query to get job counts by state
         const stateCountsQuery = SQL`

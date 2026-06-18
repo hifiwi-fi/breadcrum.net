@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 import SQL from '@nearform/sql'
 import { schemaQueuesRead } from './schemas/schema-queues-read.js'
@@ -55,7 +55,7 @@ export async function getQueues (fastify, _opts) {
       },
     },
     async function getQueuesHandler (_request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         const query = SQL`
           SELECT

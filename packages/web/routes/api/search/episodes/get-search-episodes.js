@@ -2,7 +2,7 @@ import { getSearchEpisodesQuery } from './get-search-episodes-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 
 /**
@@ -66,7 +66,7 @@ export async function getSearchEpisodes (fastify, _opts) {
         response: {
           200: {
             type: 'object',
-            additionalProperties: false,
+            additionalProperties: true,
             required: ['data', 'pagination'],
             properties: {
               data: {
@@ -144,7 +144,7 @@ export async function getSearchEpisodes (fastify, _opts) {
       },
     },
     async function getSearchEpisodesHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       /** @typedef {ReturnBody['pagination']} PaginationType */
 
       const userId = request.user.id

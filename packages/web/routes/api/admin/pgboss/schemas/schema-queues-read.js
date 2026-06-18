@@ -7,7 +7,7 @@
 export const schemaQueuesRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:queues:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['queues'],
   properties: {
     queues: {

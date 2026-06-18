@@ -7,7 +7,7 @@
 export const schemaSummaryRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:summary:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['healthy', 'totals', 'queues', 'recent_failures', 'maintenance'],
   properties: {
     healthy: {

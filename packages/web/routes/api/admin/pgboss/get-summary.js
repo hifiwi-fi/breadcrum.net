@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 import SQL from '@nearform/sql'
 import { schemaSummaryRead } from './schemas/schema-summary-read.js'
@@ -64,7 +64,7 @@ export async function getSummary (fastify, _opts) {
       },
     },
     async function getSummaryHandler (_request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Get overall job counts from cached queue metrics (v11 feature)
         const countsQuery = SQL`

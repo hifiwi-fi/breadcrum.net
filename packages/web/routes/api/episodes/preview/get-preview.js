@@ -6,7 +6,7 @@ import { schemaEpisodePreview } from '../schemas/episode-preview.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { MediumTypes } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 
 /**
@@ -41,7 +41,7 @@ export async function getPreview (fastify, _opts) {
       },
     },
     async function getPreviewHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       const { url } = request.query
       /** @type {MediumTypes} */
       const medium = request.query.medium

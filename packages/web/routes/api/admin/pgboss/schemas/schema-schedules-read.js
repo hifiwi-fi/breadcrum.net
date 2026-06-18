@@ -7,7 +7,7 @@
 export const schemaSchedulesRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:schedules:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['schedules'],
   properties: {
     schedules: {

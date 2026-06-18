@@ -5,7 +5,7 @@ import { schemaAdminUsersRead } from './schemas/schema-admin-user-read.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
  */
 
 /**
@@ -59,7 +59,7 @@ export async function getAdminUsersRoute (fastify, _opts) {
     },
     // GET users with administrative fields
     async function getAdminUsersHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       return fastify.pg.transact(async client => {
         const {
           before,

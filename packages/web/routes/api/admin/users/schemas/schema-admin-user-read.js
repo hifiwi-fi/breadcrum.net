@@ -56,7 +56,7 @@ export const adminUserProps = /** @type {const} @satisfies {JSONSchema} */ ({
 
 export const schemaAdminUserRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
-  additionalProperties: false,
+  additionalProperties: true,
   $id: 'schema:breadcrum:admin-user:read',
   required: [
     'id',

@@ -13,7 +13,7 @@ const countValueProps = /** @type {const} @satisfies {JSONSchema} */ ({
 
 const bookmarkStatProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['id', 'username', 'email', 'bookmark_count'],
   properties: {
     id: fullSerializedUserProps.properties.id,
