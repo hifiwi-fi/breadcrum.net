@@ -19,6 +19,7 @@ catalog:
   "@opentelemetry/instrumentation-http": ^0.215.0
   "@opentelemetry/instrumentation-runtime-node": ^0.28.0
   "@opentelemetry/sdk-node": ^0.215.0
+  "@sentry/node": ^10.58.0
   "@types/node": ^25.6.0
   "@types/jsdom": ^28.0.1
   "@types/pg": ^8.11.10
@@ -50,3 +51,9 @@ onlyBuiltDependencies:
 
 patchedDependencies:
   giscus@1.6.0: patches/giscus@1.6.0.patch
+
+allowBuilds:
+  '@sentry/cli': false
+  esbuild: false
+  protobufjs: false
+  unrs-resolver: false

@@ -51,6 +51,12 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
       type: 'string',
       default: 'deployment.environment=development',
     },
+    SENTRY_DSN: {
+      type: 'string',
+    },
+    SENTRY_RELEASE: {
+      type: 'string',
+    },
     EPISODE_WORKER_CONCURRENCY: {
       type: 'integer',
       default: 2,
