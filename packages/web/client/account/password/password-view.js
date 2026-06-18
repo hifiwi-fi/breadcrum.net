@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
+/** @import { TypeUserRead } from '#routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'

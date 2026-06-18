@@ -1,6 +1,6 @@
 import { test, suite } from 'node:test'
 import { strict as assert } from 'node:assert'
-import { build } from '../../../../test/helper.js'
+import { build } from '#test/helper.js'
 import { createTestUser } from './pgboss-test-utils.js'
 
 await suite('get schedules', async () => {

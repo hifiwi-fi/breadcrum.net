@@ -2,7 +2,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
+ * @import { TypeAuthTokenReadClient } from '#routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
  */
 
 import { html } from 'htm/preact'

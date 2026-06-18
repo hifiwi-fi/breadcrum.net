@@ -12,7 +12,7 @@ import { schemaAuthTokenRead } from './schema-auth-token-read.js'
 export const schemaAuthTokenCreateResponse = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:auth-token:create-response',
-  additionalProperties: false,
+  additionalProperties: true,
   properties: {
     token: {
       type: 'string',

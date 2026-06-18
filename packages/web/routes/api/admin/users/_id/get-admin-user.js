@@ -3,7 +3,7 @@ import { getAdminUser } from '../get-admin-users-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractResponseType } from '../../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**
@@ -39,7 +39,7 @@ export async function getAdminUserRoute (fastify, _opts) {
     },
     // GET user with administrative fields
     async function getAdminUserHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       const { id: userId } = request.params
 
       const user = await getAdminUser({

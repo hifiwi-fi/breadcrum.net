@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
 import { schemaMaintenanceRead } from './schemas/schema-maintenance-read.js'
@@ -44,7 +44,7 @@ export async function getMaintenance (fastify, _opts) {
       },
     },
     async function getMaintenanceHandler (_request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         // Get version from version table
         const versionQuery = SQL`

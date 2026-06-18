@@ -1,4 +1,4 @@
-import { fullSerializedUserProps, userEditableUserProps } from '../../../user/schemas/user-base.js'
+import { fullSerializedUserProps, userEditableUserProps } from '#routes/api/user/schemas/user-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
@@ -13,7 +13,7 @@ const countValueProps = /** @type {const} @satisfies {JSONSchema} */ ({
 
 const bookmarkStatProps = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['id', 'username', 'email', 'bookmark_count'],
   properties: {
     id: fullSerializedUserProps.properties.id,

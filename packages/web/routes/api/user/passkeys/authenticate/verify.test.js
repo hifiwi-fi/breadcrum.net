@@ -1,6 +1,6 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
-import { build } from '../../../../../test/helper.js'
+import { build } from '#test/helper.js'
 import { createTestUser } from '../../auth-tokens/auth-tokens-test-utils.js'
 import { storeChallenge } from '../challenge-store.js'
 import { createTestPasskey } from '../passkeys-test-utils.js'

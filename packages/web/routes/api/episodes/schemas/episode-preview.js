@@ -7,7 +7,7 @@
 export const schemaEpisodePreview = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:episode:preview',
-  additionalProperties: false,
+  additionalProperties: true,
   properties: {
     title: {
       type: 'string',

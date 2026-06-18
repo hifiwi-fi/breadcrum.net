@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
 import { schemaJobsRead } from './schemas/schema-jobs-read.js'
@@ -88,7 +88,7 @@ export async function getJobs (fastify, _opts) {
       },
     },
     async function getJobsHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       try {
         const {
           state,

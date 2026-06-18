@@ -7,7 +7,7 @@
 export const schemaQueueStatesRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:queue-states:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['created', 'retry', 'active', 'completed', 'cancelled', 'failed', 'all', 'queues'],
   properties: {
     created: { type: 'number', description: 'Jobs waiting to be processed' },

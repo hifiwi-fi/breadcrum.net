@@ -4,7 +4,7 @@
  * @typedef {FromSchema<SchemaAdminUserUpdate>} SchemaTypeAdminUserUpdateClient
  */
 
-import { fullSerializedUserProps, userEditableUserProps } from '../../../user/schemas/user-base.js'
+import { fullSerializedUserProps, userEditableUserProps } from '#routes/api/user/schemas/user-base.js'
 import { adminUserProps } from './schema-admin-user-read.js'
 
 export const schemaAdminUserUpdate = /** @type {const} @satisfies {JSONSchema} */ ({

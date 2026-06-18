@@ -1,6 +1,6 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
-import { build } from '../../../test/helper.js'
+import { build } from '#test/helper.js'
 
 await suite('User API Tests', { concurrency: false, timeout: 30000 }, async () => {
   await test('default root route', async (t) => {

@@ -110,5 +110,15 @@
     "print-routes": "fastify print-routes app.js",
     "print-plugins": "fastify print-plugins app.js --import otel.js",
     "generate-dbml": "pnpm dlx pg-to-dbml --c postgres://postgres@localhost/breadcrum"
+  },
+  "imports": {
+    "#client/*": "./client/*",
+    "#components/*": "./client/components/*",
+    "#hooks/*": "./client/hooks/*",
+    "#layouts/*": "./client/layouts/*",
+    "#plugins/*": "./plugins/*",
+    "#routes/*": "./routes/*",
+    "#test/*": "./test/*",
+    "#types/*.js": "./types/*.ts"
   }
 }

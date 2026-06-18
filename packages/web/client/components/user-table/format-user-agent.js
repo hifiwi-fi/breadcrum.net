@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserReadClient } from '#routes/api/admin/users/schemas/schema-admin-user-read.js'
  */
 
 /**

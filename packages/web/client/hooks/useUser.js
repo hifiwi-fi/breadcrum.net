@@ -9,6 +9,7 @@
  * @property {boolean} [required=true] - When true, redirects to login page if no user is authenticated
  */
 
+import * as Sentry from '@sentry/browser'
 import { useEffect, useState } from 'preact/hooks'
 import { useLSP } from './useLSP.js'
 import { useReload } from './useReload.js'
@@ -94,6 +95,10 @@ export function useUser ({
       if (requestor) userRequest = null
     })
   }, [state.apiUrl, reloadUserSignal])
+
+  useEffect(() => {
+    Sentry.setUser(state.user ? { id: state.user.id } : null)
+  }, [state.user?.id])
 
   useEffect(() => {
     if ((!state.user && !loading) && window && required) {

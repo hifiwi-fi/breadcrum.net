@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypePasskeyReadClient } from '../../../routes/api/user/passkeys/schemas/schema-passkey-read.js' */
+/** @import { TypePasskeyReadClient } from '#routes/api/user/passkeys/schemas/schema-passkey-read.js' */
 
 import { html } from 'htm/preact'
 import { PasskeyItem } from './passkey-item.js'
