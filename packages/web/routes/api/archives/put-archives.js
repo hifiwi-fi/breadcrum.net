@@ -32,11 +32,24 @@ export async function putArchives (fastify, _opts) {
               },
             },
           },
+          501: {
+            type: 'object',
+            required: ['statusCode', 'error', 'message'],
+            properties: {
+              statusCode: { type: 'number' },
+              error: { type: 'string' },
+              message: { type: 'string' },
+            },
+          },
         },
       },
     },
     async function putArchivesHandler (_request, reply) {
-      return reply.notImplemented()
+      return reply.code(501).send({
+        statusCode: 501,
+        error: 'Not Implemented',
+        message: 'Not Implemented',
+      })
     }
   )
 }
