@@ -7,7 +7,7 @@
 export const schemaMaintenanceRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:maintenance:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: [
     'version',
     'last_supervise',

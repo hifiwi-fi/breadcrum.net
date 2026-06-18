@@ -1,6 +1,6 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
-import { build } from '../../../../../test/helper.js'
+import { build } from '#test/helper.js'
 import { randomUUID } from 'node:crypto'
 import {
   createTestUser,

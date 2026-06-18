@@ -16,7 +16,7 @@ async function getCountsSqlText () {
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  * @import { QueryResult } from 'pg'
  * @import { TypeAdminStatsReadClient } from './schemas/schema-admin-stats-read.js'
  */
@@ -76,7 +76,7 @@ export async function getAdminStats (fastify, _opts) {
     },
     // Get admin flags
     async function getAdminFlagsHandler (_request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       const monthBookmarkCountQuery = SQL`
         select u.id, u.username, u.email, count(*) as bookmark_count
         from users u

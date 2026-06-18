@@ -3,8 +3,8 @@
 
 /**
  * @import { FunctionComponent, ComponentChild } from 'preact'
- * @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js'
- * @import { TypeEpisodePreview } from '../../../routes/api/episodes/schemas/episode-preview.js'
+ * @import { TypeBookmarkReadClient } from '#routes/api/bookmarks/schemas/schema-bookmark-read.js'
+ * @import { TypeEpisodePreview } from '#routes/api/episodes/schemas/episode-preview.js'
  */
 
 import { html } from 'htm/preact'

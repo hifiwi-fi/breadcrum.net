@@ -2,7 +2,7 @@
 
 /**
  * @import { ComponentChild, FunctionComponent } from 'preact'
- * @import { TypeEpisodeReadClient } from '../../../routes/api/episodes/schemas/schema-episode-read.js'
+ * @import { TypeEpisodeReadClient } from '#routes/api/episodes/schemas/schema-episode-read.js'
  */
 
 import { html } from 'htm/preact'

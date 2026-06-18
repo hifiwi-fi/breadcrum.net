@@ -4,8 +4,8 @@ import { getSingleAuthToken } from './_jti/get-single-auth-token-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { JwtUserWithTokenId } from '../../../../plugins/jwt.js'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { JwtUserWithTokenId } from '#plugins/jwt.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**
@@ -57,7 +57,7 @@ export async function createAuthToken (fastify, _opts) {
 
       // Get the full auth token details
 
-      /** @type { ExtractResponseType<typeof reply.code<201>>['auth_token'] | undefined } */
+      /** @type { ExtractKnownResponseType<typeof reply.code<201>>['auth_token'] | undefined } */
       const authToken = await getSingleAuthToken({
         fastify,
         userId,

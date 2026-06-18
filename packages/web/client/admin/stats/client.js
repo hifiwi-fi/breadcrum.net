@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeAdminStatsReadClient } from '../../../routes/api/admin/stats/schemas/schema-admin-stats-read.js' */
+/** @import { TypeAdminStatsReadClient } from '#routes/api/admin/stats/schemas/schema-admin-stats-read.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'

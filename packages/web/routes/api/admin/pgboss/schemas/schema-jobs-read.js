@@ -7,7 +7,7 @@
 export const schemaJobsRead = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:breadcrum:pgboss:jobs:read',
-  additionalProperties: false,
+  additionalProperties: true,
   required: ['jobs', 'pagination'],
   properties: {
     jobs: {

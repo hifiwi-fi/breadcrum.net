@@ -2,7 +2,7 @@ import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractResponseType } from '../../../../types/fastify-utils.js'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**
@@ -65,7 +65,7 @@ export async function getSearchBookmarks (fastify, _opts) {
         response: {
           200: {
             type: 'object',
-            additionalProperties: false,
+            additionalProperties: true,
             required: ['data', 'pagination'],
             properties: {
               data: {
@@ -144,7 +144,7 @@ export async function getSearchBookmarks (fastify, _opts) {
     },
     // Get Bookmarks
     async function getSearchBookmarksHandler (request, reply) {
-      /** @typedef {ExtractResponseType<typeof reply.code<200>>} ReturnBody */
+      /** @typedef {ExtractKnownResponseType<typeof reply.code<200>>} ReturnBody */
       /** @typedef {ReturnBody['pagination']} PaginationType */
 
       const userId = request.user.id
