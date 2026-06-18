@@ -7,6 +7,7 @@ ARG ENV=production
 ARG HOST=localhost:3000
 ARG NODE_ENV=production
 ARG NODE_VERSION=24
+ARG SENTRY_RELEASE=development
 ARG TRANSPORT=https
 
 FROM alpine:3.23 AS base
@@ -53,6 +54,9 @@ RUN pnpm --filter=@breadcrum/web deploy --prod ./deploy/web
 
 # Final stage for app image
 FROM base
+
+ARG SENTRY_RELEASE=development
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 
 # Copy built application from deploy directory
 COPY --from=build /usr/src/app/deploy/web /usr/src/app
