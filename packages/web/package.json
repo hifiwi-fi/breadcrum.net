@@ -38,7 +38,7 @@
     "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
     "@sentry/node": "catalog:",
-    "@tanstack/preact-query": "^5.100.5",
+    "@tanstack/preact-query": "^5.101.0",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",
     "common-tags": "^1.8.2",
