@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeDashboardDataRead } from '../../../routes/api/admin/pgboss/schemas/schema-dashboard-data.js' */
+/** @import { TypeDashboardDataRead } from '#routes/api/admin/pgboss/schemas/schema-dashboard-data.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'

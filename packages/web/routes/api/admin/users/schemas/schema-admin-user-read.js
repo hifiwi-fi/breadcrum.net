@@ -1,5 +1,5 @@
-import { fullSerializedUserProps } from '../../../user/schemas/user-base.js'
-import { authTokenProps, geoipRegionProps } from '../../../user/auth-tokens/schemas/auth-token-base.js'
+import { fullSerializedUserProps } from '#routes/api/user/schemas/user-base.js'
+import { authTokenProps, geoipRegionProps } from '#routes/api/user/auth-tokens/schemas/auth-token-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'

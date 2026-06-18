@@ -2,7 +2,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeBookmarkReadClient } from '../../../routes/api/bookmarks/schemas/schema-bookmark-read.js'
+ * @import { TypeBookmarkReadClient } from '#routes/api/bookmarks/schemas/schema-bookmark-read.js'
  */
 
 import { html } from 'htm/preact'

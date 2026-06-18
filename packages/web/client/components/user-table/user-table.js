@@ -2,7 +2,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { SchemaTypeAdminUserReadClient } from '../../../routes/api/admin/users/schemas/schema-admin-user-read.js'
+ * @import { SchemaTypeAdminUserReadClient } from '#routes/api/admin/users/schemas/schema-admin-user-read.js'
  */
 
 import { html } from 'htm/preact'

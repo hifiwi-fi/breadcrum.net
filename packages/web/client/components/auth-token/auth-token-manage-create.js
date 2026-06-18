@@ -2,8 +2,8 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeAuthTokenCreateResponseClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-create-response.js'
- * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
+ * @import { TypeAuthTokenCreateResponseClient } from '#routes/api/user/auth-tokens/schemas/schema-auth-token-create-response.js'
+ * @import { TypeAuthTokenUpdate } from '#routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
  */
 
 import { html } from 'htm/preact'

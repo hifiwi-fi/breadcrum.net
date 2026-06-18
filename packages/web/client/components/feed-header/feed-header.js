@@ -2,7 +2,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeFeedRead } from '../../../routes/api/feeds/schemas/schema-feed-read.js'
+ * @import { TypeFeedRead } from '#routes/api/feeds/schemas/schema-feed-read.js'
  * @import { FeedUpdateData } from './feed-edit.js'
  */
 

@@ -116,7 +116,6 @@
     "#components/*": "./client/components/*",
     "#hooks/*": "./client/hooks/*",
     "#layouts/*": "./client/layouts/*",
-    "#lib/*": "./client/lib/*",
     "#plugins/*": "./plugins/*",
     "#routes/*": "./routes/*",
     "#test/*": "./test/*",

@@ -2,7 +2,7 @@
 
 /**
  * @import { FunctionComponent } from 'preact'
- * @import { TypeArchiveReadClient } from '../../../routes/api/archives/schemas/schema-archive-read.js'
+ * @import { TypeArchiveReadClient } from '#routes/api/archives/schemas/schema-archive-read.js'
  */
 
 import { html } from 'htm/preact'

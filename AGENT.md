@@ -98,6 +98,28 @@ import { render, hydrate } from 'preact'
 import { Pool, Client } from 'pg'
 ```
 
+### Package Import Aliases
+
+Use package `imports` aliases for cross-area imports that would otherwise require deep `../../../` paths. Keep relative imports for nearby sibling files in the same feature folder.
+
+Common aliases:
+
+```javascript
+// ✅ Cross-area imports use package aliases
+import { build } from '#test/helper.js'
+import { defaultFrontendFlags } from '#plugins/flags/frontend-flags.js'
+/** @import { TypeUserRead } from '#routes/api/user/schemas/schema-user-read.js' */
+
+// ✅ Local sibling imports stay relative
+import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
+```
+
+When a package import maps to a TypeScript source file, import it with its runtime `.js` specifier, and let `package.json#imports` map it to the `.ts` source for type checking:
+
+```javascript
+/** @import { ExtractKnownResponseType } from '#types/fastify-utils.js' */
+```
+
 ### Preact Component Type Import Syntax
 
 For preact component types, always use the @import syntax at the top of the file:

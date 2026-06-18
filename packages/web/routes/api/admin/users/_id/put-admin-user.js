@@ -2,7 +2,7 @@
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  */
 import SQL from '@nearform/sql'
-// import { fullSerializedUserProps } from '../../../../user/user-props.js'
+// import { fullSerializedUserProps } from '#routes/api/user/user-props.js'
 import { schemaAdminUserUpdate } from '../schemas/schema-admin-user-update.js'
 
 /**

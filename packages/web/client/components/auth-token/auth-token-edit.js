@@ -2,8 +2,8 @@
 
 /**
  * @import { FunctionComponent, ComponentChild } from 'preact'
- * @import { TypeAuthTokenReadClient } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
- * @import { TypeAuthTokenUpdate } from '../../../routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
+ * @import { TypeAuthTokenReadClient } from '#routes/api/user/auth-tokens/schemas/schema-auth-token-read.js'
+ * @import { TypeAuthTokenUpdate } from '#routes/api/user/auth-tokens/schemas/schema-auth-token-update.js'
  */
 
 import { html } from 'htm/preact'

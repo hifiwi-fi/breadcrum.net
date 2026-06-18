@@ -1,4 +1,4 @@
-import { fullSerializedUserProps, userEditableUserProps } from '../../../user/schemas/user-base.js'
+import { fullSerializedUserProps, userEditableUserProps } from '#routes/api/user/schemas/user-base.js'
 
 /**
  * @import { JSONSchema, FromSchema } from 'json-schema-to-ts'
