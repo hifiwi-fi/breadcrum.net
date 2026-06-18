@@ -1,4 +1,5 @@
 import SQL from '@nearform/sql'
+import { YTDLPAPIError } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { FastifyRequest } from 'fastify'
@@ -112,10 +113,42 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
         reply.header('fly-cache-status', 'MISS')
       }
 
-      const metadata = await fastify.getYTDLPMetadataWrapper({
-        url: episode.src_url,
-        medium: episode.medium,
-      })
+      let metadata
+      try {
+        metadata = await fastify.getYTDLPMetadataWrapper({
+          url: episode.src_url,
+          medium: episode.medium,
+        })
+      } catch (err) {
+        if (err instanceof YTDLPAPIError) {
+          const logPayload = {
+            err,
+            episodeId,
+            feedId,
+            sourceUrl: episode.src_url,
+            ytDlpStatusCode: err.statusCode,
+            ytDlpDescription: err.description,
+          }
+
+          if (err.retryable) {
+            request.log.warn(logPayload, 'yt-dlp-api is temporarily unable to resolve episode media')
+            return reply.code(503).send({
+              statusCode: 503,
+              error: 'Service Unavailable',
+              message: 'Episode media is not currently available. Try again later.',
+            })
+          }
+
+          request.log.info(logPayload, 'yt-dlp-api failed to resolve episode media')
+          return reply.code(424).send({
+            statusCode: 424,
+            error: 'Failed Dependency',
+            message: 'Episode media could not be resolved from its source URL.',
+          })
+        }
+
+        throw err
+      }
 
       if (!metadata.url) throw new Error('metadata is missing url')
 

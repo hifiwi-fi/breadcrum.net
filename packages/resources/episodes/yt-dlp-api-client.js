@@ -37,6 +37,42 @@ export function getYTDLPMetaKey ({
 export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
 
 /**
+ * @typedef {Object} YTDLPAPIErrorParams
+ * @property {number} statusCode
+ * @property {string} description
+ * @property {string|number|null} [code]
+ * @property {'unified'|'discover'} endpointType
+ */
+
+/**
+ * Error returned by yt-dlp-api. Carries enough detail for callers to decide
+ * whether a failure is temporary service/source trouble or permanent for a URL.
+ */
+export class YTDLPAPIError extends Error {
+  /**
+   * @param {YTDLPAPIErrorParams} params
+   */
+  constructor ({ statusCode, description, code = null, endpointType }) {
+    super(`yt-dlp-api ${endpointType} error (${statusCode}): ${description}`)
+    this.name = 'YTDLPAPIError'
+    this.statusCode = statusCode
+    this.description = description
+    this.code = code
+    this.endpointType = endpointType
+    this.retryable = isRetryableYTDLPStatus(statusCode)
+    this.permanent = !this.retryable && statusCode >= 400 && statusCode < 500
+  }
+}
+
+/**
+ * @param {number} statusCode
+ * @returns {boolean}
+ */
+export function isRetryableYTDLPStatus (statusCode) {
+  return statusCode === 408 || statusCode === 429 || statusCode >= 500
+}
+
+/**
  * @typedef {Object} YTDLPMetadata
  * @property {string} url - The URL of the resource (required, format: uri).
  * @property {number} [filesize_approx] - Approximate file size (nullable).
@@ -70,11 +106,11 @@ export const ytdlpTtl = 1000 * 60 * 20 // 20 mins
  * @param  {string} params.url           the url of the video
  * @param  {MediumTypes} params.medium        the desired filetype
  * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
- * @param  {Number} params.attempt      Cache busting attempt number
+ * @param  {Number} [params.attempt]      Cache busting attempt number
  * @param  {{
-      get(key: object): Promise<any>;
-      set(key: object, value: any, ttl?: number): Promise<void>;
-    }} params.cache         The cache instance
+      get(key: object): Promise<unknown>;
+      set(key: object, value: unknown, ttl?: number): Promise<void>;
+    }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 3 for YouTube, 0 for others)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
  * @return {Promise<YTDLPMetadata>}                       metadata object
@@ -126,11 +162,11 @@ export async function getYTDLPMetadata ({
  * @param  {string} params.url           the url of the video
  * @param  {MediumTypes} params.medium        the desired filetype
  * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
- * @param  {Number} params.attempt      Cache busting attempt number
+ * @param  {Number} [params.attempt]      Cache busting attempt number
  * @param  {{
-      get(key: object): Promise<any>;
-      set(key: object, value: any, ttl?: number): Promise<void>;
-    }} params.cache         The cache instance
+      get(key: object): Promise<unknown>;
+      set(key: object, value: unknown, ttl?: number): Promise<void>;
+    }} [params.cache]         The cache instance
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
 async function getYTDLPMetadataAttempt ({
@@ -149,7 +185,7 @@ async function getYTDLPMetadataAttempt ({
   const cachedMeta = await cache?.get(cacheKey)
 
   if (cachedMeta) {
-    return cachedMeta
+    return /** @type {YTDLPMetadata} */ (cachedMeta)
   }
 
   const formatOpts = getFormatArg(medium)
@@ -169,15 +205,13 @@ async function getYTDLPMetadataAttempt ({
   })
 
   if (response.statusCode !== 200) {
-    /**
-      * @type {{
-      *  code: number,
-      *  name: string,
-      *  description: string
-      * }}
-      */
-    const body = /** @type {any} */ (await response.body.json())
-    throw new Error(`yt-dlp-api error: ${body.description}`)
+    const body = parseYTDLPErrorBody(await response.body.json())
+    throw new YTDLPAPIError({
+      statusCode: response.statusCode,
+      description: body.description,
+      code: body.code,
+      endpointType: 'unified',
+    })
   }
 
   const metadata = /** @type {YTDLPMetadata} */ (await response.body.json())
@@ -197,11 +231,11 @@ async function getYTDLPMetadataAttempt ({
  * @param  {string} params.url           the url of the video
  * @param  {MediumTypes} params.medium        the desired filetype
  * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
- * @param  {Number} params.attempt      Cache busting attempt number
+ * @param  {Number} [params.attempt]      Cache busting attempt number
  * @param  {{
-      get(key: object): Promise<any>;
-      set(key: object, value: any, ttl?: number): Promise<void>;
-    }} params.cache         The cache instance
+      get(key: object): Promise<unknown>;
+      set(key: object, value: unknown, ttl?: number): Promise<void>;
+    }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 0)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
  * @return {Promise<YTDLPDiscoveryMetadata>}
@@ -249,11 +283,11 @@ export async function getYTDLPDiscoveryMetadata ({
  * @param  {string} params.url
  * @param  {MediumTypes} params.medium
  * @param  {string} params.ytDLPEndpoint
- * @param  {Number} params.attempt
+ * @param  {Number} [params.attempt]
  * @param  {{
-      get(key: object): Promise<any>;
-      set(key: object, value: any, ttl?: number): Promise<void>;
-    }} params.cache
+      get(key: object): Promise<unknown>;
+      set(key: object, value: unknown, ttl?: number): Promise<void>;
+    }} [params.cache]
  * @return {Promise<YTDLPDiscoveryMetadata>}
  */
 async function getYTDLPDiscoveryMetadataAttempt ({
@@ -272,7 +306,7 @@ async function getYTDLPDiscoveryMetadataAttempt ({
   const cachedMeta = await cache?.get(cacheKey)
 
   if (cachedMeta) {
-    return cachedMeta
+    return /** @type {YTDLPDiscoveryMetadata} */ (cachedMeta)
   }
 
   const formatOpts = getFormatArg(medium)
@@ -292,8 +326,13 @@ async function getYTDLPDiscoveryMetadataAttempt ({
   })
 
   if (response.statusCode !== 200) {
-    const body = /** @type {any} */ (await response.body.json())
-    throw new Error(`yt-dlp-api error: ${body.description}`)
+    const body = parseYTDLPErrorBody(await response.body.json())
+    throw new YTDLPAPIError({
+      statusCode: response.statusCode,
+      description: body.description,
+      code: body.code,
+      endpointType: 'discover',
+    })
   }
 
   const metadata = /** @type {YTDLPDiscoveryMetadata} */ (await response.body.json())
@@ -312,4 +351,31 @@ function getFormatArg (medium) {
   if (!['video', 'audio'].includes(medium)) throw new Error('format must be video or audio')
 
   return medium
+}
+
+/**
+ * @param {unknown} body
+ * @returns {{ description: string, code: string|number|null }}
+ */
+function parseYTDLPErrorBody (body) {
+  if (body && typeof body === 'object') {
+    const maybeBody = /** @type {{ description?: unknown, code?: unknown, name?: unknown }} */ (body)
+    const fallbackDescription = typeof maybeBody.name === 'string'
+      ? maybeBody.name
+      : 'Unknown yt-dlp-api error'
+
+    return {
+      description: typeof maybeBody.description === 'string'
+        ? maybeBody.description
+        : fallbackDescription,
+      code: typeof maybeBody.code === 'string' || typeof maybeBody.code === 'number'
+        ? maybeBody.code
+        : null,
+    }
+  }
+
+  return {
+    description: 'Unknown yt-dlp-api error',
+    code: null,
+  }
 }
