@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { resolveType } from '@breadcrum/resources/episodes/resolve-type.js'
-import { getYTDLPDiscoveryMetadata } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
+import { getYTDLPDiscoveryMetadata, YTDLPAPIError } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 import { schemaEpisodePreview } from '../schemas/episode-preview.js'
 
 /**
@@ -36,7 +36,25 @@ export async function getPreview (fastify, _opts) {
           required: ['url'],
         },
         response: {
-          200: schemaEpisodePreview
+          200: schemaEpisodePreview,
+          424: {
+            type: 'object',
+            required: ['statusCode', 'error', 'message'],
+            properties: {
+              statusCode: { type: 'number' },
+              error: { type: 'string' },
+              message: { type: 'string' },
+            },
+          },
+          503: {
+            type: 'object',
+            required: ['statusCode', 'error', 'message'],
+            properties: {
+              statusCode: { type: 'number' },
+              error: { type: 'string' },
+              message: { type: 'string' },
+            },
+          },
         },
       },
     },
@@ -45,13 +63,44 @@ export async function getPreview (fastify, _opts) {
       const { url } = request.query
       /** @type {MediumTypes} */
       const medium = request.query.medium
-      const metadata = await getYTDLPDiscoveryMetadata({
-        url,
-        medium,
-        ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
-        attempt: 0,
-        cache: fastify.ytdlpCache,
-      })
+      let metadata
+      try {
+        metadata = await getYTDLPDiscoveryMetadata({
+          url,
+          medium,
+          ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
+          attempt: 0,
+          cache: fastify.ytdlpCache,
+        })
+      } catch (err) {
+        if (err instanceof YTDLPAPIError) {
+          const logPayload = {
+            err,
+            sourceUrl: url,
+            medium,
+            ytDlpStatusCode: err.statusCode,
+            ytDlpDescription: err.description,
+          }
+
+          if (err.retryable) {
+            request.log.warn(logPayload, 'yt-dlp-api is temporarily unable to resolve episode preview')
+            return reply.code(503).send({
+              statusCode: 503,
+              error: 'Service Unavailable',
+              message: 'Episode preview is not currently available. Try again later.',
+            })
+          }
+
+          request.log.info(logPayload, 'yt-dlp-api failed to resolve episode preview')
+          return reply.code(424).send({
+            statusCode: 424,
+            error: 'Failed Dependency',
+            message: 'Episode preview could not be resolved from its source URL.',
+          })
+        }
+
+        throw err
+      }
 
       const {
         title,
