@@ -27,6 +27,10 @@ export default fp(async function (fastify, _) {
   const crossOriginEmbedderPolicy = fastify.config.SECURE_IFRAMES
     ? { policy: 'credentialless' }
     : false
+  const sentryConnectSrc = getSentryConnectSrc([
+    fastify.config.SENTRY_BROWSER_DSN,
+    fastify.config.SENTRY_DSN,
+  ])
 
   fastify.register(import('@fastify/helmet'), {
     crossOriginResourcePolicy: { policy: 'same-origin' },
@@ -39,6 +43,7 @@ export default fp(async function (fastify, _) {
         'connect-src': [
           "'self'",
           'https://analytics.ahrefs.com',
+          ...sentryConnectSrc,
         ],
         'frame-src': frameSrc,
         'script-src': [
@@ -56,3 +61,19 @@ export default fp(async function (fastify, _) {
   name: 'helmet',
   dependencies: ['env'],
 })
+
+/**
+ * @param {Array<string | undefined>} dsns
+ * @returns {string[]}
+ */
+function getSentryConnectSrc (dsns) {
+  return [...new Set(dsns.flatMap(dsn => {
+    if (!dsn) return []
+
+    try {
+      return [new URL(dsn).origin]
+    } catch {
+      return []
+    }
+  }))]
+}

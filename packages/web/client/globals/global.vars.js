@@ -57,10 +57,15 @@ const host = process.env['HOST'] ?? 'localhost:3000'
 /** @type {string} */
 const baseUrl = `${transport}://${host}`
 /** @type {string} */
+const sentryEnvironment = process.env['SENTRY_ENVIRONMENT'] ?? process.env['ENV'] ?? process.env['NODE_ENV'] ?? 'development'
+/** @type {string} */
 /** @type {Record<string, string>} */
 export const browser = {
   'process.env.TRANSPORT': transport,
   'process.env.HOST': host,
+  'process.env.SENTRY_BROWSER_DSN': process.env['SENTRY_BROWSER_DSN'] ?? '',
+  'process.env.SENTRY_ENVIRONMENT': sentryEnvironment,
+  'process.env.SENTRY_RELEASE': process.env['SENTRY_RELEASE'] ?? '',
 }
 
 /** @type {() => Promise<GlobalVars>} */

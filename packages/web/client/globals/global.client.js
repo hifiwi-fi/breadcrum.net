@@ -1,11 +1,26 @@
 /// <reference lib="dom" />
 
+import * as Sentry from '@sentry/browser'
 // @ts-expect-error - No type definitions available for mine.css
 import { toggleTheme } from 'mine.css'
 import 'fragmentions'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
+
+const sentryDsn = process.env['SENTRY_BROWSER_DSN']
+
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: process.env['SENTRY_ENVIRONMENT'] || undefined,
+    release: process.env['SENTRY_RELEASE'] || undefined,
+    dataCollection: {
+      // userInfo: false,
+      // httpBodies: [],
+    },
+  })
+}
 
 // @ts-expect-error - Adding toggleTheme to global window object
 window.toggleTheme = toggleTheme

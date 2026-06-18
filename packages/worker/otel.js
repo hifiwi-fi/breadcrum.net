@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
@@ -5,6 +6,20 @@ import { FastifyOtelInstrumentation } from '@fastify/otel'
 import { RuntimeNodeInstrumentation } from '@opentelemetry/instrumentation-runtime-node'
 import { HostMetrics } from '@opentelemetry/host-metrics'
 import { metrics } from '@opentelemetry/api'
+
+const sentryDsn = process.env['SENTRY_DSN']
+const sentryEnvironment = process.env['SENTRY_ENVIRONMENT'] ?? process.env['ENV'] ?? process.env['NODE_ENV']
+const sentryRelease = process.env['SENTRY_RELEASE']
+
+if (sentryDsn) {
+  const Sentry = await import('@sentry/node')
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: sentryEnvironment,
+    release: sentryRelease,
+    skipOpenTelemetrySetup: true,
+  })
+}
 
 /*
 // Tracing boilerplate.

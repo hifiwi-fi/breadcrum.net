@@ -6,8 +6,9 @@
 ARG ENV=production
 ARG NODE_ENV=production
 ARG NODE_VERSION=24
+ARG SENTRY_RELEASE=development
 
-FROM alpine:3.23 AS base
+FROM alpine:3.24 AS base
 
 LABEL maintainer="HifiWifi"
 LABEL fly_launch_runtime="Fastify"
@@ -46,6 +47,9 @@ RUN pnpm --filter=@breadcrum/worker deploy --prod ./deploy/worker
 
 # Final stage for app image
 FROM base
+
+ARG SENTRY_RELEASE=development
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 
 # Copy the worker package from the build image to the final image
 COPY --from=build /usr/src/app/deploy/worker /usr/src/app

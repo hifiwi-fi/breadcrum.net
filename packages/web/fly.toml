@@ -22,7 +22,7 @@ swap_size_mb = 1024
     NODE_VERSION = "24"
 
 [deploy]
-  release_command = "pnpm run migrate --no-config"
+  release_command = "node --run migrate -- --no-config"
 
 [env]
   ENV = "production"
@@ -62,7 +62,7 @@ swap_size_mb = 1024
   [[services.tcp_checks]]
     interval = "15s"
     timeout = "2s"
-    grace_period = "1s"
+    grace_period = "15s"
     restart_limit = 0
 
   [[services.http_checks]]

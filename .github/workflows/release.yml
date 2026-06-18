@@ -56,7 +56,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 10
+          version: 11.5.2
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
@@ -116,6 +116,8 @@ jobs:
         if: ${{ github.event.inputs.deploy-web == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_BROWSER_DSN: ${{ secrets.SENTRY_BROWSER_DSN }}
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Deploy worker
@@ -123,6 +125,7 @@ jobs:
         if: ${{ github.event.inputs.deploy-worker == 'true' }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Save GeoIP cache
         if: always()
         uses: actions/cache/save@v5

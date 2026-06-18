@@ -11,7 +11,7 @@ if (process.env['ENV'] !== 'production') {
   const dotenv = []
 
   for (const [name, opts] of Object.entries(envSchema.properties)) {
-    if (opts.default != null) dotenv.push(`${name}=${opts.default}`)
+    if ('default' in opts && opts.default != null) dotenv.push(`${name}=${opts.default}`)
   }
 
   dotenv.push('')

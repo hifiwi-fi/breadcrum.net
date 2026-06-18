@@ -37,6 +37,8 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
+    "@sentry/browser": "^10.58.0",
+    "@sentry/node": "catalog:",
     "@tanstack/preact-query": "^5.100.5",
     "abstract-cache-redis": "catalog:",
     "clean-deep": "^3.4.0",

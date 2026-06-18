@@ -7,9 +7,11 @@ ARG ENV=production
 ARG HOST=localhost:3000
 ARG NODE_ENV=production
 ARG NODE_VERSION=24
+ARG SENTRY_BROWSER_DSN=
+ARG SENTRY_RELEASE=development
 ARG TRANSPORT=https
 
-FROM alpine:3.23 AS base
+FROM alpine:3.24 AS base
 
 LABEL maintainer="HifiWifi LLC"
 LABEL fly_launch_runtime="Fastify"
@@ -27,6 +29,8 @@ ARG ENV=production
 ARG HOST=localhost:3000
 ARG NODE_ENV=production
 ARG NODE_VERSION
+ARG SENTRY_BROWSER_DSN=
+ARG SENTRY_RELEASE=development
 ARG TRANSPORT=https
 
 # RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
@@ -53,6 +57,9 @@ RUN pnpm --filter=@breadcrum/web deploy --prod ./deploy/web
 
 # Final stage for app image
 FROM base
+
+ARG SENTRY_RELEASE=development
+ENV SENTRY_RELEASE=${SENTRY_RELEASE}
 
 # Copy built application from deploy directory
 COPY --from=build /usr/src/app/deploy/web /usr/src/app

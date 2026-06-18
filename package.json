@@ -11,10 +11,11 @@
     "node": ">=24.0.0"
   },
   "devDependencies": {
-    "releasearoni": "^0.1.0",
+    "@sentry/cli": "^3.5.1",
     "knip": "^6.7.0",
     "neostandard": "^0.12.0",
-    "npm-run-all2": "^8.0.1"
+    "npm-run-all2": "^8.0.1",
+    "releasearoni": "^0.1.0"
   },
   "funding": {
     "type": "individual",
@@ -46,9 +47,10 @@
     "build": "pnpm run -r build",
     "migrate": "pnpm run -r migrate",
     "start": "pnpm run watch",
-    "deploy": "run-s deploy:*",
-    "deploy:web": "flyctl deploy --config ./packages/web/fly.toml --dockerfile ./packages/web/Dockerfile",
-    "deploy:worker": "flyctl deploy --config ./packages/worker/fly.toml --dockerfile ./packages/worker/Dockerfile",
+    "deploy-all": "run-s deploy:*",
+    "deploy:web": "./scripts/deploy-with-sentry.sh ./packages/web/fly.toml ./packages/web/Dockerfile",
+    "deploy:worker": "./scripts/deploy-with-sentry.sh ./packages/worker/fly.toml ./packages/worker/Dockerfile",
+    "sentry:login": "sentry-cli login",
     "knip": "knip --dependencies",
     "new-blogpost": "node scripts/create-blogpost.js --title",
     "publish-draft": "node scripts/publish-blogpost.js",
