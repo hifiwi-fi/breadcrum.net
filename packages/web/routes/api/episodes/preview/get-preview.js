@@ -6,7 +6,7 @@ import { schemaEpisodePreview } from '../schemas/episode-preview.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { MediumTypes } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**

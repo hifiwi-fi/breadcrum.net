@@ -2,7 +2,7 @@ import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**

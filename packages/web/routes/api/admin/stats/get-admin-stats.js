@@ -16,7 +16,7 @@ async function getCountsSqlText () {
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  * @import { QueryResult } from 'pg'
  * @import { TypeAdminStatsReadClient } from './schemas/schema-admin-stats-read.js'
  */

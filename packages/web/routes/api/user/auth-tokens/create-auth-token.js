@@ -5,7 +5,7 @@ import { getSingleAuthToken } from './_jti/get-single-auth-token-query.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { JwtUserWithTokenId } from '../../../../plugins/jwt.js'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**

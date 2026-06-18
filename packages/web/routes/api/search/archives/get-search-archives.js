@@ -1,7 +1,7 @@
 import { getSearchArchivesQuery } from './get-search-archives-query.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 
 /**

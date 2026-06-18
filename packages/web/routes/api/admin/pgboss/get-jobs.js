@@ -1,7 +1,7 @@
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { QueryResult } from 'pg'
- * @import { ExtractKnownResponseType } from '../../../../types/fastify-utils.ts'
+ * @import { ExtractKnownResponseType } from '#types/fastify-utils.js'
  */
 import SQL from '@nearform/sql'
 import { schemaJobsRead } from './schemas/schema-jobs-read.js'
