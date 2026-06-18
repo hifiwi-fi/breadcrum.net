@@ -34,6 +34,7 @@ const execFileAsync = promisify(execFile)
  * @property {string} editionId
  * @property {string} dataDir
  * @property {boolean} [force]
+ * @property {AbortSignal} [signal]
  * @property {number} [timeout] - Abort the download after this many milliseconds
  * @property {GeoIpDownloadLogger} logger
  */
@@ -157,10 +158,14 @@ export async function updateGeoipDatabase ({
   editionId,
   dataDir,
   force = false,
+  signal: externalSignal,
   timeout,
   logger,
 }) {
-  const signal = timeout != null ? AbortSignal.timeout(timeout) : undefined
+  const timeoutSignal = timeout != null ? AbortSignal.timeout(timeout) : undefined
+  const signal = externalSignal && timeoutSignal
+    ? AbortSignal.any([externalSignal, timeoutSignal])
+    : externalSignal ?? timeoutSignal
   const archiveSuffix = 'tar.gz'
   const shaSuffix = `${archiveSuffix}.sha256`
   const dbFileName = `${editionId}.mmdb`

@@ -7,10 +7,12 @@ import { Reader, AddressNotFoundError, ValueError } from '@maxmind/geoip2-node'
 import { constants as fsConstants } from 'node:fs'
 import { access } from 'node:fs/promises'
 import { join } from 'node:path'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { updateGeoipDatabase } from '../lib/geoip-download.js'
 
 const defaultGeoipPath = join(process.cwd(), 'data', 'geoip', 'GeoLite2-City.mmdb')
 const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')
+const geoipStartupUpdateTimeoutMs = 10_000
 
 /**
  * @typedef {object} GeoIpRegion
@@ -62,20 +64,38 @@ export function countryIsoToFlagEmoji (countryIso) {
   return String.fromCodePoint(...codePoints)
 }
 
+/**
+ * @template T
+ * @param {(signal: AbortSignal) => Promise<T>} work
+ * @param {number} [timeoutMs]
+ * @returns {Promise<T>}
+ */
+export async function withGeoipStartupTimeout (work, timeoutMs = geoipStartupUpdateTimeoutMs) {
+  const signal = AbortSignal.timeout(timeoutMs)
+  const timeoutPromise = sleep(timeoutMs, undefined, { ref: false }).then(() => {
+    throw new Error(`GeoIP database update timed out after ${timeoutMs}ms.`)
+  })
+
+  return Promise.race([
+    work(signal),
+    timeoutPromise,
+  ])
+}
+
 /** @type {FastifyPluginAsync} */
 async function geoipPlugin (fastify) {
   const { MAXMIND_ACCOUNT_ID, MAXMIND_LICENSE_KEY } = fastify.config
 
   if (MAXMIND_ACCOUNT_ID && MAXMIND_LICENSE_KEY) {
     try {
-      await updateGeoipDatabase({
+      await withGeoipStartupTimeout(signal => updateGeoipDatabase({
         accountId: MAXMIND_ACCOUNT_ID,
         licenseKey: MAXMIND_LICENSE_KEY,
         editionId: 'GeoLite2-City',
         dataDir: defaultGeoipDir,
-        timeout: 30_000, // Must be less than pluginTimeout in server-options.js (currently 40_000)
+        signal,
         logger: fastify.log,
-      })
+      }))
     } catch (err) {
       fastify.log.warn({ err }, 'GeoIP database update failed; using existing data if present')
     }
