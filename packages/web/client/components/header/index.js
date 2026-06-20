@@ -15,6 +15,7 @@ import { Sensitive } from '../sensitive/index.js'
 import { ToRead } from '../toread/index.js'
 import { Star } from '../star/index.js'
 import { LoginButtons } from './login-buttons.js'
+import { PwaUpdateNotice } from './pwa-update-notice.js'
 
 /** @type{FunctionComponent<{}>} */
 export const Header = () => {
@@ -141,6 +142,7 @@ export const Header = () => {
       </div>`
     : null
   }
+  <${PwaUpdateNotice}/>
   ${user && !user.email_confirmed && !['/email_confirm/'].includes(window?.location?.pathname ?? '')
     ? html`
       <div class="bc-header-email-warning">

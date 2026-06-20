@@ -7,6 +7,7 @@ import 'fragmentions'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
+import { initializePwa } from './pwa-runtime.js'
 
 const sentryDsn = process.env['SENTRY_BROWSER_DSN']
 
@@ -32,12 +33,6 @@ if (typeof window !== 'undefined') {
   }
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(registration => {
-      console.log('Service Worker registered successfully:', registration.scope)
-    })
-    .catch(error => {
-      console.error('Service Worker registration failed:', error)
-    })
-}
+initializePwa().catch(err => {
+  console.error('PWA initialization failed:', err)
+})

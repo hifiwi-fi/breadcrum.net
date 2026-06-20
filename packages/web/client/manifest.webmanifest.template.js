@@ -1,12 +1,10 @@
 /**
- * @import {TemplateAsyncIterator} from '@domstack/static'
+ * @import {TemplateFunction} from '@domstack/static'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
 
-import { stripIndent as js } from 'common-tags'
-
-/** @type {TemplateAsyncIterator<GlobalVars>} */
-export default async function * serviceWorkerTemplate ({
+/** @type {TemplateFunction<GlobalVars>} */
+export default async function manifestWebmanifestTemplate ({
   vars: {
     siteName,
     siteDescription,
@@ -14,18 +12,7 @@ export default async function * serviceWorkerTemplate ({
     backgroundColor
   }
 }) {
-  // First item
-  yield {
-    content: js`
-      self.addEventListener('install', (event) => {
-        console.log('Service worker installed')
-      })
-    `,
-    outputName: 'service-worker.js'
-  }
-
-  // Second item
-  const manifestData = {
+  return JSON.stringify({
     id: '/bookmarks',
     name: siteName,
     short_name: siteName,
@@ -78,17 +65,10 @@ export default async function * serviceWorkerTemplate ({
       method: 'GET',
       params: {
         title: 'title',
-        // Note that android sends the URL as 'text' instead of 'url'
-        // but other apps send the url as 'url`
-        // so you need to handle that PWA client side.
+        // Android sends the URL as text; other apps may send it as url.
         text: 'summary',
         url: 'url'
       }
     }
-  }
-
-  yield {
-    content: JSON.stringify(manifestData, null, 2),
-    outputName: 'manifest.webmanifest'
-  }
+  }, null, 2)
 }

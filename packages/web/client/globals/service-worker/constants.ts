@@ -1,0 +1,6 @@
+export const OFFLINE_URL = '/offline/'
+export const STATIC_CACHE_PREFIX = 'breadcrum-static-'
+export const INSTALL_CACHE_PREFIX = 'breadcrum-static-install-'
+export const META_CACHE = 'breadcrum-static-meta'
+export const ACTIVE_VERSION_REQUEST = '/__breadcrum-pwa-active-version__'
+export const PENDING_VERSION_REQUEST = '/__breadcrum-pwa-pending-version__'
