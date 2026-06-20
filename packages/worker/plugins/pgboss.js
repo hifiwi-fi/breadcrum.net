@@ -4,8 +4,10 @@
  * @import { ResolveBookmarkPgBossW } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  * @import { CleanupAuthTokensPgBossW } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
  * @import { CleanupStaleResolutionsPgBossW } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
+ * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  */
 import fp from 'fastify-plugin'
+import * as Sentry from '@sentry/node'
 
 import { resolveEpisodeQName, createResolveEpisodeQ } from '@breadcrum/resources/episodes/resolve-episode-queue.js'
 import { resolveArchiveQName, createResolveArchiveQ } from '@breadcrum/resources/archives/resolve-archive-queue.js'
@@ -13,6 +15,7 @@ import { resolveBookmarkQName, createResolveBookmarkQ } from '@breadcrum/resourc
 import { cleanupAuthTokensQName, createCleanupAuthTokensQ } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { cleanupStaleResolutionsQName, createCleanupStaleResolutionsQ } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
+import { getSentryUserFromPgBossJobData } from '@breadcrum/resources/fastify-common/sentry-user-context.js'
 
 import { makeEpisodePgBossP } from '../workers/episodes/index.js'
 import { makeArchivePgBossP } from '../workers/archives/index.js'
@@ -51,10 +54,12 @@ export default fp(async function (fastify, _opts) {
   await boss.schedule(cleanupStaleResolutionsQName, '0 4 * * *', undefined, { tz: 'UTC' })
   fastify.log.info({ jobName: cleanupStaleResolutionsQName, schedule: '0 4 * * *' }, 'Scheduled stale resolution cleanup job')
 
+  const maybeWrapWorker = fastify.config.SENTRY_DSN ? wrapWorkerWithSentryJobScope : passthroughWorker
+
   // Create pg-boss workers with native processors
   /** @type {ResolveEpisodePgBossW[]} */
   const episodeWorkers = []
-  const episodeWorkerFn = makeEpisodePgBossP({ fastify })
+  const episodeWorkerFn = maybeWrapWorker(resolveEpisodeQName, makeEpisodePgBossP({ fastify }))
   for (let i = 0; i < fastify.config.EPISODE_WORKER_CONCURRENCY; i++) {
     episodeWorkers.push(
       await boss.work(resolveEpisodeQName, episodeWorkerFn)
@@ -63,7 +68,7 @@ export default fp(async function (fastify, _opts) {
 
   /** @type {ResolveArchivePgBossW[]} */
   const archiveWorkers = []
-  const archiveWorkerFn = makeArchivePgBossP({ fastify })
+  const archiveWorkerFn = maybeWrapWorker(resolveArchiveQName, makeArchivePgBossP({ fastify }))
   for (let i = 0; i < fastify.config.ARCHIVE_WORKER_CONCURRENCY; i++) {
     archiveWorkers.push(
       await boss.work(resolveArchiveQName, archiveWorkerFn)
@@ -72,7 +77,7 @@ export default fp(async function (fastify, _opts) {
 
   /** @type {ResolveBookmarkPgBossW[]} */
   const bookmarkWorkers = []
-  const bookmarkWorkerFn = makeBookmarkPgBossP({ fastify })
+  const bookmarkWorkerFn = maybeWrapWorker(resolveBookmarkQName, makeBookmarkPgBossP({ fastify }))
   for (let i = 0; i < fastify.config.BOOKMARK_WORKER_CONCURRENCY; i++) {
     bookmarkWorkers.push(
       await boss.work(resolveBookmarkQName, bookmarkWorkerFn)
@@ -81,11 +86,11 @@ export default fp(async function (fastify, _opts) {
 
   // Create auth token cleanup worker (scheduled job)
   /** @type {CleanupAuthTokensPgBossW} */
-  const cleanupAuthTokensWorker = await boss.work(cleanupAuthTokensQName, makeAuthTokenCleanupP({ fastify }))
+  const cleanupAuthTokensWorker = await boss.work(cleanupAuthTokensQName, maybeWrapWorker(cleanupAuthTokensQName, makeAuthTokenCleanupP({ fastify })))
 
   // Create stale resolution cleanup worker (scheduled job)
   /** @type {CleanupStaleResolutionsPgBossW} */
-  const cleanupStaleResolutionsWorker = await boss.work(cleanupStaleResolutionsQName, makeStaleResolutionCleanupP({ fastify }))
+  const cleanupStaleResolutionsWorker = await boss.work(cleanupStaleResolutionsQName, maybeWrapWorker(cleanupStaleResolutionsQName, makeStaleResolutionCleanupP({ fastify })))
 
   const workers = {
     [resolveEpisodeQName]: episodeWorkers,
@@ -137,3 +142,43 @@ export default fp(async function (fastify, _opts) {
   dependencies: ['env', 'pg', 'otel-metrics'],
   name: 'pgboss',
 })
+
+/**
+ * @template T
+ * @param {string} _queueName
+ * @param {WorkHandler<T>} worker
+ * @returns {WorkHandler<T>}
+ */
+function passthroughWorker (_queueName, worker) {
+  return worker
+}
+
+/**
+ * @template T
+ * @param {string} queueName
+ * @param {WorkHandler<T>} worker
+ * @returns {WorkHandler<T>}
+ */
+function wrapWorkerWithSentryJobScope (queueName, worker) {
+  return async function sentryJobScopeP (jobs) {
+    for (const job of jobs) {
+      await Sentry.withScope(async scope => {
+        const user = getSentryUserFromPgBossJobData(job.data)
+        if (user) scope.setUser(user)
+
+        scope.setTag('pgboss.queue', queueName)
+        scope.setContext('pgboss.job', {
+          id: job.id,
+          name: job.name,
+        })
+
+        try {
+          await worker([job])
+        } catch (err) {
+          Sentry.captureException(err, { mechanism: { handled: false, type: 'auto.function.pgboss' } })
+          throw err
+        }
+      })
+    }
+  }
+}
