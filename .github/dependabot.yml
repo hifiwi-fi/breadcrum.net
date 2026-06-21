@@ -15,6 +15,11 @@ updates:
     schedule:
       interval: "cron"
       cronjob: "0 0 * * *"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
     groups:
       opentelemetry:
         patterns:
@@ -30,6 +35,7 @@ updates:
           - "eslint"
           - "eslint-*"
           - "@eslint/*"
+          - "neostandard"
       jsdom:
         patterns:
           - "jsdom"

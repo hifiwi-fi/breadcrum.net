@@ -3,6 +3,7 @@
   "description": "Breadcrum internet newspaper clippigns",
   "version": "2026.2.7",
   "type": "module",
+  "packageManager": "pnpm@11.5.3",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
     "url": "https://github.com/hifiwi-fi/breadcrum.net/issues"
