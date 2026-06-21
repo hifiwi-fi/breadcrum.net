@@ -74,7 +74,7 @@
     "argsclopts": "^1.0.5",
     "classnames": "^2.3.1",
     "eslint": "catalog:",
-    "format-duration": "^3.0.0",
+    "format-duration": "^4.0.0",
     "fragmentions": "^1.1.4",
     "giscus": "^1.6.0",
     "highlight.js": "^11.5.0",
