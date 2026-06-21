@@ -21,6 +21,11 @@ function assertGeoipShape (assert, geoip) {
 
 await suite('admin users geoip', async () => {
   await test('admin users geoip', async (t) => {
+    if (process.env['SKIP_GEOIP_TESTS'] === '1') {
+      t.skip('GeoIP database update failed; skipping GeoIP tests.')
+      return
+    }
+
     const accountId = process.env['MAXMIND_ACCOUNT_ID']
     const licenseKey = process.env['MAXMIND_LICENSE_KEY']
 
