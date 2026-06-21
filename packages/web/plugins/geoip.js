@@ -1,6 +1,7 @@
 /**
  * @import { FastifyPluginAsync } from 'fastify'
  * @import { City } from '@maxmind/geoip2-node'
+ * @import { JSONSchema } from 'json-schema-to-ts'
  */
 import fp from 'fastify-plugin'
 import { Reader, AddressNotFoundError, ValueError } from '@maxmind/geoip2-node'
@@ -81,6 +82,14 @@ export async function withGeoipStartupTimeout (work, timeoutMs = geoipStartupUpd
     timeoutPromise,
   ])
 }
+
+export const geoipEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    MAXMIND_ACCOUNT_ID: { type: 'string' },
+    MAXMIND_LICENSE_KEY: { type: 'string' },
+  },
+  required: [],
+})
 
 /** @type {FastifyPluginAsync} */
 async function geoipPlugin (fastify) {

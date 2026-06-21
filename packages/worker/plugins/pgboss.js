@@ -5,6 +5,7 @@
  * @import { CleanupAuthTokensPgBossW } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
  * @import { CleanupStaleResolutionsPgBossW } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
  * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
+ * @import { JSONSchema } from 'json-schema-to-ts'
  */
 import fp from 'fastify-plugin'
 import * as Sentry from '@sentry/node'
@@ -22,6 +23,15 @@ import { makeArchivePgBossP } from '../workers/archives/index.js'
 import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
 import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
 import { makeStaleResolutionCleanupP } from '../workers/stale-resolutions/index.js'
+
+export const pgbossEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    EPISODE_WORKER_CONCURRENCY: { type: 'integer', default: 2 },
+    ARCHIVE_WORKER_CONCURRENCY: { type: 'integer', default: 2 },
+    BOOKMARK_WORKER_CONCURRENCY: { type: 'integer', default: 2 },
+  },
+  required: [],
+})
 
 /**
  * This plugin adds pg-boss workers
