@@ -88,14 +88,23 @@ jobs:
           restore-keys: |
             geoip-${{ runner.os }}-
       - name: Update GeoIP data
+        id: update-geoip
+        continue-on-error: true
         run: node packages/web/scripts/update-geoip-db.js
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+      - name: Save GeoIP cache
+        if: steps.update-geoip.outcome == 'success'
+        uses: actions/cache/save@v5
+        with:
+          path: packages/web/data/geoip
+          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
       - run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+          SKIP_GEOIP_TESTS: ${{ steps.update-geoip.outcome != 'success' && '1' || '0' }}
       - name: Set NEW_VERSION
         run: |
           if [ -z "${{ github.event.inputs.newversion }}" ]; then
@@ -126,9 +135,4 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - name: Save GeoIP cache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
+

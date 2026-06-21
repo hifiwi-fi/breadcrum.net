@@ -26,6 +26,11 @@ function assertGeoipShape (assert, geoip) {
 
 await suite('list auth tokens', async () => {
   await test('list auth tokens - basic functionality', async (t) => {
+    if (process.env['SKIP_GEOIP_TESTS'] === '1') {
+      t.skip('GeoIP database update failed; skipping GeoIP tests.')
+      return
+    }
+
     const accountId = process.env['MAXMIND_ACCOUNT_ID']
     const licenseKey = process.env['MAXMIND_LICENSE_KEY']
 
@@ -131,6 +136,11 @@ await suite('list auth tokens', async () => {
   })
 
   await test('list auth tokens - pagination', async (t) => {
+    if (process.env['SKIP_GEOIP_TESTS'] === '1') {
+      t.skip('GeoIP database update failed; skipping GeoIP tests.')
+      return
+    }
+
     const accountId = process.env['MAXMIND_ACCOUNT_ID']
     const licenseKey = process.env['MAXMIND_LICENSE_KEY']
 

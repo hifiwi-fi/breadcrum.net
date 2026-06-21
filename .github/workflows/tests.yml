@@ -72,10 +72,18 @@ jobs:
           restore-keys: |
             geoip-${{ runner.os }}-
       - name: Update GeoIP data
+        id: update-geoip
+        continue-on-error: true
         run: node packages/web/scripts/update-geoip-db.js
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+      - name: Save GeoIP cache
+        if: steps.update-geoip.outcome == 'success'
+        uses: actions/cache/save@v5
+        with:
+          path: packages/web/data/geoip
+          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
       - name: Test resources
         run: pnpm run --filter @breadcrum/resources test
       - name: Test web
@@ -83,6 +91,7 @@ jobs:
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+          SKIP_GEOIP_TESTS: ${{ steps.update-geoip.outcome != 'success' && '1' || '0' }}
       - name: Test worker
         run: pnpm run --filter @breadcrum/worker test
       - name: Run knip
@@ -93,12 +102,6 @@ jobs:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           files: "packages/web/lcov.info packages/worker/lcov.info packages/resources/lcov.info"
-      - name: Save GeoIP cache
-        if: always()
-        uses: actions/cache/save@v5
-        with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
 
   coverage:
     needs: test
