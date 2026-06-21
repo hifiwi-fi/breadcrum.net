@@ -101,13 +101,15 @@ catalogs:
       specifier: ~6.0.3
       version: 6.0.3
     undici:
-      specifier: 8.1.0
-      version: 8.1.0
+      specifier: 8.5.0
+      version: 8.5.0
 
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
 patchedDependencies:
-  giscus@1.6.0: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
+  giscus@1.6.0:
+    hash: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
+    path: patches/giscus@1.6.0.patch
 
 importers:
 
@@ -160,7 +162,7 @@ importers:
         version: 12.20.0
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.5.0
     devDependencies:
       '@types/jsdom':
         specifier: 'catalog:'
@@ -356,7 +358,7 @@ importers:
         version: 4.0.57
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.5.0
       useragent:
         specifier: ^2.3.0
         version: 2.3.0
@@ -528,7 +530,7 @@ importers:
         version: 5.7.0
       undici:
         specifier: 'catalog:'
-        version: 8.1.0
+        version: 8.5.0
       user-agents:
         specifier: ^2.1.43
         version: 2.1.97
@@ -5075,10 +5077,6 @@ packages:
   undici@7.28.0:
     resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
-
-  undici@8.1.0:
-    resolution: {integrity: sha512-E9MkTS4xXLnRPYqxH2e6Hr2/49e7WFDKczKcCaFH4VaZs2iNvHMqeIkyUAD9vM8kujy9TjVrRlQ5KkdEJxB2pw==}
-    engines: {node: '>=22.19.0'}
 
   undici@8.5.0:
     resolution: {integrity: sha512-xamtWoB1EshgjpmlXd7GGm2VfdDtw1+rD8uhry8pSNW3If6S8E0m2T2+orSKeZXEn/aPJMviCpDBA65WJt8zhg==}
@@ -10264,8 +10262,6 @@ snapshots:
   undici@6.27.0: {}
 
   undici@7.28.0: {}
-
-  undici@8.1.0: {}
 
   undici@8.5.0: {}
 
