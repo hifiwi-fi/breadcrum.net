@@ -19,7 +19,7 @@ swap_size_mb = 1024
     HOST = "breadcrum.net"
     NODE_ENV = "production"
     TRANSPORT = "https"
-    NODE_VERSION = "24"
+    NODE_VERSION = "26"
 
 [deploy]
   release_command = "node --run migrate -- --no-config"

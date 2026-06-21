@@ -65,7 +65,7 @@ catalogs:
       specifier: ^8.11.10
       version: 8.20.0
     '@voxpelli/tsconfig':
-      specifier: ^16.0.0
+      specifier: ^16.2.1
       version: 16.2.1
     abstract-cache-redis:
       specifier: ^2.0.0

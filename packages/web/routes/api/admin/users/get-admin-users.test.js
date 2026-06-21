@@ -4,10 +4,9 @@ import { build } from '#test/helper.js'
 import { createTestUser } from '../pgboss/pgboss-test-utils.js'
 
 /**
- * @param {import('node:assert')} assert
- * @param {any} geoip
+ * @param {Record<string, unknown>} geoip
  */
-function assertGeoipShape (assert, geoip) {
+function assertGeoipShape (geoip) {
   assert.ok(geoip, 'GeoIP data should be present')
   assert.strictEqual(typeof geoip, 'object')
   assert.ok('country_iso' in geoip)
@@ -64,8 +63,8 @@ await suite('admin users geoip', async () => {
       const adminRecord = body.data.find((/** @type {{ id: string }} */ user) => user.id === adminUser.userId)
       assert.ok(adminRecord, 'Should include admin user record in response')
 
-      assertGeoipShape(assert, adminRecord.geoip)
-      assertGeoipShape(assert, adminRecord.registration_geoip)
+      assertGeoipShape(adminRecord.geoip)
+      assertGeoipShape(adminRecord.registration_geoip)
     })
   })
 })
