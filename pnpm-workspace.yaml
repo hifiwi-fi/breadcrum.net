@@ -21,7 +21,7 @@ catalog:
   "@opentelemetry/sdk-node": ^0.219.0
   "@sentry/node": ^10.58.0
   "@types/node": ^26.0.0
-  "@types/jsdom": ^28.0.1
+  "@types/jsdom": ^28.0.3
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.0.0
   abstract-cache-redis: ^2.0.0
