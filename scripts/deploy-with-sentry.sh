@@ -10,6 +10,10 @@ fly_config=$1
 dockerfile=$2
 shift 2
 
+if [ "${1:-}" = "--" ]; then
+  shift
+fi
+
 : "${SENTRY_ORG:=breadcrum}"
 : "${SENTRY_ENVIRONMENT:=production}"
 

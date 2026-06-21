@@ -31,8 +31,8 @@
   },
   "scripts": {
     "clean": "rm -rf node_modules && rm -rf ./packages/*/node_modules && rm -f pnpm-lock.yaml",
-    "prepublishOnly": "git push --follow-tags && releasearoni -y",
-    "release": "git push --follow-tags && releasearoni -y",
+    "prepublishOnly": "releasearoni --no-npm-check --no-build",
+    "release": "releasearoni --no-npm-check --no-build",
     "version": "releasearoni version",
     "test": "run-s test:*",
     "test:all": "pnpm run --workspace-concurrency=1 -r test",

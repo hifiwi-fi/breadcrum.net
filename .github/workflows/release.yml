@@ -15,6 +15,9 @@ on:
         description: "Deploy worker service"
         default: true
 
+permissions:
+  contents: write
+
 env:
   FORCE_COLOR: 1
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
@@ -50,7 +53,7 @@ jobs:
         ports:
           - 6379:6379
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install pnpm
@@ -115,11 +118,11 @@ jobs:
           echo $NEW_VERSION
       - uses: bcomnes/npm-bump@v3
         with:
-          git_email: bcomnes@gmail.com
-          git_username: ${{ github.actor }}
-          newversion: ${{ env.NEW_VERSION }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_cmd: pnpm run release
+          git-email: bcomnes@gmail.com
+          git-username: ${{ github.actor }}
+          new-version: ${{ env.NEW_VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          publish-cmd: pnpm run release
       - name: Deploy web
         run: pnpm run deploy:web
         if: ${{ github.event.inputs.deploy-web == 'true' }}
