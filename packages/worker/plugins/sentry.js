@@ -1,5 +1,16 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
 import { shouldHandleSentryError } from '@breadcrum/resources/fastify-common/sentry-error-filter.js'
+
+export const sentryEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    SENTRY_DSN: { type: 'string' },
+    SENTRY_RELEASE: { type: 'string' },
+  },
+  required: [],
+})
 
 export default fp(async function sentryPlugin (fastify) {
   if (!fastify.config.SENTRY_DSN) return

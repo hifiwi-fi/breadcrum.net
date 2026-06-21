@@ -1,4 +1,14 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
+
+export const redisEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    REDIS_CACHE_URL: { type: 'string', default: 'redis://localhost:6379/1' },
+  },
+  required: [],
+})
 
 /**
  * This plugins adds a redis connection

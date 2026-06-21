@@ -1,7 +1,17 @@
+/**
+ * @import { JSONSchema } from 'json-schema-to-ts'
+ */
 import fp from 'fastify-plugin'
 import { stripIndent } from 'common-tags'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
+
+export const swaggerEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
+  properties: {
+    SWAGGER: { type: 'boolean', default: true },
+  },
+  required: [],
+})
 
 /**
  * This plugins adds fastify-swagger
