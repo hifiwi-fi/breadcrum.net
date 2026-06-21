@@ -48,8 +48,8 @@
     "fastify-plugin": "catalog:",
     "gunzip-maybe": "^1.4.2",
     "jsdom": "catalog:",
-    "json-schema-to-ts": "^3.1.1",
-    "type-fest": "^5.2.0",
+    "json-schema-to-ts": "catalog:",
+    "type-fest": "catalog:",
     "undici": "catalog:",
     "user-agents": "^2.1.43"
   },

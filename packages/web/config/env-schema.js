@@ -1,9 +1,11 @@
 /**
  * @import { FromSchema, JSONSchema } from "json-schema-to-ts"
+ * @import { EnvSchemaFragment } from '@breadcrum/resources/fastify-common/env-schema.js'
  * @typedef { typeof envSchema } EnvSchemaType
  * @typedef { FromSchema<EnvSchemaType> } DotEnvSchemaType
  */
 
+import { mergeEnvSchemas } from '@breadcrum/resources/fastify-common/env-schema.js'
 import { authEnvSchema } from '#plugins/auth.js'
 import { cookieEnvSchema } from '#plugins/cookie.js'
 import { emailEnvSchema } from '#plugins/email.js'
@@ -18,25 +20,29 @@ import { sentryEnvSchema } from '#plugins/sentry.js'
 import { swaggerEnvSchema } from '#plugins/swagger.js'
 import { ytDlpEnvSchema } from '#plugins/yt-dlp.js'
 
+const pluginEnvSchemas = /** @type {const} @satisfies {readonly EnvSchemaFragment[]} */ ([
+  authEnvSchema,
+  cookieEnvSchema,
+  emailEnvSchema,
+  geoipEnvSchema,
+  helmetEnvSchema,
+  jwtEnvSchema,
+  otelMetricsEnvSchema,
+  pgEnvSchema,
+  rateLimitEnvSchema,
+  redisEnvSchema,
+  sentryEnvSchema,
+  swaggerEnvSchema,
+  ytDlpEnvSchema,
+])
+
+const pluginEnvSchema = mergeEnvSchemas(pluginEnvSchemas)
+
 export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:dotenv',
   additionalProperties: false,
-  required: [
-    ...authEnvSchema.required,
-    ...cookieEnvSchema.required,
-    ...emailEnvSchema.required,
-    ...geoipEnvSchema.required,
-    ...helmetEnvSchema.required,
-    ...jwtEnvSchema.required,
-    ...otelMetricsEnvSchema.required,
-    ...pgEnvSchema.required,
-    ...rateLimitEnvSchema.required,
-    ...redisEnvSchema.required,
-    ...sentryEnvSchema.required,
-    ...swaggerEnvSchema.required,
-    ...ytDlpEnvSchema.required,
-  ],
+  required: pluginEnvSchema.required,
   properties: {
     // Base / cross-cutting
     ENV: {
@@ -54,18 +60,6 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     },
 
     // Plugin schemas
-    ...authEnvSchema.properties,
-    ...cookieEnvSchema.properties,
-    ...emailEnvSchema.properties,
-    ...geoipEnvSchema.properties,
-    ...helmetEnvSchema.properties,
-    ...jwtEnvSchema.properties,
-    ...otelMetricsEnvSchema.properties,
-    ...pgEnvSchema.properties,
-    ...rateLimitEnvSchema.properties,
-    ...redisEnvSchema.properties,
-    ...sentryEnvSchema.properties,
-    ...swaggerEnvSchema.properties,
-    ...ytDlpEnvSchema.properties,
+    ...pluginEnvSchema.properties,
   },
 })

@@ -31,9 +31,11 @@ catalog:
   fastify-healthcheck: ^5.0.0
   fastify-plugin: ^6.0.0
   jsdom: ^29.1.0
+  json-schema-to-ts: ^3.1.1
   neostandard: ^0.13.0
   npm-run-all2: ^9.0.2
   pg: ^8.16.3
+  type-fest: ^5.2.0
   typescript: ~6.0.3
   undici: ^8.5.0
 

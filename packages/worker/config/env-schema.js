@@ -1,26 +1,32 @@
 /**
  * @import { FromSchema, JSONSchema } from "json-schema-to-ts"
+ * @import { EnvSchemaFragment } from '@breadcrum/resources/fastify-common/env-schema.js'
  * @typedef { typeof envSchema } EnvSchemaType
  * @typedef { FromSchema<EnvSchemaType> } DotEnvSchemaType
  */
 
+import { mergeEnvSchemas } from '@breadcrum/resources/fastify-common/env-schema.js'
 import { otelMetricsEnvSchema } from '#plugins/otel-metrics.js'
 import { pgEnvSchema } from '#plugins/pg.js'
 import { pgbossEnvSchema } from '#plugins/pgboss.js'
 import { redisEnvSchema } from '#plugins/redis.js'
 import { sentryEnvSchema } from '#plugins/sentry.js'
 
+const pluginEnvSchemas = /** @type {const} @satisfies {readonly EnvSchemaFragment[]} */ ([
+  otelMetricsEnvSchema,
+  pgEnvSchema,
+  pgbossEnvSchema,
+  redisEnvSchema,
+  sentryEnvSchema,
+])
+
+const pluginEnvSchema = mergeEnvSchemas(pluginEnvSchemas)
+
 export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:dotenv',
   additionalProperties: false,
-  required: [
-    ...otelMetricsEnvSchema.required,
-    ...pgEnvSchema.required,
-    ...pgbossEnvSchema.required,
-    ...redisEnvSchema.required,
-    ...sentryEnvSchema.required,
-  ],
+  required: pluginEnvSchema.required,
   properties: {
     // Base / cross-cutting
     ENV: {
@@ -52,10 +58,6 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
     },
 
     // Plugin schemas
-    ...otelMetricsEnvSchema.properties,
-    ...pgEnvSchema.properties,
-    ...pgbossEnvSchema.properties,
-    ...redisEnvSchema.properties,
-    ...sentryEnvSchema.properties,
+    ...pluginEnvSchema.properties,
   },
 })

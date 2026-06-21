@@ -29,8 +29,10 @@
     "@voxpelli/tsconfig": "catalog:",
     "eslint": "catalog:",
     "fastify": "catalog:",
+    "json-schema-to-ts": "catalog:",
     "neostandard": "catalog:",
     "npm-run-all2": "catalog:",
+    "type-fest": "catalog:",
     "typescript": "catalog:"
   },
   "imports": {
