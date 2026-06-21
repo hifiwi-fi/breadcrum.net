@@ -9,7 +9,7 @@ catalog:
   "@fastify/env": ^6.0.0
   "@fastify/otel": ^0.18.1
   "@fastify/postgres": ^6.0.2
-  "@fastify/redis": ^7.1.0
+  "@fastify/redis": ^8.0.0
   "@fastify/sensible": ^6.0.1
   "@fastify/type-provider-json-schema-to-ts": ^5.0.0
   "@nearform/sql": ^1.10.5
