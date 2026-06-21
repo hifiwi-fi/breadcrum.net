@@ -5,7 +5,7 @@
 ## Do not pass secrets here.
 ARG ENV=production
 ARG NODE_ENV=production
-ARG NODE_VERSION=24
+ARG NODE_VERSION=26
 ARG SENTRY_RELEASE=development
 
 FROM alpine:3.24 AS base

@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "engines": {
-    "node": ">=23.0.0"
+    "node": ">=26.0.0"
   },
   "scripts": {
     "generate-default-env": "node scripts/generate-default-env.js",
@@ -13,7 +13,7 @@
     "start": "run-s watch",
     "test": "run-s test:*",
     "test:eslint": "eslint .",
-    "test:node": "node --experimental-test-coverage --test --test-reporter spec --test-reporter-destination stdout --test-reporter lcov --test-reporter-destination lcov.info --test-force-exit --test-concurrency 1",
+    "test:node": "node --experimental-test-coverage --test --test-reporter=dot --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test-force-exit --test-concurrency 1",
     "test:tsc": "tsc",
     "watch": "run-p watch:*",
     "watch:server": "fastify start -w --ignore-watch='node_modules .git web public' -l info -P -p 3001 --options --address localhost app.js",

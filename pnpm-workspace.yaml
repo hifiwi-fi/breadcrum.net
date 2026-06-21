@@ -23,7 +23,7 @@ catalog:
   "@types/node": ^26.0.0
   "@types/jsdom": ^28.0.1
   "@types/pg": ^8.11.10
-  "@voxpelli/tsconfig": ^16.0.0
+  "@voxpelli/tsconfig": ^16.2.1
   abstract-cache-redis: ^2.0.0
   eslint: ^9.39.1
   fastify: ^5.8.1

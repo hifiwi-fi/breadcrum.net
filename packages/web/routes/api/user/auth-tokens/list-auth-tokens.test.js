@@ -9,10 +9,9 @@ import {
 } from './auth-tokens-test-utils.js'
 
 /**
- * @param {import('node:assert')} assert
- * @param {any} geoip
+ * @param {Record<string, unknown>} geoip
  */
-function assertGeoipShape (assert, geoip) {
+function assertGeoipShape (geoip) {
   assert.ok(geoip, 'GeoIP data should be present')
   assert.strictEqual(typeof geoip, 'object')
   assert.ok('country_iso' in geoip)
@@ -131,7 +130,7 @@ await suite('list auth tokens', async () => {
       const listBody = JSON.parse(listRes.payload)
       const token = listBody.data[0]
 
-      assertGeoipShape(assert, token.geoip)
+      assertGeoipShape(token.geoip)
     })
   })
 

@@ -1,7 +1,8 @@
 {
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "ignore": [],
   "ignoreBinaries": ["eslint"],
-  "ignoreUnresolved": ["spec", "lcov"],
+  "ignoreUnresolved": [],
   "ignoreDependencies": [],
   "ignoreWorkspaces": [],
   "workspaces": {
