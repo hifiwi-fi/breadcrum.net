@@ -7,25 +7,23 @@ import { PgBoss } from 'pg-boss'
 import { defaultBossOptions } from './default-job-options.js'
 
 /**
- * Start PgBoss instance with error handling and lifecycle hooks
+ * Start PgBoss instance with error handling and lifecycle hooks.
+ *
+ * PgBoss manages its own pg pool so queue startup/maintenance is isolated from
+ * the application query pool's timeout and session settings.
  *
  * @param {Object} params
- * @param {(text: string, values: any[]) => Promise<any>} params.executeSql - Database query function
  * @param {FastifyBaseLogger} params.logger - Fastify logger instance
- * @param {Partial<ConstructorOptions>} [params.pgBossOptions] - Optional pg-boss configuration overrides
+ * @param {Partial<ConstructorOptions>} params.pgBossOptions - pg-boss database/configuration overrides
  * @returns {Promise<PgBoss>} Started PgBoss instance
  */
 export async function startPGBoss ({
-  executeSql,
   logger,
   pgBossOptions
 }) {
   const bossConfig = {
     ...defaultBossOptions,
     ...pgBossOptions,
-    db: {
-      executeSql
-    }
   }
 
   const boss = new PgBoss(bossConfig)

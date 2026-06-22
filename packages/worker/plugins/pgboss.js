@@ -39,8 +39,10 @@ export const pgbossEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
 export default fp(async function (fastify, _opts) {
   // Start pg-boss with lifecycle management
   const boss = await startPGBoss({
-    executeSql: fastify.pg.query,
-    logger: fastify.log
+    logger: fastify.log,
+    pgBossOptions: {
+      connectionString: fastify.config.DATABASE_URL
+    }
   })
 
   // Create queue wrappers using factory functions
