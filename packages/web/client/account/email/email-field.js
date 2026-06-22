@@ -2,7 +2,6 @@
 
 /** @import { TypeUserRead } from '#routes/api/user/schemas/schema-user-read.js' */
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeUserRead } from '../../../routes/api/user/schemas/schema-user-read.js' */
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
