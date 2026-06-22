@@ -60,7 +60,7 @@ export async function deleteAdminUser (fastify, _opts) {
         } catch (err) {
           if (!isStripeResourceMissingError(err)) {
             request.log.error({ err, targetUserId, customerId }, 'Failed to cancel Stripe subscriptions during user deletion')
-            throw err
+            return reply.internalServerError('Failed to cancel Stripe subscriptions during user deletion.')
           }
           request.log.info({ targetUserId, customerId }, 'Stripe customer missing while canceling subscriptions; continuing user deletion')
         }
@@ -70,7 +70,7 @@ export async function deleteAdminUser (fastify, _opts) {
         } catch (err) {
           if (!isStripeResourceMissingError(err)) {
             request.log.error({ err, targetUserId, customerId }, 'Failed to delete Stripe customer during user deletion')
-            throw err
+            return reply.internalServerError('Failed to delete Stripe customer during user deletion.')
           }
           request.log.info({ targetUserId, customerId }, 'Stripe customer already deleted; continuing user deletion')
         }
