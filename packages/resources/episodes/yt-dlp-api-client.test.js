@@ -50,8 +50,8 @@ test('YTDLPAPIError classifies 5xx unified failures as retryable', async () => {
       url: 'https://www.youtube.com/watch?v=abc123',
       medium: 'video',
       ytDLPEndpoint: endpoint,
-      cache: undefined,
       maxRetries: 0,
+      dispatcher: mockAgent,
     }),
     (err) => {
       assert.ok(err instanceof YTDLPAPIError)
@@ -81,7 +81,7 @@ test('YTDLPAPIError classifies 4xx unified failures as permanent', async () => {
       url: 'https://example.com/video',
       medium: 'audio',
       ytDLPEndpoint: endpoint,
-      cache: undefined,
+      dispatcher: mockAgent,
     }),
     (err) => {
       assert.ok(err instanceof YTDLPAPIError)
@@ -111,7 +111,7 @@ test('YTDLPAPIError preserves discover endpoint failures', async () => {
       url: 'https://example.com/video',
       medium: 'video',
       ytDLPEndpoint: endpoint,
-      cache: undefined,
+      dispatcher: mockAgent,
     }),
     (err) => {
       assert.ok(err instanceof YTDLPAPIError)
@@ -119,6 +119,61 @@ test('YTDLPAPIError preserves discover endpoint failures', async () => {
       assert.equal(err.endpointType, 'discover')
       assert.equal(err.retryable, true)
       assert.equal(err.permanent, false)
+      return true
+    }
+  )
+})
+
+test('YTDLPAPIError handles empty unified error responses', async () => {
+  const { mockAgent, endpoint } = setupMockYTDLPAPI()
+  const pool = mockAgent.get('https://ytdlp.example.test')
+
+  pool.intercept({
+    method: 'GET',
+    path: '/unified?url=https%3A%2F%2Fexample.com%2Fempty-error&format=video',
+  }).reply(500, '')
+
+  await assert.rejects(
+    getYTDLPMetadata({
+      url: 'https://example.com/empty-error',
+      medium: 'video',
+      ytDLPEndpoint: endpoint,
+      maxRetries: 0,
+      dispatcher: mockAgent,
+    }),
+    (err) => {
+      assert.ok(err instanceof YTDLPAPIError)
+      assert.equal(err.statusCode, 500)
+      assert.equal(err.description, 'Unknown yt-dlp-api error')
+      assert.equal(err.endpointType, 'unified')
+      assert.equal(err.retryable, true)
+      return true
+    }
+  )
+})
+
+test('YTDLPAPIError handles non-JSON discover error responses', async () => {
+  const { mockAgent, endpoint } = setupMockYTDLPAPI()
+  const pool = mockAgent.get('https://ytdlp.example.test')
+
+  pool.intercept({
+    method: 'GET',
+    path: '/discover?url=https%3A%2F%2Fexample.com%2Fhtml-error&format=audio',
+  }).reply(503, '<html>Service Unavailable</html>')
+
+  await assert.rejects(
+    getYTDLPDiscoveryMetadata({
+      url: 'https://example.com/html-error',
+      medium: 'audio',
+      ytDLPEndpoint: endpoint,
+      dispatcher: mockAgent,
+    }),
+    (err) => {
+      assert.ok(err instanceof YTDLPAPIError)
+      assert.equal(err.statusCode, 503)
+      assert.equal(err.description, '<html>Service Unavailable</html>')
+      assert.equal(err.endpointType, 'discover')
+      assert.equal(err.retryable, true)
       return true
     }
   )
