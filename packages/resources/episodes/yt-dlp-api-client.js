@@ -1,5 +1,13 @@
-import { request as undiciRequest } from 'undici'
+import { Agent, request as undiciRequest } from 'undici'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
+
+/** @import { Dispatcher } from 'undici' */
+
+const ytdlpDispatcher = new Agent({
+  connect: {
+    autoSelectFamily: true,
+  },
+})
 
 // TODO: move the shared elements of this back into breadcrum
 
@@ -113,6 +121,7 @@ export function isRetryableYTDLPStatus (statusCode) {
     }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 3 for YouTube, 0 for others)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
+ * @param  {Dispatcher} [params.dispatcher] Optional undici dispatcher, primarily for tests.
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
 export async function getYTDLPMetadata ({
@@ -123,6 +132,7 @@ export async function getYTDLPMetadata ({
   cache,
   maxRetries,
   retryDelayMs = 5000,
+  dispatcher,
 }) {
   const parsedUrl = new URL(url)
   const isYouTube = isYouTubeUrl(parsedUrl)
@@ -140,6 +150,7 @@ export async function getYTDLPMetadata ({
         ytDLPEndpoint,
         attempt: attempt + retryAttempt,
         cache,
+        dispatcher,
       })
     } catch (err) {
       lastError = err
@@ -164,9 +175,10 @@ export async function getYTDLPMetadata ({
  * @param  {string} params.ytDLPEndpoint The configured yt-dlp-api endpoint
  * @param  {Number} [params.attempt]      Cache busting attempt number
  * @param  {{
-      get(key: object): Promise<unknown>;
-      set(key: object, value: unknown, ttl?: number): Promise<void>;
-    }} [params.cache]         The cache instance
+    get(key: object): Promise<unknown>;
+    set(key: object, value: unknown, ttl?: number): Promise<void>;
+  }|undefined} [params.cache]         The cache instance
+ * @param  {Dispatcher|undefined} [params.dispatcher] Optional undici dispatcher.
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
 async function getYTDLPMetadataAttempt ({
@@ -175,6 +187,7 @@ async function getYTDLPMetadataAttempt ({
   ytDLPEndpoint,
   attempt = 0,
   cache,
+  dispatcher,
 }) {
   const cacheKey = {
     type: 'unified',
@@ -200,12 +213,11 @@ async function getYTDLPMetadataAttempt ({
       Accept: 'application/json',
       Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password),
     },
-    // @ts-ignore
-    autoSelectFamily: true,
+    dispatcher: dispatcher ?? ytdlpDispatcher,
   })
 
   if (response.statusCode !== 200) {
-    const body = parseYTDLPErrorBody(await response.body.json())
+    const body = await parseYTDLPErrorResponseBody(response.body)
     throw new YTDLPAPIError({
       statusCode: response.statusCode,
       description: body.description,
@@ -238,6 +250,7 @@ async function getYTDLPMetadataAttempt ({
     }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 0)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
+ * @param  {Dispatcher} [params.dispatcher] Optional undici dispatcher, primarily for tests.
  * @return {Promise<YTDLPDiscoveryMetadata>}
  */
 export async function getYTDLPDiscoveryMetadata ({
@@ -248,6 +261,7 @@ export async function getYTDLPDiscoveryMetadata ({
   cache,
   maxRetries,
   retryDelayMs = 5000,
+  dispatcher,
 }) {
   // Discovery is fast and reliable for all sources — no YouTube-specific retry needed.
   // pg-boss handles job-level retries for workers; callers can pass maxRetries to override.
@@ -263,6 +277,7 @@ export async function getYTDLPDiscoveryMetadata ({
         ytDLPEndpoint,
         attempt: attempt + retryAttempt,
         cache,
+        dispatcher,
       })
     } catch (err) {
       lastError = err
@@ -285,9 +300,10 @@ export async function getYTDLPDiscoveryMetadata ({
  * @param  {string} params.ytDLPEndpoint
  * @param  {Number} [params.attempt]
  * @param  {{
-      get(key: object): Promise<unknown>;
-      set(key: object, value: unknown, ttl?: number): Promise<void>;
-    }} [params.cache]
+    get(key: object): Promise<unknown>;
+    set(key: object, value: unknown, ttl?: number): Promise<void>;
+  }|undefined} [params.cache]
+ * @param  {Dispatcher|undefined} [params.dispatcher] Optional undici dispatcher.
  * @return {Promise<YTDLPDiscoveryMetadata>}
  */
 async function getYTDLPDiscoveryMetadataAttempt ({
@@ -296,6 +312,7 @@ async function getYTDLPDiscoveryMetadataAttempt ({
   ytDLPEndpoint,
   attempt = 0,
   cache,
+  dispatcher,
 }) {
   const cacheKey = {
     type: 'discover',
@@ -321,12 +338,11 @@ async function getYTDLPDiscoveryMetadataAttempt ({
       Accept: 'application/json',
       Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password),
     },
-    // @ts-ignore
-    autoSelectFamily: true,
+    dispatcher: dispatcher ?? ytdlpDispatcher,
   })
 
   if (response.statusCode !== 200) {
-    const body = parseYTDLPErrorBody(await response.body.json())
+    const body = await parseYTDLPErrorResponseBody(response.body)
     throw new YTDLPAPIError({
       statusCode: response.statusCode,
       description: body.description,
@@ -351,6 +367,27 @@ function getFormatArg (medium) {
   if (!['video', 'audio'].includes(medium)) throw new Error('format must be video or audio')
 
   return medium
+}
+
+/**
+ * @param {{ text(): Promise<string> }} body
+ * @returns {Promise<{ description: string, code: string|number|null }>}
+ */
+async function parseYTDLPErrorResponseBody (body) {
+  const text = await body.text()
+
+  if (!text) {
+    return parseYTDLPErrorBody(null)
+  }
+
+  try {
+    return parseYTDLPErrorBody(JSON.parse(text))
+  } catch {
+    return {
+      description: text,
+      code: null,
+    }
+  }
 }
 
 /**
