@@ -9,6 +9,20 @@ import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '@breadcrum/resources/bookmarks/normalize-url.js'
 
+export const maxBookmarkTitleLength = 255
+
+/**
+ * Derive a bookmark title that satisfies the database title length constraint.
+ *
+ * @param {string | undefined} submittedTitle
+ * @param {string} fallbackTitle
+ * @returns {string}
+ */
+export function getBookmarkCreateTitle (submittedTitle, fallbackTitle) {
+  const title = submittedTitle || fallbackTitle
+  return Array.from(title).slice(0, maxBookmarkTitleLength).join('')
+}
+
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
  *   SerializerSchemaOptions: {
@@ -159,7 +173,7 @@ export async function putBookmarks (fastify, _opts) {
         }
 
         // Title will fallback to just being the URL on create
-        const workingTitle = submittedTitle || workingUrlString
+        const workingTitle = getBookmarkCreateTitle(submittedTitle, workingUrlString)
 
         const bookmark = await createBookmark({
           fastify,
