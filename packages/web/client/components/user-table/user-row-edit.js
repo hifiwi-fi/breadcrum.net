@@ -165,19 +165,19 @@ export const UserRowEdit = ({
 
           <div class="bc-user-edit-flags">
             <label class="bc-user-flag">
-              <input type="checkbox" name="email_confirmed" checked="${u.email_confirmed}" />
+              <input type="checkbox" name="email_confirmed" checked=${u.email_confirmed} />
               <span>Email confirmed</span>
             </label>
             <label class="bc-user-flag">
-              <input type="checkbox" name="newsletter_subscription" checked="${u.newsletter_subscription}" />
+              <input type="checkbox" name="newsletter_subscription" checked=${u.newsletter_subscription} />
               <span>Newsletter subscribed</span>
             </label>
             <label class="bc-user-flag">
-              <input type="checkbox" name="disabled_email" checked="${u.disabled_email}" />
+              <input type="checkbox" name="disabled_email" checked=${u.disabled_email} />
               <span>Email disabled</span>
             </label>
             <label class="bc-user-flag">
-              <input type="checkbox" name="disabled" checked="${u.disabled}" />
+              <input type="checkbox" name="disabled" checked=${u.disabled} />
               <span>Account disabled</span>
             </label>
           </div>
