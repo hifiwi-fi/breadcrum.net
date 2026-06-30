@@ -84,7 +84,7 @@ jobs:
           PGUSER: postgres
       - name: Restore GeoIP cache
         id: cache-geoip-restore
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: packages/web/data/geoip
           key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
@@ -99,7 +99,7 @@ jobs:
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
       - name: Save GeoIP cache
         if: steps.update-geoip.outcome == 'success'
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: packages/web/data/geoip
           key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
