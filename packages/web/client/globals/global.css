@@ -5,8 +5,10 @@
 @import "../components/header";
 @import "../components/footer";
 
-@view-transition {
-  navigation: auto;
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 :root {
