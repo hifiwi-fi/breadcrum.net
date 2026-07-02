@@ -7,6 +7,7 @@ import 'fragmentions'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
+import { isSkippedViewTransitionAbortError } from './sentry-filters.js'
 
 const sentryDsn = process.env['SENTRY_BROWSER_DSN']
 
@@ -18,6 +19,11 @@ if (sentryDsn) {
     dataCollection: {
       // userInfo: false,
       // httpBodies: [],
+    },
+    beforeSend (event, hint) {
+      if (isSkippedViewTransitionAbortError(event, hint)) return null
+
+      return event
     },
   })
 }
