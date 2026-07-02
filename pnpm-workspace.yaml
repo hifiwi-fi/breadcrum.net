@@ -20,7 +20,7 @@ catalog:
   "@opentelemetry/instrumentation-runtime-node": ^0.32.0
   "@opentelemetry/sdk-node": ^0.219.0
   "@sentry/node": ^10.58.0
-  "@types/node": ^26.0.0
+  "@types/node": ^26.1.0
   "@types/jsdom": ^28.0.3
   "@types/pg": ^8.11.10
   "@voxpelli/tsconfig": ^16.2.1
