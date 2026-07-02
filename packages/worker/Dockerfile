@@ -13,8 +13,8 @@ FROM alpine:3.24 AS base
 LABEL maintainer="HifiWifi"
 LABEL fly_launch_runtime="Fastify"
 
-# Install Node.js and pnpm from Alpine packages
-RUN apk add --no-cache nodejs pnpm
+# Install current Node.js from Alpine packages. The default nodejs package is older.
+RUN apk add --no-cache nodejs-current pnpm
 
 # Set the working directory
 WORKDIR /usr/src/app
