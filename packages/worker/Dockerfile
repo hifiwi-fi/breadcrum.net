@@ -43,7 +43,8 @@ RUN pnpm install --frozen-lockfile
 COPY --link . .
 
 # Deploy worker package to a standalone directory
-RUN pnpm --filter=@breadcrum/worker deploy --prod ./deploy/worker
+# Remove --legacy when re-enabling injectWorkspacePackages.
+RUN pnpm --filter=@breadcrum/worker deploy --legacy --prod ./deploy/worker
 
 # Final stage for app image
 FROM base

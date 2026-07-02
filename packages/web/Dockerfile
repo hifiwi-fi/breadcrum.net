@@ -53,7 +53,8 @@ COPY --link . .
 RUN pnpm run build
 
 # Deploy web package to a standalone directory
-RUN pnpm --filter=@breadcrum/web deploy --prod ./deploy/web
+# Remove --legacy when re-enabling injectWorkspacePackages.
+RUN pnpm --filter=@breadcrum/web deploy --legacy --prod ./deploy/web
 
 # Final stage for app image
 FROM base
