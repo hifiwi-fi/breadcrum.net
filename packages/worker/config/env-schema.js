@@ -6,6 +6,7 @@
  */
 
 import { mergeEnvSchemas } from '@breadcrum/resources/fastify-common/env-schema.js'
+import { billingEnvSchema } from '#plugins/billing.js'
 import { otelMetricsEnvSchema } from '#plugins/otel-metrics.js'
 import { pgEnvSchema } from '#plugins/pg.js'
 import { pgbossEnvSchema } from '#plugins/pgboss.js'
@@ -13,6 +14,7 @@ import { redisEnvSchema } from '#plugins/redis.js'
 import { sentryEnvSchema } from '#plugins/sentry.js'
 
 const pluginEnvSchemas = /** @type {const} @satisfies {readonly EnvSchemaFragment[]} */ ([
+  billingEnvSchema,
   otelMetricsEnvSchema,
   pgEnvSchema,
   pgbossEnvSchema,

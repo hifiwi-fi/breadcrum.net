@@ -8,6 +8,9 @@ import type {
 import type {
   ResolveBookmarkPgBossQ
 } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
+import type {
+  SyncSubscriptionPgBossQ
+} from '@breadcrum/resources/billing/sync-subscription-queue.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -18,6 +21,7 @@ declare module 'fastify' {
         resolveEpisodeQ: ResolveEpisodePgBossQ
         resolveArchiveQ: ResolveArchivePgBossQ
         resolveBookmarkQ: ResolveBookmarkPgBossQ
+        syncSubscriptionQ: SyncSubscriptionPgBossQ
       }
     }
   }

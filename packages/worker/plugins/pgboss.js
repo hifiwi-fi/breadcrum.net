@@ -4,6 +4,7 @@
  * @import { ResolveBookmarkPgBossW } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
  * @import { CleanupAuthTokensPgBossW } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
  * @import { CleanupStaleResolutionsPgBossW } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
+ * @import { SyncSubscriptionPgBossW } from '@breadcrum/resources/billing/sync-subscription-queue.js'
  * @import { WorkHandler } from '@breadcrum/resources/pgboss/types.js'
  * @import { JSONSchema } from 'json-schema-to-ts'
  */
@@ -15,6 +16,7 @@ import { resolveArchiveQName, createResolveArchiveQ } from '@breadcrum/resources
 import { resolveBookmarkQName, createResolveBookmarkQ } from '@breadcrum/resources/bookmarks/resolve-bookmark-queue.js'
 import { cleanupAuthTokensQName, createCleanupAuthTokensQ } from '@breadcrum/resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { cleanupStaleResolutionsQName, createCleanupStaleResolutionsQ } from '@breadcrum/resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
+import { syncSubscriptionQName, createSyncSubscriptionQ } from '@breadcrum/resources/billing/sync-subscription-queue.js'
 import { startPGBoss } from '@breadcrum/resources/pgboss/start-pgboss.js'
 import { getSentryUserFromPgBossJobData } from '@breadcrum/resources/fastify-common/sentry-user-context.js'
 
@@ -23,6 +25,7 @@ import { makeArchivePgBossP } from '../workers/archives/index.js'
 import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
 import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
 import { makeStaleResolutionCleanupP } from '../workers/stale-resolutions/index.js'
+import { makeSyncSubscriptionP } from '../workers/billing/sync-subscription.js'
 
 export const pgbossEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   properties: {
@@ -53,6 +56,7 @@ export default fp(async function (fastify, _opts) {
     resolveBookmarkQ: await createResolveBookmarkQ({ boss }),
     cleanupAuthTokensQ: await createCleanupAuthTokensQ({ boss }),
     cleanupStaleResolutionsQ: await createCleanupStaleResolutionsQ({ boss }),
+    syncSubscriptionQ: await createSyncSubscriptionQ({ boss }),
   }
   fastify.log.info('pg-boss queues created')
 
@@ -102,12 +106,17 @@ export default fp(async function (fastify, _opts) {
   /** @type {CleanupStaleResolutionsPgBossW} */
   const cleanupStaleResolutionsWorker = await boss.work(cleanupStaleResolutionsQName, maybeWrapWorker(cleanupStaleResolutionsQName, makeStaleResolutionCleanupP({ fastify })))
 
+  // Create subscription sync worker (webhook-triggered)
+  /** @type {SyncSubscriptionPgBossW} */
+  const syncSubscriptionWorker = await boss.work(syncSubscriptionQName, maybeWrapWorker(syncSubscriptionQName, makeSyncSubscriptionP({ fastify })))
+
   const workers = {
     [resolveEpisodeQName]: episodeWorkers,
     [resolveArchiveQName]: archiveWorkers,
     [resolveBookmarkQName]: bookmarkWorkers,
     [cleanupAuthTokensQName]: [cleanupAuthTokensWorker],
     [cleanupStaleResolutionsQName]: [cleanupStaleResolutionsWorker],
+    [syncSubscriptionQName]: [syncSubscriptionWorker],
   }
 
   const pgboss = {
@@ -149,7 +158,7 @@ export default fp(async function (fastify, _opts) {
   })
 },
 {
-  dependencies: ['env', 'pg', 'otel-metrics'],
+  dependencies: ['env', 'pg', 'otel-metrics', 'billing'],
   name: 'pgboss',
 })
 

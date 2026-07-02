@@ -58,6 +58,7 @@
     "preact": "^10.29.2",
     "preact-render-to-string": "^6.6.3",
     "resolve-email": "^4.0.45",
+    "stripe": "catalog:",
     "undici": "catalog:",
     "useragent": "^2.3.0"
   },
