@@ -8,6 +8,8 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 1
 
   - package-ecosystem: "npm"
     directory: "/" # Covers all workspaces
@@ -15,6 +17,8 @@ updates:
     schedule:
       interval: "cron"
       cronjob: "0 0 * * *"
+    cooldown:
+      default-days: 1
     ignore:
       - dependency-name: "*"
         update-types:
@@ -46,9 +50,13 @@ updates:
     directory: "/packages/worker"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 1
 
   # Server
   - package-ecosystem: "docker"
     directory: "/packages/web"
     schedule:
       interval: "daily"
+    cooldown:
+      default-days: 1
