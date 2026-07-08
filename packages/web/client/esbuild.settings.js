@@ -1,5 +1,5 @@
 /**
- * @import { BuildOptions } from '@domstack/static'
+ * @import { BuildOptions } from '@domstack/static/types.ts'
  */
 
 /**

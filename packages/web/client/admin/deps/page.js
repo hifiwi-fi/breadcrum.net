@@ -1,4 +1,4 @@
-/** @import { AsyncPageFunction } from '@domstack/static' */
+/** @import { AsyncPageFunction } from '@domstack/static/types.ts' */
 /** @import { RootLayoutVars, PageReturn } from '../../layouts/root/root.layout.js' */
 import { html } from 'htm/preact'
 import { exec } from 'node:child_process'

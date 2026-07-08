@@ -1,4 +1,4 @@
-/** @import { LayoutFunction } from '@domstack/static' */
+/** @import { LayoutFunction } from '@domstack/static/types.ts' */
 /** @import { GlobalVars } from '../../globals/global.vars.js' */
 /** @import { VNode } from 'preact' */
 

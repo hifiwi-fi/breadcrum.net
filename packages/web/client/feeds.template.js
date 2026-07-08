@@ -1,5 +1,5 @@
 /**
- * @import { TemplateAsyncIterator } from '@domstack/static'
+ * @import { TemplateAsyncIterator } from '@domstack/static/types.ts'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
 import pMap from 'p-map'

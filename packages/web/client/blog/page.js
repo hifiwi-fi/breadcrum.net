@@ -1,4 +1,4 @@
-/** @import { PageFunction } from '@domstack/static' */
+/** @import { PageFunction } from '@domstack/static/types.ts' */
 /** @import { BlogIndexVars } from '../layouts/blog-index/blog-index.layout.js' */
 /** @import { PageReturn } from '../layouts/root/root.layout.js' */
 import { html } from 'htm/preact'

@@ -1,5 +1,5 @@
 /**
- * @import { LayoutFunction } from '@domstack/static'
+ * @import { LayoutFunction } from '@domstack/static/types.ts'
  * @import { BlogIndexVars } from './blog-index.layout.js'
  * @import { PageReturn } from '../root/root.layout.js'
  */
