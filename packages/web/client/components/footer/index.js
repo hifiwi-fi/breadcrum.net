@@ -76,6 +76,10 @@ export const Footer = ({
       <img height="16" width="16" src="/static/bsky.svg" alt="Bsky icon" />
     </a>
     <div>🇺🇸</div>
+    <div class="bc-footer-connection" data-connection-status data-online="true" aria-live="polite" title="Connection status: online">
+          <span class="bc-footer-connection-dot" data-connection-status-dot aria-hidden="true"></span>
+          <span data-connection-status-label>Online</span>
+        </div>
   </footer>
   `
 }

@@ -74,6 +74,10 @@
   background-color: var(--accent-midground);
 }
 
+.bc-header-service-notice--pwa-update {
+  background-color: var(--accent-background);
+}
+
 .bc-header-service-notice-dismiss {
   border: 1px solid currentColor;
   background: transparent;

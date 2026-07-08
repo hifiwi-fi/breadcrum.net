@@ -29,6 +29,28 @@
   align-items: center;
 }
 
+.bc-footer-connection {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35em;
+}
+
+.bc-footer-connection-dot {
+  background-color: var(--accent-midground);
+  border-radius: 50%;
+  display: inline-block;
+  height: 0.65em;
+  width: 0.65em;
+}
+
+.bc-footer-connection[data-online="true"] .bc-footer-connection-dot {
+  background-color: #1a7f37;
+}
+
+.bc-footer-connection[data-online="false"] .bc-footer-connection-dot {
+  background-color: #cf222e;
+}
+
 /* fairly arbitrary. Just make sure the content justification */
 @media screen and (max-width: 500px) {
   .bc-footer {

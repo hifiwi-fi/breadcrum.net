@@ -47,6 +47,7 @@
     "build": "pnpm run -r build",
     "migrate": "pnpm run -r migrate",
     "start": "pnpm run watch",
+    "serve": "pnpm run --filter @breadcrum/web serve",
     "deploy-all": "run-s deploy:*",
     "deploy:web": "./scripts/deploy-with-sentry.sh ./packages/web/fly.toml ./packages/web/Dockerfile",
     "deploy:worker": "./scripts/deploy-with-sentry.sh ./packages/worker/fly.toml ./packages/worker/Dockerfile",

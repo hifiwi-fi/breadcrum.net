@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "1.0.13",
-    "@domstack/static": "^11.0.2",
+    "@domstack/static": "link:../../../domstack",
     "@fastify/type-provider-json-schema-to-ts": "catalog:",
     "@types/common-tags": "^1.8.4",
     "@types/node": "catalog:",
@@ -86,6 +86,11 @@
     "p-map": "^7.0.0",
     "type-fest": "catalog:",
     "typescript": "catalog:",
+    "workbox-core": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-recipes": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1",
     "xmlbuilder": "^15.1.1"
   },
   "engines": {
@@ -93,11 +98,12 @@
   },
   "scripts": {
     "build": "run-s clean && run-p build:*",
-    "build:domstack": "dom --src client --dest public",
+    "build:domstack": "dom --src client --dest public --domstackManifest",
     "clean": "rm -rf public && mkdir -p public",
     "migrate": "postgrator",
     "generate-default-env": "node scripts/generate-default-env.js",
     "prod-sim": "fastify start -l info app.js --address 0.0.0.0 --import otel.js",
+    "serve": "run-s clean build:domstack prod-sim",
     "start": "run-s watch",
     "test": "run-s test:*",
     "test:eslint": "eslint . --ignore-pattern 'public/*'",
@@ -118,6 +124,7 @@
     "#layouts/*": "./client/layouts/*",
     "#plugins/*": "./plugins/*",
     "#routes/*": "./routes/*",
+    "#service-worker-settings": "./client/globals/service-worker/service-worker-settings.ts",
     "#test/*": "./test/*",
     "#types/*.js": "./types/*.ts"
   }

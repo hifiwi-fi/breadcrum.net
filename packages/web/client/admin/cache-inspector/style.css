@@ -1,0 +1,58 @@
+.bc-cache-inspector {
+  display: grid;
+  gap: 1rem;
+}
+
+.bc-cache-inspector-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bc-cache-inspector-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+}
+
+.bc-cache-inspector-summary div {
+  border: 1px dotted var(--accent-midground);
+  border-radius: 0.35rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.bc-cache-inspector-summary dt {
+  color: var(--accent-foreground);
+  font-size: var(--small-font-size);
+}
+
+.bc-cache-inspector-summary dd {
+  margin: 0;
+}
+
+.bc-cache-inspector-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.bc-cache-inspector-cache {
+  border: 1px dotted var(--accent-midground);
+  border-radius: 0.35rem;
+  padding: 0.75rem;
+}
+
+.bc-cache-inspector-cache summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bc-cache-inspector-cache ol {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+  padding-left: 1.5rem;
+}

@@ -9,5 +9,6 @@ noindex: true
 - [Redis Cache](./redis-cache/)
 - [Stats](./stats/)
 - [Deps](./deps/)
+- [Cache Inspector](./cache-inspector/)
 - [pg-boss Queue Dashboard](./pgboss/)
 - [Status Page Reports](https://uptime.betterstack.com/team/111238/status-pages/159520/reports)

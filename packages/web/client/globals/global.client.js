@@ -7,6 +7,7 @@ import 'fragmentions'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
+import { initializePwa } from './pwa-runtime.js'
 import { isSkippedViewTransitionAbortError } from './sentry-filters.js'
 
 const sentryDsn = process.env['SENTRY_BROWSER_DSN']
@@ -38,12 +39,32 @@ if (typeof window !== 'undefined') {
   }
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(registration => {
-      console.log('Service Worker registered successfully:', registration.scope)
-    })
-    .catch(error => {
-      console.error('Service Worker registration failed:', error)
-    })
+initializeConnectionStatus()
+
+initializePwa().catch(err => {
+  console.error('PWA initialization failed:', err)
+})
+
+/** Update the footer online/offline indicator. */
+function initializeConnectionStatus () {
+  const status = document.querySelector('[data-connection-status]')
+  const label = document.querySelector('[data-connection-status-label]')
+
+  if (!(status instanceof HTMLElement) || !(label instanceof HTMLElement)) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeConnectionStatus, { once: true })
+    }
+    return
+  }
+
+  const update = () => {
+    const online = navigator.onLine
+    status.dataset['online'] = String(online)
+    label.textContent = online ? 'Online' : 'Offline'
+    status.title = online ? 'Connection status: online' : 'Connection status: offline'
+  }
+
+  update()
+  window.addEventListener('online', update)
+  window.addEventListener('offline', update)
 }
