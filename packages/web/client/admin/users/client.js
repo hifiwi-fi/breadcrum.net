@@ -3,24 +3,23 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useCallback } from 'preact/hooks'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 import { useWindow } from '../../hooks/useWindow.js'
 import { UserTable } from '../../components/user-table/user-table.js'
 import { useAdminUsers } from '../../hooks/use-admin-users.js'
 import { tc } from '../../lib/typed-component.js'
 import { PaginationButtons } from '../../components/pagination-buttons/index.js'
+import { mountPage } from '../../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParams([])
   const {
     usersLoading,
     usersError,
     users,
-    reloadAdminUsers,
     beforeParams,
     afterParams
   } = useAdminUsers()
@@ -39,7 +38,7 @@ export const Page = () => {
     ${usersLoading && !Array.isArray(users) ? html`<div>...</div>` : null}
     ${usersError ? html`<div>${usersError.message}</div>` : null}
     ${Array.isArray(users)
-      ? tc(UserTable, { users, reload: reloadAdminUsers, onDelete: reloadAdminUsers })
+      ? tc(UserTable, { users })
       : null
     }
 
@@ -47,9 +46,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${Page}/>`, container)
-  }
-}
+mountPage(Page)

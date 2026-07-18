@@ -7,7 +7,8 @@
  */
 
 import { html } from 'htm/preact'
-import { useRef, useState, useCallback } from 'preact/hooks'
+import { useRef, useState, useCallback, useMemo } from 'preact/hooks'
+import { useMutation, useQueryClient } from '@tanstack/preact-query'
 import { useLSP } from '../../hooks/useLSP.js'
 import { tc } from '../../lib/typed-component.js'
 import { AuthTokenEdit } from './auth-token-edit.js'
@@ -15,14 +16,17 @@ import { AuthTokenEdit } from './auth-token-edit.js'
 /**
  * @typedef {object} AuthTokenManageCreateFieldProps
  * @property {() => void} handleCancelEditMode
- * @property {() => void} reload
  */
 
 /**
  * @type {FunctionComponent<AuthTokenManageCreateFieldProps>}
  */
-export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => {
+export const ManageAuthTokenCreateField = ({ handleCancelEditMode }) => {
   const state = useLSP()
+  const queryClient = useQueryClient()
+  const authTokensQueryKeyPrefix = useMemo(() => (
+    ['auth-tokens', state.user?.id, state.apiUrl]
+  ), [state.apiUrl, state.user?.id])
   const [newToken, setNewToken] = useState(/** @type {TypeAuthTokenCreateResponseClient | null} */(null))
   const copyButton = useRef()
 
@@ -31,24 +35,29 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => 
     handleCancelEditMode()
   }, [handleCancelEditMode])
 
-  const handleCreateSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */{ note, protect }) => {
-    const endpoint = `${state.apiUrl}/user/auth-tokens`
-    const response = await fetch(endpoint, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({ note, protect }),
-    })
-
-    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
-      const data = await response.json()
-      setNewToken(data)
-      reload()
-    } else {
+  const createMutation = useMutation({
+    mutationFn: async (/** @type {TypeAuthTokenUpdate} */ { note, protect }) => {
+      const response = await fetch(`${state.apiUrl}/user/auth-tokens`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({ note, protect }),
+      })
+      if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+        return await response.json()
+      }
       throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-    }
-  }, [state.apiUrl])
+    },
+    onSuccess: (data) => {
+      setNewToken(data)
+      queryClient.invalidateQueries({ queryKey: authTokensQueryKeyPrefix })
+    },
+  })
+
+  const handleCreateSave = useCallback(async (/** @type {TypeAuthTokenUpdate} */ update) => {
+    await createMutation.mutateAsync(update)
+  }, [createMutation])
 
   const handleNewTokenSelect = useCallback(async (/** @type{MouseEvent & {currentTarget: HTMLInputElement}} */ev) => {
     ev.currentTarget?.select()
@@ -83,7 +92,7 @@ export const ManageAuthTokenCreateField = ({ handleCancelEditMode, reload }) => 
             defaultValue="${newToken.token}"
           />
           <button type="button" ref=${copyButton} onClick=${handleNewTokenCopy}>Copy</button>
-          <button type="button" onClick="${handleHideNewToken}">Hide</button>
+          <button type="button" onClick=${handleHideNewToken}>Hide</button>
         </div>
         <div class="bc-help-text bc-token-create-copy-help-text">
           ℹ️ New auth token created. Save it in a safe place as it will never be shown again.
