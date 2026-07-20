@@ -429,8 +429,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.4
       mine.css:
-        specifier: ^10.0.0
-        version: 10.0.3
+        specifier: ^11.0.7
+        version: 11.0.7
       neostandard:
         specifier: 'catalog:'
         version: 0.13.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
@@ -3691,6 +3691,10 @@ packages:
 
   mine.css@10.0.3:
     resolution: {integrity: sha512-fMzRcnC7fr7vEYUDRrFN1+7cbidaQARp6g0v0cEIhgq5bRxVyJsSLm2ltLixAmp3WB1zvvCI1MFRZe+zRRR+MA==}
+
+  mine.css@11.0.7:
+    resolution: {integrity: sha512-l+EehT3M0jinLxKzb+1jBnY3G4CjJsdckmr3GfzG+AqSZbjVwUPKEejgpYFFws2PyvXqj4/Gi2oDE+t0wKGJjQ==}
+    engines: {node: '>=22', npm: '>=10'}
 
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
@@ -8509,6 +8513,8 @@ snapshots:
   mimic-function@5.0.1: {}
 
   mine.css@10.0.3: {}
+
+  mine.css@11.0.7: {}
 
   minimalistic-assert@1.0.1: {}
 
