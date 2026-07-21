@@ -54,7 +54,7 @@
     "jsonfeed-to-rss": "^3.0.8",
     "nodemailer": "^9.0.1",
     "pg": "catalog:",
-    "postgrator-cli": "^9.0.0",
+    "postgrator-cli": "^10.0.0",
     "preact": "^10.29.2",
     "preact-render-to-string": "^6.6.3",
     "resolve-email": "^4.0.45",

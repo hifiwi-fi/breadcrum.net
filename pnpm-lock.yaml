@@ -356,8 +356,8 @@ importers:
         specifier: 'catalog:'
         version: 8.22.0
       postgrator-cli:
-        specifier: ^9.0.0
-        version: 9.1.0(pg@8.22.0)
+        specifier: ^10.0.0
+        version: 10.0.0(pg@8.22.0)
       preact:
         specifier: ^10.29.2
         version: 10.29.3
@@ -4068,23 +4068,20 @@ packages:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
 
-  postgrator-cli@9.1.0:
-    resolution: {integrity: sha512-dfw4me03k73zqV3aPxL4M+Qs2Q5syjSLCEpwz/++xHHnuxojKoW/4Lxt6LCaHeFkYDiXrLOGd1CW3F46smIk2w==}
-    engines: {node: ^20.11.0 || >=22.0.0}
+  postgrator-cli@10.0.0:
+    resolution: {integrity: sha512-56+q/rrvKF4fOabhkLrMZfuA70Sg2infLnYAiGZosq4wIEA1Xni+rY2Obh7g4Q96YzOO8AggnjEQMj5IB5CR1g==}
+    engines: {node: ^22.16.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
       mssql: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0
       mysql: ^2.0.0
       pg: ^8.0.0
-      sqlite3: ^5.0.0
     peerDependenciesMeta:
       mssql:
         optional: true
       mysql:
         optional: true
       pg:
-        optional: true
-      sqlite3:
         optional: true
 
   postgrator@8.0.0:
@@ -8944,7 +8941,7 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postgrator-cli@9.1.0(pg@8.22.0):
+  postgrator-cli@10.0.0(pg@8.22.0):
     dependencies:
       command-line-args: 6.0.2
       command-line-usage: 7.0.4
