@@ -1,5 +1,9 @@
 # Agent Development Notes
 
+Write Markdown prose with one sentence per source line.
+Use one newline between sentences to keep them in the same paragraph.
+Use two newlines to start a new paragraph.
+
 This is a TypeScript-in-JavaScript type checked codebase. All code uses JSDoc comments for type annotations and is type-checked by TypeScript without requiring .ts files.
 
 ## JSDoc Typing Patterns

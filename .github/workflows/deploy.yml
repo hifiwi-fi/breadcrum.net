@@ -16,6 +16,8 @@ env:
   FORCE_COLOR: 1
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
 
+permissions: {}
+
 concurrency:
   group: flyctl-deploy
   cancel-in-progress: true
@@ -23,6 +25,8 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     services:
       postgres:
@@ -50,9 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           fetch-depth: 0
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: 11
       - name: Use Node.js
@@ -62,7 +67,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master
       - run: pnpm install --frozen-lockfile
       - name: Upload lockfile
         uses: actions/upload-artifact@v7

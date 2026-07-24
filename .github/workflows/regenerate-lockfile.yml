@@ -3,6 +3,8 @@ name: Regenerate pnpm-lock.yaml
 on:
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   regenerate-lockfile:
     runs-on: ubuntu-latest
@@ -13,9 +15,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+        with:
+          # Keep credentials because the regeneration script pushes its branch.
+          persist-credentials: true
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: 11
 

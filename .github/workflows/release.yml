@@ -15,8 +15,7 @@ on:
         description: "Deploy worker service"
         default: true
 
-permissions:
-  contents: write
+permissions: {}
 
 env:
   FORCE_COLOR: 1
@@ -29,6 +28,8 @@ concurrency:
 jobs:
   version_and_release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     services:
       postgres:
@@ -55,9 +56,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
+          # Keep credentials because npm-bump pushes the release commit and tag.
+          persist-credentials: true
           fetch-depth: 0
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         with:
           version: 11
       - name: Use Node.js
@@ -67,7 +70,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master
       - run: pnpm install --frozen-lockfile
       - name: Upload lockfile
         uses: actions/upload-artifact@v7
@@ -109,14 +112,21 @@ jobs:
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
           SKIP_GEOIP_TESTS: ${{ steps.update-geoip.outcome != 'success' && '1' || '0' }}
       - name: Set NEW_VERSION
+        env:
+          INPUT_NEW_VERSION: ${{ github.event.inputs.newversion }}
+          REPOSITORY_PUSHED_AT: ${{ github.event.repository.pushed_at }}
         run: |
-          if [ -z "${{ github.event.inputs.newversion }}" ]; then
-            echo "NEW_VERSION=$(date -d "${{ github.event.repository.pushed_at }}" +%Y.%m.%d)" >> $GITHUB_ENV
+          if [ -z "$INPUT_NEW_VERSION" ]; then
+            NEW_VERSION=$(date -d "$REPOSITORY_PUSHED_AT" +%Y.%m.%d)
+          elif [[ "$INPUT_NEW_VERSION" =~ ^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$ ]]; then
+            NEW_VERSION=$INPUT_NEW_VERSION
           else
-            echo "NEW_VERSION=${{ github.event.inputs.newversion }}" >> $GITHUB_ENV
+            echo "newversion must use YYYY.M.D format" >&2
+            exit 1
           fi
-          echo $NEW_VERSION
-      - uses: bcomnes/npm-bump@v3
+          echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
+          echo "$NEW_VERSION"
+      - uses: bcomnes/npm-bump@8e67058c250579782ed12d6e591c8d07b7b0cae4 # v3
         with:
           git-email: bcomnes@gmail.com
           git-username: ${{ github.actor }}
