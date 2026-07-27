@@ -19,7 +19,7 @@
         "test/**/*.js",
         "otel.js"
       ],
-      "ignoreDependencies": ["highlight.js"],
+      "ignoreDependencies": ["highlight.js", "mine.css"],
       "ignoreBinaries": [],
       "project": ["**/*.js"]
     },

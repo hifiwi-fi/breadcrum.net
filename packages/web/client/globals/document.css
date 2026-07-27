@@ -32,7 +32,7 @@
   & input[type="time"],
   & input[type="url"],
   & input[type="week"] {
-    font-size: calc(12px + var(--font-size-scale));
+    font-size: calc(var(--font-size-body) - 2px);
   }
 }
 

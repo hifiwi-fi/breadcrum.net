@@ -23,7 +23,7 @@
 }
 
 .bc-logo {
-  font-size: calc(var(--font-size-body) + var(--font-size-scale));
+  font-size: var(--font-size-body);
 }
 
 .bc-header-start,.bc-header-end {
