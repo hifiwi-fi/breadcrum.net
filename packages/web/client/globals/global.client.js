@@ -1,9 +1,6 @@
 /// <reference lib="dom" />
 
 import * as Sentry from '@sentry/browser'
-// @ts-expect-error - No type definitions available for mine.css
-import { toggleTheme } from 'mine.css'
-import 'fragmentions'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
@@ -27,9 +24,6 @@ if (sentryDsn) {
     },
   })
 }
-
-// @ts-expect-error - Adding toggleTheme to global window object
-window.toggleTheme = toggleTheme
 
 if (typeof window !== 'undefined') {
   const container = document.querySelector('.bc-header')

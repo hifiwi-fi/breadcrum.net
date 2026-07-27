@@ -64,6 +64,7 @@ export default function defaultRootLayout ({
     <meta charset="utf-8">
     <title>${title ? `${title}` : ''}${title && siteName ? ' | ' : ''}${siteName}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+    <meta name="color-scheme" content="light dark">
     <meta name="referrer" content="no-referrer">
     <meta name="description" content="${description ?? `${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}">
     <meta itemprop="publisher" content="${siteName}">
