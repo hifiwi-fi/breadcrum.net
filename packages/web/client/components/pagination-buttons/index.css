@@ -27,14 +27,8 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
-.pagination-date-picker {
-  font: inherit;
-  line-height: 1;
-  height: 0.5em;
-  padding: 0;
-  min-width: 0;
+.pagination-buttons input.pagination-date-picker {
+  font-size: 0.75rem;
   width: auto;
-  max-width: 11ch;
-  box-sizing: content-box;
   field-sizing: content;
 }

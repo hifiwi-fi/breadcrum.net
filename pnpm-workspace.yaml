@@ -6,9 +6,10 @@ packages:
 # When turning this back on, remove the --legacy deploy flags in the Dockerfiles.
 injectWorkspacePackages: false
 
-# Allow Dependabot's undici updates through the minimum release age policy.
+# Allow explicitly trusted updates through the minimum release age policy.
 minimumReleaseAgeExclude:
   - undici
+  - mine.css
 
 catalog:
   "@bret/is-youtube-url": ^1.0.5

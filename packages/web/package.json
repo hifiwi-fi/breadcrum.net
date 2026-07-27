@@ -79,7 +79,7 @@
     "highlight.js": "^11.5.0",
     "json-schema-to-ts": "catalog:",
     "local-storage-proxy": "^4.0.3",
-    "mine.css": "^11.0.8",
+    "mine.css": "^11.0.11",
     "neostandard": "catalog:",
     "npm-run-all2": "catalog:",
     "p-map": "^7.0.0",
