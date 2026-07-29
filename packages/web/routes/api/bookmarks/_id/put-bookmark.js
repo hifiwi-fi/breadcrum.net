@@ -268,6 +268,7 @@ export async function putBookmark (fastify, _opts) {
           episodeId,
           url: episodeURL,
           medium: episodeMedium,
+          parentRequestId: request.id,
         }
 
         const resolveEpisodePayload = retryOptions
@@ -297,7 +298,8 @@ export async function putBookmark (fastify, _opts) {
           data: {
             url: archiveURL,
             userId,
-            archiveId
+            archiveId,
+            parentRequestId: request.id,
           }
         })
       }

@@ -204,6 +204,7 @@ export async function putBookmarks (fastify, _opts) {
               resolveBookmark: meta,
               resolveEpisode: episode,
               resolveArchive: archive,
+              parentRequestId: request.id,
               userProvidedMeta: {
                 // If submittedTitle is null, this is treated as a signal
                 // to resolve it when resolveBookmark is true.

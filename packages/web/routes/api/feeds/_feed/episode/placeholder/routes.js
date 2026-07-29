@@ -70,6 +70,7 @@ export default async function placeholderRoute (fastify, _opts) {
         metadata = await fastify.getYTDLPMetadataWrapper({
           url: placeholderUrl,
           medium: 'video',
+          parentRequestId: request.id,
         })
       } catch (err) {
         if (err instanceof YTDLPAPIError) {

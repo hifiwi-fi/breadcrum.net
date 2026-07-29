@@ -45,9 +45,10 @@ export function makeBookmarkPgBossP ({ fastify }) {
         resolveArchive,
         resolveEpisode,
         userProvidedMeta,
+        parentRequestId,
       } = job.data
 
-      const log = logger.child({ jobId: job.id })
+      const log = logger.child({ jobId: job.id, parentRequestId })
       const pg = fastify.pg
 
       const jobStartTime = performance.now()
@@ -81,6 +82,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
             attempt: retryCount,
             cache: fastify.ytdlpCache,
             maxRetries: isYouTube ? 3 : 0,
+            parentRequestId,
           })
         } catch (err) {
           log.warn(err, 'getYTDLPMetadata threw during bookmark resolve')
@@ -116,7 +118,8 @@ export function makeBookmarkPgBossP ({ fastify }) {
                   bookmarkTitle: userProvidedMeta.title,
                   episodeId: episodeEntity.id,
                   url,
-                  medium: 'video'
+                  medium: 'video',
+                  parentRequestId,
                 },
                 options: {
                   startAfter: delayDate,
@@ -247,7 +250,8 @@ export function makeBookmarkPgBossP ({ fastify }) {
                 bookmarkTitle: userProvidedMeta.title,
                 episodeId: episodeEntity.id,
                 url,
-                medium: 'video'
+                medium: 'video',
+                parentRequestId,
               },
               options: {
                 startAfter: releaseTimestampDate,

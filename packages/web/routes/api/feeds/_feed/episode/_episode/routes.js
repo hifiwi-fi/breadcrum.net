@@ -2,12 +2,13 @@ import SQL from '@nearform/sql'
 import { YTDLPAPIError } from '@breadcrum/resources/episodes/yt-dlp-api-client.js'
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { FastifyRequest } from 'fastify'
+ * @import { FastifyRequest, FastifyBaseLogger } from 'fastify'
  */
 
 /**
  * @typedef {Object} FeedTokenUser
  * @property {string} userId - The authenticated user ID from feed token
+ * @property {string} username - The authenticated username
  * @property {string} token - The feed token
  */
 
@@ -52,9 +53,12 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
     async function episodeHandler (request, reply) {
       const feedTokenUser = /** @type {FeedAuthRequest} */ (request).feedTokenUser
       const userId = feedTokenUser?.userId ?? request?.user?.id
+      const username = feedTokenUser?.username ?? request?.user?.username
       if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
       const { feed: feedId, episode: episodeId } = request.params
+      const requestLogger = /** @type {FastifyBaseLogger & {setBindings?: (bindings: Record<string, unknown>) => void}} */ (request.log)
+      requestLogger.setBindings?.({ userId, username, feedId, episodeId })
 
       const episodeQuery = SQL`
           select
@@ -105,11 +109,41 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
       }
 
       const cachedUrl = await fastify.urlCache.get(cacheKey)
+      const clientGeoip = fastify.geoip?.lookup(request.ip)
+      const mediaRequestLog = {
+        userId,
+        username,
+        feedId,
+        episodeId,
+        sourceUrl: episode.src_url,
+        medium: episode.medium,
+        authenticationType: feedTokenUser ? 'feed-token' : 'jwt',
+        clientIp: request.ip,
+        clientGeoip: clientGeoip
+          ? {
+              countryIso: clientGeoip.country_iso,
+              regionIso: clientGeoip.region_iso,
+              regionName: clientGeoip.region_name,
+              timeZone: clientGeoip.time_zone,
+            }
+          : null,
+        userAgent: request.headers['user-agent'] ?? null,
+        range: request.headers.range ?? null,
+      }
 
       if (cachedUrl) {
+        request.log.info({
+          ...mediaRequestLog,
+          cacheStatus: 'hit',
+          mediaHost: new URL(cachedUrl).hostname,
+        }, 'redirecting episode request to cached media URL')
         reply.header('fly-cache-status', 'HIT')
         return reply.redirect(cachedUrl, 302)
       } else {
+        request.log.info({
+          ...mediaRequestLog,
+          cacheStatus: 'miss',
+        }, 'resolving episode media URL')
         reply.header('fly-cache-status', 'MISS')
       }
 
@@ -118,14 +152,14 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
         metadata = await fastify.getYTDLPMetadataWrapper({
           url: episode.src_url,
           medium: episode.medium,
+          parentRequestId: request.id,
         })
       } catch (err) {
         if (err instanceof YTDLPAPIError) {
           const logPayload = {
+            ...mediaRequestLog,
             err,
-            episodeId,
-            feedId,
-            sourceUrl: episode.src_url,
+            cacheStatus: 'miss',
             ytDlpStatusCode: err.statusCode,
             ytDlpDescription: err.description,
           }
@@ -153,6 +187,11 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
       if (!metadata.url) throw new Error('metadata is missing url')
 
       await fastify.urlCache.set(cacheKey, metadata.url)
+      request.log.info({
+        ...mediaRequestLog,
+        cacheStatus: 'miss',
+        mediaHost: new URL(metadata.url).hostname,
+      }, 'redirecting episode request to resolved media URL')
       reply.redirect(metadata.url, 302)
     }
   )

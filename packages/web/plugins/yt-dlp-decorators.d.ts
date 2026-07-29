@@ -7,6 +7,7 @@ declare module 'fastify' {
       url: string;
       medium: MediumTypes;
       attempt?: number;
+      parentRequestId?: string | undefined;
     }) => Promise<YTDLPMetadata>;
   }
 }

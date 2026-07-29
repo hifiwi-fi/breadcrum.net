@@ -71,6 +71,7 @@ export async function getPreview (fastify, _opts) {
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
           attempt: 0,
           cache: fastify.ytdlpCache,
+          parentRequestId: request.id,
         })
       } catch (err) {
         if (err instanceof YTDLPAPIError) {

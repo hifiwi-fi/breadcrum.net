@@ -121,6 +121,7 @@ export function isRetryableYTDLPStatus (statusCode) {
     }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 3 for YouTube, 0 for others)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
+ * @param  {string | undefined} [params.parentRequestId] Breadcrum request ID to propagate for correlation.
  * @param  {Dispatcher} [params.dispatcher] Optional undici dispatcher, primarily for tests.
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
@@ -132,6 +133,7 @@ export async function getYTDLPMetadata ({
   cache,
   maxRetries,
   retryDelayMs = 5000,
+  parentRequestId,
   dispatcher,
 }) {
   const parsedUrl = new URL(url)
@@ -150,6 +152,7 @@ export async function getYTDLPMetadata ({
         ytDLPEndpoint,
         attempt: attempt + retryAttempt,
         cache,
+        parentRequestId,
         dispatcher,
       })
     } catch (err) {
@@ -178,6 +181,7 @@ export async function getYTDLPMetadata ({
     get(key: object): Promise<unknown>;
     set(key: object, value: unknown, ttl?: number): Promise<void>;
   }|undefined} [params.cache]         The cache instance
+ * @param  {string|undefined} [params.parentRequestId] Breadcrum request ID to propagate for correlation.
  * @param  {Dispatcher|undefined} [params.dispatcher] Optional undici dispatcher.
  * @return {Promise<YTDLPMetadata>}                       metadata object
  */
@@ -187,6 +191,7 @@ async function getYTDLPMetadataAttempt ({
   ytDLPEndpoint,
   attempt = 0,
   cache,
+  parentRequestId,
   dispatcher,
 }) {
   const cacheKey = {
@@ -212,6 +217,7 @@ async function getYTDLPMetadataAttempt ({
     headers: {
       Accept: 'application/json',
       Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password),
+      ...(parentRequestId ? { 'X-Breadcrum-Request-Id': parentRequestId } : {}),
     },
     dispatcher: dispatcher ?? ytdlpDispatcher,
   })
@@ -250,6 +256,7 @@ async function getYTDLPMetadataAttempt ({
     }} [params.cache]         The cache instance
  * @param  {Number} [params.maxRetries] Maximum number of retries (default: 0)
  * @param  {Number} [params.retryDelayMs] Delay between retries in milliseconds (default: 5000)
+ * @param  {string | undefined} [params.parentRequestId] Breadcrum request ID to propagate for correlation.
  * @param  {Dispatcher} [params.dispatcher] Optional undici dispatcher, primarily for tests.
  * @return {Promise<YTDLPDiscoveryMetadata>}
  */
@@ -261,6 +268,7 @@ export async function getYTDLPDiscoveryMetadata ({
   cache,
   maxRetries,
   retryDelayMs = 5000,
+  parentRequestId,
   dispatcher,
 }) {
   // Discovery is fast and reliable for all sources — no YouTube-specific retry needed.
@@ -277,6 +285,7 @@ export async function getYTDLPDiscoveryMetadata ({
         ytDLPEndpoint,
         attempt: attempt + retryAttempt,
         cache,
+        parentRequestId,
         dispatcher,
       })
     } catch (err) {
@@ -303,6 +312,7 @@ export async function getYTDLPDiscoveryMetadata ({
     get(key: object): Promise<unknown>;
     set(key: object, value: unknown, ttl?: number): Promise<void>;
   }|undefined} [params.cache]
+ * @param  {string|undefined} [params.parentRequestId] Breadcrum request ID to propagate for correlation.
  * @param  {Dispatcher|undefined} [params.dispatcher] Optional undici dispatcher.
  * @return {Promise<YTDLPDiscoveryMetadata>}
  */
@@ -312,6 +322,7 @@ async function getYTDLPDiscoveryMetadataAttempt ({
   ytDLPEndpoint,
   attempt = 0,
   cache,
+  parentRequestId,
   dispatcher,
 }) {
   const cacheKey = {
@@ -337,6 +348,7 @@ async function getYTDLPDiscoveryMetadataAttempt ({
     headers: {
       Accept: 'application/json',
       Authorization: 'Basic ' + btoa(requestURL.username + ':' + requestURL.password),
+      ...(parentRequestId ? { 'X-Breadcrum-Request-Id': parentRequestId } : {}),
     },
     dispatcher: dispatcher ?? ytdlpDispatcher,
   })

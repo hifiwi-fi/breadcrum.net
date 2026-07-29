@@ -29,8 +29,9 @@ export function makeArchivePgBossP ({ fastify }) {
         url,
         userId,
         archiveId,
+        parentRequestId,
       } = job.data
-      const log = logger.child({ jobId: job.id })
+      const log = logger.child({ jobId: job.id, parentRequestId })
       const pg = fastify.pg
 
       const jobStartTime = performance.now()

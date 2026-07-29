@@ -13,6 +13,7 @@ import { defaultQueueOptions } from '../pgboss/default-job-options.js'
  *   url: string
  *   userId: string
  *   archiveId: string
+ *   parentRequestId?: string | undefined
  * }} ResolveArchiveData
  */
 

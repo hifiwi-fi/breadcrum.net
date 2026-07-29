@@ -27,6 +27,7 @@ import { defaultQueueOptions } from '../pgboss/default-job-options.js'
  *   resolveArchive: boolean
  *   resolveEpisode: boolean
  *   userProvidedMeta: UserProvidedMeta
+ *   parentRequestId?: string | undefined
  * }} ResolveBookmarkData
  */
 

@@ -22,17 +22,19 @@ export function makeEpisodePgBossP ({ fastify }) {
   /** @type {WorkHandler<ResolveEpisodeData>} */
   return async function episodePgBossP (jobs) {
     for (const job of jobs) {
-      const log = logger.child({
-        jobId: job.id,
-      })
-
       const {
         userId,
         bookmarkTitle,
         episodeId,
         url,
         medium,
+        parentRequestId,
       } = job.data
+
+      const log = logger.child({
+        jobId: job.id,
+        parentRequestId,
+      })
 
       const pg = fastify.pg
       const isYouTube = isYouTubeUrl(new URL(url))
@@ -51,6 +53,7 @@ export function makeEpisodePgBossP ({ fastify }) {
           attempt: 0,
           cache: fastify.ytdlpCache,
           maxRetries: 0, // pg-boss handles retries
+          parentRequestId,
         })
 
         if (!media.title) {

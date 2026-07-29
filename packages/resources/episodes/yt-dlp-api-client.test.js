@@ -32,6 +32,58 @@ function setupMockYTDLPAPI () {
   }
 }
 
+test('getYTDLPMetadata propagates the parent request ID', async () => {
+  const { mockAgent, endpoint } = setupMockYTDLPAPI()
+  const pool = mockAgent.get('https://ytdlp.example.test')
+
+  pool.intercept({
+    method: 'GET',
+    path: '/unified?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabc123&format=video',
+    headers: {
+      'x-breadcrum-request-id': 'breadcrum-request-123',
+    },
+  }).reply(200, {
+    url: 'https://media.example.test/video.mp4',
+    ext: 'mp4',
+  })
+
+  const metadata = await getYTDLPMetadata({
+    url: 'https://www.youtube.com/watch?v=abc123',
+    medium: 'video',
+    ytDLPEndpoint: endpoint,
+    parentRequestId: 'breadcrum-request-123',
+    dispatcher: mockAgent,
+  })
+
+  assert.equal(metadata.url, 'https://media.example.test/video.mp4')
+})
+
+test('getYTDLPDiscoveryMetadata propagates the parent request ID', async () => {
+  const { mockAgent, endpoint } = setupMockYTDLPAPI()
+  const pool = mockAgent.get('https://ytdlp.example.test')
+
+  pool.intercept({
+    method: 'GET',
+    path: '/discover?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dabc123&format=video',
+    headers: {
+      'x-breadcrum-request-id': 'breadcrum-job-request-456',
+    },
+  }).reply(200, {
+    title: 'Example video',
+    ext: 'mp4',
+  })
+
+  const metadata = await getYTDLPDiscoveryMetadata({
+    url: 'https://www.youtube.com/watch?v=abc123',
+    medium: 'video',
+    ytDLPEndpoint: endpoint,
+    parentRequestId: 'breadcrum-job-request-456',
+    dispatcher: mockAgent,
+  })
+
+  assert.equal(metadata.title, 'Example video')
+})
+
 test('YTDLPAPIError classifies 5xx unified failures as retryable', async () => {
   const { mockAgent, endpoint } = setupMockYTDLPAPI()
   const pool = mockAgent.get('https://ytdlp.example.test')

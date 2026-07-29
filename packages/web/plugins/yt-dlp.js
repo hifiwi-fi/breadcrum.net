@@ -21,6 +21,7 @@ export default fp(async function (fastify, _opts) {
       url,
       medium,
       attempt = 0,
+      parentRequestId,
     }) {
       const startTime = performance.now()
       try {
@@ -28,6 +29,7 @@ export default fp(async function (fastify, _opts) {
           url,
           medium,
           attempt,
+          parentRequestId,
           ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
           cache: fastify.ytdlpCache,
         })

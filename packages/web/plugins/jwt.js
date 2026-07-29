@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import SQL from '@nearform/sql'
 
 /**
- * @import { FastifyRequest } from 'fastify'
+ * @import { FastifyRequest, FastifyBaseLogger } from 'fastify'
  * @import { QueryResult } from 'pg'
  * @import { JSONSchema } from 'json-schema-to-ts'
  * @import { AuthTokenSource as AuthTokenSourceType } from '../routes/api/user/auth-tokens/schemas/auth-token-base.js'
@@ -111,6 +111,11 @@ export default fp(async function (fastify, _) {
       fastify.otel.jwtVerifyCounter.add(1)
       try {
         await request.jwtVerify()
+        const requestLogger = /** @type {FastifyBaseLogger & {setBindings?: (bindings: Record<string, unknown>) => void}} */ (request.log)
+        requestLogger.setBindings?.({
+          userId: request.user.id,
+          username: request.user.username,
+        })
       } catch (err) {
         // reply.deleteJWTCookie()
         fastify.otel.jwtVerifyFailCounter.add(1)

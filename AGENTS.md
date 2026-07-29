@@ -30,6 +30,47 @@ const data: { id: number, name: string } = {...}
 function process(item: { id: number, name: string }) {...}
 ```
 
+### Prefer type updates over conditional object spreads
+
+When `exactOptionalPropertyTypes` reports that a caller passes `T | undefined` to an optional property, update the declared type to accept explicit `undefined` when that matches the function's runtime behavior.
+Do not add conditional object spreads solely to satisfy the type checker.
+
+```javascript
+// ❌ Avoid type-driven object construction noise
+await createBookmark({
+  url,
+  ...(note !== undefined ? { note } : {}),
+  ...(summary !== undefined ? { summary } : {}),
+})
+
+// ✅ Prefer an accurate parameter declaration
+/**
+ * @param {Object} params
+ * @param {string} params.url
+ * @param {string | undefined} [params.note]
+ * @param {string | undefined} [params.summary]
+ */
+async function createBookmark ({ url, note, summary }) {
+  // ...
+}
+
+await createBookmark({ url, note, summary })
+```
+
+Use a conditional spread only when the runtime behavior intentionally distinguishes an absent property from a property whose value is `undefined`, such as serialization, defaulting, or merge semantics.
+Undici request headers are a concrete exception because header values cannot be `undefined`; conditionally omit an optional header instead of passing an undefined value.
+
+```javascript
+const response = await request(url, {
+  headers: {
+    Accept: 'application/json',
+    ...(parentRequestId
+      ? { 'X-Breadcrum-Request-Id': parentRequestId }
+      : {}),
+  },
+})
+```
+
 ### Use @ts-expect-error over @ts-ignore
 
 Always use `@ts-expect-error` instead of `@ts-ignore` for TypeScript error suppression:

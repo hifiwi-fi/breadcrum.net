@@ -16,6 +16,7 @@ import { defaultQueueOptions } from '../pgboss/default-job-options.js'
  *   episodeId: string
  *   url: string
  *   medium: MediumTypes
+ *   parentRequestId?: string | undefined
  * }} ResolveEpisodeData
  */
 

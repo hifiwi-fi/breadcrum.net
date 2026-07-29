@@ -9,6 +9,7 @@ declare module 'fastify' {
   interface FastifyRequest {
     feedTokenUser?: {
       userId: string;
+      username: string;
       token: string;
     } | null;
   }
