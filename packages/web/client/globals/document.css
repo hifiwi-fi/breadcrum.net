@@ -55,22 +55,18 @@
   }
 }
 
-.bc-header {
-}
-
 .bc-main {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 46em;
+  max-width: 56em;
   margin: 0 auto;
   padding-top: 0;
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: max(1em, env(safe-area-inset-left));
+  padding-right: max(1em, env(safe-area-inset-right));
   padding-bottom: 1em;
-  overflow: hidden;
-  /* word-wrap: break-word; */
+  overflow-wrap: break-word;
 }
 
 /* .bc-main > *:first-child { margin-top: 0 !important; } */

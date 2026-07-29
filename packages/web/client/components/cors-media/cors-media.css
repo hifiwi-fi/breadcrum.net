@@ -1,11 +1,5 @@
-.bc-cors-video,
-.bc-cors-audio {
-  width: 100%;
-}
-
 .bc-cors-video {
-  border-radius: 10px;
-  background-color: var(--accent-background);
+  width: 100%;
   overflow: hidden;
 }
 
@@ -17,15 +11,16 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   background: var(--accent-background);
-  border: 1px solid var(--accent-foreground);
-  border-radius: 5px;
+  border: 1px solid var(--control-border);
+  border-radius: 7px;
+  box-shadow: var(--surface-shadow);
   cursor: pointer;
   overflow: hidden;
   padding: 0;
 }
 
 .bc-cors-media-activate:hover {
-  border-color: var(--link-color);
+  border-color: var(--link-text);
 }
 
 .bc-cors-media-activate-thumb {

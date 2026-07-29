@@ -38,15 +38,7 @@
   color: var(--accent-foreground);
 }
 
-.bc-episode-video-preview,
-.bc-episode-audio-preview {
-  width: 100%;
-}
 
-.bc-episode-video-preview {
-  background-color: var(--accent-background);
-  border-radius: 5px;
-}
 
 .bc-episode-embed {
   margin: 8px 0;
@@ -63,6 +55,8 @@
   height: auto;
   aspect-ratio: var(--bc-embed-aspect);
   border: 0;
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .bc-episode-embed--soundcloud .bc-episode-embed-html iframe {
@@ -79,8 +73,9 @@
   width: 100%;
   aspect-ratio: var(--bc-embed-aspect, 16 / 9);
   background: var(--accent-background);
-  border: 2px solid var(--accent-midground);
-  border-radius: 5px;
+  border: 1px solid var(--control-border);
+  border-radius: 7px;
+  box-shadow: var(--surface-shadow);
   cursor: pointer;
   overflow: hidden;
   padding: 0;
