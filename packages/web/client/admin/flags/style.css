@@ -7,10 +7,7 @@
 }
 
 .bc-admin-flags fieldset {
-  border: 1px solid var(--accent-midground);
-  border-radius: 6px;
   padding: 1rem 1.25rem;
-  background: var(--accent-background);
 }
 
 .bc-admin-flags-legend {

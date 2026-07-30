@@ -26,7 +26,11 @@
   }
 
   & .author-info img {
-    border: 1px solid rgba(0,0,0,.1);
+    border: 1px solid color-mix(
+      in srgb,
+      var(--accent-midground) 70%,
+      var(--background)
+    );
     border-radius: 50%;
     padding: 4px;
   }
