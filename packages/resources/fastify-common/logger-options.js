@@ -30,6 +30,7 @@ const urlLogPaths = [
  * @returns {unknown}
  */
 function redactUrlData (value) {
+  if (value == null) return value
   if (typeof value !== 'string') return '[Redacted]'
 
   if (value.startsWith('/') || /^[a-z][a-z\d+.-]*:\/\//i.test(value)) {
