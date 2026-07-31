@@ -37,7 +37,21 @@ function redactUrlData (value) {
     return sanitizeUrl(value)
   }
 
-  return value.replace(/https?:\/\/[^\s]+/gi, url => sanitizeUrl(url))
+  return value.replace(/https?:\/\/[^\s]+/gi, sanitizeUrlToken)
+}
+
+/**
+ * Preserve punctuation surrounding a URL embedded in prose.
+ * @param {string} value
+ * @returns {string}
+ */
+function sanitizeUrlToken (value) {
+  let urlEnd = value.length
+  while (urlEnd > 0 && /[),.;:!?\]}>'"]/.test(value[urlEnd - 1] ?? '')) {
+    urlEnd--
+  }
+
+  return sanitizeUrl(value.slice(0, urlEnd)) + value.slice(urlEnd)
 }
 
 /**
