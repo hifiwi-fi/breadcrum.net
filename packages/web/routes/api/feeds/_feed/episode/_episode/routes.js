@@ -41,7 +41,7 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
               type: 'string',
               format: 'uuid',
             },
-            episodes: {
+            episode: {
               type: 'string',
               format: 'uuid',
             },
