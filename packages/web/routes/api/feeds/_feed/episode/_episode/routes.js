@@ -36,6 +36,7 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
         tags: ['feeds', 'episodes'],
         params: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             feed: {
               type: 'string',
