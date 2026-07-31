@@ -11,12 +11,71 @@ const PinoLevelToSeverityLookup = /** @type {const} */ ({
   fatal: 'CRITICAL',
 })
 
+const urlLogPaths = [
+  'sourceUrl',
+  'url',
+  'req.url',
+  'err.message',
+  'err.stack',
+  'err.description',
+  'err.cause.message',
+  'err.cause.stack',
+  'ytDlpDescription',
+]
+
+/**
+ * Remove URL data that can contain credentials or signatures while retaining
+ * enough stable information to identify the source.
+ * @param {unknown} value
+ * @returns {unknown}
+ */
+function redactUrlData (value) {
+  if (typeof value !== 'string') return '[Redacted]'
+
+  if (value.startsWith('/') || /^[a-z][a-z\d+.-]*:\/\//i.test(value)) {
+    return sanitizeUrl(value)
+  }
+
+  return value.replace(/https?:\/\/[^\s]+/gi, url => sanitizeUrl(url))
+}
+
+/**
+ * @param {string} value
+ * @returns {string}
+ */
+function sanitizeUrl (value) {
+  try {
+    const isRelative = value.startsWith('/')
+    const url = new URL(value, 'https://redacted.invalid')
+    const videoId = isYouTubeWatchUrl(url) ? url.searchParams.get('v') : null
+
+    url.username = ''
+    url.password = ''
+    url.search = ''
+    url.hash = ''
+    if (videoId) url.searchParams.set('v', videoId)
+
+    return isRelative ? `${url.pathname}${url.search}` : url.toString()
+  } catch {
+    return '[Redacted]'
+  }
+}
+
+/**
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isYouTubeWatchUrl (url) {
+  return /(^|\.)youtube\.com$/i.test(url.hostname) && url.pathname === '/watch'
+}
+
 /**
  * @typedef {Object} LoggerOptions
  * @property {() => { service: string }} mixin
  * @property {string} messageKey
  * @property {Object} formatters
  * @property {(label: string, number: number) => { level: string, levelN: number }} formatters.level
+ * @property {{paths: string[], censor: (value: unknown) => unknown}} redact
  */
 
 /**
@@ -33,6 +92,10 @@ export function createLoggerOptions ({ serviceName }) {
       }
     },
     messageKey: 'message',
+    redact: {
+      paths: urlLogPaths,
+      censor: redactUrlData,
+    },
     formatters: {
       level (/** @type{string} */label, /** @type{number} */number) {
         return {
