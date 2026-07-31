@@ -53,12 +53,13 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
     async function episodeHandler (request, reply) {
       const feedTokenUser = /** @type {FeedAuthRequest} */ (request).feedTokenUser
       const userId = feedTokenUser?.userId ?? request?.user?.id
-      const username = feedTokenUser?.username ?? request?.user?.username
       if (!userId) return reply.unauthorized('Missing authenticated feed userId')
 
       const { feed: feedId, episode: episodeId } = request.params
       const requestLogger = /** @type {FastifyBaseLogger & {setBindings?: (bindings: Record<string, unknown>) => void}} */ (request.log)
-      requestLogger.setBindings?.({ userId, username, feedId, episodeId })
+      requestLogger.setBindings?.(feedTokenUser
+        ? { episodeId }
+        : { feedId, episodeId })
 
       const episodeQuery = SQL`
           select
@@ -111,10 +112,6 @@ export default async function podcastFeedsRoutes (fastify, _opts) {
       const cachedUrl = await fastify.urlCache.get(cacheKey)
       const clientGeoip = fastify.geoip?.lookup(request.ip)
       const mediaRequestLog = {
-        userId,
-        username,
-        feedId,
-        episodeId,
         sourceUrl: episode.src_url,
         medium: episode.medium,
         authenticationType: feedTokenUser ? 'feed-token' : 'jwt',
