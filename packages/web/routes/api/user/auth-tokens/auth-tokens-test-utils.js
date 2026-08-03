@@ -1,8 +1,25 @@
 import { randomUUID } from 'node:crypto'
+import * as assert from 'node:assert'
 import SQL from '@nearform/sql'
 
 /**
  * @import { AuthTokenSource } from './schemas/auth-token-base.js'
+ * @typedef {object} TestToken
+ * @property {unknown} jti
+ * @property {unknown} created_at
+ * @property {unknown} last_seen
+ * @property {unknown} last_seen_micros
+ * @property {unknown} updated_at
+ * @property {unknown} is_current
+ * @property {unknown} protect
+ * @property {unknown} user_agent
+ * @property {unknown} ip
+ * @property {unknown} note
+ * @typedef {object} TestPagination
+ * @property {unknown} top
+ * @property {unknown} bottom
+ * @property {unknown} before
+ * @property {unknown} after
  */
 
 /**
@@ -39,8 +56,7 @@ export async function createTestUser (app, t) {
   }
 
   if (registerRes.statusCode !== 201) {
-    console.error('Registration failed:', registerRes.statusCode, registerRes.payload)
-    throw new Error(`Registration failed with status ${registerRes.statusCode}`)
+    throw new Error(`Registration failed with status ${registerRes.statusCode}: ${registerRes.payload}`)
   }
 
   const registerBody = JSON.parse(registerRes.payload)
@@ -129,12 +145,10 @@ export async function createTokensWithDates (app, userId, tokenSpecs) {
 
 /**
  * Asserts that a token object has the expected shape
- * @param {import('node:assert')} assert
- * @param {any} token
- * @param {object} options
- * @param {boolean} [options.checkCurrent]
+ * @param {TestToken} token
+ * @param {{checkCurrent?: boolean | undefined}} options
  */
-export function assertTokenShape (assert, token, options = {}) {
+export function assertTokenShape (token, options = {}) {
   assert.ok(token.jti, 'Token should have JTI')
   assert.ok(token.created_at, 'Token should have created_at')
   assert.ok(token.last_seen, 'Token should have last_seen')
@@ -155,10 +169,9 @@ export function assertTokenShape (assert, token, options = {}) {
 
 /**
  * Asserts that pagination metadata has the expected shape
- * @param {import('node:assert')} assert
- * @param {any} pagination
+ * @param {TestPagination} pagination
  */
-export function assertPaginationShape (assert, pagination) {
+export function assertPaginationShape (pagination) {
   assert.strictEqual(typeof pagination.top, 'boolean', 'Pagination should have top boolean')
   assert.strictEqual(typeof pagination.bottom, 'boolean', 'Pagination should have bottom boolean')
   assert.ok('before' in pagination, 'Pagination should have before field')

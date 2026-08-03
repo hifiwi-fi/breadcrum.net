@@ -35,8 +35,7 @@ export async function createTestUser (app, t, options = {}) {
   }
 
   if (registerRes.statusCode !== 201) {
-    console.error('Registration failed:', registerRes.statusCode, registerRes.payload)
-    throw new Error(`Registration failed with status ${registerRes.statusCode}`)
+    throw new Error(`Registration failed with status ${registerRes.statusCode}: ${registerRes.payload}`)
   }
 
   const registerBody = JSON.parse(registerRes.payload)
