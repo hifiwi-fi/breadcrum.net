@@ -40,6 +40,14 @@ test('redacts sensitive URL data while preserving YouTube video IDs', () => {
     censor('Unable to download (https://cdn.example.com/audio.mp3?Signature=secret), retrying.'),
     'Unable to download (https://cdn.example.com/audio.mp3), retrying.'
   )
+  assert.equal(
+    censor('Unable to reach http://[::1]/status'),
+    'Unable to reach http://[::1]/status'
+  )
+  assert.equal(
+    censor('Unable to reach [http://[::1]/status?token=secret], retrying.'),
+    'Unable to reach [http://[::1]/status], retrying.'
+  )
 })
 
 test('mixin returns correct service name', () => {

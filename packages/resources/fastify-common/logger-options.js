@@ -24,10 +24,12 @@ const urlLogPaths = [
 ]
 
 /**
- * Remove URL data that can contain credentials or signatures while retaining
- * enough stable information to identify the source.
- * @param {unknown} value
- * @returns {unknown}
+ * Pino invokes this censor for every configured URL-bearing log path.
+ * Nullish values retain their JSON semantics, unexpected non-string values are
+ * fully redacted, direct URL fields are sanitized as a whole, and URLs inside
+ * error prose are sanitized without replacing the surrounding diagnostic text.
+ * @param {unknown} value - The value found at a configured Pino redaction path.
+ * @returns {unknown} The value safe to serialize into logs.
  */
 function redactUrlData (value) {
   if (value == null) return value
@@ -41,13 +43,20 @@ function redactUrlData (value) {
 }
 
 /**
- * Preserve punctuation surrounding a URL embedded in prose.
- * @param {string} value
- * @returns {string}
+ * Sanitize one URL token matched inside a larger diagnostic string.
+ * Common trailing prose punctuation is separated before URL parsing and then
+ * reattached so removing a signed query does not alter the surrounding message.
+ * Balanced square brackets remain part of the URL because IPv6 literal hosts
+ * require them, while unmatched closing brackets are treated as punctuation.
+ * @param {string} value - The URL token, potentially followed by punctuation.
+ * @returns {string} The sanitized URL followed by its original punctuation.
  */
 function sanitizeUrlToken (value) {
   let urlEnd = value.length
-  while (urlEnd > 0 && /[),.;:!?\]}>'"]/.test(value[urlEnd - 1] ?? '')) {
+  while (urlEnd > 0) {
+    const trailingCharacter = value[urlEnd - 1] ?? ''
+    if (!/[),.;:!?\]}>'"]/.test(trailingCharacter)) break
+    if (trailingCharacter === ']' && !hasUnmatchedClosingBracket(value.slice(0, urlEnd))) break
     urlEnd--
   }
 
@@ -55,8 +64,25 @@ function sanitizeUrlToken (value) {
 }
 
 /**
- * @param {string} value
- * @returns {string}
+ * Determine whether a token ends with prose punctuation rather than the closing
+ * bracket required by an IPv6 literal host.
+ * @param {string} value - The candidate URL token through its current endpoint.
+ * @returns {boolean} Whether closing square brackets outnumber opening brackets.
+ */
+function hasUnmatchedClosingBracket (value) {
+  const openingBracketCount = value.match(/\[/g)?.length ?? 0
+  const closingBracketCount = value.match(/\]/g)?.length ?? 0
+  return closingBracketCount > openingBracketCount
+}
+
+/**
+ * Remove credentials, fragments, and potentially signed query parameters from
+ * an absolute or request-relative URL before it is serialized into logs.
+ * The YouTube watch video ID is the only retained query value because it is a
+ * stable public identifier needed to correlate extraction failures.
+ * Invalid URL values are fully redacted rather than risk exposing their content.
+ * @param {string} value - The complete absolute or request-relative URL.
+ * @returns {string} A normalized URL containing only safe diagnostic fields.
  */
 function sanitizeUrl (value) {
   try {
@@ -77,8 +103,9 @@ function sanitizeUrl (value) {
 }
 
 /**
- * @param {URL} url
- * @returns {boolean}
+ * Identify YouTube watch pages whose public video ID may remain in logs.
+ * @param {URL} url - The parsed source URL.
+ * @returns {boolean} Whether the URL is a YouTube watch page.
  */
 function isYouTubeWatchUrl (url) {
   return /(^|\.)youtube\.com$/i.test(url.hostname) && url.pathname === '/watch'
