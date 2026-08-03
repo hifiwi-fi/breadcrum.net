@@ -105,9 +105,6 @@ catalogs:
     typescript:
       specifier: ~6.0.3
       version: 6.0.3
-    undici:
-      specifier: ^8.9.0
-      version: 8.9.0
 
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
@@ -167,7 +164,7 @@ importers:
         version: 12.24.1
       undici:
         specifier: 'catalog:'
-        version: 8.9.0
+        version: 6.28.0
     devDependencies:
       '@types/jsdom':
         specifier: 'catalog:'
@@ -369,7 +366,7 @@ importers:
         version: 4.0.61
       undici:
         specifier: 'catalog:'
-        version: 8.9.0
+        version: 6.28.0
       useragent:
         specifier: ^2.3.0
         version: 2.3.0
@@ -538,7 +535,7 @@ importers:
         version: 5.7.0
       undici:
         specifier: 'catalog:'
-        version: 8.9.0
+        version: 6.28.0
       user-agents:
         specifier: ^2.1.43
         version: 2.1.108
@@ -4841,16 +4838,12 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  undici@6.27.0:
-    resolution: {integrity: sha512-YmfV3YnEDzXRC5lZ2jWtWWHKGUm1zIt8AhesR1tens+HTNv+YZlN/dp6G727LOvMJ8xjP9Be7Y2Sdr96LDm+pg==}
+  undici@6.28.0:
+    resolution: {integrity: sha512-LIY910g9TI13YS95lrMFrs8Rm/u/irgHeTWoKCoteeJ04CUJ92eEfj0rVn+7VKMPBpUPiUoBKfhNyLI23EE/KA==}
     engines: {node: '>=18.17'}
 
-  undici@8.7.0:
-    resolution: {integrity: sha512-N7iQtfyLhIMOFgQubvmLV26svHpO0bqKnAiWotTQCVKCmWrcGbBotPuW1x+xwYZ2VHdSTVUfPQQnlEt1/LouTQ==}
-    engines: {node: '>=22.19.0'}
-
-  undici@8.9.0:
-    resolution: {integrity: sha512-aWZpUj7XoGonMClx4gdDRfgBjqeA+F473aDmROQQbM9n6PRfK/u1q/a0X4wMTgcHfT8H6fpbt98PFuDUwFg2YA==}
+  undici@8.10.0:
+    resolution: {integrity: sha512-HvltHd7avK13QIw/oLe4qoOLyoVSoafqJ2jYOrtMRBkbYT31eiBQ8O0ehRKZiEZCMEyLFQNIADpgCWC5fALvYQ==}
     engines: {node: '>=22.19.0'}
 
   unicorn-magic@0.1.0:
@@ -6214,7 +6207,7 @@ snapshots:
     dependencies:
       progress: 2.0.3
       proxy-from-env: 1.1.0
-      undici: 6.27.0
+      undici: 6.28.0
       which: 2.0.2
     optionalDependencies:
       '@sentry/cli-darwin': 3.6.0
@@ -8228,7 +8221,7 @@ snapshots:
       saxes: 6.0.0
       symbol-tree: 3.2.4
       tough-cookie: 6.0.2
-      undici: 8.9.0
+      undici: 8.10.0
       w3c-xmlserializer: 5.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
@@ -9193,7 +9186,7 @@ snapshots:
       ghauth: 7.0.7
       github-url-to-object: 4.0.6
       mime-types: 3.0.2
-      undici: 8.7.0
+      undici: 8.10.0
 
   remove-markdown@0.5.5: {}
 
@@ -9838,11 +9831,9 @@ snapshots:
 
   undici-types@8.3.0: {}
 
-  undici@6.27.0: {}
+  undici@6.28.0: {}
 
-  undici@8.7.0: {}
-
-  undici@8.9.0: {}
+  undici@8.10.0: {}
 
   unicorn-magic@0.1.0: {}
 
