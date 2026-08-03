@@ -146,7 +146,7 @@ export async function putBookmarks (fastify, _opts) {
 
         // This will be the one possibly slow step
         // This needs to happen on create for de-dupe behavior
-        const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache }) : submittedUrl
+        const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log }) : submittedUrl
         const workingUrlString = shouldNormalize ? workingUrl.toString() : submittedUrlString
 
         const maybeResult = await getBookmark({

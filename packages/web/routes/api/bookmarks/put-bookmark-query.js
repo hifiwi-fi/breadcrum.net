@@ -21,16 +21,16 @@ import { putTagsQuery } from '@breadcrum/resources/tags/put-tags-query.js'
  * @param {FastifyInstance} params.fastify - Fastify instance, used for logging and other utilities.
  * @param {PoolClient} params.pg - PostgreSQL connection or transaction client for executing the query.
  * @param {string} params.url - URL of the bookmark to be created.
- * @param {string} [params.title] - Title of the bookmark, defaults to the URL if not provided.
- * @param {string} [params.note] - Optional note associated with the bookmark.
- * @param {boolean} [params.toread=false] - Flag indicating if the bookmark is marked to read later.
- * @param {boolean} [params.sensitive=false] - Flag indicating if the bookmark is marked as sensitive.
+ * @param {string | undefined} [params.title] - Title of the bookmark, defaults to the URL if not provided.
+ * @param {string | undefined} [params.note] - Optional note associated with the bookmark.
+ * @param {boolean | undefined} [params.toread=false] - Flag indicating if the bookmark is marked to read later.
+ * @param {boolean | undefined} [params.sensitive=false] - Flag indicating if the bookmark is marked as sensitive.
  * @param {Array<string>} [params.archiveUrls=[]] - List of archived URLs, defaults to an empty array.
- * @param {string} [params.summary] - Optional summary of the bookmark.
+ * @param {string | undefined} [params.summary] - Optional summary of the bookmark.
  * @param {string} params.userId - UUID of the user creating the bookmark (must be provided).
- * @param {string?} [params.originalUrl] - The originally submitted URL prior to normalization, if it differs
- * @param {boolean} [params.meta=false] - Metadata flag for the bookmark, defaults to false.
- * @param {Array<string>} [params.tags] - List of tags to associate with the bookmark.
+ * @param {string | null | undefined} [params.originalUrl] - The originally submitted URL prior to normalization, if it differs
+ * @param {boolean | undefined} [params.meta=false] - Metadata flag for the bookmark, defaults to false.
+ * @param {Array<string> | undefined} [params.tags] - List of tags to associate with the bookmark.
  * @throws {Error} Throws an error if userId is not provided.
  * @returns {Promise<CreatedBookmark>} The created bookmark object.
  */

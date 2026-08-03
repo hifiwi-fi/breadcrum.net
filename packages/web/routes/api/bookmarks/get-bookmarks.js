@@ -126,7 +126,7 @@ export async function getBookmarksHandler (fastify) {
       if (after) bookmarkParams.after = after
       if (url) {
         try {
-          const workingUrl = exactUrl ? url : (await normalizeURL(new URL(url), { cache: fastify.cache, followShorteners: false })).toString()
+          const workingUrl = exactUrl ? url : (await normalizeURL(new URL(url), { cache: fastify.cache, followShorteners: false, logger: request.log })).toString()
           bookmarkParams.url = workingUrl
         } catch (err) {
           return reply.badRequest('Invalid URL format')

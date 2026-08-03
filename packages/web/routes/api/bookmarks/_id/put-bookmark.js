@@ -115,7 +115,7 @@ export async function putBookmark (fastify, _opts) {
           try {
             const submittedUrlString = bookmark.url
             const submittedUrl = new URL(submittedUrlString)
-            const normalizedUrl = await normalizeURL(submittedUrl, { cache: fastify.cache })
+            const normalizedUrl = await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log })
             bookmark.url = normalizedUrl.toString()
             const originalUrl = normalizedUrl.toString() === submittedUrlString ? null : submittedUrlString
             updates.push(SQL`url = ${bookmark.url}`)
@@ -134,7 +134,7 @@ export async function putBookmark (fastify, _opts) {
           try {
             const normalizedArchiveUrls = await Promise.all(
               bookmark.archive_urls.map(async (archiveUrl) => {
-                const normalized = await normalizeURL(new URL(archiveUrl), { cache: fastify.cache })
+                const normalized = await normalizeURL(new URL(archiveUrl), { cache: fastify.cache, logger: request.log })
                 return normalized.toString()
               })
             )
@@ -148,7 +148,7 @@ export async function putBookmark (fastify, _opts) {
 
       if (shouldNormalize && bookmark.createEpisode?.url) {
         try {
-          const normalizedEpisodeUrl = await normalizeURL(new URL(bookmark.createEpisode.url), { cache: fastify.cache })
+          const normalizedEpisodeUrl = await normalizeURL(new URL(bookmark.createEpisode.url), { cache: fastify.cache, logger: request.log })
           bookmark.createEpisode.url = normalizedEpisodeUrl.toString()
         } catch (err) {
           return reply.badRequest('Invalid episode URL format')
@@ -157,7 +157,7 @@ export async function putBookmark (fastify, _opts) {
 
       if (shouldNormalize && bookmark.createArchive && typeof bookmark.createArchive === 'object' && bookmark.createArchive.url) {
         try {
-          const normalizedArchiveUrl = await normalizeURL(new URL(bookmark.createArchive.url), { cache: fastify.cache })
+          const normalizedArchiveUrl = await normalizeURL(new URL(bookmark.createArchive.url), { cache: fastify.cache, logger: request.log })
           bookmark.createArchive.url = normalizedArchiveUrl.toString()
         } catch (err) {
           return reply.badRequest('Invalid archive URL format')
