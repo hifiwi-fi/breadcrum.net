@@ -14,7 +14,7 @@ import { isNotSSRF } from '../urls/ssrf-check.js'
  * @property {number} [maxRedirects=5] - Max redirect hops when expanding short URLs.
  * @property {number} [timeoutMs=5000] - Timeout per request when expanding short URLs.
  * @property {NormalizeUrlCache} [cache] - Optional cache for shortener expansions.
- * @property {FastifyBaseLogger} [logger] - Request logger for correlated validation failures.
+ * @property {FastifyBaseLogger} logger - Request logger for correlated validation failures.
  */
 
 const SHORTENER_CACHE_TTL_MS = 5 * 60 * 1000
@@ -91,10 +91,10 @@ const X_HOSTS = new Set([
  * Normalizes a URL object by modifying its host property if necessary.
  *
  * @param {URL} url - The URL string to be normalized.
- * @param {NormalizeUrlOptions} [options] - Optional normalization configuration.
+ * @param {NormalizeUrlOptions} options - Normalization configuration and request logger.
  * @returns {Promise<URL>} An object containing the normalized URL string.
  */
-export async function normalizeURL (url, options = {}) {
+export async function normalizeURL (url, options) {
   const { followShorteners = true, maxRedirects = 5, timeoutMs = 5000, cache, logger } = options
   let workingUrl = new URL(url.toString())
 
@@ -253,7 +253,7 @@ function sortQueryParams (url) {
 
 /**
  * @param {URL} url
- * @param {{ maxRedirects: number, timeoutMs: number, cache: NormalizeUrlCache | undefined, logger: FastifyBaseLogger | undefined }} options
+ * @param {{ maxRedirects: number, timeoutMs: number, cache: NormalizeUrlCache | undefined, logger: FastifyBaseLogger }} options
  * @returns {Promise<URL>}
  */
 async function expandShortUrl (url, options) {
