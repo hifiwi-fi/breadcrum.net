@@ -24,6 +24,7 @@
   "homepage": "https://github.com/hifiwi-fi/breadcrum.net",
   "keywords": [],
   "license": "AGPL-3.0-or-later",
+  "packageManager": "pnpm@10.34.5",
   "private": true,
   "repository": {
     "type": "git",
