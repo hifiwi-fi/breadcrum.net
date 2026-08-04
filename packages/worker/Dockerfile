@@ -14,7 +14,8 @@ LABEL maintainer="HifiWifi"
 LABEL fly_launch_runtime="Fastify"
 
 # Install current Node.js from Alpine packages. The default nodejs package is older.
-RUN apk add --no-cache nodejs-current pnpm
+RUN apk add --no-cache nodejs-current npm && \
+  npm install --global pnpm@10
 
 # Set the working directory
 WORKDIR /usr/src/app
