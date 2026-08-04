@@ -15,7 +15,11 @@ test('registerOtelShutdown closes the preloaded SDK with Fastify', async () => {
   await app.ready()
 
   await app.close()
-  setOtelSdk(undefined)
+
+  const secondApp = Fastify({ logger: false })
+  registerOtelShutdown(secondApp)
+  await secondApp.ready()
+  await secondApp.close()
 
   assert.equal(shutdownCalls, 1)
 })

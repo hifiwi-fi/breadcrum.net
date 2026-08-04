@@ -25,8 +25,11 @@ export function registerOtelShutdown (fastify) {
   fastify.addHook('onClose', async function shutdownOtel () {
     if (!otelSdk) return
 
+    const sdk = otelSdk
+    otelSdk = undefined
+
     try {
-      await otelSdk.shutdown()
+      await sdk.shutdown()
       fastify.log.info('OpenTelemetry SDK shut down successfully')
     } catch (err) {
       fastify.log.error({ err }, 'Error shutting down OpenTelemetry SDK')
