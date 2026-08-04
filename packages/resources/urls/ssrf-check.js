@@ -96,7 +96,7 @@ export async function isNotSSRF (urlString, logger) {
     return true // Passed all checks, URL is safe
   } catch (err) {
     const workingError = err instanceof Error ? err : new Error('Unknown Error Type', { cause: err })
-    logger?.warn({ err: workingError }, 'URL failed SSRF validation')
+    logger.warn({ err: workingError }, 'URL failed SSRF validation')
     return false // Fail closed on error
   }
 }
