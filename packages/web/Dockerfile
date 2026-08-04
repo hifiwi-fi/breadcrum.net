@@ -18,7 +18,7 @@ LABEL fly_launch_runtime="Fastify"
 
 # Install current Node.js from Alpine packages. The default nodejs package is older.
 RUN apk add --no-cache python3 py3-pip nodejs-current git protobuf npm && \
-  npm install --global pnpm@10.34.5
+  npm install --global pnpm@10
 
 # Set the working directory
 WORKDIR /usr/src/app
