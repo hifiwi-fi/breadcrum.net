@@ -10,6 +10,7 @@ injectWorkspacePackages: false
 minimumReleaseAgeExclude:
   - undici
   - mine.css
+  - neostandard@0.14.0-next
 
 catalog:
   "@bret/is-youtube-url": ^1.0.5
@@ -40,7 +41,7 @@ catalog:
   fastify-plugin: ^6.0.0
   jsdom: ^30.0.1
   json-schema-to-ts: ^3.1.1
-  neostandard: ^0.13.0
+  neostandard: 0.14.0-next
   npm-run-all2: ^9.0.2
   pg: ^8.16.3
   type-fest: ^5.7.0

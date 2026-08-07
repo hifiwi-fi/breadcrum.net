@@ -12,8 +12,9 @@
   },
   "devDependencies": {
     "@sentry/cli": "^3.5.1",
+    "eslint": "catalog:",
     "knip": "^6.7.0",
-    "neostandard": "^0.13.0",
+    "neostandard": "catalog:",
     "npm-run-all2": "^9.0.2",
     "releasearoni": "^0.2.0"
   },
