@@ -3,6 +3,8 @@
 import dns from 'node:dns/promises'
 import ipaddr from 'ipaddr.js'
 
+/** @import { FastifyBaseLogger } from 'fastify' */
+
 // List of blocked IP ranges
 const blockedIPRanges = [
   '127.0.0.0/8',   // Loopback
@@ -60,10 +62,11 @@ async function dnsRebindingCheck (hostname) {
 }
 
 /**
- * @param  {string}  urlString
+ * @param {string} urlString
+ * @param {FastifyBaseLogger} logger
  * @return {Promise<Boolean>}
  */
-export async function isNotSSRF (urlString) {
+export async function isNotSSRF (urlString, logger) {
   try {
     const url = new URL(urlString)
 
@@ -93,7 +96,7 @@ export async function isNotSSRF (urlString) {
     return true // Passed all checks, URL is safe
   } catch (err) {
     const workingError = err instanceof Error ? err : new Error('Unknown Error Type', { cause: err })
-    console.error('Error validating URL:', workingError.message)
+    logger.warn({ err: workingError }, 'URL failed SSRF validation')
     return false // Fail closed on error
   }
 }

@@ -6,6 +6,7 @@ import { FastifyOtelInstrumentation } from '@fastify/otel'
 import { RuntimeNodeInstrumentation } from '@opentelemetry/instrumentation-runtime-node'
 import { HostMetrics } from '@opentelemetry/host-metrics'
 import { metrics } from '@opentelemetry/api'
+import { setOtelSdk } from '@breadcrum/resources/fastify-common/otel-shutdown.js'
 
 const sentryDsn = process.env['SENTRY_DSN']
 const sentryEnvironment = process.env['SENTRY_ENVIRONMENT'] ?? process.env['ENV'] ?? process.env['NODE_ENV']
@@ -51,14 +52,6 @@ export const sdk = new NodeSDK({
 })
 
 sdk.start()
+setOtelSdk(sdk)
 // Must come after sdk.start() for getMeterProvider to return something
 new HostMetrics({ meterProvider: metrics.getMeterProvider() }).start()
-
-process.on('SIGTERM', () => {
-  sdk
-    .shutdown()
-    .then(
-      () => console.log('SDK shut down successfully'),
-      (err) => console.log(new Error('Error shutting down SDK', { cause: err }))
-    )
-})

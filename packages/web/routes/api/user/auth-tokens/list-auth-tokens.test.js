@@ -68,7 +68,7 @@ await suite('list auth tokens', async () => {
       assert.strictEqual(listBody.data.length, 1, 'Should have exactly one token')
 
       assert.ok(listBody.pagination, 'Should have pagination metadata')
-      assertPaginationShape(assert, listBody.pagination)
+      assertPaginationShape(listBody.pagination)
     })
 
     await t.test('marks current token with is_current: true', async (t) => {
@@ -86,7 +86,7 @@ await suite('list auth tokens', async () => {
       const listBody = JSON.parse(listRes.payload)
       const currentToken = listBody.data[0]
 
-      assertTokenShape(assert, currentToken, { checkCurrent: true })
+      assertTokenShape(currentToken, { checkCurrent: true })
     })
 
     await t.test('returns proper token fields', async (t) => {
@@ -104,7 +104,7 @@ await suite('list auth tokens', async () => {
       const listBody = JSON.parse(listRes.payload)
       const token = listBody.data[0]
 
-      assertTokenShape(assert, token)
+      assertTokenShape(token)
 
       // Check date formats
       assert.ok(new Date(token.created_at).getTime() > 0, 'created_at should be valid date')

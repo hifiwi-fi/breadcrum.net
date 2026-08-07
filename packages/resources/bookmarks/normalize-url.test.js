@@ -1,6 +1,23 @@
 import { equal, ok } from 'node:assert'
 import { test } from 'node:test'
-import { normalizeURL } from './normalize-url.js'
+import { normalizeURL as normalizeURLWithLogger } from './normalize-url.js'
+
+/**
+ * @import { FastifyBaseLogger } from 'fastify'
+ * @import { NormalizeUrlOptions } from './normalize-url.js'
+ */
+
+const logger = /** @type {FastifyBaseLogger} */ (/** @type {unknown} */ ({
+  warn () {},
+}))
+
+/**
+ * @param {URL} url
+ * @param {Omit<NormalizeUrlOptions, 'logger'>} options
+ */
+function normalizeURL (url, options) {
+  return normalizeURLWithLogger(url, { ...options, logger })
+}
 
 // YouTube normalization tests
 test('normalizeURL - youtube shorts normalize to watch', async () => {
