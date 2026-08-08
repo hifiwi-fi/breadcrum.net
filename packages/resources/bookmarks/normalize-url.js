@@ -1,5 +1,7 @@
 import { isNotSSRF } from '../urls/ssrf-check.js'
 
+/** @import { FastifyBaseLogger } from 'fastify' */
+
 /**
  * @typedef {object} NormalizeUrlCache
  * @property {(key: string) => Promise<unknown>} get
@@ -12,6 +14,7 @@ import { isNotSSRF } from '../urls/ssrf-check.js'
  * @property {number} [maxRedirects=5] - Max redirect hops when expanding short URLs.
  * @property {number} [timeoutMs=5000] - Timeout per request when expanding short URLs.
  * @property {NormalizeUrlCache} [cache] - Optional cache for shortener expansions.
+ * @property {FastifyBaseLogger} logger - Request logger for correlated validation failures.
  */
 
 const SHORTENER_CACHE_TTL_MS = 5 * 60 * 1000
@@ -88,19 +91,17 @@ const X_HOSTS = new Set([
  * Normalizes a URL object by modifying its host property if necessary.
  *
  * @param {URL} url - The URL string to be normalized.
- * @param {NormalizeUrlOptions} [options] - Optional normalization configuration.
+ * @param {NormalizeUrlOptions} options - Normalization configuration and request logger.
  * @returns {Promise<URL>} An object containing the normalized URL string.
  */
-export async function normalizeURL (url, options = {}) {
-  const { followShorteners = true, maxRedirects = 5, timeoutMs = 5000, cache } = options
+export async function normalizeURL (url, options) {
+  const { followShorteners = true, maxRedirects = 5, timeoutMs = 5000, cache, logger } = options
   let workingUrl = new URL(url.toString())
 
   sanitizeUrl(workingUrl)
 
   if (followShorteners && typeof fetch === 'function' && isShortenerHost(workingUrl.hostname)) {
-    const expandOptions = cache
-      ? { maxRedirects, timeoutMs, cache }
-      : { maxRedirects, timeoutMs, cache: undefined }
+    const expandOptions = { maxRedirects, timeoutMs, cache, logger }
     workingUrl = await expandShortUrl(workingUrl, expandOptions)
     sanitizeUrl(workingUrl)
   }
@@ -250,7 +251,7 @@ function sortQueryParams (url) {
 
 /**
  * @param {URL} url
- * @param {{ maxRedirects: number, timeoutMs: number, cache: NormalizeUrlCache | undefined }} options
+ * @param {{ maxRedirects: number, timeoutMs: number, cache: NormalizeUrlCache | undefined, logger: FastifyBaseLogger }} options
  * @returns {Promise<URL>}
  */
 async function expandShortUrl (url, options) {
@@ -274,7 +275,7 @@ async function expandShortUrl (url, options) {
     if (!nextUrl || !isHttpProtocol(nextUrl.protocol) || visited.has(nextUrl.href)) break
 
     // SSRF protection: reject redirects to internal/private IPs using comprehensive DNS-based checks
-    const isSafe = await isNotSSRF(nextUrl.href)
+    const isSafe = await isNotSSRF(nextUrl.href, options.logger)
     if (!isSafe) break
 
     visited.add(nextUrl.href)

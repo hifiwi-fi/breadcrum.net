@@ -273,7 +273,11 @@ export function makeBookmarkPgBossP ({ fastify }) {
               log.warn(err, 'Failed to resolve embed for episode')
             }
 
-            console.dir({ oembed })
+            log.debug({
+              oembedResolved: oembed !== null,
+              oembedProvider: oembed?.provider_name ?? null,
+              oembedType: oembed?.type ?? null,
+            }, 'episode embed resolution result')
 
             await finalizeEpisode({
               pg,

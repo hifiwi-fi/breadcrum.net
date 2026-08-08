@@ -36,7 +36,7 @@ await suite('create auth token', async () => {
 
       // Check auth token details
       const authToken = createBody.auth_token
-      assertTokenShape(assert, authToken, { checkCurrent: false })
+      assertTokenShape(authToken, { checkCurrent: false })
       assert.strictEqual(authToken.note, 'My work laptop', 'Should have correct note')
       assert.strictEqual(authToken.protect, true, 'Should have correct protect status')
       assert.strictEqual(authToken.is_current, false, 'New token should not be current')
@@ -64,7 +64,7 @@ await suite('create auth token', async () => {
 
       // Check auth token details
       const authToken = createBody.auth_token
-      assertTokenShape(assert, authToken, { checkCurrent: false })
+      assertTokenShape(authToken, { checkCurrent: false })
       assert.strictEqual(authToken.note, null, 'Should have null note when not provided')
       assert.strictEqual(authToken.protect, false, 'Should have false protect when not provided')
       assert.strictEqual(authToken.is_current, false, 'New token should not be current')

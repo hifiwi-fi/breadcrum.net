@@ -40,7 +40,7 @@ await suite('get specific auth token', async () => {
       assert.strictEqual(getRes.statusCode, 200, 'Should return 200 OK')
       const getBody = JSON.parse(getRes.payload)
       assert.strictEqual(getBody.jti, tokenJti, 'Should return the requested token')
-      assertTokenShape(assert, getBody)
+      assertTokenShape(getBody)
     })
 
     await t.test('correctly identifies current token with is_current: true', async (t) => {
