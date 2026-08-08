@@ -64,7 +64,7 @@ async function dnsRebindingCheck (hostname) {
 /**
  * @param {string} urlString
  * @param {FastifyBaseLogger} logger
- * @return {Promise<Boolean>}
+ * @returns {Promise<boolean>}
  */
 export async function isNotSSRF (urlString, logger) {
   try {

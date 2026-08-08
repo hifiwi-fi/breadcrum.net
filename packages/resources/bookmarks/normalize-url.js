@@ -101,9 +101,7 @@ export async function normalizeURL (url, options) {
   sanitizeUrl(workingUrl)
 
   if (followShorteners && typeof fetch === 'function' && isShortenerHost(workingUrl.hostname)) {
-    const expandOptions = cache
-      ? { maxRedirects, timeoutMs, cache, logger }
-      : { maxRedirects, timeoutMs, cache: undefined, logger }
+    const expandOptions = { maxRedirects, timeoutMs, cache, logger }
     workingUrl = await expandShortUrl(workingUrl, expandOptions)
     sanitizeUrl(workingUrl)
   }

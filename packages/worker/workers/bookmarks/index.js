@@ -277,7 +277,7 @@ export function makeBookmarkPgBossP ({ fastify }) {
               oembedResolved: oembed !== null,
               oembedProvider: oembed?.provider_name ?? null,
               oembedType: oembed?.type ?? null,
-            }, 'resolved episode embed')
+            }, 'episode embed resolution result')
 
             await finalizeEpisode({
               pg,
