@@ -245,8 +245,8 @@ importers:
         specifier: 'catalog:'
         version: 7.0.0
       '@fastify/formbody':
-        specifier: ^8.0.1
-        version: 8.0.2
+        specifier: ^9.0.0
+        version: 9.0.0
       '@fastify/helmet':
         specifier: ^13.0.0
         version: 13.0.2
@@ -940,8 +940,8 @@ packages:
   '@fastify/fast-json-stringify-compiler@5.0.3':
     resolution: {integrity: sha512-uik7yYHkLr6fxd8hJSZ8c+xF4WafPK+XzneQDPU+D10r5X19GW8lJcom2YijX2+qtFF1ENJlHXKFM9ouXNJYgQ==}
 
-  '@fastify/formbody@8.0.2':
-    resolution: {integrity: sha512-84v5J2KrkXzjgBpYnaNRPqwgMsmY7ZDjuj0YVuMR3NXCJRCgKEZy/taSP1wUYGn0onfxJpLyRGDLa+NMaDJtnA==}
+  '@fastify/formbody@9.0.0':
+    resolution: {integrity: sha512-T/af26CSrUARBCvsEmv+DJLPfZlrRKESzqironxP1j7qzuLyKcoZtj6MuTGShuKx1THXugoie2oFbUJxXfGFzA==}
 
   '@fastify/forwarded@3.0.1':
     resolution: {integrity: sha512-JqDochHFqXs3C3Ml3gOY58zM7OqO9ENqPo0UqAjAjH8L01fRZqwX9iLeX34//kiJubF7r2ZQHtBRU36vONbLlw==}
@@ -4986,10 +4986,10 @@ snapshots:
     dependencies:
       fast-json-stringify: 6.4.0
 
-  '@fastify/formbody@8.0.2':
+  '@fastify/formbody@9.0.0':
     dependencies:
       fast-querystring: 1.1.2
-      fastify-plugin: 5.1.0
+      fastify-plugin: 6.0.0
 
   '@fastify/forwarded@3.0.1': {}
 
