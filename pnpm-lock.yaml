@@ -22,8 +22,8 @@ catalogs:
       specifier: ^6.0.2
       version: 6.0.2
     '@fastify/redis':
-      specifier: ^8.0.0
-      version: 8.0.0
+      specifier: ^9.0.0
+      version: 9.0.0
     '@fastify/sensible':
       specifier: ^6.0.1
       version: 6.0.4
@@ -264,7 +264,7 @@ importers:
         version: 11.1.0
       '@fastify/redis':
         specifier: 'catalog:'
-        version: 8.0.0
+        version: 9.0.0
       '@fastify/sensible':
         specifier: 'catalog:'
         version: 6.0.4
@@ -475,7 +475,7 @@ importers:
         version: 6.0.2(pg@8.22.0)
       '@fastify/redis':
         specifier: 'catalog:'
-        version: 8.0.0
+        version: 9.0.0
       '@fastify/sensible':
         specifier: 'catalog:'
         version: 6.0.4
@@ -971,8 +971,8 @@ packages:
   '@fastify/rate-limit@11.1.0':
     resolution: {integrity: sha512-BeJ9tizLvmTXGD7deYU5G04OtHhwk5uHxbpEPVp09gKvUBIXmau/4Bshxhu9ci54MvVWfGjCEx4RzvsTntojwA==}
 
-  '@fastify/redis@8.0.0':
-    resolution: {integrity: sha512-+ljufdQHWhUAJmyn5m7GnqjwcuyN2XLgl9Lvxe/o353YQwyw258Rkf0K/2MBkxMKlv3pJvB8SnBrW/XBbcA9tQ==}
+  '@fastify/redis@9.0.0':
+    resolution: {integrity: sha512-NGE2w+dyFq5VNQOBxfeGs8vP/snEZ/dvQAy0b2LJDNtUiat38gGFXtK9HU6fw0Gx+Uv0n0aMPuBpEt8B+Y9/nA==}
 
   '@fastify/send@4.1.0':
     resolution: {integrity: sha512-TMYeQLCBSy2TOFmV95hQWkiTYgC/SEx7vMdV+wnZVX4tt8VBLKzmH8vV9OzJehV0+XBfg+WxPMt5wp+JBUKsVw==}
@@ -1032,6 +1032,9 @@ packages:
 
   '@ioredis/commands@1.10.0':
     resolution: {integrity: sha512-UmeW7z4LfctwoQ5wkhVzgq8tXkreED2xZGpX+Bg+zA+WJFZCT6c062AfCK/Dfk81xZnnwdhJCUMkitihRaoC2Q==}
+
+  '@ioredis/commands@2.0.0':
+    resolution: {integrity: sha512-vrx0AE/T0h7cRZwfo1M39Cr+ZhZrkf0V8mQN75wucKCxCLD9l/VX6no3gFvrLqD1IlG/1LtzWovqEw3t0Vr9zg==}
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -2996,9 +2999,9 @@ packages:
     resolution: {integrity: sha512-tVrCrc4LWJwX82GD79dZ0teZQGq+5KJEGpXJRgzHOrhHtLgF9ME6rTwDV5+HN5bjnvmtrnS8ioXhflY16sy2HQ==}
     engines: {node: '>=6'}
 
-  ioredis@5.11.1:
-    resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
-    engines: {node: '>=12.22.0'}
+  ioredis@6.0.0:
+    resolution: {integrity: sha512-f+Dtubxfpf6KYFq7WVXJoOLn0bk4TJrMrN9SzeE+jrWrCWj7XX3fA6vkryafhADX+GMymRxgDJDOI33COkJc0w==}
+    engines: {node: '>=20.0.0'}
 
   ipaddr.js@2.4.0:
     resolution: {integrity: sha512-9VGk3HGanVE6JoZXHiCpnGy5X0jYDnN4EA4lntFPj+1vIWlFhIylq2CrrCOJH9EAhc5CYhq18F2Av2tgoAPsYQ==}
@@ -5036,10 +5039,10 @@ snapshots:
       fastify-plugin: 6.0.0
       toad-cache: 3.7.1
 
-  '@fastify/redis@8.0.0':
+  '@fastify/redis@9.0.0':
     dependencies:
-      fastify-plugin: 5.1.0
-      ioredis: 5.11.1
+      fastify-plugin: 6.0.0
+      ioredis: 6.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -5138,6 +5141,8 @@ snapshots:
   '@humanwhocodes/retry@0.4.3': {}
 
   '@ioredis/commands@1.10.0': {}
+
+  '@ioredis/commands@2.0.0': {}
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -7203,14 +7208,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ioredis@5.11.1:
+  ioredis@6.0.0:
     dependencies:
-      '@ioredis/commands': 1.10.0
+      '@ioredis/commands': 2.0.0
       cluster-key-slot: 1.1.1
       debug: 4.4.3
       denque: 2.1.0
       redis-errors: 1.2.0
-      redis-parser: 3.0.0
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
