@@ -28,6 +28,7 @@ async function pgPlugin (fastify) {
     // pg default: false; detect stale app-to-PgBouncer sockets
     keepAlive: true,
     keepAliveInitialDelayMillis: fastify.config.PG_KEEP_ALIVE_INITIAL_DELAY_MS,
+    pipeline: true,
   })
 }
 
