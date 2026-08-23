@@ -61,8 +61,8 @@ catalogs:
       specifier: ^26.1.0
       version: 26.1.0
     '@types/pg':
-      specifier: ^8.11.10
-      version: 8.20.0
+      specifier: ^8.23.1
+      version: 8.23.1
     '@voxpelli/tsconfig':
       specifier: ^16.2.1
       version: 16.2.1
@@ -97,8 +97,8 @@ catalogs:
       specifier: ^9.0.2
       version: 9.0.2
     pg:
-      specifier: ^8.16.3
-      version: 8.22.0
+      specifier: ^8.23.0
+      version: 8.23.0
     type-fest:
       specifier: ^5.7.0
       version: 5.7.0
@@ -146,7 +146,7 @@ importers:
         version: 1.0.5
       '@fastify/postgres':
         specifier: 'catalog:'
-        version: 6.0.2(pg@8.22.0)
+        version: 6.0.2(pg@8.23.0)
       '@nearform/sql':
         specifier: 'catalog:'
         version: 1.10.8
@@ -164,7 +164,7 @@ importers:
         version: 3.0.2
       pg:
         specifier: 'catalog:'
-        version: 8.22.0
+        version: 8.23.0
       pg-boss:
         specifier: ^12.18.1
         version: 12.24.1
@@ -183,7 +183,7 @@ importers:
         version: 26.1.0
       '@types/pg':
         specifier: 'catalog:'
-        version: 8.20.0
+        version: 8.23.1
       '@voxpelli/tsconfig':
         specifier: 'catalog:'
         version: 16.2.1(typescript@6.0.3)
@@ -258,7 +258,7 @@ importers:
         version: 0.19.0(@opentelemetry/api@1.9.1)
       '@fastify/postgres':
         specifier: 'catalog:'
-        version: 6.0.2(pg@8.22.0)
+        version: 6.0.2(pg@8.23.0)
       '@fastify/rate-limit':
         specifier: ^11.0.0
         version: 11.1.0
@@ -357,10 +357,10 @@ importers:
         version: 9.0.3
       pg:
         specifier: 'catalog:'
-        version: 8.22.0
+        version: 8.23.0
       postgrator-cli:
         specifier: ^10.0.0
-        version: 10.0.0(pg@8.22.0)
+        version: 10.0.0(pg@8.23.0)
       preact:
         specifier: ^10.29.2
         version: 10.29.3
@@ -397,7 +397,7 @@ importers:
         version: 8.0.1
       '@types/pg':
         specifier: 'catalog:'
-        version: 8.20.0
+        version: 8.23.1
       '@types/useragent':
         specifier: ^2.3.4
         version: 2.3.4
@@ -472,7 +472,7 @@ importers:
         version: 0.19.0(@opentelemetry/api@1.9.1)
       '@fastify/postgres':
         specifier: 'catalog:'
-        version: 6.0.2(pg@8.22.0)
+        version: 6.0.2(pg@8.23.0)
       '@fastify/redis':
         specifier: 'catalog:'
         version: 9.0.0
@@ -1830,8 +1830,8 @@ packages:
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
 
-  '@types/pg@8.20.0':
-    resolution: {integrity: sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow==}
+  '@types/pg@8.23.1':
+    resolution: {integrity: sha512-fKVHpikPdg4GKks3JuLEhvwSyvwzF23hnabPy6DD8ljVbC7+6J5dQzdv4arV6jqq57djnMgs1HKBxX4P8aBI3A==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -3706,12 +3706,15 @@ packages:
   pg-protocol@1.15.0:
     resolution: {integrity: sha512-cq9sECI5s0+uPUXjbz8ioyPJni6RzsRib0US67i5IoTZKw8fNeYlVE7u8F4dG7vEJJtc5wdD1K189lCCUwqWTQ==}
 
+  pg-protocol@1.16.0:
+    resolution: {integrity: sha512-sILXutLVjCLjcDuOmvhX5e2Z4cS5qG/6Bu3VkpFwdf/633ElGLpEh9bgmuI5I4sqKqkifQiGyiCcx1HdtrK7tg==}
+
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
 
-  pg@8.22.0:
-    resolution: {integrity: sha512-8wih1vVIBMxoUM2oB4soJsD9tDnDpLv4OXBJ+EJzFsvycD+lfyIreC2gGHq78f8jbLLt+bvlPTFdFZfJkOuzAA==}
+  pg@8.23.0:
+    resolution: {integrity: sha512-Ip2EQCngowJLGOfCwkFhPXU7/ljlhn6Rxlmy4XYfL2Y+vyRM59+8uR2xqRWKdYmbXmxCFOAmKxBuSUCdF34qLg==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -5023,10 +5026,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@fastify/postgres@6.0.2(pg@8.22.0)':
+  '@fastify/postgres@6.0.2(pg@8.23.0)':
     dependencies:
       fastify-plugin: 5.1.0
-      pg: 8.22.0
+      pg: 8.23.0
 
   '@fastify/proxy-addr@5.1.0':
     dependencies:
@@ -5932,7 +5935,7 @@ snapshots:
 
   '@types/normalize-package-data@2.4.4': {}
 
-  '@types/pg@8.20.0':
+  '@types/pg@8.23.1':
     dependencies:
       '@types/node': 26.1.0
       pg-protocol: 1.15.0
@@ -7901,7 +7904,7 @@ snapshots:
   pg-boss@12.24.1:
     dependencies:
       cron-parser: 5.6.1
-      pg: 8.22.0
+      pg: 8.23.0
       serialize-error: 13.0.1
     transitivePeerDependencies:
       - pg-native
@@ -7913,11 +7916,13 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-pool@3.14.0(pg@8.22.0):
+  pg-pool@3.14.0(pg@8.23.0):
     dependencies:
-      pg: 8.22.0
+      pg: 8.23.0
 
   pg-protocol@1.15.0: {}
+
+  pg-protocol@1.16.0: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -7927,11 +7932,11 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.22.0:
+  pg@8.23.0:
     dependencies:
       pg-connection-string: 2.14.0
-      pg-pool: 3.14.0(pg@8.22.0)
-      pg-protocol: 1.15.0
+      pg-pool: 3.14.0(pg@8.23.0)
+      pg-protocol: 1.16.0
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
@@ -7999,7 +8004,7 @@ snapshots:
       async: 2.6.4
       is-number-like: 1.0.8
 
-  postgrator-cli@10.0.0(pg@8.22.0):
+  postgrator-cli@10.0.0(pg@8.23.0):
     dependencies:
       command-line-args: 6.0.2
       command-line-usage: 7.0.4
@@ -8008,7 +8013,7 @@ snapshots:
       postgrator: 8.0.0
       yaml: 2.9.0
     optionalDependencies:
-      pg: 8.22.0
+      pg: 8.23.0
     transitivePeerDependencies:
       - '@75lb/nature'
 
