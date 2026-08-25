@@ -112,9 +112,7 @@ catalogs:
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
 patchedDependencies:
-  giscus@1.6.0:
-    hash: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
-    path: patches/giscus@1.6.0.patch
+  giscus@1.6.0: 73dec956ff02928aa00fad03a3dec2fead661753ace1585c7736da5579a11c8d
 
 importers:
 
