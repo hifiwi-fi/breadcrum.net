@@ -126,7 +126,7 @@ jobs:
           fi
           echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
           echo "$NEW_VERSION"
-      - uses: bcomnes/npm-bump@8e67058c250579782ed12d6e591c8d07b7b0cae4 # v3
+      - uses: bcomnes/npm-bump@b587a4f7c366cda0768fca754980054c91dee972 # v3
         with:
           git-email: bcomnes@gmail.com
           git-username: ${{ github.actor }}
