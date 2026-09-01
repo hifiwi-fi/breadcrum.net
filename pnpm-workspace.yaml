@@ -44,7 +44,7 @@ catalog:
   neostandard: 0.14.0-next
   npm-run-all2: ^9.0.2
   pg: ^8.23.0
-  type-fest: ^5.7.0
+  type-fest: ^5.9.0
   typescript: ~6.0.3
   undici: ^8.10.0
 
