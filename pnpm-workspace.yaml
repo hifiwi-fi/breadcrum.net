@@ -46,7 +46,7 @@ catalog:
   pg: ^8.23.0
   type-fest: ^5.7.0
   typescript: ~6.0.3
-  undici: ^8.10.0
+  undici: ^8.10.1
 
 packageExtensions:
   htm:
