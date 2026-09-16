@@ -4,7 +4,34 @@ Write Markdown prose with one sentence per source line.
 Use one newline between sentences to keep them in the same paragraph.
 Use two newlines to start a new paragraph.
 
-This is a TypeScript-in-JavaScript type checked codebase. All code uses JSDoc comments for type annotations and is type-checked by TypeScript without requiring .ts files.
+This is a TypeScript-in-JavaScript type checked codebase.
+All code uses JSDoc comments for type annotations and is type-checked by TypeScript without requiring .ts files.
+
+## Package and runtime layout
+
+Use Node.js 26+ and pnpm 10.34.5 from the repository root.
+There is one private ESM package and one root lockfile; do not use workspace recursion or package filters.
+Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
+Install reproducibly with `pnpm install --frozen-lockfile`.
+
+API routes/schemas live in `src/api/`, consumers/processors in `src/worker/`, shared domain/queue code in `src/resources/`, and browser code in `client/`.
+Use the single `src/app.js` application composition; keep `src/main.js` for runtime bootstrap and lifecycle.
+Do not reintroduce `src/api/app.js`, `src/worker/app.js`, or the `src/config/server-options.js` Fastify CLI helper.
+Keep plugins under one root `src/plugins/` tree, imported across areas through `#plugins/*`.
+Use `src/plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `src/plugins/api/` for auth, static serving, flags, and other API-only plugins; and `src/plugins/worker/` for pg-boss consumer registration.
+Keep shared environment schemas, loading, role defaults, and application options in `src/config/`, imported across areas through `#config/*`.
+Do not introduce separate API or worker config folders.
+Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
+Development uses one backend process with `APP_ROLE=all node src/main.js`; production explicitly selects `APP_ROLE=api` or `APP_ROLE=worker` from the same image.
+`APP_ROLE` is required and must be `api`, `worker`, or `all`; missing/unknown roles fail startup, and `--role` flags are unsupported.
+Reject `all` when either `NODE_ENV=production` or `ENV=production`.
+The runtime image runs `node src/main.js` without an implicit role default; callers must supply `APP_ROLE`.
+Fly process commands select roles with `env APP_ROLE=api node src/main.js` and `env APP_ROLE=worker node src/main.js`; never set a global Fly `APP_ROLE` default.
+Only the `app` Fly process group is publicly routed; the worker group stays internal and continuously running.
+
+Use one root local `.env` and never automatically overwrite existing files or env symlink targets.
+Deployments, production migrations, secret changes, and worker cutover require explicit authorization.
+Do not run `scripts/deploy-with-sentry.sh` to validate configuration: it performs real external writes.
 
 ## JSDoc Typing Patterns
 
@@ -151,9 +178,9 @@ Common aliases:
 
 ```javascript
 // ✅ Cross-area imports use package aliases
-import { build } from '#test/helper.js'
-import { defaultFrontendFlags } from '#plugins/flags/frontend-flags.js'
-/** @import { TypeUserRead } from '#routes/api/user/schemas/schema-user-read.js' */
+import { build } from '#api/test/helper.js'
+import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
+/** @import { TypeUserRead } from '#api/routes/api/user/schemas/schema-user-read.js' */
 
 // ✅ Local sibling imports stay relative
 import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
@@ -162,7 +189,7 @@ import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 When a package import maps to a TypeScript source file, import it with its runtime `.js` specifier, and let `package.json#imports` map it to the `.ts` source for type checking:
 
 ```javascript
-/** @import { ExtractKnownResponseType } from '#types/fastify-utils.js' */
+/** @import { ExtractKnownResponseType } from '#api/types/fastify-utils.js' */
 ```
 
 ### Preact Component Type Import Syntax
@@ -485,25 +512,25 @@ This pattern ensures:
 - Tests are usually in the same directory as the code they test
 - All tests are written with the Node.js test runner
 - Cannot use `npm test -- --grep "pattern"` - that's for other test runners. Use `node --test --test-name-pattern="pattern"` to filter tests by name pattern
-- Use the test script in package.json for workspace-specific testing
+- Use the root package.json test scripts; select individual suites with the Node.js test runner
 - **Always check editor diagnostics before running unit tests** - fix any TypeScript/JSDoc errors first to avoid test failures
 - **Test resource cleanup**: Tests that create resources (users, tokens, etc.) should clean them up using appropriate test lifecycle hooks (`t.after()`)
 - **Database cascade deletes**: Resources should be designed with proper foreign key constraints and cascade deletes to automatically clean up dependent resources
-- **Auto-formatting**: Use `npm run test:eslint -- --fix` to automatically fix ESLint formatting errors
+- **Auto-formatting**: Use `pnpm run test:eslint --fix` to automatically fix ESLint formatting errors
 - **Documentation lookup**: Use context7 with discovered library IDs (e.g., `/nodejs/node`, `/bcomnes/domstack`) to skip the resolve step and look up docs directly
 - Avoid branching or skipping tests. If something isn't right fail the tests.
 - Avoid using colsole debugging in tests when an asserts can be used instead, unless you are solving a problem and just need console output short term.
 
 ## Client-Side Code
 
-- Client-side code is written using @domstack/static in the `packages/web/client` folder
+- Client-side code is written using @domstack/static in the root `client` folder
 - All client-side code is directly runnable in Node.js and browsers via esbuild
 - Client-side JavaScript bundles are built using @domstack/static's build system with esbuild
 - Page-specific client code goes in `client.js` files alongside page files.
 - Layout-specific client code goes in `.layout.client.js` files
 - Global client code goes in `global.client.js`
 - All client code supports ESM imports and can import from npm packages
-- When working on client side code (anything that runs in the browser) in the `pacakges/web/client` folder, always ensure we set the following headers/pragma:
+- When working on client side code (anything that runs in the browser) in the root `client` folder, always ensure we set the following headers/pragma:
 
 ```js
 /// <reference lib="dom" />
@@ -694,39 +721,26 @@ ${tc(MyComponent, { prop: value, onSave: handler })}
 
 Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts with `:` separator (e.g., `test:node`, `test:eslint`) are used in glob patterns like `run-s test:*`. Individual steps can also be run directly. This repo will follow this pattern strictly.
 
-### Root Level Scripts
-- `npm test` - Run tests in all workspaces
-- `npm run test-web` - Run tests specifically in web workspace
-- `npm run test-worker` - Run tests specifically in worker workspace
-- `npm run watch` - Start development mode (both web and worker)
-- `npm run build` - Build all workspaces
-- `npm run migrate` - Run database migrations
-- `npm run start` - Alias for watch
-- `npm run deploy` - Deploy both web and worker to production
-- `npm run neostandard` - Run linter across project
-- `npm run knip` - Check for unused dependencies
-- `npm run deps` - Generate dependency graph
+### Root scripts
 
-### Web Workspace Scripts
-- `npm run test` - Run eslint and node tests with coverage
-- `npm run test:node` - Run node tests with c8 coverage
-- `npm run test:eslint` - Run eslint
-- `npm run watch` - Start development server with file watching
-- `npm run build` - Build client assets with @domstack/static
-- `npm run migrate` - Run database migrations with postgrator
-- `npm run prod-sim` - Start production simulation
-- `npm run print-routes` - Print all fastify routes
-- `npm run print-plugins` - Print all fastify plugins
+- `pnpm test` - Run root lint, type, Node.js test, and dependency checks.
+- `pnpm run test:node` - Run the Node.js suites with coverage.
+- `pnpm run test:eslint` - Run ESLint.
+- `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
+- `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.
+- `pnpm run watch:server` - Run `APP_ROLE=all node --watch --watch-preserve-output src/main.js`.
+- `pnpm run start:api` / `pnpm run start:worker` - Run `APP_ROLE=api node src/main.js` / `APP_ROLE=worker node src/main.js` without watching.
+- `pnpm run build` - Build root browser assets with @domstack/static.
+- `pnpm run migrate` - Run root Postgrator migrations without booting application roles.
+- `pnpm run generate-default-env` - Create root development defaults without replacing existing env files.
+- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api node scripts/inspect-app.js routes` / `plugins`, not the Fastify CLI.
+- `pnpm run deploy` - Explicitly deploy the shared image to both Fly groups, only when authorized.
+- `node scripts/verify-giscus-patch.js --built` - Verify the installed and emitted native Giscus patch.
 
-### Worker Workspace Scripts
-- `npm run test` - Run eslint, node tests, and typescript check
-- `npm run test:node` - Run node tests with c8 coverage
-- `npm run test:eslint` - Run eslint
-- `npm run test:tsc` - Run typescript check
-- `npm run watch` - Start development worker with file watching
-- `npm run prod-sim` - Start production simulation
-- `npm run print-routes` - Print all fastify routes
-- `npm run print-plugins` - Print all fastify plugins
+Inspection loads and closes `src/app.js` without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
+Zed debug configurations select `APP_ROLE` through `env`, never role arguments.
+Keep native pnpm patches enabled in frozen installs and production dependency installs.
+Do not introduce workspace `pnpm deploy`, package filters, or separate per-role images.
 
 ## External package availability
 

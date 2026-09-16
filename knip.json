@@ -1,43 +1,17 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
-  "ignore": [],
-  "ignoreBinaries": ["eslint"],
-  "ignoreUnresolved": [],
-  "ignoreDependencies": [],
-  "ignoreWorkspaces": [],
-  "workspaces": {
-    ".": {
-      "entry": ["eslint.config.js"]
-    },
-    "packages/web": {
-      "entry": [
-        "app.js",
-        "client/**/*.js",
-        "plugins/**/*.js",
-        "routes/**/{routes,autohooks}.js",
-        "scripts/**/*.js",
-        "test/**/*.js",
-        "otel.js"
-      ],
-      "ignoreDependencies": ["highlight.js", "mine.css"],
-      "ignoreBinaries": [],
-      "project": ["**/*.js"]
-    },
-    "packages/worker": {
-      "entry": [
-        "app.js",
-        "plugins/**/*.js",
-        "routes/**/index.js",
-        "scripts/**/*.js",
-        "test/**/*.js",
-        "workers/bookmarks/ua.js",
-        "otel.js"
-      ],
-      "project": ["**/*.js"]
-    },
-    "packages/*": {
-      "entry": ["**/*.js"],
-      "project": ["**/*.js"]
-    }
-  }
+  "entry": [
+
+    "src/plugins/**/*.js",
+    "src/api/routes/**/{routes,autohooks}.js",
+
+    "client/**/*.js",
+    "scripts/**/*.js",
+    "src/**/test/**/*.js",
+    "src/**/*.test.js",
+    "src/worker/workers/bookmarks/ua.js"
+  ],
+  "project": ["src/**/*.{js,ts}", "client/**/*.js", "scripts/**/*.js"],
+  "ignoreDependencies": ["highlight.js", "mine.css"],
+  "ignoreBinaries": ["redis-server"]
 }

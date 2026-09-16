@@ -1,0 +1,114 @@
+# One image, two independently running process groups in the existing app.
+# Deployments and the initial bc-worker cutover require separate approval.
+app = "breadcrum"
+primary_region = "lax"
+kill_signal = "SIGINT"
+kill_timeout = "120s"
+swap_size_mb = 1024
+
+[experimental]
+  auto_rollback = true
+
+[build]
+  dockerfile = "Dockerfile"
+  [build.args]
+    ENV = "production"
+    HOST = "breadcrum.net"
+    NODE_ENV = "production"
+    NODE_VERSION = "26"
+    TRANSPORT = "https"
+
+[deploy]
+  # Skip local connection defaults; the release Machine needs PostgreSQL PG* env/secrets.
+  release_command = "node --run migrate -- --no-config"
+
+[processes]
+  app = "env APP_ROLE=api node src/main.js"
+  worker = "env APP_ROLE=worker node src/main.js"
+
+# Select APP_ROLE per process above, never as an app-wide default.
+[env]
+  ENV = "production"
+  LISTEN_HOST = "0.0.0.0"
+  FASTIFY_LOG_LEVEL = "info"
+  HOST = "breadcrum.net"
+  NODE_ENV = "production"
+  NODE_OPTIONS = "--max-old-space-size=512"
+  PORT = "8080"
+  PQUEUE_CONCURRENCY = "2"
+  TRANSPORT = "https"
+  METRICS = "1"
+  OTEL_SERVICE_VERSION = "1.0.0"
+  OTEL_RESOURCE_ATTRIBUTES = "deployment.environment=production"
+  SECURE_IFRAMES = "true"
+  # Service identities and metrics ports are selected by runtime role.
+  # Runtime selects SENTRY_API_DSN / SENTRY_WORKER_DSN by role, falling back
+  # to SENTRY_DSN. Configure distinct role DSNs as app-wide Fly secrets.
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+  auto_stop_machines = "off"
+  auto_start_machines = false
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "15s"
+
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "2s"
+    grace_period = "5s"
+    method = "get"
+    path = "/health"
+    protocol = "http"
+
+# A queue consumer cannot be woken by HTTP traffic; keep worker capacity running.
+[[restart]]
+  policy = "always"
+  processes = ["worker"]
+
+# These monitor readiness but do not restart a still-running unhealthy process.
+[checks.worker]
+  type = "http"
+  port = 8080
+  path = "/health"
+  method = "get"
+  interval = "15s"
+  timeout = "2s"
+  grace_period = "15s"
+  processes = ["worker"]
+
+[checks.worker_tcp]
+  type = "tcp"
+  port = 8080
+  interval = "15s"
+  timeout = "2s"
+  grace_period = "15s"
+  processes = ["worker"]
+
+[[metrics]]
+  port = 9091
+  path = "/metrics"
+  processes = ["app"]
+
+[[metrics]]
+  port = 9092
+  path = "/metrics"
+  processes = ["worker"]

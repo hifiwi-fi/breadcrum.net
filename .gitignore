@@ -6,10 +6,13 @@ lcov.info
 public
 ./yt-dlp
 .env
+.env.*
 dependency-graph.html
 *.dbml
 .tap
 tsconfig.tsbuildinfo
 deploy
-packages/web/data/geoip
+data/geoip
+# Keep pre-consolidation local caches ignored until users relocate them.
+packages/web/data/geoip/
 .claude/

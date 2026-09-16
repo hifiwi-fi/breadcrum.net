@@ -1,0 +1,150 @@
+/**
+ * @import { FastifyPluginAsync } from 'fastify'
+ * @import { City } from '@maxmind/geoip2-node'
+ */
+import fp from 'fastify-plugin'
+import { Reader, AddressNotFoundError, ValueError } from '@maxmind/geoip2-node'
+import { constants as fsConstants } from 'node:fs'
+import { access } from 'node:fs/promises'
+import { join } from 'node:path'
+import { setTimeout as sleep } from 'node:timers/promises'
+import { updateGeoipDatabase } from '#api/lib/geoip-download.js'
+
+const defaultGeoipPath = join(process.cwd(), 'data', 'geoip', 'GeoLite2-City.mmdb')
+const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')
+const geoipStartupUpdateTimeoutMs = 10_000
+
+/**
+ * @typedef {object} GeoIpRegion
+ * @property {string | null} country_iso
+ * @property {string | null} country_name
+ * @property {string | null} flag_emoji
+ * @property {string | null} region_iso
+ * @property {string | null} region_name
+ * @property {string | null} city_name
+ * @property {string | null} time_zone
+ */
+
+/**
+ * @typedef {object} GeoIpLookup
+ * @property {(ip: string) => GeoIpRegion | null} lookup
+ */
+
+/**
+ * @param {City} response
+ * @returns {GeoIpRegion}
+ */
+function mapCityResponse (response) {
+  const region = response.subdivisions?.[0] ?? null
+  const countryIso = response.country?.isoCode ?? null
+  return {
+    country_iso: countryIso,
+    country_name: response.country?.names?.en ?? null,
+    flag_emoji: countryIsoToFlagEmoji(countryIso),
+    region_iso: region?.isoCode ?? null,
+    region_name: region?.names?.en ?? null,
+    city_name: response.city?.names?.en ?? null,
+    time_zone: response.location?.timeZone ?? null,
+  }
+}
+
+/**
+ * @param {string | null} countryIso
+ * @returns {string | null}
+ */
+export function countryIsoToFlagEmoji (countryIso) {
+  if (!countryIso) return null
+  const upper = countryIso.toUpperCase()
+  if (!/^[A-Z]{2}$/.test(upper)) return null
+  const indicatorOffset = 0x1F1E6 - 0x41
+  const codePoints = [
+    upper.charCodeAt(0) + indicatorOffset,
+    upper.charCodeAt(1) + indicatorOffset,
+  ]
+  return String.fromCodePoint(...codePoints)
+}
+
+/**
+ * @template T
+ * @param {(signal: AbortSignal) => Promise<T>} work
+ * @param {number} [timeoutMs]
+ * @returns {Promise<T>}
+ */
+export async function withGeoipStartupTimeout (work, timeoutMs = geoipStartupUpdateTimeoutMs) {
+  const signal = AbortSignal.timeout(timeoutMs)
+  const timeoutPromise = sleep(timeoutMs, undefined, { ref: false }).then(() => {
+    throw new Error(`GeoIP database update timed out after ${timeoutMs}ms.`)
+  })
+
+  return Promise.race([
+    work(signal),
+    timeoutPromise,
+  ])
+}
+
+export { geoipEnvSchema } from '#config/env-fragments.js'
+
+/** @type {FastifyPluginAsync} */
+async function geoipPlugin (fastify) {
+  const { MAXMIND_ACCOUNT_ID, MAXMIND_LICENSE_KEY } = fastify.config
+
+  if (MAXMIND_ACCOUNT_ID && MAXMIND_LICENSE_KEY) {
+    try {
+      await withGeoipStartupTimeout(signal => updateGeoipDatabase({
+        accountId: MAXMIND_ACCOUNT_ID,
+        licenseKey: MAXMIND_LICENSE_KEY,
+        editionId: 'GeoLite2-City',
+        dataDir: defaultGeoipDir,
+        signal,
+        logger: fastify.log,
+      }))
+    } catch (err) {
+      fastify.log.warn({ err }, 'GeoIP database update failed; using existing data if present')
+    }
+  }
+
+  try {
+    await access(defaultGeoipPath, fsConstants.R_OK)
+  } catch (err) {
+    fastify.log.warn({ err, path: defaultGeoipPath }, 'GeoIP database missing; skipping GeoIP lookups')
+    return
+  }
+
+  let reader
+  try {
+    reader = await Reader.open(defaultGeoipPath, {
+      cache: { max: 10000 },
+      watchForUpdates: true,
+      watchForUpdatesNonPersistent: true,
+    })
+  } catch (err) {
+    fastify.log.warn({ err, path: defaultGeoipPath }, 'GeoIP database failed to load; skipping GeoIP lookups')
+    return
+  }
+
+  /** @type {GeoIpLookup} */
+  const geoip = {
+    lookup (ip) {
+      if (!ip) return null
+      try {
+        const response = reader.city(ip)
+        return mapCityResponse(response)
+      } catch (err) {
+        if (err instanceof AddressNotFoundError || err instanceof ValueError) {
+          return null
+        }
+
+        const error = /** @type {Error} */ (err)
+        fastify.log.debug({ err: error, ip }, 'GeoIP lookup failed')
+        return null
+      }
+    },
+  }
+
+  fastify.decorate('geoip', geoip)
+}
+
+export default fp(geoipPlugin, {
+  name: 'geoip',
+  dependencies: ['env'],
+})

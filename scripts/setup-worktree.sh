@@ -1,64 +1,35 @@
 #!/bin/bash
-# Called by the Zed create_worktree hook to initialize a new worktree.
-# Symlinks .env files from the main worktree, copies ignored local data,
-# and runs pnpm install.
-#
-# Expected env vars (provided by Zed):
-#   ZED_WORKTREE_ROOT       — path to the newly created worktree
-#   ZED_MAIN_GIT_WORKTREE   — path to the main (original) worktree
-
+# Called by Zed's create_worktree hook; never replace local files or symlinks.
+# Zed supplies ZED_WORKTREE_ROOT and ZED_MAIN_GIT_WORKTREE.
 set -euo pipefail
 
-ENV_FILES=(
-  "packages/web/.env"
-  "packages/worker/.env"
-)
-
-COPY_DIRS=(
-  "packages/web/data/geoip"
-)
+: "${ZED_WORKTREE_ROOT:?Zed must supply the new worktree path}"
+: "${ZED_MAIN_GIT_WORKTREE:?Zed must supply the main worktree path}"
 
 echo "Setting up worktree: $ZED_WORKTREE_ROOT"
+src="$ZED_MAIN_GIT_WORKTREE/.env"
+dst="$ZED_WORKTREE_ROOT/.env"
+if [ -e "$dst" ] || [ -L "$dst" ]; then
+  echo "  Preserving existing .env file or symlink"
+elif [ -f "$src" ]; then
+  ln -s "$src" "$dst"
+  echo "  Linked root .env"
+else
+  echo "  No root .env in the main worktree; reconcile legacy env files manually."
+fi
 
-for rel_path in "${ENV_FILES[@]}"; do
-  src="$ZED_MAIN_GIT_WORKTREE/$rel_path"
-  dst="$ZED_WORKTREE_ROOT/$rel_path"
-
-  if [ ! -f "$src" ]; then
-    echo "  WARNING: source not found: $src"
-    continue
-  fi
-
+src="$ZED_MAIN_GIT_WORKTREE/data/geoip"
+dst="$ZED_WORKTREE_ROOT/data/geoip"
+if [ -e "$dst" ] || [ -L "$dst" ]; then
+  echo "  Preserving existing GeoIP data"
+elif [ -d "$src" ]; then
   mkdir -p "$(dirname "$dst")"
+  cp -R "$src" "$dst"
+  echo "  Copied GeoIP data"
+else
+  echo "  No GeoIP data in the main worktree; lookups will be unavailable until downloaded."
+fi
 
-  if [ -L "$dst" ]; then
-    echo "  Updating symlink: $rel_path"
-    ln -sf "$src" "$dst"
-  elif [ -f "$dst" ]; then
-    echo "  WARNING: regular file exists at $dst, skipping"
-  else
-    echo "  Creating symlink: $rel_path"
-    ln -s "$src" "$dst"
-  fi
-done
-
-for rel_path in "${COPY_DIRS[@]}"; do
-  src="$ZED_MAIN_GIT_WORKTREE/$rel_path"
-  dst="$ZED_WORKTREE_ROOT/$rel_path"
-
-  if [ ! -d "$src" ]; then
-    echo "  WARNING: source directory not found: $src"
-    continue
-  fi
-
-  mkdir -p "$dst"
-
-  echo "  Copying directory: $rel_path"
-  cp -R "$src/." "$dst/"
-done
-
-echo "Running pnpm install..."
 cd "$ZED_WORKTREE_ROOT"
-pnpm install
-
+pnpm install --frozen-lockfile
 echo "Done."

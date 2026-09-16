@@ -1,0 +1,392 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { WorkHandler } from '#resources/pgboss/types.js'
+ * @import { ResolveBookmarkData } from '#resources/bookmarks/resolve-bookmark-queue.js'
+ * @import { YTDLPDiscoveryMetadata } from '#resources/episodes/yt-dlp-api-client.js'
+ * @import { ExtractMetaMeta } from '@breadcrum/extract-meta'
+ * @import { ReadabilityParseResult } from '../archives/extract-archive.js'
+ * @import { CreatedEpisode } from '#resources/episodes/episode-query-create.js'
+ */
+
+import SQL from '@nearform/sql'
+import { createDocumentFromHtml } from '#resources/archives/create-document-from-html.js'
+import { isYouTubeUrl } from '@bret/is-youtube-url'
+import { putTagsQuery } from '#resources/tags/put-tags-query.js'
+import { createEpisode } from '#resources/episodes/episode-query-create.js'
+import { createArchive } from '#resources/archives/archive-query-create.js'
+import { getYTDLPDiscoveryMetadata } from '#resources/episodes/yt-dlp-api-client.js'
+import { youtubeRetryOptions } from '#resources/episodes/resolve-episode-queue.js'
+
+import { fetchHTML } from '../archives/fetch-html.js'
+import { getSiteMetadata } from '../archives/get-site-metadata.js'
+import { extractArchive } from '../archives/extract-archive.js'
+import { upcomingCheck } from '../episodes/handle-upcoming.js'
+import { finalizeEpisode, finalizeEpisodeError } from '../episodes/finaize-episode.js'
+import { resolveEpisodeEmbed } from '../episodes/resolve-embed.js'
+import { finalizeArchive } from '../archives/finalize-archive.js'
+
+/**
+ * pg-boss compatible bookmark processor
+ * @param {object} params
+ * @param  { FastifyInstance } params.fastify
+ * @return {WorkHandler<ResolveBookmarkData>} pg-boss handler
+ */
+export function makeBookmarkPgBossP ({ fastify }) {
+  const logger = fastify.log
+
+  /** @type {WorkHandler<ResolveBookmarkData>} */
+  return async function bookmarkPgBossP (jobs) {
+    for (const job of jobs) {
+      const {
+        userId,
+        bookmarkId,
+        url,
+        resolveBookmark,
+        resolveArchive,
+        resolveEpisode,
+        userProvidedMeta,
+        parentRequestId,
+      } = job.data
+
+      const log = logger.child({ jobId: job.id, parentRequestId })
+      const pg = fastify.pg
+
+      const jobStartTime = performance.now()
+      // Get full job metadata to access retry count
+      const jobWithMetadata = await fastify.pgboss.boss.getJobById(job.name, job.id)
+      const retryCount = jobWithMetadata?.retryCount || 0
+
+      log.info({ userId, bookmarkId, url, resolveBookmark, resolveArchive, resolveEpisode, userProvidedMeta: Boolean(userProvidedMeta), retryCount }, 'processing bookmark')
+
+      /** workingUrl is the URL to fetch subsequent data with. It is probably normalized but might not be. */
+      const workingUrl = new URL(url)
+
+      // We perform the expensive network calls, according to input options
+      // and use the results to derive associated assets.
+
+      /** @type { YTDLPDiscoveryMetadata | undefined } */
+      let media
+      let retryOptions
+      let isYouTube = false
+      if (resolveEpisode) {
+        log.info({ url }, 'resolving episode')
+        const parsedUrl = new URL(url)
+        isYouTube = isYouTubeUrl(parsedUrl)
+        retryOptions = isYouTube ? youtubeRetryOptions : undefined
+
+        try {
+          media = await getYTDLPDiscoveryMetadata({
+            url,
+            medium: 'video',
+            ytDLPEndpoint: fastify.config.YT_DLP_API_URL,
+            attempt: retryCount,
+            cache: fastify.ytdlpCache,
+            maxRetries: isYouTube ? 3 : 0,
+            parentRequestId,
+          })
+        } catch (err) {
+          log.warn(err, 'getYTDLPMetadata threw during bookmark resolve')
+          log.warn(
+            {
+              bookmarkId,
+              resolveBookmark,
+              resolveArchive,
+              resolveEpisode,
+              userProvidedMeta
+            },
+            'getYTDLPMetadata threw during bookmark resolve (stats)'
+          )
+
+          // For YouTube URLs that failed after retries, schedule delayed episode job
+          if (isYouTube) {
+            log.info('YouTube URL failed after retries, scheduling delayed episode job')
+
+            try {
+              const episodeEntity = await createEpisode({
+                client: pg,
+                userId,
+                bookmarkId,
+                type: 'redirect',
+                medium: 'video',
+                url,
+              })
+
+              const delayDate = new Date(Date.now() + 10000) // 10 seconds from now
+              await fastify.pgboss.queues.resolveEpisodeQ.send({
+                data: {
+                  userId,
+                  bookmarkTitle: userProvidedMeta.title,
+                  episodeId: episodeEntity.id,
+                  url,
+                  medium: 'video',
+                  parentRequestId,
+                },
+                options: {
+                  startAfter: delayDate,
+                  ...(retryOptions ?? {})
+                }
+              })
+
+              log.info({ episodeId: episodeEntity.id, delayDate }, 'Scheduled delayed episode job for failed YouTube URL')
+            } catch (scheduleErr) {
+              log.error({ error: scheduleErr }, 'Failed to schedule delayed episode job')
+            }
+          }
+          // For non-YouTube URLs, don't schedule anything - just continue processing bookmark
+        }
+      }
+
+      /** @type { Document | undefined } */
+      let document
+      if ((resolveBookmark || resolveArchive) && !isYouTube) {
+        // TODO: Handle xhtml, pdfs etc.
+        log.info({ resolveBookmark, resolveArchive }, 'resolving document')
+        const fetchStartTime = performance.now()
+        try {
+          const html = await fetchHTML({ url: workingUrl })
+          const fetchDuration = (performance.now() - fetchStartTime) / 1000
+          fastify.otel.httpFetchSeconds.record(fetchDuration)
+          fastify.otel.httpFetchSuccessCounter.add(1)
+
+          document = createDocumentFromHtml({ html, url })
+        } catch (err) {
+          const fetchDuration = (performance.now() - fetchStartTime) / 1000
+          fastify.otel.httpFetchSeconds.record(fetchDuration)
+          fastify.otel.httpFetchFailedCounter.add(1)
+
+          log.warn(err, 'Resolving html document failed during bookmark resolve')
+          log.warn(
+            {
+              error: err,
+              bookmarkId,
+              resolveBookmark,
+              resolveArchive,
+              resolveEpisode,
+              userProvidedMeta
+            },
+            'Resolving html document failed during bookmark resolve (stats)'
+          )
+        }
+      }
+
+      /** @type {ExtractMetaMeta | undefined} */
+      let pageMetadata
+      if (resolveBookmark && (document || (isYouTube && media))) {
+        const metadataStartTime = performance.now()
+        log.info({ }, 'resolving bookmark with document')
+        try {
+          pageMetadata = await getSiteMetadata({
+            url: workingUrl,
+            document,
+            media
+          })
+          const metadataDuration = (performance.now() - metadataStartTime) / 1000
+          fastify.otel.siteMetadataSeconds.record(metadataDuration)
+          fastify.otel.siteMetadataSuccessCounter.add(1)
+        } catch (err) {
+          const metadataDuration = (performance.now() - metadataStartTime) / 1000
+          fastify.otel.siteMetadataSeconds.record(metadataDuration)
+          fastify.otel.siteMetadataFailedCounter.add(1)
+
+          log.warn(err, 'Failed to ExtractMeta during bookmark resolve')
+          log.warn(
+            {
+              bookmarkId,
+              resolveBookmark,
+              resolveArchive,
+              resolveEpisode,
+              userProvidedMeta
+            },
+            'Failed to ExtractMeta during bookmark resolve (stats)'
+          )
+        }
+      }
+
+      /** @type {ReadabilityParseResult | undefined} */
+      let article
+      if (resolveArchive && document) {
+        log.info({ }, 'resolving archive with document')
+        try {
+          article = await extractArchive({ document })
+        } catch (err) {
+          log.warn(err, 'Failed to run Readability during bookmark resolve')
+          log.warn(
+            {
+              error: err,
+              bookmarkId,
+              resolveBookmark,
+              resolveArchive,
+              resolveEpisode,
+              userProvidedMeta
+            },
+            'Failed to run Readability during bookmark resolve (stats)'
+          )
+        }
+      }
+
+      if (resolveEpisode && media) {
+        const upcomingData = upcomingCheck({ media })
+        log.info({ upcomingData }, 'resolving episode')
+        /** @type {CreatedEpisode | undefined} */
+        let episodeEntity
+        try {
+          episodeEntity = await createEpisode({
+            client: pg,
+            userId,
+            bookmarkId,
+            type: 'redirect',
+            medium: 'video',
+            url,
+          })
+
+          if (upcomingData.isUpcoming) {
+            fastify.otel.episodeUpcomingCounter.add(1)
+            const releaseTimestampDate = new Date(upcomingData.releaseTimestampMs)
+
+            // Use typed queue wrapper
+            const scheduledJobId = await fastify.pgboss.queues.resolveEpisodeQ.send({
+              data: {
+                userId,
+                bookmarkTitle: userProvidedMeta.title,
+                episodeId: episodeEntity.id,
+                url,
+                medium: 'video',
+                parentRequestId,
+              },
+              options: {
+                startAfter: releaseTimestampDate,
+                ...(retryOptions ?? {})
+              }
+            })
+
+            log.info({
+              episodeEntity,
+              upcomingData,
+              jobId: scheduledJobId,
+              releaseTimestamp: releaseTimestampDate.toLocaleString(),
+            }, 'Upcoming episode for bookmark scheduled')
+          } else {
+            let oembed = null
+            try {
+              oembed = await resolveEpisodeEmbed({ fastify, url })
+            } catch (err) {
+              log.warn(err, 'Failed to resolve embed for episode')
+            }
+
+            log.debug({
+              oembedResolved: oembed !== null,
+              oembedProvider: oembed?.provider_name ?? null,
+              oembedType: oembed?.type ?? null,
+            }, 'episode embed resolution result')
+
+            await finalizeEpisode({
+              pg,
+              media,
+              bookmarkTitle: userProvidedMeta.title,
+              episodeId: episodeEntity.id,
+              userId,
+              url,
+              oembed,
+            })
+
+            log.info(`Episode ${episodeEntity.id} for ${url} is ready.`)
+          }
+        } catch (err) {
+          const handledError = err instanceof Error
+            ? err
+            : new Error('Unknown episode create error', { cause: err })
+
+          log.error(err, 'Error creating episode on bookmark create')
+          log.error({ episodeEntity, error: err }, 'Error creating episode on bookmark create (stats)')
+          if (episodeEntity && episodeEntity.id) {
+            await finalizeEpisodeError({
+              pg,
+              error: handledError,
+              episodeId: episodeEntity.id,
+              userId
+            })
+          }
+        }
+      }
+
+      if (resolveBookmark && pageMetadata) {
+        log.info({ }, 'resolving metadata')
+        // Set the tags
+        if (pageMetadata?.tags?.length > 0 && !(userProvidedMeta?.tags?.length > 0)) {
+          await putTagsQuery({
+            fastify,
+            pg,
+            userId,
+            bookmarkId,
+            tags: pageMetadata.tags,
+          })
+        }
+
+        // Update the rest
+        const bookmarkUpdates = []
+
+        bookmarkUpdates.push(SQL`done = true`)
+
+        if (pageMetadata?.title && !userProvidedMeta.title) {
+          bookmarkUpdates.push(SQL`title = ${pageMetadata.title}`)
+        }
+
+        if (pageMetadata?.summary && !userProvidedMeta.summary) {
+          bookmarkUpdates.push(SQL`summary = ${pageMetadata?.summary}`)
+        }
+
+        log.debug({ bookmarkUpdates }, 'Bookmark updates')
+
+        if (bookmarkUpdates.length > 0) {
+          const bookmarkResolveQuery = SQL`
+              update bookmarks
+              set ${SQL.glue(bookmarkUpdates, ' , ')}
+              where id = ${bookmarkId}
+              and owner_id =${userId};
+            `
+          log.debug({ bookmarkResolveQuery }, 'Bookmark resolve query')
+
+          const bookmarkResolveResult = await pg.query(bookmarkResolveQuery)
+          log.debug({ bookmarkResolveResult }, 'Bookmark resolved')
+        }
+
+        log.info(`Bookmark ${bookmarkId} for ${url} is ready.`)
+      } else if (resolveBookmark) {
+        // Metadata was unavailable (fetch or extraction failed) — mark done to avoid
+        // permanent done=false. Error column records the failure for diagnostics.
+        await pg.query(SQL`
+          UPDATE bookmarks
+          SET done = true,
+              error = 'Resolution failed: unable to fetch or extract metadata'
+          WHERE id = ${bookmarkId}
+          AND owner_id = ${userId}
+        `)
+        log.warn(`Bookmark ${bookmarkId} for ${url} marked done with error (metadata unavailable).`)
+      }
+
+      if (resolveArchive && article && article.title && article.content) {
+        log.info({ }, 'creating archive')
+        const { id: archiveId } = await createArchive({
+          client: pg,
+          userId,
+          bookmarkId,
+          bookmarkTitle: article.title,
+          url: workingUrl.toString(),
+          extractionMethod: 'server',
+        })
+
+        await finalizeArchive({
+          pg,
+          userId,
+          archiveId,
+          article,
+        })
+      }
+
+      // Record successful bookmark job completion
+      const totalDuration = (performance.now() - jobStartTime) / 1000
+      fastify.otel.bookmarkProcessingSeconds.record(totalDuration)
+      fastify.otel.bookmarkJobProcessedCounter.add(1)
+    }
+  }
+}

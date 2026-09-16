@@ -6,14 +6,10 @@ on:
       newversion:
         description: "npm version (YYYY.MM.DD)"
         required: false
-      deploy-web:
+      deploy:
         type: boolean
-        description: "Deploy web service"
-        default: true
-      deploy-worker:
-        type: boolean
-        description: "Deploy worker service"
-        default: true
+        description: "Deploy the shared image to both API and worker process groups"
+        default: false
 
 permissions: {}
 
@@ -22,8 +18,8 @@ env:
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/breadcrum
 
 concurrency:
-  group: npm-bump
-  cancel-in-progress: true
+  group: breadcrum-production-release
+  cancel-in-progress: false
 
 jobs:
   version_and_release:
@@ -62,7 +58,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
-          version: 10
+          version: 10.34.5
       - name: Use Node.js
         uses: actions/setup-node@v7
         with:
@@ -71,14 +67,21 @@ jobs:
           cache: "pnpm"
 
       - uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master
+      - name: Install Redis executable for isolated runtime tests
+        run: |
+          sudo apt-get update
+          # The shared Redis service container already owns port 6379.
+          sudo systemctl mask redis-server.service
+          sudo apt-get install --yes --no-install-recommends redis-server
+          redis-server --version
       - run: pnpm install --frozen-lockfile
       - name: Upload lockfile
         uses: actions/upload-artifact@v7
         with:
           path: pnpm-lock.yaml
           archive: false
-      - run: pnpm run -r generate-default-env
-      - run: pnpm run -r migrate
+      - run: pnpm run generate-default-env
+      - run: pnpm run migrate
         env:
           PGDATABASE: breadcrum
           PGHOST: localhost
@@ -89,14 +92,14 @@ jobs:
         id: cache-geoip-restore
         uses: actions/cache/restore@v6
         with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
+          path: data/geoip
+          key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
           restore-keys: |
-            geoip-${{ runner.os }}-
+            geoip-root-${{ runner.os }}-
       - name: Update GeoIP data
         id: update-geoip
         continue-on-error: true
-        run: node packages/web/scripts/update-geoip-db.js
+        run: node scripts/api/update-geoip-db.js
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
@@ -104,8 +107,11 @@ jobs:
         if: steps.update-geoip.outcome == 'success'
         uses: actions/cache/save@v6
         with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
+          path: data/geoip
+          key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
+      - run: node scripts/verify-giscus-patch.js
+      - run: pnpm run build
+      - run: node scripts/verify-giscus-patch.js --built
       - run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
@@ -133,19 +139,13 @@ jobs:
           new-version: ${{ env.NEW_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           publish-cmd: pnpm run release
-      - name: Deploy web
-        run: pnpm run deploy:web
-        if: ${{ github.event.inputs.deploy-web == 'true' }}
+      - name: Deploy API and worker
+        run: pnpm run deploy
+        if: ${{ inputs.deploy }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_BROWSER_DSN: ${{ secrets.SENTRY_BROWSER_DSN }}
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
-      - name: Deploy worker
-        run: pnpm run deploy:worker
-        if: ${{ github.event.inputs.deploy-worker == 'true' }}
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 

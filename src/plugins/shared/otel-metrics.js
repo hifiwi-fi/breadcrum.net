@@ -1,0 +1,242 @@
+import fp from 'fastify-plugin'
+import { metrics } from '@opentelemetry/api'
+
+export { otelMetricsEnvSchema } from '#config/env-fragments.js'
+
+/**
+ * This plugin adds OpenTelemetry metrics under the 'otel' decorator.
+ */
+export default fp(async function (fastify, _) {
+  // Create meter for custom metrics using centralized config
+  const serviceName = fastify.config.OTEL_SERVICE_NAME
+  const serviceVersion = fastify.config.OTEL_SERVICE_VERSION
+  const meter = metrics.getMeter(serviceName, serviceVersion)
+
+  fastify.decorate('otel', {
+    meter,
+
+    bookmarkCreatedCounter: meter.createCounter('breadcrum_bookmark_created_total', {
+      description: 'The number of times bookmarks are created',
+    }),
+
+    bookmarkDeleteCounter: meter.createCounter('breadcrum_bookmark_deleted_total', {
+      description: 'The number of times bookmarks are deleted',
+    }),
+
+    bookmarkEditCounter: meter.createCounter('breadcrum_bookmark_edit_total', {
+      description: 'The number of times bookmarks are edited',
+    }),
+
+    episodeCounter: meter.createCounter('breadcrum_episode_created_total', {
+      description: 'The number of times episodes are created',
+    }),
+
+    episodeEditCounter: meter.createCounter('breadcrum_episode_edit_total', {
+      description: 'The number of times episodes are edited',
+    }),
+
+    archiveEditCounter: meter.createCounter('breadcrum_archive_edit_total', {
+      description: 'The number of times archives are edited',
+    }),
+
+    episodeDeleteCounter: meter.createCounter('breadcrum_episode_delete_total', {
+      description: 'The number of times episodes are deleted',
+    }),
+
+    archiveDeleteCounter: meter.createCounter('breadcrum_archive_delete_total', {
+      description: 'The number of times archives are deleted',
+    }),
+
+    tagAppliedCounter: meter.createCounter('breadcrum_tag_applied_total', {
+      description: 'The number of times tags are applied to bookmarks',
+    }),
+
+    tagRemovedCounter: meter.createCounter('breadcrum_tag_removed_total', {
+      description: 'The number of times tags are removed from bookmarks',
+    }),
+
+    userCreatedCounter: meter.createCounter('breadcrum_user_created_total', {
+      description: 'The number of times a new user is created',
+    }),
+
+    ytdlpSeconds: meter.createHistogram('breadcrum_ytdlp_seconds', {
+      description: 'The time it takes for ytdlp items to finish',
+      unit: 's',
+    }),
+
+    siteMetaSeconds: meter.createHistogram('breadcrum_site_meta_seconds', {
+      description: 'The time it takes for site meta extraction',
+      unit: 's',
+    }),
+
+    archiveSeconds: meter.createHistogram('breadcrum_archive_seconds', {
+      description: 'The time it takes for readability archive extraction',
+      unit: 's',
+    }),
+
+    archiveCounter: meter.createCounter('breadcrum_archive_created_total', {
+      description: 'The number of times a readability archive is created',
+    }),
+
+    jwtVerifyCounter: meter.createCounter('breadcrum_jwt_verify_total', {
+      description: 'The number of times a jwt token attempts verification',
+    }),
+
+    jwtVerifyFailCounter: meter.createCounter('breadcrum_jwt_verify_fail_total', {
+      description: 'The number of times a jwt token verification fails',
+    }),
+
+    jwtCreatedCounter: meter.createCounter('breadcrum_jwt_created_total', {
+      description: 'The number of times a jwt token is created',
+    }),
+
+    // Podcast feed metrics
+    podcastFeedDeleteCounter: meter.createCounter('breadcrum_podcast_feed_delete_total', {
+      description: 'The number of times podcast feeds are deleted',
+    }),
+
+    podcastFeedEditCounter: meter.createCounter('breadcrum_podcast_feed_edit_total', {
+      description: 'The number of times podcast feeds are edited',
+    }),
+    // Archive processing metrics
+    archiveJobProcessedCounter: meter.createCounter('breadcrum_archive_job_processed_total', {
+      description: 'The number of archive jobs processed',
+    }),
+
+    archiveJobFailedCounter: meter.createCounter('breadcrum_archive_job_failed_total', {
+      description: 'The number of archive jobs that failed',
+    }),
+
+    archiveProcessingSeconds: meter.createHistogram('breadcrum_archive_processing_seconds', {
+      description: 'The time it takes to process archive jobs',
+      unit: 's',
+    }),
+
+    archiveExtractionSeconds: meter.createHistogram('breadcrum_archive_extraction_seconds', {
+      description: 'The time it takes to extract archive content',
+      unit: 's',
+    }),
+
+    archiveFetchSeconds: meter.createHistogram('breadcrum_archive_fetch_seconds', {
+      description: 'The time it takes to fetch HTML for archives',
+      unit: 's',
+    }),
+
+    // Episode processing metrics
+    episodeJobProcessedCounter: meter.createCounter('breadcrum_episode_job_processed_total', {
+      description: 'The number of episode jobs processed',
+    }),
+
+    episodeJobFailedCounter: meter.createCounter('breadcrum_episode_job_failed_total', {
+      description: 'The number of episode jobs that failed',
+    }),
+
+    episodeProcessingSeconds: meter.createHistogram('breadcrum_episode_processing_seconds', {
+      description: 'The time it takes to process episode jobs',
+      unit: 's',
+    }),
+
+    episodeUpcomingCounter: meter.createCounter('breadcrum_episode_upcoming_total', {
+      description: 'The number of upcoming episodes detected',
+    }),
+
+    // Bookmark processing metrics
+    bookmarkJobProcessedCounter: meter.createCounter('breadcrum_bookmark_job_processed_total', {
+      description: 'The number of bookmark jobs processed',
+    }),
+
+    bookmarkJobFailedCounter: meter.createCounter('breadcrum_bookmark_job_failed_total', {
+      description: 'The number of bookmark jobs that failed',
+    }),
+
+    bookmarkProcessingSeconds: meter.createHistogram('breadcrum_bookmark_processing_seconds', {
+      description: 'The time it takes to process bookmark jobs',
+      unit: 's',
+    }),
+
+    // Site metadata metrics
+    siteMetadataSeconds: meter.createHistogram('breadcrum_site_metadata_seconds', {
+      description: 'The time it takes to extract site metadata',
+      unit: 's',
+    }),
+
+    siteMetadataSuccessCounter: meter.createCounter('breadcrum_site_metadata_success_total', {
+      description: 'The number of successful site metadata extractions',
+    }),
+
+    siteMetadataFailedCounter: meter.createCounter('breadcrum_site_metadata_failed_total', {
+      description: 'The number of failed site metadata extractions',
+    }),
+
+    // HTTP fetch metrics
+    httpFetchSeconds: meter.createHistogram('breadcrum_http_fetch_seconds', {
+      description: 'The time it takes to fetch HTTP resources',
+      unit: 's',
+    }),
+
+    httpFetchSuccessCounter: meter.createCounter('breadcrum_http_fetch_success_total', {
+      description: 'The number of successful HTTP fetches',
+    }),
+
+    httpFetchFailedCounter: meter.createCounter('breadcrum_http_fetch_failed_total', {
+      description: 'The number of failed HTTP fetches',
+    }),
+
+    // pg-boss queue metrics (observable gauges)
+    queueDeferredGauge: meter.createObservableGauge('breadcrum_queue_deferred', {
+      description: 'The number of deferred jobs in each queue',
+    }),
+
+    queueQueuedGauge: meter.createObservableGauge('breadcrum_queue_queued', {
+      description: 'The number of queued jobs in each queue',
+    }),
+
+    queueActiveGauge: meter.createObservableGauge('breadcrum_queue_active', {
+      description: 'The number of active jobs in each queue',
+    }),
+
+    queueTotalGauge: meter.createObservableGauge('breadcrum_queue_total', {
+      description: 'The total number of jobs in each queue (deferred + queued + active)',
+    }),
+
+    // Auth token cleanup metrics
+    authTokensCleanedCounter: meter.createCounter('breadcrum_auth_tokens_cleaned_total', {
+      description: 'The number of stale auth tokens deleted',
+    }),
+
+    authTokensCleanupJobCounter: meter.createCounter('breadcrum_auth_tokens_cleanup_job_total', {
+      description: 'The number of times auth token cleanup job has run',
+    }),
+
+    authTokensCleanupDuration: meter.createHistogram('breadcrum_auth_tokens_cleanup_seconds', {
+      description: 'The time it takes to run auth token cleanup job',
+      unit: 's',
+    }),
+
+    // Stale resolution cleanup metrics
+    staleBookmarksCleanedCounter: meter.createCounter('breadcrum_stale_bookmarks_cleaned_total', {
+      description: 'The number of stale bookmarks marked done by cleanup job',
+    }),
+
+    staleArchivesCleanedCounter: meter.createCounter('breadcrum_stale_archives_cleaned_total', {
+      description: 'The number of stale archives marked done by cleanup job',
+    }),
+
+    staleEpisodesCleanedCounter: meter.createCounter('breadcrum_stale_episodes_cleaned_total', {
+      description: 'The number of stale episodes marked done by cleanup job',
+    }),
+
+    staleResolutionsCleanupJobCounter: meter.createCounter('breadcrum_stale_resolutions_cleanup_job_total', {
+      description: 'The number of times stale resolution cleanup job has run',
+    }),
+
+    staleResolutionsCleanupDuration: meter.createHistogram('breadcrum_stale_resolutions_cleanup_seconds', {
+      description: 'The time it takes to run stale resolution cleanup job',
+      unit: 's',
+    }),
+  })
+},
+{
+  name: 'otel-metrics',
+  dependencies: ['env'],
+})
