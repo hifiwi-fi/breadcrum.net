@@ -2,40 +2,22 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { copyFile, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /** @param {TestContext} t */
 async function startupFixture (t) {
   const directory = await mkdtemp(join(tmpdir(), 'breadcrum-environment-startup-'))
   t.after(() => rm(directory, { recursive: true, force: true }))
-  // Copy the real config/startup graph without the user's .env or resource plugins.
-  for (const file of [
-    'src/main.js',
-    'src/config/config.js',
-    'src/config/role.js',
-    'src/config/env-schema.js',
-    'src/config/env-fragments.js',
-    'src/resources/fastify-common/env-schema.js',
-    'src/runtime/shutdown.js',
-  ]) {
-    const destination = join(directory, file)
-    await mkdir(dirname(destination), { recursive: true })
-    await copyFile(new URL(`../../${file}`, import.meta.url), destination)
-  }
-  await writeFile(join(directory, 'package.json'), JSON.stringify({
-    type: 'module',
-    imports: {
-      '#config/*': './src/config/*',
-      '#resources/*': './src/resources/*',
-    },
-  }))
+  // Keep the real CLI/preload/application graph, without inheriting the user's .env.
+  await Promise.all(['package.json', 'src'].map(name =>
+    cp(new URL(`../../${name}`, import.meta.url), join(directory, name), { recursive: true })))
   await symlink(fileURLToPath(new URL('../../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
-  for (const file of ['src/runtime/telemetry.js', 'src/app.js']) {
-    await writeFile(join(directory, file), "throw new Error('RESOURCE_IMPORT_REACHED')\n")
-  }
+  await writeFile(join(directory, 'src/runtime/telemetry.js'), "throw new Error('RESOURCE_IMPORT_REACHED')\n")
+  // A missed early guard must fail before any real database/cache plugin can run.
+  await writeFile(join(directory, 'src/plugins/shared/env.js'), "export default async function env () { throw new Error('RESOURCE_IMPORT_REACHED') }\n")
   return directory
 }
 
@@ -45,7 +27,12 @@ async function startupFixture (t) {
  * @param {string[]} [args]
  */
 function runStartup (directory, environment, args = []) {
-  return spawnSync(process.execPath, [join(directory, 'src/main.js'), ...args], {
+  return spawnSync(process.execPath, [
+    '--import', join(directory, 'src/otel.js'),
+    join(directory, 'node_modules/fastify-cli/cli.js'), 'start',
+    '--config', join(directory, 'src/config/fastify-cli.cjs'),
+    join(directory, 'src/app.js'), ...args,
+  ], {
     cwd: join(directory, 'src'),
     env: environment,
     encoding: 'utf8',
@@ -54,7 +41,7 @@ function runStartup (directory, environment, args = []) {
   })
 }
 
-test('main rejects missing/invalid roles, production all, and invalid full config before resource imports', async t => {
+test('CLI preload rejects missing/invalid roles, production all, and invalid full config before telemetry imports', async t => {
   const directory = await startupFixture(t)
   /** @type {{ name: string, environment: NodeJS.ProcessEnv, error: RegExp }[]} */
   const cases = [
@@ -79,18 +66,27 @@ test('main rejects missing/invalid roles, production all, and invalid full confi
   }
 })
 
-test('main rejects every extra argument instead of allowing CLI role overrides', async t => {
+test('CLI rejects role flags including plugin options rather than overriding APP_ROLE', async t => {
   const directory = await startupFixture(t)
-  for (const args of [['--role=api'], ['--role=worker'], ['--role', 'all'], ['--unknown'], ['worker'], ['--']]) {
-    const result = runStartup(directory, { APP_ROLE: 'worker' }, args)
-    assert.equal(result.error, undefined)
-    assert.equal(result.status, 1, result.stderr)
-    assert.match(result.stderr, /CLI arguments are not supported; set APP_ROLE=api\|worker\|all in the environment instead/)
-    assert.doesNotMatch(result.stderr, /RESOURCE_IMPORT_REACHED/)
+  // Let the real application reject CLI plugin options without opening telemetry resources.
+  await writeFile(join(directory, 'src/runtime/telemetry.js'), 'export async function bootstrapTelemetry () { return { shutdown: async () => {} } }\n')
+  for (const args of [
+    ['--role=api'], ['--role=worker'], ['--role', 'all'],
+    ['--', '--role=api'], ['--', '--role=worker'], ['--', '--role', 'all'],
+  ]) {
+    await t.test(args.join(' '), () => {
+      const result = runStartup(directory, { APP_ROLE: 'worker' }, args)
+      assert.equal(result.error, undefined, result.stderr)
+      assert.equal(result.signal, null, result.stderr)
+      assert.equal(result.status, 1, result.stderr)
+      assert.match(result.stderr, /CLI role flags are not supported; set APP_ROLE=api\|worker\|all instead/)
+      assert.doesNotMatch(result.stderr, /RESOURCE_IMPORT_REACHED|ECONNREFUSED/)
+      assert.doesNotMatch(result.stdout, /Server listening at|Scheduled auth token cleanup job/)
+    })
   }
 })
 
-test('main reads root dotenv independent of cwd and process APP_ROLE wins before resource imports', async t => {
+test('CLI preload reads root dotenv independent of cwd and process APP_ROLE wins before resource imports', async t => {
   const directory = await startupFixture(t)
   await writeFile(join(directory, '.env'), 'APP_ROLE=all\nENV=production\n')
   const fromFile = runStartup(directory, {})
@@ -104,4 +100,48 @@ test('main reads root dotenv independent of cwd and process APP_ROLE wins before
   assert.equal(fromProcess.error, undefined)
   assert.equal(fromProcess.status, 1, fromProcess.stderr)
   assert.match(fromProcess.stderr, /RESOURCE_IMPORT_REACHED/)
+})
+
+test('telemetry preload skips both watch parent flags but validates and imports in CLI forks', async t => {
+  const directory = await startupFixture(t)
+  for (const flag of ['--watch', '-w']) {
+    /** @param {NodeJS.ProcessEnv} env */
+    const runPreload = env => spawnSync(process.execPath, [
+      '--import', join(directory, 'src/otel.js'),
+      '--eval', "console.log('WATCH_PARENT_REACHED')", '--', flag,
+    ], {
+      cwd: directory,
+      env,
+      encoding: 'utf8',
+      timeout: 10000,
+      killSignal: 'SIGKILL',
+    })
+    // Isolate the preload decision; the integration suite exercises the real watcher.
+    await t.test(`${flag} parent skips config validation and telemetry`, () => {
+      const result = runPreload({})
+      assert.equal(result.error, undefined)
+      assert.equal(result.signal, null)
+      assert.equal(result.status, 0, result.stderr)
+      assert.equal(result.stdout, 'WATCH_PARENT_REACHED\n')
+      assert.equal(result.stderr, '')
+    })
+    for (const childEvent of ['start', 'restart']) {
+      await t.test(`${flag} ${childEvent} validates before importing telemetry`, () => {
+        const invalid = runPreload({ childEvent })
+        assert.equal(invalid.error, undefined)
+        assert.equal(invalid.signal, null)
+        assert.equal(invalid.status, 1, invalid.stderr)
+        assert.equal(invalid.stdout, '')
+        assert.match(invalid.stderr, /APP_ROLE is required/)
+        assert.doesNotMatch(invalid.stderr, /RESOURCE_IMPORT_REACHED/)
+
+        const valid = runPreload({ APP_ROLE: 'worker', childEvent })
+        assert.equal(valid.error, undefined)
+        assert.equal(valid.signal, null)
+        assert.equal(valid.status, 1, valid.stderr)
+        assert.equal(valid.stdout, '')
+        assert.match(valid.stderr, /RESOURCE_IMPORT_REACHED/)
+      })
+    }
+  }
 })

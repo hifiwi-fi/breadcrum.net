@@ -9,7 +9,7 @@ import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
 import { once } from 'node:events'
 import { execFile, spawn } from 'node:child_process'
-import { cp, mkdir, mkdtemp, readdir, rm, symlink } from 'node:fs/promises'
+import { appendFile, cp, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -21,6 +21,7 @@ import { loadConfig } from '#config/config.js'
 import { integrationFixture } from './integration-fixture.js'
 
 const execFileAsync = promisify(execFile)
+const cliStartArgs = ['--import', './src/otel.js', 'node_modules/fastify-cli/cli.js', 'start', '--config', './src/config/fastify-cli.cjs']
 
 /** @param {RuntimeConfig} config @returns {NodeJS.ProcessEnv} */
 function subprocessEnvironment (config) {
@@ -231,7 +232,7 @@ test('unified role application integration', { timeout: 120000 }, async t => {
     await fixture.assertDisconnected()
   })
 
-  await t.test('main exits nonzero at its hard deadline for a stuck native worker after ready', { timeout: 20000 }, async t => {
+  await t.test('CLI exits nonzero at its hard deadline for a stuck native worker after ready', { timeout: 20000 }, async t => {
     const config = loadConfig('worker', {
       ...isolated,
       envData: {
@@ -243,12 +244,12 @@ test('unified role application integration', { timeout: 120000 }, async t => {
         FASTIFY_LOG_LEVEL: 'info',
       },
     })
-    // Stall one native processor's dependency, retaining the production main,
-    // onReady activation, tracking wrapper, and signal handling.
-    const child = spawn(process.execPath, ['--input-type=module', '--eval', `
-      import { PgBoss } from 'pg-boss'
-      import { Pool } from 'pg'
-      import { cleanupAuthTokensQName } from '#resources/auth-tokens/cleanup-auth-tokens-queue.js'
+    // Stall one native processor's dependency while retaining the actual CLI,
+    // telemetry preload, onReady activation, tracking wrapper, and signal handling.
+    const stalledProcessor = `
+      import { PgBoss } from ${JSON.stringify(import.meta.resolve('pg-boss'))}
+      import { Pool } from ${JSON.stringify(import.meta.resolve('pg'))}
+      import { cleanupAuthTokensQName } from ${JSON.stringify(import.meta.resolve('#resources/auth-tokens/cleanup-auth-tokens-queue.js'))}
       const query = Pool.prototype.query
       Pool.prototype.query = function (statement, ...args) {
         const text = typeof statement === 'string' ? statement : statement.text
@@ -266,23 +267,16 @@ test('unified role application integration', { timeout: 120000 }, async t => {
         }
         return id
       }
-      process.argv = [process.execPath, 'src/main.js']
-      await import(${JSON.stringify(new URL('../main.js', import.meta.url).href)})
-    `], {
+    `
+    const child = spawn(process.execPath, [
+      '--import', `data:text/javascript,${encodeURIComponent(stalledProcessor)}`,
+      ...cliStartArgs, 'src/app.js',
+    ], {
       cwd: new URL('../../', import.meta.url),
-      env: {
-        ...Object.fromEntries(Object.entries(config).map(([key, value]) => [key, String(value)])),
-        SENTRY_DSN: '',
-        SENTRY_API_DSN: '',
-        SENTRY_WORKER_DSN: '',
-        OTEL_SDK_DISABLED: 'true',
-        OTEL_TRACES_EXPORTER: 'none',
-        OTEL_METRICS_EXPORTER: 'none',
-        OTEL_LOGS_EXPORTER: 'none',
-      },
+      env: subprocessEnvironment(config),
       stdio: ['ignore', 'pipe', 'pipe'],
     })
-    const exited = once(child, 'exit')
+    const exited = once(child, 'close')
     exited.catch(() => {})
     t.after(async () => {
       child.kill('SIGKILL')
@@ -300,7 +294,7 @@ test('unified role application integration', { timeout: 120000 }, async t => {
     const [code, signal] = await exited
     assert.equal(signal, null, output)
     assert.equal(code, 1, output)
-    assert.match(output, /Shutdown exceeded 2500ms; interrupted jobs may be retried/)
+    assert.match(output, /killed by timeout \(2500ms\)/)
     await fixture.assertDisconnected()
   })
 
@@ -360,8 +354,6 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
   // Run the actual entrypoints without copying or inheriting the user's .env.
   await Promise.all(['package.json', 'src', 'public', 'migrations'].map(name =>
     cp(new URL(`../../${name}`, import.meta.url), join(directory, name), { recursive: true })))
-  await mkdir(join(directory, 'scripts'))
-  await cp(new URL('../../scripts/inspect-app.js', import.meta.url), join(directory, 'scripts/inspect-app.js'))
   await symlink(fileURLToPath(new URL('../../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
   const isolated = /** @type {const} */ ({ dotEnvPath: false, processEnv: {} })
   const common = /** @satisfies {Partial<RuntimeConfig>} */ ({
@@ -386,9 +378,9 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
     { role: 'worker', environment: 'production', apiStatus: 404, consumers: true },
     { role: 'all', environment: 'development', apiStatus: 401, consumers: true },
   ])) {
-    await t.test(`main starts APP_ROLE=${role} in ${environment} without flags and shuts down cleanly`, { timeout: 30000 }, async t => {
+    await t.test(`CLI starts APP_ROLE=${role} in ${environment} without role flags and shuts down cleanly`, { timeout: 30000 }, async t => {
       const config = loadConfig(role, { ...isolated, envData: { ...common, ENV: environment } })
-      const child = spawn(process.execPath, ['src/main.js'], {
+      const child = spawn(process.execPath, [...cliStartArgs, 'src/app.js'], {
         cwd: directory,
         env: { ...subprocessEnvironment(config), NODE_ENV: environment },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -420,12 +412,104 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
       const [code, signal] = await exited
       assert.equal(signal, null, output)
       assert.equal(code, 0, output)
-      assert.doesNotMatch(output, /Shutdown exceeded/)
+      assert.doesNotMatch(output, /killed by timeout|Shutdown exceeded/)
       await fixture.assertDisconnected()
     })
   }
 
-  await t.test('inspector prints API routes and plugins without listeners or telemetry, then closes pools', { timeout: 40000 }, async t => {
+  await t.test('CLI watch starts telemetry only in its fork and releases the exporter on restart and shutdown', { timeout: 40000 }, async t => {
+    const reservation = createServer()
+    t.after(() => new Promise(resolve => reservation.close(resolve)))
+    reservation.listen(0, '127.0.0.1')
+    await once(reservation, 'listening')
+    const address = /** @type {AddressInfo} */ (reservation.address())
+    await new Promise(resolve => reservation.close(resolve))
+    const config = loadConfig('all', {
+      ...isolated,
+      envData: { ...common, ENV: 'development', METRICS: 1, METRICS_PORT: address.port },
+    })
+    // Observe the real preload state in both processes, without replacing the exporter.
+    await writeFile(join(directory, 'src/watch-observer.js'), `
+      import { telemetryState } from './runtime/telemetry-state.js'
+      console.log('WATCH_TELEMETRY', process.pid, Boolean(telemetryState.shutdown))
+    `)
+    const child = spawn(process.execPath, [
+      '--import', './src/otel.js', '--import', './src/watch-observer.js',
+      'node_modules/fastify-cli/cli.js', 'start', '--config', './src/config/fastify-cli.cjs',
+      '--watch', '--ignore-watch=client public data .tap', 'src/app.js',
+    ], {
+      cwd: directory,
+      env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      // Own the watcher and its fork so a failed assertion cannot leave an orphan server.
+      detached: true,
+    })
+    const exited = once(child, 'close')
+    exited.catch(() => {})
+    t.after(async () => {
+      if (child.pid) {
+        try {
+          process.kill(-child.pid, 'SIGKILL')
+        } catch (err) {
+          assert.ok(err instanceof Error && 'code' in err && err.code === 'ESRCH')
+        }
+      }
+      await exited
+    })
+    let output = ''
+    child.stdout.on('data', chunk => { output += chunk.toString() })
+    child.stderr.on('data', chunk => { output += chunk.toString() })
+    const listening = () => [...output.matchAll(/Server listening at (http:\/\/127\.0\.0\.1:\d+)/g)]
+    const exporters = () => [...output.matchAll(/WATCH_TELEMETRY (\d+) true/g)].map(match => Number(match[1]))
+    const firstOrigin = await t.waitFor(() => {
+      assert.equal(child.exitCode, null, output)
+      assert.equal(child.signalCode, null, output)
+      assert.match(output, new RegExp(`WATCH_TELEMETRY ${child.pid} false`))
+      assert.equal(exporters().length, 1, output)
+      const origin = listening()[0]?.[1]
+      assert.ok(origin, output)
+      return origin
+    }, { timeout: 15000, interval: 25 })
+    const firstPid = exporters()[0]
+    assert.notEqual(firstPid, child.pid)
+    const health = await fetch(`${firstOrigin}/health`, { signal: AbortSignal.any([t.signal, AbortSignal.timeout(5000)]) })
+    assert.equal(health.status, 200, await health.text())
+    const metrics = await fetch(`http://127.0.0.1:${address.port}/metrics`, { signal: AbortSignal.any([t.signal, AbortSignal.timeout(5000)]) })
+    assert.equal(metrics.status, 200)
+    assert.match(await metrics.text(), /target_info/)
+
+    await appendFile(join(directory, 'src/app.js'), '\n')
+    const restartedOrigin = await t.waitFor(() => {
+      assert.equal(child.exitCode, null, output)
+      assert.equal(child.signalCode, null, output)
+      assert.equal(exporters().length, 2, output)
+      assert.equal(listening().length, 2, output)
+      const origin = listening()[1]?.[1]
+      assert.ok(origin, output)
+      return origin
+    }, { timeout: 15000, interval: 25 })
+    assert.notEqual(exporters()[1], firstPid)
+    assert.notEqual(exporters()[1], child.pid)
+    const restartedHealth = await fetch(`${restartedOrigin}/health`, { signal: AbortSignal.any([t.signal, AbortSignal.timeout(5000)]) })
+    assert.equal(restartedHealth.status, 200, await restartedHealth.text())
+    const restartedMetrics = await fetch(`http://127.0.0.1:${address.port}/metrics`, { signal: AbortSignal.any([t.signal, AbortSignal.timeout(5000)]) })
+    assert.equal(restartedMetrics.status, 200)
+    assert.match(await restartedMetrics.text(), /target_info/)
+    assert.doesNotMatch(output, /EADDRINUSE|process forced end|killed by timeout|app crashed/)
+
+    assert.ok(child.pid)
+    process.kill(-child.pid, 'SIGTERM')
+    const [code, signal] = await exited
+    assert.equal(code, null, output)
+    assert.equal(signal, 'SIGTERM', output)
+    assert.doesNotMatch(output, /killed by timeout/)
+    await fixture.assertDisconnected()
+    // Binding the same port proves the child closed its real telemetry listener.
+    reservation.listen(address.port, '127.0.0.1')
+    await once(reservation, 'listening')
+  })
+
+  await t.test('CLI prints API routes and plugins without listeners or telemetry, then closes pools', { timeout: 40000 }, async t => {
     const occupied = createServer()
     let connections = 0
     occupied.on('connection', socket => {
@@ -444,7 +528,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
       { mode: 'routes', patterns: [/health \(GET, HEAD\)/, /bookmarks \(GET, HEAD, PUT\)/, /user \(GET, HEAD, PUT\)/] },
       { mode: 'plugins', patterns: [/health/, /pgboss/, /redis/, /jwt/] },
     ]) {
-      const { stdout, stderr } = await execFileAsync(process.execPath, ['scripts/inspect-app.js', mode], {
+      const { stdout, stderr } = await execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'src/app.js'], {
         cwd: directory,
         env: { ...subprocessEnvironment(config), NODE_ENV: 'production' },
         timeout: 15000,
@@ -460,7 +544,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
     }
   })
 
-  await t.test('inspector rejects consumer roles before connecting to PostgreSQL or Redis', { timeout: 30000 }, async t => {
+  await t.test('CLI inspection rejects consumer roles before connecting to PostgreSQL or Redis', { timeout: 30000 }, async t => {
     const trap = createServer()
     let connections = 0
     trap.on('connection', socket => {
@@ -482,22 +566,25 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
         },
       })
       for (const mode of ['routes', 'plugins']) {
-        await assert.rejects(execFileAsync(process.execPath, ['scripts/inspect-app.js', mode], {
-          cwd: directory,
-          env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },
-          timeout: 5000,
-          killSignal: 'SIGKILL',
-          signal: t.signal,
-        }), error => {
-          assert.ok(error instanceof Error)
-          assert.ok('code' in error)
-          assert.equal(error.code, 1)
-          assert.ok('stderr' in error && typeof error.stderr === 'string')
-          assert.match(error.stderr, /Inspection requires APP_ROLE=api to avoid activating queue consumers/)
-          return true
+        await t.test(`APP_ROLE=${role} print-${mode}`, async t => {
+          const before = connections
+          await assert.rejects(execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'src/app.js'], {
+            cwd: directory,
+            env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },
+            timeout: 5000,
+            killSignal: 'SIGKILL',
+            signal: t.signal,
+          }), error => {
+            assert.ok(error instanceof Error)
+            assert.ok('code' in error)
+            assert.equal(error.code, 1, `${error.message}\nResource connections opened: ${connections - before}`)
+            assert.ok('stderr' in error && typeof error.stderr === 'string')
+            assert.match(error.stderr, /Inspection requires APP_ROLE=api to avoid activating queue consumers/)
+            return true
+          })
+          assert.equal(connections, before, 'Consumer-role inspection must fail before opening resource connections')
+          await fixture.assertDisconnected()
         })
-        assert.equal(connections, 0, 'Consumer-role inspection must fail before opening resource connections')
-        await fixture.assertDisconnected()
       }
     }
   })

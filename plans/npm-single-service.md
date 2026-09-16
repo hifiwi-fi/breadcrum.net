@@ -4,7 +4,9 @@
 
 The original consolidation was authorized with checkpoint commits, followed by a request for a draft PR.
 Draft PR [#918](https://github.com/hifiwi-fi/breadcrum.net/pull/918) tracks the implementation and follow-up configuration, `APP_ROLE`, and plugin-layout changes.
-The architecture below incorporates those follow-ups; production cutover still requires separate approval.
+The architecture below incorporates those follow-ups and the latest request to restore Fastify CLI instead of a custom bootstrap and inspector; production cutover still requires separate approval.
+This CLI restoration supersedes the prior instructions to retain `src/main.js` and remove the CLI helpers.
+The earlier validation results below are historical and do not establish that the restored CLI passes those checks.
 Do not deploy, merge, change production secrets, run production migrations, or stop existing Machines as part of this work.
 
 Fetched `origin` and ran `git pull --ff-only origin master` in this clean, detached worktree before creating `plan/npm-single-service`.
@@ -60,9 +62,11 @@ Dockerfile
 fly.toml
 tsconfig.json
 src/
-  main.js                    # Role selection, bootstrap, and process lifecycle
-  app.js                     # Testable Fastify composition
+  app.js                     # Fastify composition and lazy CLI options export
+  otel.js                    # Node preload before Fastify loads
   config/                    # Shared environment schemas, loading, role defaults, and options
+    server-options.js        # Lazy CLI server options exported through app.js
+    fastify-cli.cjs           # Shared CLI startup and graceful-close configuration
   runtime/                   # Shared startup/shutdown helpers
   telemetry/                 # Single OTel/Sentry bootstrap and metrics setup
   plugins/                   # One root plugin tree, imported through #plugins/*
@@ -131,7 +135,7 @@ The settings file's name does not imply a multi-package repository: there will b
 | `api` | Yes | Yes | No | Public service listener, production port 8080 |
 | `worker` | No | Yes, for follow-up jobs | Yes | Health-only listener, production port 8080, not publicly routed |
 
-Select roles only through `APP_ROLE=api|worker|all`, such as `APP_ROLE=api node src/main.js`; `--role` flags are not supported.
+Select roles only through `APP_ROLE=api|worker|all`, such as `APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`; `--role` flags are not supported.
 Development scripts explicitly select `APP_ROLE=all`.
 Reject `all` when either `NODE_ENV=production` or `ENV=production`.
 Reject unknown or missing roles before opening connections; there is no implicit role default.
@@ -139,16 +143,18 @@ Reject unknown or missing roles before opening connections; there is no implicit
 ### Composition
 
 1. Load the root development environment and validate role-specific configuration before telemetry or application imports with side effects.
-2. Initialize OTel/Sentry once, then dynamically import application code so instrumentation is installed early enough.
-3. Construct one Fastify application and register shared configuration, PostgreSQL, Redis, cache, metrics, health, and queue producers once.
+2. Initialize telemetry once through the Node preload `--import ./src/otel.js` before Fastify loads; the watch parent skips telemetry and its application child inherits the preload.
+3. Let Fastify CLI construct one Fastify application and register shared configuration, PostgreSQL, Redis, cache, metrics, health, and queue producers once.
 4. Register API-only schemas, routes, static serving, auth, and other API plugins only for `api` or `all`, preserving autoload order and route hooks.
 5. Load worker processors and register consumers/schedules only for `worker` or `all`, after their dependencies and queue decorators are ready.
 6. Mark the application ready only after required startup steps succeed, with cleanup for partial initialization or listener failure.
 
 Do not mount the two existing apps unchanged under a parent server.
 Their overlapping infrastructure, schemas, decorators, and telemetry ownership would preserve duplication and introduce conflicts.
-Use `src/app.js` as the single application composition and keep `src/main.js` for environment/role selection, telemetry bootstrap, and process lifecycle.
-Remove the `src/api/app.js` and `src/worker/app.js` wrappers and the `src/config/server-options.js` Fastify CLI helper.
+Use `src/app.js` as the single application composition, exporting lazy CLI server options from `src/config/server-options.js`.
+Keep `src/config/fastify-cli.cjs` as the shared CLI config, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+Fastify CLI owns startup and graceful close, including the configured shutdown deadline.
+Remove the custom `src/main.js` bootstrap and `scripts/inspect-app.js` inspector; do not restore separate `src/api/app.js` or `src/worker/app.js` wrappers.
 Load shared and role-specific plugins from `src/plugins/shared/`, `src/plugins/api/`, and `src/plugins/worker/`, registering shared infrastructure once.
 Keep the app factory usable by tests without automatically installing signal handlers or starting telemetry listeners.
 
@@ -164,7 +170,8 @@ Retain pg-boss's dedicated database pool rather than folding it into the applica
 Give each acquired resource a cleanup owner immediately.
 On SIGINT/SIGTERM, mark unready, stop accepting new requests and jobs, drain active requests/jobs while their database/cache/follow-up queue operations remain available, then close queues and pools and flush telemetry last.
 Verify pg-boss v12 stop/drain behavior before choosing exact hook ordering.
-Make cleanup idempotent and bounded, including startup failures and development restarts.
+Keep resource cleanup idempotent and use the configured CLI deadline for ready-state signal shutdown.
+Fastify CLI 8.0.2 has separate startup-failure and development-restart limitations recorded below; do not claim these paths have the same cleanup guarantees.
 Align Fly's shutdown timeout with the tested drain budget instead of blindly keeping the current five seconds.
 Preserve retry semantics and account for interrupted jobs without promising exactly-once side effects.
 
@@ -184,10 +191,10 @@ Verify Sentry request/job scope isolation when HTTP handlers and consumers share
 
 - `pnpm install --frozen-lockfile`: reproducible single-package installation, including native patch application.
 - `pnpm run watch`: one restarting `all` backend plus the existing domstack asset watcher as development tooling.
-- `pnpm run watch:server`: `APP_ROLE=all node --watch --watch-preserve-output src/main.js`.
+- `pnpm run watch:server`: `APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' src/app.js`.
 - `pnpm start`: retain the current development-oriented convention by delegating to `watch`.
-- `pnpm run start:api` and `pnpm run start:worker`: `APP_ROLE=api node src/main.js` and `APP_ROLE=worker node src/main.js`, explicit non-watching runtime modes for local production simulation.
-- `pnpm run print-routes` and `pnpm run print-plugins`: `APP_ROLE=api node scripts/inspect-app.js routes` and `APP_ROLE=api node scripts/inspect-app.js plugins`, without the Fastify CLI.
+- `pnpm run start:api` and `pnpm run start:worker`: prefix `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js` with `APP_ROLE=api` and `APP_ROLE=worker`, respectively, for explicit non-watching runtime modes.
+- `pnpm run print-routes` and `pnpm run print-plugins`: `APP_ROLE=api fastify print-routes src/app.js` and `APP_ROLE=api fastify print-plugins src/app.js`, without the telemetry preload or a custom inspector.
 - `pnpm run build`: build domstack assets from root paths using the dependencies patched during installation.
 - `pnpm run migrate`: run Postgrator against the relocated migrations without booting API or worker consumers.
 - `pnpm test`: sequential root ESLint, TypeScript, Node test, and Knip steps using the existing `npm-run-all2` naming pattern.
@@ -195,10 +202,11 @@ Verify Sentry request/job scope isolation when HTTP handlers and consumers share
 
 One application process does not mean PostgreSQL, Redis, the file-watching supervisor, or the asset compiler must run inside that process.
 The important constraint is that API handlers and queue consumers execute inside the same backend PID in development, without a second worker child process or worker thread.
-Watch backend, worker, and resource changes; exclude generated output and client-only changes from backend restarts.
+Watch backend, worker, and resource changes; exclude `client public data .tap` from backend restarts, in addition to Fastify CLI's own default `.git` and `node_modules` exclusions.
 Preserve useful route/plugin inspection and blog/GeoIP maintenance commands with updated paths.
-Inspection loads and closes the single application without listening or exporting telemetry, but still initializes configured dependencies and requires local services, valid API configuration, and applicable built assets.
-Zed debug configurations set `APP_ROLE` in `env` rather than passing role arguments.
+Inspection loads and closes the single application and its pools without listening or exporting telemetry, but still initializes configured dependencies and requires local services, valid API configuration, and applicable built assets.
+The scripts select `APP_ROLE=api`; direct CLI inspection rejects `worker` or `all` before opening resource connections, covered by subprocess tests.
+Zed debug configurations launch `node_modules/fastify-cli/cli.js` with `runtimeArgs: ['--import', './src/otel.js']` and `args: ['start', '--config', './src/config/fastify-cli.cjs', 'src/app.js']`, setting `APP_ROLE` in `env` rather than passing role arguments.
 
 ## 4. One image and two Fly process groups
 
@@ -206,9 +214,9 @@ Use a single root multi-stage Dockerfile with frozen-lockfile pnpm installation,
 Copy the root manifest, lockfile, pnpm settings, and native patch files into the install stage.
 Replace workspace-filtered `pnpm deploy --legacy` steps with a single-package production dependency install or prune flow, verifying that patched dependencies remain correct.
 Retain required OS dependencies, GeoIP assets, build-time public configuration, Sentry release metadata, and non-root execution.
-The image's `CMD` is `["node", "src/main.js"]`, with no implicit `APP_ROLE` default.
+The image's `CMD` is `["node", "--import", "./src/otel.js", "node_modules/fastify-cli/cli.js", "start", "--config", "./src/config/fastify-cli.cjs", "src/app.js"]`, with no implicit `APP_ROLE` default.
 Callers must supply `APP_ROLE=api` or `APP_ROLE=worker`; the production image rejects `all` and fails when the role is missing.
-Use `env APP_ROLE=... node src/main.js` for Fly process startup so each group selects its own role and signals reach the application directly.
+Prefix the same direct Node CLI command with `env APP_ROLE=api` or `env APP_ROLE=worker` for Fly process startup so each group selects its own role without a package-manager wrapper.
 Do not set `APP_ROLE` globally in the Docker environment, Fly `[env]`, or app-wide secrets.
 Keep secret files and development data out of image layers and do not pass secrets as build arguments.
 Verify the actual image Node version satisfies the manifest rather than assuming the currently declared build argument controls Alpine's installed version.
@@ -221,8 +229,8 @@ app = "breadcrum"
 primary_region = "lax"
 
 [processes]
-  app = "env APP_ROLE=api node src/main.js"
-  worker = "env APP_ROLE=worker node src/main.js"
+  app = "env APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js"
+  worker = "env APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js"
 
 [[services]]
   protocol = "tcp"
@@ -327,10 +335,11 @@ No database rollback should be needed for the consolidation itself because schem
 
 ## Original consolidation results (before the APP_ROLE follow-up)
 
-The repository now has one manifest, one freshly resolved pnpm lockfile with a root-only importer, and native pnpm patches.
-The role-based runtime, one-image Fly topology, root tooling, and CI/documentation changes are implemented without performing a production cutover.
+The original consolidation produced one manifest, one freshly resolved pnpm lockfile with a root-only importer, and native pnpm patches.
+The role-based runtime, one-image Fly topology, root tooling, and CI/documentation changes were implemented without performing a production cutover.
 The baseline pg-boss pin is the intentional exception to selecting newer versions within the former dependency ranges.
-Development uses portable Node module watching; `.env` changes and newly introduced modules require restarting the watcher.
+At that stage, development used portable Node module watching; `.env` changes and newly introduced modules required restarting the watcher.
+That watcher has been superseded by the Fastify CLI watch contract above.
 Existing local env files and ignored legacy GeoIP caches were not overwritten or committed.
 
 The following validation was recorded for the original consolidation, not the current `APP_ROLE` follow-up:
@@ -347,13 +356,15 @@ The following validation was recorded for the original consolidation, not the cu
 
 Production migrations, secret changes, deployments, and stopping the old worker app remain unauthorized and unperformed.
 
-## APP_ROLE and unified plugin follow-up results
+## Historical APP_ROLE and unified plugin follow-up results (before CLI restoration)
 
-One `src/app.js` now composes `src/plugins/shared/`, `src/plugins/api/`, and `src/plugins/worker/`, using shared configuration from `src/config/`.
-The separate API/worker app wrappers and Fastify CLI configuration have been removed.
-The runtime requires `APP_ROLE=api|worker|all`, rejects CLI role flags, and forbids `all` when either production environment marker is set.
-Docker, Fly process commands, root scripts, inspection tools, and editor launch configurations use the same contract.
-Health routes register after API route hooks, while queues retain drain-before-pools shutdown ordering.
+At this checkpoint, one `src/app.js` composed `src/plugins/shared/`, `src/plugins/api/`, and `src/plugins/worker/`, using shared configuration from `src/config/`.
+The separate API/worker app wrappers and Fastify CLI configuration had been removed in favor of a custom bootstrap and inspector.
+The latest user contract supersedes that bootstrap/inspector decision and restores the CLI configuration described above.
+The runtime required `APP_ROLE=api|worker|all`, rejected CLI role flags, and forbade `all` when either production environment marker was set; these role requirements remain unchanged.
+Docker, Fly process commands, root scripts, inspection tools, and editor launch configurations used the prior custom-bootstrap contract at this checkpoint.
+Health routes registered after API route hooks, while queues retained drain-before-pools shutdown ordering.
+The following validation was recorded before CLI restoration, not rerun or claimed to pass for it:
 
 - Root TypeScript, ESLint, and Knip checks pass.
 - The 61 focused configuration, runtime, and workflow-script tests pass with no skips, including 17 runtime integration tests.
@@ -363,6 +374,25 @@ Health routes register after API route hooks, while queues retain drain-before-p
   These are partial results, not a replacement for the earlier completed suite's totals.
   Disposable PostgreSQL/Redis resources were cleaned up without changing local env files.
 - Docker image building and authenticated Fly platform validation remain unverified; no production operation was performed.
+
+## Fastify CLI restoration results
+
+Removed `src/main.js` and the custom inspector and restored `fastify-cli` 8.0.2.
+Runtime, Docker, Fly process commands, and editor launches now use the single application through the CLI, with shared lazy options and a Node telemetry preload.
+The preload skips the watch parent and initializes telemetry once in the application child.
+The application flushes telemetry after queues and pools close; CLI owns listening, signals, and the production shutdown deadline.
+
+- TypeScript, ESLint, Knip, frozen pnpm installation, frontend build, and Giscus patch checks pass.
+- All 79 focused configuration, runtime, and workflow-script tests pass with no skips.
+- Real CLI coverage includes API/worker/combined startup and health, listener-free inspection, rejection of consumer inspection and role flags, a stuck-processor shutdown deadline, and watcher restart with a real metrics exporter.
+- The full Node suite was not rerun for CLI restoration; the historical full-suite results above still apply only to their respective checkpoints.
+- Docker image building and authenticated Fly platform validation remain unverified.
+
+Known upstream CLI lifecycle limitations remain explicit rather than introducing a replacement bootstrap:
+
+- File-change restarts use a fixed five-second deadline rather than `SHUTDOWN_TIMEOUT_MS`, so longer development jobs may be interrupted and retried.
+- Rapid consecutive file events can start a replacement before the previous child finishes draining, potentially causing a listener conflict.
+- Startup failures before registration completes can exit nonzero without invoking close hooks or flushing telemetry; the configured graceful-close handler is installed after registration.
 
 ## References
 

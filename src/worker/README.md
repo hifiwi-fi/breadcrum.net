@@ -3,7 +3,8 @@
 This directory contains the queue consumer and job-processing portion of the single root Breadcrum package.
 It is not a separate package or independently built service.
 Shared queue/domain code lives in `src/resources/`.
-The single `src/app.js` composes all roles; `src/main.js` handles runtime bootstrap, with no separate worker app wrapper.
+The single `src/app.js` composes all roles and exports lazy CLI server options from `src/config/server-options.js`, with no separate worker app wrapper or custom `src/main.js`.
+Fastify CLI owns startup and graceful close through `src/config/fastify-cli.cjs`, which reads `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
 Plugins live under the root `src/plugins/` tree, imported across areas through `#plugins/*`.
 Shared infrastructure lives in `src/plugins/shared/`, API-only plugins in `src/plugins/api/`, and pg-boss consumer registration in `src/plugins/worker/`.
 
@@ -15,15 +16,18 @@ pnpm run start:worker
 ```
 
 `watch` runs API handlers and workers in one backend process for development using `APP_ROLE=all`.
-`start:worker` runs `APP_ROLE=worker node src/main.js`, with an internal health listener and no public routes or frontend requirement.
+`start:worker` runs `APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, with an internal health listener and no public routes or frontend requirement.
+The Node preload initializes telemetry before Fastify loads.
+The backend watcher adds `--watch --ignore-watch='client public data .tap'`; Fastify CLI also ignores `.git` and `node_modules` by default.
+The watch parent skips telemetry, while its application child inherits the preload.
 Roles are selected only through `APP_ROLE=api|worker|all`, not `--role` flags; missing or unknown roles fail startup.
 The combined `all` role is rejected if either `NODE_ENV=production` or `ENV=production`.
 Both use the root environment and the existing PostgreSQL-backed queues.
 Use a different `PORT` when running a separate API process locally.
 
 Production uses the root `Dockerfile` and `fly.toml`, with the `worker` process group in the `breadcrum` Fly app.
-The image runs `node src/main.js` without a default role, so callers must supply `APP_ROLE`.
-Fly selects the worker with `env APP_ROLE=worker node src/main.js`, not a global role environment setting.
+The image runs `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js` without a default role, so callers must supply `APP_ROLE`.
+Fly prefixes that same command with `env APP_ROLE=worker`, not a global role environment setting.
 Only the `app` group has a public service.
 Worker health checks target `/health` on port 8080; metrics use port 9092 and the `breadcrum-worker` telemetry identity.
 The worker must remain running to consume jobs; HTTP autostart cannot wake it.

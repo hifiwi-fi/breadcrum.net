@@ -29,14 +29,22 @@ Run `pnpm run watch` (or `pnpm start`) for the asset watcher and one backend pro
 
 ## Runtime and layout
 
-`APP_ROLE=all node src/main.js` runs the combined development backend.
+`pnpm run watch:server` runs the combined development backend with Fastify CLI:
+
+```sh
+APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' src/app.js
+```
+
+Fastify CLI also ignores `.git` and `node_modules` by default.
+The Node preload initializes telemetry before Fastify loads; the watch parent skips telemetry and its application child inherits the preload.
 Select the role through `APP_ROLE=api|worker|all`; missing or unknown roles fail startup, and `--role` flags are not supported.
 The combined `all` role is rejected when either `NODE_ENV=production` or `ENV=production`.
 The explicit `api` and `worker` roles run separately in production from the same image.
 PostgreSQL-backed queues remain durable even when producer and consumer share a process.
 
-- `src/main.js`: environment/role selection, telemetry bootstrap, and process lifecycle.
-- `src/app.js`: the single Fastify application composition for all roles, tests, and inspection.
+- `src/app.js`: the single Fastify application composition for all roles, tests, and CLI inspection, exporting lazy CLI server options from `src/config/server-options.js`.
+- `src/otel.js`: Node telemetry preload for runtime startup.
+- `src/config/fastify-cli.cjs`: shared CLI startup and graceful-close configuration, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
 - `src/plugins/shared/`: shared env, PostgreSQL, Redis, cache, metrics, health, queue, sensible, and Sentry plugins.
 - `src/plugins/api/`: API-only plugins, including auth, static serving, and flags.
 - `src/plugins/worker/`: pg-boss consumer registration.
@@ -50,12 +58,15 @@ PostgreSQL-backed queues remain durable even when producer and consumer share a 
 - `data/geoip/`: ignored local GeoIP database/cache.
 
 Cross-area plugin imports use the root `#plugins/*` alias.
-There are no separate API/worker app wrappers or Fastify CLI startup helpers.
-Inspection commands run `APP_ROLE=api node scripts/inspect-app.js routes` or `plugins`, load the app and its configured dependencies, and close it without listening or exporting telemetry.
+There are no separate API/worker app wrappers, custom `src/main.js` bootstrap, or custom inspector.
+Runtime startup and the graceful-close deadline are owned by Fastify CLI configuration.
+Inspection commands run `APP_ROLE=api fastify print-routes src/app.js` or `APP_ROLE=api fastify print-plugins src/app.js`, without the telemetry preload.
+They load the app and its configured dependencies, then close the app and its pools without listening or exporting telemetry.
 Use local development services for inspection; it is not a static source-only operation.
 
 The root `Dockerfile` builds both roles, installs only production dependencies in the final image, and runs as a non-root user.
-Its command is `node src/main.js`, with no implicit `APP_ROLE`; callers must supply `APP_ROLE=api` or `APP_ROLE=worker` for the production image.
+Its command is `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, with no implicit `APP_ROLE`; callers must supply `APP_ROLE=api` or `APP_ROLE=worker` for the production image.
+Root `start:api` and `start:worker` scripts prefix this same command with their respective `APP_ROLE` values.
 The root `fly.toml` targets the existing `breadcrum` app with public `app` and internal-only `worker` process groups.
 Each Fly process command sets its own `APP_ROLE` using `env`; there is no global role default.
 Deployments are manual, release both groups together, and require separate approval for the initial `bc-worker` cutover.

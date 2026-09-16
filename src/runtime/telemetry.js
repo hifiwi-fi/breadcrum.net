@@ -8,7 +8,7 @@ import { HostMetrics } from '@opentelemetry/host-metrics'
 import { metrics } from '@opentelemetry/api'
 
 /**
- * Called once by main, after config validation and before importing the app.
+ * Called once by the Node preload, after config validation and before Fastify loads.
  * @param {RuntimeConfig} config
  */
 export async function bootstrapTelemetry (config) {

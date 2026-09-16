@@ -23,8 +23,8 @@ swap_size_mb = 1024
   release_command = "node --run migrate -- --no-config"
 
 [processes]
-  app = "env APP_ROLE=api node src/main.js"
-  worker = "env APP_ROLE=worker node src/main.js"
+  app = "env APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js"
+  worker = "env APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js"
 
 # Select APP_ROLE per process above, never as an app-wide default.
 [env]

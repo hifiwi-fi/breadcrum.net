@@ -6,7 +6,7 @@ import Fastify from 'fastify'
 import fp from 'fastify-plugin'
 import AutoLoad from '@fastify/autoload'
 import { join, basename } from 'node:path'
-import { loadConfig } from '#config/config.js'
+import { loadConfig, loadRuntimeConfig } from '#config/config.js'
 import { assertRole } from '#config/role.js'
 import { createShutdown } from './runtime/shutdown.js'
 import { schemaForRole } from '#config/env-schema.js'
@@ -14,18 +14,31 @@ import { createServerOptions } from '#resources/fastify-common/server-options.js
 import env from '#plugins/shared/env.js'
 import pgboss from '#plugins/shared/pgboss.js'
 import health from '#plugins/shared/health.js'
+import { telemetryState } from '#runtime/telemetry-state.js'
+
+export { options } from '#config/server-options.js'
 
 const ignorePattern = /(?:test|spec|\.no-load)\.(?:js|cjs|mjs)$/i
 
-/** @type {FastifyPluginAsync<AppOptions>} */
+/** @type {FastifyPluginAsync<Partial<AppOptions>>} */
 export default async function App (fastify, opts) {
-  assertRole(opts.role)
-  const config = opts.config ?? loadConfig(opts.role, opts)
-  const options = { ...opts, config }
-  fastify.addSchema(schemaForRole(opts.role))
+  if (opts.role !== undefined) {
+    throw new Error('CLI role flags are not supported; set APP_ROLE=api|worker|all instead')
+  }
+  const config = opts.config ?? loadRuntimeConfig(opts)
+  const role = config.APP_ROLE
+  assertRole(role)
+  // CLI inspection omits exported options; consumer roles require configured startup.
+  if (!opts.config && role !== 'api') {
+    throw new Error('Inspection requires APP_ROLE=api to avoid activating queue consumers')
+  }
+  const options = { ...opts, role, config }
+  // Register first so telemetry flushes after queues and infrastructure close.
+  fastify.addHook('onClose', async () => { await telemetryState.shutdown?.() })
+  fastify.addSchema(schemaForRole(role))
   await fastify.register(env, options)
 
-  if (opts.role !== 'worker') {
+  if (role !== 'worker') {
     await fastify.register(AutoLoad, {
       dir: join(import.meta.dirname, 'api/routes'),
       matchFilter: /^.*[a-zA-Z0-9_-]+\.schema\.(?:js|cjs|mjs)$/i,
@@ -45,7 +58,7 @@ export default async function App (fastify, opts) {
     options,
   })
 
-  if (opts.role !== 'worker') {
+  if (role !== 'worker') {
     await fastify.register(AutoLoad, {
       dir: join(import.meta.dirname, 'plugins/api'),
       ignorePattern,
@@ -59,7 +72,7 @@ export default async function App (fastify, opts) {
 
   // Registered after all pools/cache: reverse onClose order drains jobs before dependencies close.
   await fastify.register(pgboss, options)
-  if (opts.role !== 'api') {
+  if (role !== 'api') {
     await fastify.register(AutoLoad, {
       dir: join(import.meta.dirname, 'plugins/worker'),
       ignorePattern,
@@ -68,7 +81,7 @@ export default async function App (fastify, opts) {
     })
   }
 
-  if (opts.role !== 'worker') {
+  if (role !== 'worker') {
     await fastify.register(AutoLoad, {
       dir: join(import.meta.dirname, 'api/routes'),
       indexPattern: /^.*routes\.(?:ts|js|cjs|mjs)$/,
@@ -95,7 +108,8 @@ export async function createApp (opts) {
     ...opts.serverOptions,
   })
   try {
-    await fastify.register(fp(App), { ...opts, config })
+    const { role: _role, ...appOptions } = opts
+    await fastify.register(fp(App), { ...appOptions, config })
     await fastify.ready()
     return fastify
   } catch (err) {

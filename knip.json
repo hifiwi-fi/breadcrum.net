@@ -1,7 +1,9 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "entry": [
+    "src/app.js",
 
+    "src/config/fastify-cli.cjs",
     "src/plugins/**/*.js",
     "src/api/routes/**/{routes,autohooks}.js",
 
@@ -11,7 +13,7 @@
     "src/**/*.test.js",
     "src/worker/workers/bookmarks/ua.js"
   ],
-  "project": ["src/**/*.{js,ts}", "client/**/*.js", "scripts/**/*.js"],
+  "project": ["src/**/*.{js,cjs,ts}", "client/**/*.js", "scripts/**/*.js"],
   "ignoreDependencies": ["highlight.js", "mine.css"],
   "ignoreBinaries": ["redis-server"]
 }

@@ -16,4 +16,9 @@ API-only instances never load the worker plugin tree.
 Do not autoload the entire `src/plugins/` directory at once or duplicate shared plugins under a role.
 Keep named Fastify plugin dependencies explicit and preserve their startup and shutdown ordering.
 Job processors remain under `src/worker/workers/`; routes and route-scoped hooks remain under `src/api/routes/`.
-Telemetry SDK initialization and shutdown belong to `src/main.js`, not an autoloaded plugin.
+Fastify CLI owns startup and graceful close, using `src/config/fastify-cli.cjs` to read `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+The single `src/app.js` exports lazy CLI server options from `src/config/server-options.js`.
+Telemetry initializes through the Node preload `--import ./src/otel.js` before Fastify loads, not through an autoloaded plugin.
+The watch parent skips telemetry, while its application child inherits the preload.
+Keep telemetry cleanup coordinated with application shutdown; do not restore a custom `src/main.js` lifecycle or inspector.
+CLI `print-routes` and `print-plugins` use `APP_ROLE=api` without the preload, initialize configured dependencies, and close the app and its pools without starting listeners or exporters.
