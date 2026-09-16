@@ -41,8 +41,9 @@ export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   $id: 'schema:dotenv',
   additionalProperties: false,
-  required: [...common.required, ...api.required],
+  required: ['APP_ROLE', ...common.required, ...api.required],
   properties: {
+    APP_ROLE: { type: 'string', enum: ['api', 'worker', 'all'] },
     ENV: { type: 'string', default: 'development' },
     FASTIFY_LOG_LEVEL: { type: 'string', enum: ['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'], default: 'info' },
     HOST: { type: 'string', default: 'localhost:3000' },
@@ -64,7 +65,7 @@ export function schemaForRole (role) {
   const defaults = roleDefaults(role)
   return {
     ...envSchema,
-    required: role === 'worker' ? common.required : envSchema.required,
+    required: role === 'worker' ? ['APP_ROLE', ...common.required] : envSchema.required,
     properties: {
       ...envSchema.properties,
       OTEL_SERVICE_NAME: { ...envSchema.properties.OTEL_SERVICE_NAME, default: defaults.OTEL_SERVICE_NAME },

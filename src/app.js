@@ -11,13 +11,11 @@ import { assertRole } from '#config/role.js'
 import { createShutdown } from './runtime/shutdown.js'
 import { schemaForRole } from '#config/env-schema.js'
 import { createServerOptions } from '#resources/fastify-common/server-options.js'
-import env from '#api/plugins/env.js'
-import pgboss from '#api/plugins/pgboss.js'
+import env from '#plugins/shared/env.js'
+import pgboss from '#plugins/shared/pgboss.js'
+import health from '#plugins/shared/health.js'
 
 const ignorePattern = /(?:test|spec|\.no-load)\.(?:js|cjs|mjs)$/i
-const sharedPlugins = new Set([
-  'cache.js', 'health.js', 'otel-metrics.js', 'pg.js', 'redis.js', 'sensible.js', 'sentry.js',
-])
 
 /** @type {FastifyPluginAsync<AppOptions>} */
 export default async function App (fastify, opts) {
@@ -39,21 +37,35 @@ export default async function App (fastify, opts) {
   }
 
   await fastify.register(AutoLoad, {
-    dir: join(import.meta.dirname, 'api/plugins'),
+    dir: join(import.meta.dirname, 'plugins/shared'),
     ignorePattern,
-    ignoreFilter: (path) => {
-      const name = basename(path)
-      if (['env.js', 'pgboss.js', 'otel-shutdown.js'].includes(name)) return true
-      return opts.role === 'worker' && !sharedPlugins.has(name)
-    },
+    // These plugins need explicit ordering around infrastructure and API hooks.
+    ignoreFilter: path => ['env.js', 'pgboss.js', 'health.js'].includes(basename(path)),
     dirNameRoutePrefix: false,
     options,
   })
 
+  if (opts.role !== 'worker') {
+    await fastify.register(AutoLoad, {
+      dir: join(import.meta.dirname, 'plugins/api'),
+      ignorePattern,
+      dirNameRoutePrefix: false,
+      options,
+    })
+  }
+
+  // API onRoute hooks (including circuit-breaker) must see health routes too.
+  await fastify.register(health, options)
+
   // Registered after all pools/cache: reverse onClose order drains jobs before dependencies close.
   await fastify.register(pgboss, options)
   if (opts.role !== 'api') {
-    await fastify.register(import('#worker/plugins/pgboss.js'), options)
+    await fastify.register(AutoLoad, {
+      dir: join(import.meta.dirname, 'plugins/worker'),
+      ignorePattern,
+      dirNameRoutePrefix: false,
+      options,
+    })
   }
 
   if (opts.role !== 'worker') {

@@ -37,12 +37,14 @@ pnpm run watch
 ```
 
 `pnpm start` delegates to `watch`.
-The backend watcher runs API handlers and queue consumers in one application PID (`--role=all`), alongside the separate domstack asset watcher.
+The backend watcher runs API handlers and queue consumers in one application PID, alongside the separate domstack asset watcher.
+`watch:server` runs `APP_ROLE=all node --watch --watch-preserve-output src/main.js`.
 It uses Node's portable module-watching mode rather than platform-restricted `--watch-path` options.
 Restart it after changing `.env` or adding a new module that has not yet been imported.
 PostgreSQL and Redis remain external services.
 `pnpm run build` creates the browser assets in `public/`.
-The Zed debug configurations launch the same role-based entry point; build assets separately when debugging without the watcher.
+The Zed debug configurations launch the same role-based entry point with `APP_ROLE` in `env`, not command-line role arguments; build assets separately when debugging without the watcher.
+The combined debug configuration still rejects `ENV=production`, even with `NODE_ENV=development`.
 
 ### Reconciling existing local environments
 
@@ -65,14 +67,35 @@ Editing a linked root `.env` later affects every worktree sharing it.
 
 | Role | Command | Behavior |
 | --- | --- | --- |
-| Combined | `node src/main.js --role=all` | API, producers, and consumers in one development process |
+| Combined | `APP_ROLE=all node src/main.js` | API, producers, and consumers in one development process |
 | API | `pnpm run start:api` | Public routes and queue producers, no consumers or cleanup schedules |
 | Worker | `pnpm run start:worker` | Consumers and internal health routes, no public routes or frontend requirement |
 
-Roles are explicit; production does not silently default to `all`.
+Select roles only through `APP_ROLE=api|worker|all`; `--role` flags are not supported.
+Missing or unknown roles fail startup rather than selecting a default.
+The combined `all` role is rejected when either `NODE_ENV=production` or `ENV=production`.
+`start:api` runs `APP_ROLE=api node src/main.js`, and `start:worker` runs `APP_ROLE=worker node src/main.js`.
 When running separate roles locally, use distinct listener ports, such as `PORT=3001 pnpm run start:worker`.
 API and worker production metrics use ports 9091 and 9092 respectively.
 The combined role owns one exporter, not two telemetry initializations.
+
+### Application composition and inspection
+
+`src/app.js` is the single Fastify application composition for runtime, tests, and inspection.
+`src/main.js` remains the runtime bootstrap for environment/role selection, telemetry, and process lifecycle.
+There are no `src/api/app.js` or `src/worker/app.js` wrappers, and no `src/config/server-options.js` Fastify CLI helper.
+Keep plugins in one root tree and use `#plugins/*` for cross-area imports:
+
+- `src/plugins/shared/`: env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry.
+- `src/plugins/api/`: auth, static serving, flags, and other API-only plugins.
+- `src/plugins/worker/`: pg-boss consumer registration.
+
+API routes/schemas remain in `src/api/`, processors in `src/worker/`, and shared domain/queue code in `src/resources/`.
+`pnpm run print-routes` runs `APP_ROLE=api node scripts/inspect-app.js routes`; `pnpm run print-plugins` uses the same command with `plugins`.
+These commands load the app and close it without starting HTTP listeners or telemetry exporters; they do not use the Fastify CLI.
+Inspection requires `APP_ROLE=api` and refuses consumer roles so it cannot start processing jobs.
+They still need valid API configuration, local services, and applicable built assets because they initialize the app rather than only reading source files.
+Do not point inspection at production resources.
 
 ## Validation
 
@@ -131,12 +154,16 @@ Only the GeoIP database/cache is eligible for copying from local data into the i
 Deployment is an explicitly authorized operation, never part of install/build/test.
 The root image uses Node 26, a frozen pnpm installation with native patches, a root frontend build, and a separate production-dependency installation.
 It includes migrations and GeoIP assets, preserves the release identifier, and runs as the non-root `node` user.
+Its `CMD` is `node src/main.js`, with no implicit `APP_ROLE` default.
+Callers must supply `APP_ROLE=api` or `APP_ROLE=worker`; running the image without a role fails, and its production environment rejects `all`.
 No workspace `pnpm deploy` step is used.
 
 The checked-in topology is one existing Fly app, `breadcrum`, with two process groups:
 
-- `app`: `node src/main.js --role=api`, the only group selected by public HTTP/HTTPS services.
-- `worker`: `node src/main.js --role=worker`, internal health listener only, with an `always` restart policy.
+- `app`: `env APP_ROLE=api node src/main.js`, the only group selected by public HTTP/HTTPS services.
+- `worker`: `env APP_ROLE=worker node src/main.js`, internal health listener only, with an `always` restart policy.
+
+Set `APP_ROLE` in each process command, not in the global Fly `[env]` table or app-wide secrets.
 
 The Fly release command runs `node --run migrate -- --no-config` once per deployment attempt against root `migrations/`, without booting either application role.
 `--no-config` skips the local `.postgratorrc.json` connection settings; Postgrator defaults to the `pg` driver and root-relative `migrations/*` pattern.

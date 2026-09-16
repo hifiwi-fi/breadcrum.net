@@ -7,7 +7,7 @@ import { parseEnv } from 'node:util'
 import { fileURLToPath } from 'node:url'
 import envSchema from 'env-schema'
 import { schemaForRole } from './env-schema.js'
-import { assertRole } from './role.js'
+import { assertRole, parseRoleFromEnvironment } from './role.js'
 
 export const dotEnvPath = fileURLToPath(new URL('../../.env', import.meta.url))
 
@@ -32,6 +32,20 @@ export function loadEnvironment (options = {}) {
 }
 
 /**
+ * Resolve the runtime role and validate the same environment before resource startup.
+ * @param {object} [options]
+ * @param {Partial<RuntimeConfig> | undefined} [options.envData]
+ * @param {string | false | undefined} [options.dotEnvPath]
+ * @param {NodeJS.ProcessEnv | undefined} [options.processEnv]
+ * @returns {RuntimeConfig}
+ */
+export function loadRuntimeConfig (options = {}) {
+  const environment = loadEnvironment(options)
+  const role = parseRoleFromEnvironment(environment)
+  return loadConfig(role, { ...options, dotEnvPath: false, processEnv: environment })
+}
+
+/**
  * Validate role-specific config before opening any connections.
  * Explicit data is reserved for test/application-factory overrides.
  * @param {Role} role
@@ -43,11 +57,13 @@ export function loadEnvironment (options = {}) {
  */
 export function loadConfig (role, options = {}) {
   assertRole(role)
+  const data = { ...loadEnvironment(options), ...options.envData, APP_ROLE: role }
+  parseRoleFromEnvironment(data)
   /** @type {RuntimeConfig} */
   const config = envSchema({
     schema: schemaForRole(role),
     env: false,
-    data: { ...loadEnvironment(options), ...options.envData },
+    data,
   })
   if (config.SHUTDOWN_TIMEOUT_MS <= config.JOB_DRAIN_TIMEOUT_MS) {
     throw new Error('SHUTDOWN_TIMEOUT_MS must exceed JOB_DRAIN_TIMEOUT_MS to allow pool and telemetry cleanup')

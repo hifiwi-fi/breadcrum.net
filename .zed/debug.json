@@ -5,10 +5,10 @@
     "type": "pwa-node",
     "request": "launch",
     "program": "${ZED_WORKTREE_ROOT}/src/main.js",
-    "args": ["--role=all"],
     "cwd": "${ZED_WORKTREE_ROOT}",
     "console": "integratedTerminal",
     "env": {
+      "APP_ROLE": "all",
       "NODE_ENV": "development",
       "FORCE_COLOR": "1"
     },
@@ -21,10 +21,9 @@
     "type": "pwa-node",
     "request": "launch",
     "program": "${ZED_WORKTREE_ROOT}/src/main.js",
-    "args": ["--role=api"],
     "cwd": "${ZED_WORKTREE_ROOT}",
     "console": "integratedTerminal",
-    "env": { "NODE_ENV": "development", "FORCE_COLOR": "1" },
+    "env": { "APP_ROLE": "api", "NODE_ENV": "development", "FORCE_COLOR": "1" },
     "skipFiles": ["<node_internals>/**"]
   },
   {
@@ -33,10 +32,9 @@
     "type": "pwa-node",
     "request": "launch",
     "program": "${ZED_WORKTREE_ROOT}/src/main.js",
-    "args": ["--role=worker"],
     "cwd": "${ZED_WORKTREE_ROOT}",
     "console": "integratedTerminal",
-    "env": { "NODE_ENV": "development", "FORCE_COLOR": "1", "PORT": "3001" },
+    "env": { "APP_ROLE": "worker", "NODE_ENV": "development", "FORCE_COLOR": "1", "PORT": "3001" },
     "skipFiles": ["<node_internals>/**"]
   }
 ]

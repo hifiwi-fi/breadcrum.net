@@ -23,9 +23,10 @@ swap_size_mb = 1024
   release_command = "node --run migrate -- --no-config"
 
 [processes]
-  app = "node src/main.js --role=api"
-  worker = "node src/main.js --role=worker"
+  app = "env APP_ROLE=api node src/main.js"
+  worker = "env APP_ROLE=worker node src/main.js"
 
+# Select APP_ROLE per process above, never as an app-wide default.
 [env]
   ENV = "production"
   LISTEN_HOST = "0.0.0.0"

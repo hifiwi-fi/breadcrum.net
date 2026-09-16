@@ -1,4 +1,4 @@
-import { defaultFrontendFlags } from '#api/plugins/flags/frontend-flags.js'
+import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'

@@ -14,11 +14,19 @@ There is one private ESM package and one root lockfile; do not use workspace rec
 Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
 Install reproducibly with `pnpm install --frozen-lockfile`.
 
-API code lives in `src/api/`, consumers in `src/worker/`, shared domain/queue code in `src/resources/`, and browser code in `client/`.
+API routes/schemas live in `src/api/`, consumers/processors in `src/worker/`, shared domain/queue code in `src/resources/`, and browser code in `client/`.
+Use the single `src/app.js` application composition; keep `src/main.js` for runtime bootstrap and lifecycle.
+Do not reintroduce `src/api/app.js`, `src/worker/app.js`, or the `src/config/server-options.js` Fastify CLI helper.
+Keep plugins under one root `src/plugins/` tree, imported across areas through `#plugins/*`.
+Use `src/plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `src/plugins/api/` for auth, static serving, flags, and other API-only plugins; and `src/plugins/worker/` for pg-boss consumer registration.
 Keep shared environment schemas, loading, role defaults, and application options in `src/config/`, imported across areas through `#config/*`.
 Do not introduce separate API or worker config folders.
 Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
-Development uses one backend process with `node src/main.js --role=all`; production explicitly selects `api` or `worker` from the same image.
+Development uses one backend process with `APP_ROLE=all node src/main.js`; production explicitly selects `APP_ROLE=api` or `APP_ROLE=worker` from the same image.
+`APP_ROLE` is required and must be `api`, `worker`, or `all`; missing/unknown roles fail startup, and `--role` flags are unsupported.
+Reject `all` when either `NODE_ENV=production` or `ENV=production`.
+The runtime image runs `node src/main.js` without an implicit role default; callers must supply `APP_ROLE`.
+Fly process commands select roles with `env APP_ROLE=api node src/main.js` and `env APP_ROLE=worker node src/main.js`; never set a global Fly `APP_ROLE` default.
 Only the `app` Fly process group is publicly routed; the worker group stays internal and continuously running.
 
 Use one root local `.env` and never automatically overwrite existing files or env symlink targets.
@@ -171,7 +179,7 @@ Common aliases:
 ```javascript
 // ✅ Cross-area imports use package aliases
 import { build } from '#api/test/helper.js'
-import { defaultFrontendFlags } from '#api/plugins/flags/frontend-flags.js'
+import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
 /** @import { TypeUserRead } from '#api/routes/api/user/schemas/schema-user-read.js' */
 
 // ✅ Local sibling imports stay relative
@@ -720,14 +728,17 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.
-- `pnpm run start:api` / `pnpm run start:worker` - Run an explicit non-watching role.
+- `pnpm run watch:server` - Run `APP_ROLE=all node --watch --watch-preserve-output src/main.js`.
+- `pnpm run start:api` / `pnpm run start:worker` - Run `APP_ROLE=api node src/main.js` / `APP_ROLE=worker node src/main.js` without watching.
 - `pnpm run build` - Build root browser assets with @domstack/static.
 - `pnpm run migrate` - Run root Postgrator migrations without booting application roles.
 - `pnpm run generate-default-env` - Create root development defaults without replacing existing env files.
-- `pnpm run print-routes` / `pnpm run print-plugins` - Inspect the root application.
+- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api node scripts/inspect-app.js routes` / `plugins`, not the Fastify CLI.
 - `pnpm run deploy` - Explicitly deploy the shared image to both Fly groups, only when authorized.
 - `node scripts/verify-giscus-patch.js --built` - Verify the installed and emitted native Giscus patch.
 
+Inspection loads and closes `src/app.js` without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
+Zed debug configurations select `APP_ROLE` through `env`, never role arguments.
 Keep native pnpm patches enabled in frozen installs and production dependency installs.
 Do not introduce workspace `pnpm deploy`, package filters, or separate per-role images.
 

@@ -1,12 +1,14 @@
 /** @import { FastifyInstance } from 'fastify' */
-import { parseRole } from '#config/role.js'
-import { loadConfig, loadEnvironment } from '#config/config.js'
+import { loadRuntimeConfig, loadEnvironment } from '#config/config.js'
 import { createShutdown } from './runtime/shutdown.js'
 
 async function main () {
-  const role = parseRole(process.argv.slice(2))
   const environment = loadEnvironment()
-  const config = loadConfig(role, { dotEnvPath: false, processEnv: environment })
+  if (process.argv.length > 2) {
+    throw new Error('CLI arguments are not supported; set APP_ROLE=api|worker|all in the environment instead (for example: APP_ROLE=api node src/main.js)')
+  }
+  const config = loadRuntimeConfig({ dotEnvPath: false, processEnv: environment })
+  const role = config.APP_ROLE
   // Preserve library-specific env settings as well as the validated application configuration.
   for (const [key, value] of Object.entries(environment)) {
     if (value !== undefined) process.env[key] = value

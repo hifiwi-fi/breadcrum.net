@@ -8,7 +8,7 @@ import { constants as fsConstants } from 'node:fs'
 import { access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as sleep } from 'node:timers/promises'
-import { updateGeoipDatabase } from '../lib/geoip-download.js'
+import { updateGeoipDatabase } from '#api/lib/geoip-download.js'
 
 const defaultGeoipPath = join(process.cwd(), 'data', 'geoip', 'GeoLite2-City.mmdb')
 const defaultGeoipDir = join(process.cwd(), 'data', 'geoip')

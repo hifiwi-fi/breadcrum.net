@@ -8,7 +8,7 @@ import { createCleanupAuthTokensQ } from '#resources/auth-tokens/cleanup-auth-to
 import { createCleanupStaleResolutionsQ } from '#resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 import { startPGBoss } from '#resources/pgboss/start-pgboss.js'
 import { defaultBossOptions } from '#resources/pgboss/default-job-options.js'
-import { createProcessorTracker, createQueueLifecycle } from '../../runtime/queue-lifecycle.js'
+import { createProcessorTracker, createQueueLifecycle } from '#runtime/queue-lifecycle.js'
 
 /** @type {FastifyPluginAsync<AppOptions>} */
 async function queuePlugin (fastify, opts) {

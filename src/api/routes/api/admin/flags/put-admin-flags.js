@@ -1,6 +1,6 @@
 import SQL from '@nearform/sql'
-import { defaultFrontendFlags } from '#api/plugins/flags/frontend-flags.js'
-import { defaultBackendFlags } from '#api/plugins/flags/backend-flags.js'
+import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
+import { defaultBackendFlags } from '#plugins/api/flags/backend-flags.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'

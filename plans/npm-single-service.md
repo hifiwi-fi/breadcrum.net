@@ -2,9 +2,10 @@
 
 ## Status and scope
 
-Implementation was subsequently authorized, including local checkpoint commits, but no push or deployment.
-The architecture below has been implemented locally; production cutover still requires separate approval.
-Do not push, deploy, change production secrets, run production migrations, or stop existing Machines as part of this task.
+The original consolidation was authorized with checkpoint commits, followed by a request for a draft PR.
+Draft PR [#918](https://github.com/hifiwi-fi/breadcrum.net/pull/918) tracks the implementation and follow-up configuration, `APP_ROLE`, and plugin-layout changes.
+The architecture below incorporates those follow-ups; production cutover still requires separate approval.
+Do not deploy, merge, change production secrets, run production migrations, or stop existing Machines as part of this work.
 
 Fetched `origin` and ran `git pull --ff-only origin master` in this clean, detached worktree before creating `plan/npm-single-service`.
 The branch starts at `4000367aaceb33eb58848690ab446b97c2a08389`, matching `origin/master` at planning time.
@@ -64,9 +65,12 @@ src/
   config/                    # Shared environment schemas, loading, role defaults, and options
   runtime/                   # Shared startup/shutdown helpers
   telemetry/                 # Single OTel/Sentry bootstrap and metrics setup
-  plugins/                   # Shared database, Redis, cache, and queue infrastructure
-  api/                       # Existing API routes, schemas, and API-only plugins
-  worker/                    # Consumer registration and existing job processors
+  plugins/                   # One root plugin tree, imported through #plugins/*
+    shared/                  # Env, pg, Redis, cache, metrics, health, queues, sensible, Sentry
+    api/                     # Auth, static serving, flags, and other API-only plugins
+    worker/                  # pg-boss consumer registration
+  api/                       # Existing API routes and schemas
+  worker/                    # Existing consumers and job processors
   resources/                 # Existing shared domain/query/queue modules
   types/                     # Shared type declarations and utilities
 client/                      # Existing domstack source
@@ -108,7 +112,8 @@ The settings file's name does not imply a multi-package repository: there will b
 ### Imports, paths, and types
 
 - Replace internal `@breadcrum/resources/...` imports with root `#resources/*` aliases.
-- Introduce clear `#api/*`, `#worker/*`, and shared/runtime aliases instead of preserving conflicting `#plugins`, `#routes`, and `#test` meanings.
+- Introduce clear `#api/*`, `#worker/*`, and shared/runtime aliases instead of preserving conflicting package-local aliases.
+- Map `#plugins/*` to the single root `src/plugins/*` tree, with explicit `shared/`, `api/`, and `worker/` subpaths.
 - Preserve useful client aliases and runtime `.js` specifiers for aliases mapped to type-only `.ts` sources.
 - Consolidate Fastify config, metrics, and pg-boss declarations without falsely declaring role-specific functionality universally available.
 - Preserve browser-safe imports for flags and other client-shared values; do not pull server infrastructure into client bundles.
@@ -126,9 +131,10 @@ The settings file's name does not imply a multi-package repository: there will b
 | `api` | Yes | Yes | No | Public service listener, production port 8080 |
 | `worker` | No | Yes, for follow-up jobs | Yes | Health-only listener, production port 8080, not publicly routed |
 
-Use explicit CLI role selection, such as `node src/main.js --role=api`, for deploy commands.
-Development scripts explicitly select `all`; production must not silently default to the combined role.
-Reject unknown or missing required roles before opening connections.
+Select roles only through `APP_ROLE=api|worker|all`, such as `APP_ROLE=api node src/main.js`; `--role` flags are not supported.
+Development scripts explicitly select `APP_ROLE=all`.
+Reject `all` when either `NODE_ENV=production` or `ENV=production`.
+Reject unknown or missing roles before opening connections; there is no implicit role default.
 
 ### Composition
 
@@ -141,6 +147,9 @@ Reject unknown or missing required roles before opening connections.
 
 Do not mount the two existing apps unchanged under a parent server.
 Their overlapping infrastructure, schemas, decorators, and telemetry ownership would preserve duplication and introduce conflicts.
+Use `src/app.js` as the single application composition and keep `src/main.js` for environment/role selection, telemetry bootstrap, and process lifecycle.
+Remove the `src/api/app.js` and `src/worker/app.js` wrappers and the `src/config/server-options.js` Fastify CLI helper.
+Load shared and role-specific plugins from `src/plugins/shared/`, `src/plugins/api/`, and `src/plugins/worker/`, registering shared infrastructure once.
 Keep the app factory usable by tests without automatically installing signal handlers or starting telemetry listeners.
 
 ### Queues and shutdown
@@ -175,8 +184,10 @@ Verify Sentry request/job scope isolation when HTTP handlers and consumers share
 
 - `pnpm install --frozen-lockfile`: reproducible single-package installation, including native patch application.
 - `pnpm run watch`: one restarting `all` backend plus the existing domstack asset watcher as development tooling.
+- `pnpm run watch:server`: `APP_ROLE=all node --watch --watch-preserve-output src/main.js`.
 - `pnpm start`: retain the current development-oriented convention by delegating to `watch`.
-- `pnpm run start:api` and `pnpm run start:worker`: explicit non-watching runtime modes for local production simulation.
+- `pnpm run start:api` and `pnpm run start:worker`: `APP_ROLE=api node src/main.js` and `APP_ROLE=worker node src/main.js`, explicit non-watching runtime modes for local production simulation.
+- `pnpm run print-routes` and `pnpm run print-plugins`: `APP_ROLE=api node scripts/inspect-app.js routes` and `APP_ROLE=api node scripts/inspect-app.js plugins`, without the Fastify CLI.
 - `pnpm run build`: build domstack assets from root paths using the dependencies patched during installation.
 - `pnpm run migrate`: run Postgrator against the relocated migrations without booting API or worker consumers.
 - `pnpm test`: sequential root ESLint, TypeScript, Node test, and Knip steps using the existing `npm-run-all2` naming pattern.
@@ -186,6 +197,8 @@ One application process does not mean PostgreSQL, Redis, the file-watching super
 The important constraint is that API handlers and queue consumers execute inside the same backend PID in development, without a second worker child process or worker thread.
 Watch backend, worker, and resource changes; exclude generated output and client-only changes from backend restarts.
 Preserve useful route/plugin inspection and blog/GeoIP maintenance commands with updated paths.
+Inspection loads and closes the single application without listening or exporting telemetry, but still initializes configured dependencies and requires local services, valid API configuration, and applicable built assets.
+Zed debug configurations set `APP_ROLE` in `env` rather than passing role arguments.
 
 ## 4. One image and two Fly process groups
 
@@ -193,7 +206,10 @@ Use a single root multi-stage Dockerfile with frozen-lockfile pnpm installation,
 Copy the root manifest, lockfile, pnpm settings, and native patch files into the install stage.
 Replace workspace-filtered `pnpm deploy --legacy` steps with a single-package production dependency install or prune flow, verifying that patched dependencies remain correct.
 Retain required OS dependencies, GeoIP assets, build-time public configuration, Sentry release metadata, and non-root execution.
-Use explicit Node commands for Fly process startup so signals reach the application directly.
+The image's `CMD` is `["node", "src/main.js"]`, with no implicit `APP_ROLE` default.
+Callers must supply `APP_ROLE=api` or `APP_ROLE=worker`; the production image rejects `all` and fails when the role is missing.
+Use `env APP_ROLE=... node src/main.js` for Fly process startup so each group selects its own role and signals reach the application directly.
+Do not set `APP_ROLE` globally in the Docker environment, Fly `[env]`, or app-wide secrets.
 Keep secret files and development data out of image layers and do not pass secrets as build arguments.
 Verify the actual image Node version satisfies the manifest rather than assuming the currently declared build argument controls Alpine's installed version.
 
@@ -205,8 +221,8 @@ app = "breadcrum"
 primary_region = "lax"
 
 [processes]
-  app = "node src/main.js --role=api"
-  worker = "node src/main.js --role=worker"
+  app = "env APP_ROLE=api node src/main.js"
+  worker = "env APP_ROLE=worker node src/main.js"
 
 [[services]]
   protocol = "tcp"
@@ -271,6 +287,8 @@ Use the Node.js test runner and preserve deterministic cleanup with test lifecyc
 2. Root lint/type/dependency checks cover all former workspaces and client build boundaries.
 3. Existing API, worker, and resource suites retain coverage and pass against isolated test PostgreSQL/Redis resources.
 4. Role tests prove API-only never registers consumers or cleanup schedules, worker-only never registers public API/static routes, and `all` registers shared infrastructure exactly once.
+   Verify missing/unknown `APP_ROLE` fails and `all` is rejected independently by `NODE_ENV=production` and `ENV=production`.
+   Verify inspection uses the single app without HTTP listeners or telemetry exporters.
 5. An integration test enqueues through the API and completes work through consumers in the same application PID, still using pg-boss.
 6. Separate-role integration tests prove the same durable queue contracts work across production-style API/worker processes.
 7. Startup failure, SIGINT/SIGTERM, repeated close, and watcher restart tests demonstrate cleanup without duplicate consumers, leaked listeners, or stranded connections.
@@ -307,7 +325,7 @@ No database rollback should be needed for the consolidation itself because schem
 5. Update CI, local scripts, docs, and complete the validation matrix.
 6. Stop for review before any push or production operation.
 
-## Local implementation results
+## Original consolidation results (before the APP_ROLE follow-up)
 
 The repository now has one manifest, one freshly resolved pnpm lockfile with a root-only importer, and native pnpm patches.
 The role-based runtime, one-image Fly topology, root tooling, and CI/documentation changes are implemented without performing a production cutover.
@@ -315,23 +333,41 @@ The baseline pg-boss pin is the intentional exception to selecting newer version
 Development uses portable Node module watching; `.env` changes and newly introduced modules require restarting the watcher.
 Existing local env files and ignored legacy GeoIP caches were not overwritten or committed.
 
-Validation completed locally:
+The following validation was recorded for the original consolidation, not the current `APP_ROLE` follow-up:
 
 - Root TypeScript, ESLint, and Knip checks pass.
 - Frozen pnpm installs, the frontend build, and installed/emitted Giscus patch verification pass.
 - Focused runtime/logger coverage passes, including real queue draining, stuck-handler termination, role-specific logging, and a client-source-free runtime layout.
-- A separate production-only frozen dependency installation successfully boots API, worker, and combined roles against disposable services.
+- A separate production-only frozen dependency installation successfully booted API, worker, and combined roles against disposable services under the earlier role contract.
+  This is not evidence that the new contract permits `APP_ROLE=all` with either production environment marker.
 - Postgrator applies all 30 migrations to a disposable database, and a second run is a no-op.
 - The full Node suite finishes naturally with 416 tests: 413 pass, 3 fail, and none are skipped.
 - The three failures are existing GeoIP tests requiring unavailable `MAXMIND_ACCOUNT_ID` / `MAXMIND_LICENSE_KEY` values, not newly introduced runtime failures.
 - Docker image building remains unverified because the Docker daemon is unavailable; Fly platform validation requires authentication and was not completed.
 
-Pushes, production migrations, secret changes, deployments, and stopping the old worker app remain unauthorized and unperformed.
+Production migrations, secret changes, deployments, and stopping the old worker app remain unauthorized and unperformed.
+
+## APP_ROLE and unified plugin follow-up results
+
+One `src/app.js` now composes `src/plugins/shared/`, `src/plugins/api/`, and `src/plugins/worker/`, using shared configuration from `src/config/`.
+The separate API/worker app wrappers and Fastify CLI configuration have been removed.
+The runtime requires `APP_ROLE=api|worker|all`, rejects CLI role flags, and forbids `all` when either production environment marker is set.
+Docker, Fly process commands, root scripts, inspection tools, and editor launch configurations use the same contract.
+Health routes register after API route hooks, while queues retain drain-before-pools shutdown ordering.
+
+- Root TypeScript, ESLint, and Knip checks pass.
+- The 61 focused configuration, runtime, and workflow-script tests pass with no skips, including 17 runtime integration tests.
+- Integration tests exercise production API/worker entrypoints, development combined mode, health checks, same-process queue handling, shutdown deadlines, and listener-free inspection.
+- Frozen pnpm installation, frontend build, and Giscus patch verification pass.
+- The full Node-suite rerun timed out before completion; its partial TAP output reports 197 passes and the same three missing-MaxMind-credential failures, with no skips.
+  These are partial results, not a replacement for the earlier completed suite's totals.
+  Disposable PostgreSQL/Redis resources were cleaned up without changing local env files.
+- Docker image building and authenticated Fly platform validation remain unverified; no production operation was performed.
 
 ## References
 
 - [Fly process groups and independent scaling](https://fly.io/docs/launch/processes/).
 - [Fly configuration: processes, services, checks, metrics, VM settings, and release commands](https://fly.io/docs/reference/configuration/).
-- Current manifests: `package.json`, `packages/web/package.json`, `packages/worker/package.json`, and `packages/resources/package.json`.
-- Current deployment definitions: `packages/web/fly.toml`, `packages/worker/fly.toml`, both package Dockerfiles, and `scripts/deploy-with-sentry.sh`.
-- Current queue bootstrap: both `plugins/pgboss.js` implementations and `packages/resources/pgboss/start-pgboss.js`.
+- Pre-consolidation manifests: `package.json`, `packages/web/package.json`, `packages/worker/package.json`, and `packages/resources/package.json`.
+- Pre-consolidation deployment definitions: `packages/web/fly.toml`, `packages/worker/fly.toml`, both package Dockerfiles, and `scripts/deploy-with-sentry.sh`.
+- Pre-consolidation queue bootstrap: both `plugins/pgboss.js` implementations and `packages/resources/pgboss/start-pgboss.js`.

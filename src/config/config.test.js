@@ -3,9 +3,78 @@ import assert from 'node:assert/strict'
 import { mkdtemp, writeFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { loadConfig, loadEnvironment } from './config.js'
+import { fileURLToPath } from 'node:url'
+import { dotEnvPath, loadConfig, loadEnvironment, loadRuntimeConfig } from './config.js'
+import { envSchema, schemaForRole } from './env-schema.js'
 
 const isolated = /** @type {const} */ ({ dotEnvPath: false, processEnv: {} })
+
+test('runtime role is required with no schema default and the dotenv path is rooted at the repository', () => {
+  assert.equal(dotEnvPath, fileURLToPath(new URL('../../.env', import.meta.url)))
+  assert.equal('default' in envSchema.properties.APP_ROLE, false)
+  for (const role of /** @type {const} */ (['api', 'worker', 'all'])) {
+    assert.ok(schemaForRole(role).required.includes('APP_ROLE'))
+  }
+  assert.throws(() => loadRuntimeConfig(isolated), /APP_ROLE/)
+  assert.throws(() => loadRuntimeConfig({ ...isolated, processEnv: { APP_ROLE: 'web' } }), /APP_ROLE/)
+  assert.throws(() => loadRuntimeConfig({ ...isolated, envData: { APP_ROLE: 'worker' } }), /APP_ROLE/)
+})
+
+test('runtime role selects the schema and defaults before resource startup', () => {
+  for (const APP_ROLE of /** @type {const} */ (['api', 'worker', 'all'])) {
+    const config = loadRuntimeConfig({
+      ...isolated,
+      processEnv: { APP_ROLE, COOKIE_SECRET: 'test-cookie', JWT_SECRET: 'test-jwt' },
+    })
+    assert.equal(config.APP_ROLE, APP_ROLE)
+    assert.equal(config.OTEL_SERVICE_NAME, APP_ROLE === 'api' ? 'breadcrum-web' : `breadcrum-${APP_ROLE}`)
+    assert.equal(config.METRICS_PORT, APP_ROLE === 'worker' ? 9092 : 9091)
+  }
+  assert.equal(loadRuntimeConfig({ ...isolated, processEnv: { APP_ROLE: 'worker' } }).COOKIE_SECRET, undefined)
+  for (const APP_ROLE of ['api', 'all']) {
+    assert.throws(() => loadRuntimeConfig({ ...isolated, processEnv: { APP_ROLE } }), /COOKIE_SECRET|JWT_SECRET/)
+  }
+  assert.throws(() => loadRuntimeConfig({ ...isolated, processEnv: { APP_ROLE: 'worker', PORT: '65536' } }), /PORT/)
+})
+
+test('explicit factory roles override stray environment and envData roles without mutation', () => {
+  const before = { ...process.env }
+  for (const role of /** @type {const} */ (['api', 'worker', 'all'])) {
+    for (const APP_ROLE of [undefined, 'worker', 'api', 'all', 'invalid']) {
+      const processEnv = Object.freeze({ APP_ROLE })
+      const envData = Object.freeze({ APP_ROLE: 'api', COOKIE_SECRET: 'test-cookie', JWT_SECRET: 'test-jwt' })
+      const config = loadConfig(role, { dotEnvPath: false, processEnv, envData })
+      assert.equal(config.APP_ROLE, role)
+      assert.equal(processEnv.APP_ROLE, APP_ROLE)
+      assert.equal(envData.APP_ROLE, 'api')
+    }
+  }
+  const processEnv = Object.freeze({ APP_ROLE: 'worker' })
+  assert.equal(loadRuntimeConfig({ dotEnvPath: false, processEnv, envData: { APP_ROLE: 'api' } }).APP_ROLE, 'worker')
+  assert.equal(processEnv.APP_ROLE, 'worker')
+  assert.deepEqual({ ...process.env }, before)
+})
+
+test('runtime and explicit config reject all for either production marker before validating API secrets', () => {
+  for (const environment of [
+    { NODE_ENV: 'production' },
+    { ENV: 'production' },
+    { NODE_ENV: 'production', ENV: 'development' },
+    { NODE_ENV: 'development', ENV: 'production' },
+  ]) {
+    const processEnv = { ...environment, APP_ROLE: 'all' }
+    assert.throws(() => loadRuntimeConfig({ dotEnvPath: false, processEnv }), /APP_ROLE=all is not allowed in production/)
+    assert.throws(() => loadConfig('all', { dotEnvPath: false, processEnv }), /APP_ROLE=all is not allowed in production/)
+    for (const role of /** @type {const} */ (['api', 'worker'])) {
+      const config = loadRuntimeConfig({
+        dotEnvPath: false,
+        processEnv: { ...environment, APP_ROLE: role, COOKIE_SECRET: 'test-cookie', JWT_SECRET: 'test-jwt' },
+      })
+      assert.equal(config.APP_ROLE, role)
+    }
+  }
+  assert.throws(() => loadConfig('all', { ...isolated, envData: { ENV: 'production' } }), /APP_ROLE=all is not allowed in production/)
+})
 
 test('log level defaults to info and validates Pino levels before startup', () => {
   assert.equal(loadConfig('worker', isolated).FASTIFY_LOG_LEVEL, 'info')
@@ -41,6 +110,30 @@ test('root dotenv is loaded without modifying process env; explicit environment 
   assert.equal(config.PORT, 8081)
   assert.equal(config.OTEL_SERVICE_NAME, 'from-process')
   assert.equal(process.env['OTEL_SERVICE_NAME'], before)
+})
+
+test('runtime uses dotenv role and config together, with process environment taking precedence', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'breadcrum-role-'))
+  t.after(() => rm(directory, { recursive: true, force: true }))
+  const dotEnvPath = join(directory, '.env')
+  await writeFile(dotEnvPath, 'APP_ROLE=worker\nPORT=8080\nENV=development\n')
+  const before = { ...process.env }
+  const fromFile = loadRuntimeConfig({ dotEnvPath, processEnv: {} })
+  assert.equal(fromFile.APP_ROLE, 'worker')
+  assert.equal(fromFile.PORT, 8080)
+  assert.equal(fromFile.METRICS_PORT, 9092)
+  const fromProcess = loadRuntimeConfig({
+    dotEnvPath,
+    processEnv: { APP_ROLE: 'api', PORT: '8081', COOKIE_SECRET: 'test-cookie', JWT_SECRET: 'test-jwt' },
+  })
+  assert.equal(fromProcess.APP_ROLE, 'api')
+  assert.equal(fromProcess.PORT, 8081)
+  assert.equal(fromProcess.METRICS_PORT, 9091)
+  assert.throws(() => loadRuntimeConfig({ dotEnvPath, processEnv: { APP_ROLE: '' } }), /APP_ROLE/)
+  assert.throws(() => loadRuntimeConfig({ dotEnvPath, processEnv: { APP_ROLE: 'all', NODE_ENV: 'production' } }), /not allowed in production/)
+  await writeFile(dotEnvPath, 'APP_ROLE=all\nENV=production\n')
+  assert.throws(() => loadRuntimeConfig({ dotEnvPath, processEnv: { NODE_ENV: 'development' } }), /not allowed in production/)
+  assert.deepEqual({ ...process.env }, before)
 })
 
 test('role-specific Sentry DSNs select one effective SDK with legacy fallback', () => {

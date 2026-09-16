@@ -6,7 +6,7 @@
 
 // @ts-expect-error
 import lsp from 'local-storage-proxy'
-import { defaultFrontendFlags } from '../../src/api/plugins/flags/frontend-flags.js'
+import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
 
 /**
  * @typedef {{ [key: string]: boolean | string }} FrontendFlags

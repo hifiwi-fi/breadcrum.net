@@ -16,11 +16,11 @@ import { cleanupAuthTokensQName } from '#resources/auth-tokens/cleanup-auth-toke
 import { cleanupStaleResolutionsQName } from '#resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 import { getSentryUserFromPgBossJobData } from '#resources/fastify-common/sentry-user-context.js'
 
-import { makeEpisodePgBossP } from '../workers/episodes/index.js'
-import { makeArchivePgBossP } from '../workers/archives/index.js'
-import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
-import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
-import { makeStaleResolutionCleanupP } from '../workers/stale-resolutions/index.js'
+import { makeEpisodePgBossP } from '#worker/workers/episodes/index.js'
+import { makeArchivePgBossP } from '#worker/workers/archives/index.js'
+import { makeBookmarkPgBossP } from '#worker/workers/bookmarks/index.js'
+import { makeAuthTokenCleanupP } from '#worker/workers/auth-tokens/index.js'
+import { makeStaleResolutionCleanupP } from '#worker/workers/stale-resolutions/index.js'
 
 export { pgbossEnvSchema } from '#config/env-schema.js'
 

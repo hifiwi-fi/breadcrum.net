@@ -2,10 +2,9 @@
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "entry": [
 
-    "src/api/app.js",
-    "src/api/plugins/**/*.js",
+    "src/plugins/**/*.js",
     "src/api/routes/**/{routes,autohooks}.js",
-    "src/worker/app.js",
+
     "client/**/*.js",
     "scripts/**/*.js",
     "src/**/test/**/*.js",

@@ -53,4 +53,5 @@ COPY --from=build --chown=node:node /usr/src/app/data/geoip ./data/geoip
 
 USER node
 EXPOSE 8080 9091 9092
-CMD ["node", "src/main.js", "--role=api"]
+# Supply APP_ROLE=api or APP_ROLE=worker at runtime; there is no implicit role.
+CMD ["node", "src/main.js"]

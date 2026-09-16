@@ -1,4 +1,4 @@
-import { PgClientAlias } from '../pg.js'
+import { PgClientAlias } from '#plugins/shared/pg.js'
 
 declare module 'fastify' {
   interface FastifyInstance {
