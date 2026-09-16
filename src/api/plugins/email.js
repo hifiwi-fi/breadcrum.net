@@ -7,7 +7,7 @@ import SQL from '@nearform/sql'
  * @import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
  */
 
-export { emailEnvSchema } from '../../runtime/env-fragments.js'
+export { emailEnvSchema } from '#config/env-fragments.js'
 
 /**
  * This plugins adds nodemailer

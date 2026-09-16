@@ -1,4 +1,4 @@
-/** @import { RuntimeConfig } from './env-schema.js' */
+/** @import { RuntimeConfig } from '#config/env-schema.js' */
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'

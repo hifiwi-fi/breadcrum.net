@@ -1,5 +1,5 @@
 /** @import { FastifyPluginAsync } from 'fastify' */
-/** @import { AppOptions } from '../../runtime/options.js' */
+/** @import { AppOptions } from '#config/options.js' */
 import fp from 'fastify-plugin'
 import { createResolveEpisodeQ } from '#resources/episodes/resolve-episode-queue.js'
 import { createResolveArchiveQ } from '#resources/archives/resolve-archive-queue.js'

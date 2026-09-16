@@ -1,8 +1,8 @@
 /**
  * @import { TestContext } from 'node:test'
  * @import { FastifyServerOptions } from 'fastify'
- * @import { RuntimeConfig } from '../../runtime/env-schema.js'
- * @import { AppOptions } from '../../runtime/options.js'
+ * @import { RuntimeConfig } from '#config/env-schema.js'
+ * @import { AppOptions } from '#config/options.js'
  */
 import { createApp } from '../../app.js'
 

@@ -1,7 +1,7 @@
 /**
  * @import { AddressInfo } from 'node:net'
  * @import { QueryResult } from 'pg'
- * @import { RuntimeConfig } from './env-schema.js'
+ * @import { RuntimeConfig } from '#config/env-schema.js'
  * @import { TypeBookmarkReadClient } from '#api/routes/api/bookmarks/schemas/schema-bookmark-read.js'
  */
 import { test } from 'node:test'
@@ -17,7 +17,7 @@ import { promisify } from 'node:util'
 import { setTimeout as delay } from 'node:timers/promises'
 import { PgBoss } from 'pg-boss'
 import { createApp } from '../app.js'
-import { loadConfig } from './config.js'
+import { loadConfig } from '#config/config.js'
 import { integrationFixture } from './integration-fixture.js'
 
 const execFileAsync = promisify(execFile)

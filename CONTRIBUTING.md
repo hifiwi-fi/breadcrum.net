@@ -22,7 +22,8 @@ pnpm run generate-default-env
 
 Use a local PostgreSQL database and Redis instance before running migrations or starting the app.
 Configure the root `.env` for these local services and any optional integrations.
-The generator uses the unified runtime schema to create development cookie/JWT keys and defaults, but refuses to overwrite an existing file or symlink.
+Both roles share the environment schemas, loader, role defaults, and application options in `src/config/` through the `#config/*` alias.
+The generator uses that unified schema to create development cookie/JWT keys and defaults, but refuses to overwrite an existing file or symlink.
 It writes only the repository-root `.env`, regardless of the working directory.
 It omits `OTEL_SERVICE_NAME` and `METRICS_PORT` so each role can select its own telemetry defaults.
 Process environment values take precedence over the local `.env`.

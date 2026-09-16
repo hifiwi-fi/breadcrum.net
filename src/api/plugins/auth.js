@@ -5,7 +5,7 @@ import SQL from '@nearform/sql'
  * @import { FastifyRequest } from 'fastify'
  */
 
-export { authEnvSchema } from '../../runtime/env-fragments.js'
+export { authEnvSchema } from '#config/env-fragments.js'
 
 /**
  * This plugins adds fastify-auth

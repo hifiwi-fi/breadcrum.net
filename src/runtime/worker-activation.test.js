@@ -1,6 +1,6 @@
 /** @import { TestContext } from 'node:test' */
 /** @import { ErrorEvent } from '@sentry/node' */
-/** @import { RuntimeConfig } from './env-schema.js' */
+/** @import { RuntimeConfig } from '#config/env-schema.js' */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import Fastify from 'fastify'
@@ -10,7 +10,7 @@ import * as Sentry from '@sentry/node'
 import { context } from '@opentelemetry/api'
 import workerPlugin from '#worker/plugins/pgboss.js'
 import metricsPlugin from '#api/plugins/otel-metrics.js'
-import { loadConfig } from './config.js'
+import { loadConfig } from '#config/config.js'
 import { createProcessorTracker, createQueueLifecycle } from './queue-lifecycle.js'
 
 /** @param {TestContext} t @param {Partial<RuntimeConfig>} [envData] */

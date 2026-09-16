@@ -1,7 +1,7 @@
 /** @import { FastifyPluginAsync } from 'fastify' */
-/** @import { AppOptions } from '../../runtime/options.js' */
+/** @import { AppOptions } from '#config/options.js' */
 import fp from 'fastify-plugin'
-import { loadConfig } from '../../runtime/config.js'
+import { loadConfig } from '#config/config.js'
 
 /** @type {FastifyPluginAsync<AppOptions>} */
 async function envPlugin (fastify, opts) {

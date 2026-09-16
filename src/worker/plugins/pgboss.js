@@ -22,7 +22,7 @@ import { makeBookmarkPgBossP } from '../workers/bookmarks/index.js'
 import { makeAuthTokenCleanupP } from '../workers/auth-tokens/index.js'
 import { makeStaleResolutionCleanupP } from '../workers/stale-resolutions/index.js'
 
-export { pgbossEnvSchema } from '../../runtime/env-schema.js'
+export { pgbossEnvSchema } from '#config/env-schema.js'
 
 export default fp(async function workerPlugin (fastify) {
   const { boss, workers, track } = fastify.pgboss

@@ -1,7 +1,9 @@
 /** @import { FastifyPluginAsync } from 'fastify' */
-/** @import { AppOptions } from '../runtime/options.js' */
+/** @import { AppOptions } from '#config/options.js' */
 import App from '../app.js'
-export { options } from './config/server-options.js'
+import { createCliOptions } from '#config/server-options.js'
+
+export const options = createCliOptions('worker')
 
 /** @type {FastifyPluginAsync<Omit<AppOptions, 'role'>>} */
 export default async function WorkerApp (fastify, opts) {

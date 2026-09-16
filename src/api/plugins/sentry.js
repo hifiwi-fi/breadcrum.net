@@ -2,7 +2,7 @@ import fp from 'fastify-plugin'
 import { shouldHandleSentryError } from '#resources/fastify-common/sentry-error-filter.js'
 import { getSentryUserFromFastifyRequest } from '#resources/fastify-common/sentry-user-context.js'
 
-export { sentryEnvSchema } from '../../runtime/env-fragments.js'
+export { sentryEnvSchema } from '#config/env-fragments.js'
 
 export default fp(async function sentryPlugin (fastify) {
   if (!fastify.config.SENTRY_DSN) return

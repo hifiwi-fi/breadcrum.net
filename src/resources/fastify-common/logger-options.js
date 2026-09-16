@@ -1,6 +1,6 @@
 /**
  * @import { FastifyServerOptions } from 'fastify'
- * @import { RuntimeConfig } from '#runtime/env-schema.js'
+ * @import { RuntimeConfig } from '#config/env-schema.js'
  */
 
 const PinoLevelToSeverityLookup = /** @type {const} */ ({

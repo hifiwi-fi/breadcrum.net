@@ -1,6 +1,6 @@
 /** @import { FastifyInstance } from 'fastify' */
-import { parseRole } from './runtime/role.js'
-import { loadConfig, loadEnvironment } from './runtime/config.js'
+import { parseRole } from '#config/role.js'
+import { loadConfig, loadEnvironment } from '#config/config.js'
 import { createShutdown } from './runtime/shutdown.js'
 
 async function main () {

@@ -162,6 +162,7 @@
     "#worker/*": "./src/worker/*",
     "#resources/*": "./src/resources/*",
     "#runtime/*": "./src/runtime/*",
+    "#config/*": "./src/config/*",
     "#client/*": "./client/*",
     "#components/*": "./client/components/*",
     "#hooks/*": "./client/hooks/*",

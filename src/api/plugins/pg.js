@@ -8,7 +8,7 @@ import fp from 'fastify-plugin'
  * @typedef {PgClient} PgClientAlias
  */
 
-export { pgEnvSchema } from '../../runtime/env-fragments.js'
+export { pgEnvSchema } from '#config/env-fragments.js'
 
 /**
  * This plugins adds a postgres connection

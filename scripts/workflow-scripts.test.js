@@ -47,9 +47,9 @@ async function generatorFixture (t) {
   // Copy only the real generator and data-only schema graph, never local env files.
   const files = [
     'scripts/api/generate-default-env.js',
-    'src/runtime/env-schema.js',
-    'src/runtime/env-fragments.js',
-    'src/runtime/role.js',
+    'src/config/env-schema.js',
+    'src/config/env-fragments.js',
+    'src/config/role.js',
     'src/resources/fastify-common/env-schema.js',
   ]
   for (const file of files) {
@@ -60,7 +60,7 @@ async function generatorFixture (t) {
   await writeFile(join(dir, 'package.json'), JSON.stringify({
     type: 'module',
     imports: {
-      '#runtime/*': './src/runtime/*',
+      '#config/*': './src/config/*',
       '#resources/*': './src/resources/*',
     },
   }))

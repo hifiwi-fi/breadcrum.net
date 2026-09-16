@@ -36,6 +36,7 @@ PostgreSQL-backed queues remain durable even when producer and consumer share a 
 - `src/api/`: API routes, schemas, and API-only plugins.
 - `src/worker/`: queue consumers and job processors.
 - `src/resources/`: shared domain and queue code.
+- `src/config/`: shared environment schemas, loading, role defaults, and application options.
 - `client/`: browser code and domstack content.
 - `migrations/`: database migrations.
 - `scripts/`: maintenance and deployment tooling.

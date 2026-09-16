@@ -82,7 +82,7 @@ export async function withGeoipStartupTimeout (work, timeoutMs = geoipStartupUpd
   ])
 }
 
-export { geoipEnvSchema } from '../../runtime/env-fragments.js'
+export { geoipEnvSchema } from '#config/env-fragments.js'
 
 /** @type {FastifyPluginAsync} */
 async function geoipPlugin (fastify) {

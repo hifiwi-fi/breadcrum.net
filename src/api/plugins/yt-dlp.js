@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin'
 import { getYTDLPMetadata } from '#resources/episodes/yt-dlp-api-client.js'
 
-export { ytDlpEnvSchema } from '../../runtime/env-fragments.js'
+export { ytDlpEnvSchema } from '#config/env-fragments.js'
 
 /**
  * This plugin adds yt-dlp fetching helpers

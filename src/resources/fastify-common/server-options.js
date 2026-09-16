@@ -1,6 +1,6 @@
 /**
  * @import { FastifyServerOptions, FastifyPluginOptions } from 'fastify'
- * @import { RuntimeConfig } from '#runtime/env-schema.js'
+ * @import { RuntimeConfig } from '#config/env-schema.js'
  */
 
 import hyperid from 'hyperid'

@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto'
 import { writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
-import { envSchema } from '#runtime/env-schema.js'
+import { envSchema } from '#config/env-schema.js'
 
 const __dirname = import.meta.dirname
 

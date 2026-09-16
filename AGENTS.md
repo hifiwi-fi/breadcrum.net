@@ -15,6 +15,8 @@ Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age r
 Install reproducibly with `pnpm install --frozen-lockfile`.
 
 API code lives in `src/api/`, consumers in `src/worker/`, shared domain/queue code in `src/resources/`, and browser code in `client/`.
+Keep shared environment schemas, loading, role defaults, and application options in `src/config/`, imported across areas through `#config/*`.
+Do not introduce separate API or worker config folders.
 Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
 Development uses one backend process with `node src/main.js --role=all`; production explicitly selects `api` or `worker` from the same image.
 Only the `app` Fly process group is publicly routed; the worker group stays internal and continuously running.

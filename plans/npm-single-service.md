@@ -61,7 +61,8 @@ tsconfig.json
 src/
   main.js                    # Role selection, bootstrap, and process lifecycle
   app.js                     # Testable Fastify composition
-  runtime/                   # Configuration and shared startup/shutdown helpers
+  config/                    # Shared environment schemas, loading, role defaults, and options
+  runtime/                   # Shared startup/shutdown helpers
   telemetry/                 # Single OTel/Sentry bootstrap and metrics setup
   plugins/                   # Shared database, Redis, cache, and queue infrastructure
   api/                       # Existing API routes, schemas, and API-only plugins
