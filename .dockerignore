@@ -13,4 +13,23 @@
 **/node_modules
 **/npm-debug.log
 **/public
-!packages/web/data/geoip/**
+**/.zed
+**/.claude
+**/.pnpm-store
+**/.npmrc
+**/coverage
+**/.nyc_output
+**/lcov.info
+**/tsconfig.tsbuildinfo
+packages
+plans
+dashboards
+deploy
+data/**
+!data/geoip/
+!data/geoip/*.mmdb
+!data/geoip/*.metadata.json
+# Secret files stay excluded even under the GeoIP allowlist.
+**/.env*
+**/*.pem
+**/*.key

@@ -1,82 +1,42 @@
 [
   {
-    "label": "Debug Web Server (Port 3000)",
+    "label": "Debug API and worker (one process)",
     "adapter": "JavaScript",
     "type": "pwa-node",
     "request": "launch",
-    "program": "npm",
-    "args": [
-      "run",
-      "-w",
-      "@breadcrum/web",
-      "watch:server"
-    ],
+    "program": "${ZED_WORKTREE_ROOT}/src/main.js",
+    "args": ["--role=all"],
     "cwd": "${ZED_WORKTREE_ROOT}",
     "console": "integratedTerminal",
     "env": {
       "NODE_ENV": "development",
       "FORCE_COLOR": "1"
     },
-    "skipFiles": [
-      "<node_internals>/**"
-    ],
-    "resolveSourceMapLocations": [
-      "${workspaceFolder}/**",
-      "!**/node_modules/**"
-    ]
+    "skipFiles": ["<node_internals>/**"],
+    "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
   },
   {
-    "label": "Debug Worker Server (Port 3001)",
+    "label": "Debug API only",
     "adapter": "JavaScript",
     "type": "pwa-node",
     "request": "launch",
-    "program": "npm",
-    "args": [
-      "run",
-      "-w",
-      "@breadcrum/worker",
-      "watch:server"
-    ],
+    "program": "${ZED_WORKTREE_ROOT}/src/main.js",
+    "args": ["--role=api"],
     "cwd": "${ZED_WORKTREE_ROOT}",
     "console": "integratedTerminal",
-    "env": {
-      "NODE_ENV": "development",
-      "FORCE_COLOR": "1"
-    },
-    "skipFiles": [
-      "<node_internals>/**"
-    ],
-    "resolveSourceMapLocations": [
-      "${workspaceFolder}/**",
-      "!**/node_modules/**"
-    ]
+    "env": { "NODE_ENV": "development", "FORCE_COLOR": "1" },
+    "skipFiles": ["<node_internals>/**"]
   },
   {
-    "label": "Attach to Web Server Debug (Port 9320)",
+    "label": "Debug worker only (port 3001)",
     "adapter": "JavaScript",
     "type": "pwa-node",
-    "request": "attach",
-    "port": 9320,
-    "skipFiles": [
-      "<node_internals>/**"
-    ],
-    "resolveSourceMapLocations": [
-      "${workspaceFolder}/**",
-      "!**/node_modules/**"
-    ]
-  },
-  {
-    "label": "Attach to Worker Server Debug (Port 9321)",
-    "adapter": "JavaScript",
-    "type": "pwa-node",
-    "request": "attach",
-    "port": 9321,
-    "skipFiles": [
-      "<node_internals>/**"
-    ],
-    "resolveSourceMapLocations": [
-      "${workspaceFolder}/**",
-      "!**/node_modules/**"
-    ]
+    "request": "launch",
+    "program": "${ZED_WORKTREE_ROOT}/src/main.js",
+    "args": ["--role=worker"],
+    "cwd": "${ZED_WORKTREE_ROOT}",
+    "console": "integratedTerminal",
+    "env": { "NODE_ENV": "development", "FORCE_COLOR": "1", "PORT": "3001" },
+    "skipFiles": ["<node_internals>/**"]
   }
 ]

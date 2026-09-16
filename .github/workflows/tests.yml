@@ -48,21 +48,28 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
         with:
-          version: 10
+          version: 10.34.5
       - name: Use Node.js
         uses: actions/setup-node@v7
         with:
           node-version-file: package.json
           cache: "pnpm"
 
+      - name: Install Redis executable for isolated runtime tests
+        run: |
+          sudo apt-get update
+          # The shared Redis service container already owns port 6379.
+          sudo systemctl mask redis-server.service
+          sudo apt-get install --yes --no-install-recommends redis-server
+          redis-server --version
       - run: pnpm install --frozen-lockfile
       - name: Upload lockfile
         uses: actions/upload-artifact@v7
         with:
           path: pnpm-lock.yaml
           archive: false
-      - run: pnpm run -r generate-default-env
-      - run: pnpm run -r migrate
+      - run: pnpm run generate-default-env
+      - run: pnpm run migrate
         env:
           PGDATABASE: breadcrum
           PGHOST: localhost
@@ -73,14 +80,14 @@ jobs:
         id: cache-geoip-restore
         uses: actions/cache/restore@v6
         with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
+          path: data/geoip
+          key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
           restore-keys: |
-            geoip-${{ runner.os }}-
+            geoip-root-${{ runner.os }}-
       - name: Update GeoIP data
         id: update-geoip
         continue-on-error: true
-        run: node packages/web/scripts/update-geoip-db.js
+        run: node scripts/api/update-geoip-db.js
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
@@ -88,26 +95,24 @@ jobs:
         if: steps.update-geoip.outcome == 'success'
         uses: actions/cache/save@v6
         with:
-          path: packages/web/data/geoip
-          key: geoip-${{ runner.os }}-${{ hashFiles('packages/web/data/geoip/**') }}
-      - name: Test resources
-        run: pnpm run --filter @breadcrum/resources test
-      - name: Test web
-        run: pnpm run --filter @breadcrum/web test
+          path: data/geoip
+          key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
+      - run: node scripts/verify-giscus-patch.js
+      - run: pnpm run build
+      - run: node scripts/verify-giscus-patch.js --built
+      - name: Test
+        run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
           SKIP_GEOIP_TESTS: ${{ steps.update-geoip.outcome != 'success' && '1' || '0' }}
-      - name: Test worker
-        run: pnpm run --filter @breadcrum/worker test
-      - name: Run knip
-        run: pnpm run knip
+
       - name: Coveralls
         uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2
         with:
           parallel: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          files: "packages/web/lcov.info packages/worker/lcov.info packages/resources/lcov.info"
+          files: "lcov.info"
 
   coverage:
     needs: test

@@ -2,8 +2,9 @@
 
 ## Status and scope
 
-Planning only; implementation requires approval.
-Do not push, deploy, change production secrets, run production migrations, or stop existing Machines as part of this planning task.
+Implementation was subsequently authorized, including local checkpoint commits, but no push or deployment.
+The architecture below has been implemented locally; production cutover still requires separate approval.
+Do not push, deploy, change production secrets, run production migrations, or stop existing Machines as part of this task.
 
 Fetched `origin` and ran `git pull --ff-only origin master` in this clean, detached worktree before creating `plan/npm-single-service`.
 The branch starts at `4000367aaceb33eb58848690ab446b97c2a08389`, matching `origin/master` at planning time.
@@ -147,6 +148,7 @@ Continue using PostgreSQL-backed pg-boss queues in development, even though prod
 Preserve the `pgboss_v11` schema, queue names, payloads, retry policies, delayed jobs, concurrency controls, request correlation, and cleanup schedules at 03:00/04:00 UTC.
 Do not widen the pg-boss dependency range or intentionally migrate its schema as part of this work.
 Review any pg-boss version change selected by the required fresh resolution for queue compatibility and automatic schema migration behavior before accepting it.
+Implementation pins pg-boss to baseline `12.28.0` (schema version 38) because fresh resolution initially selected `12.32.0`, which would automatically migrate the queue schema to version 41.
 Retain pg-boss's dedicated database pool rather than folding it into the application pool.
 
 Give each acquired resource a cleanup owner immediately.
@@ -303,6 +305,27 @@ No database rollback should be needed for the consolidation itself because schem
 4. Consolidate Docker/Fly configuration and deployment/release tooling without deploying.
 5. Update CI, local scripts, docs, and complete the validation matrix.
 6. Stop for review before any push or production operation.
+
+## Local implementation results
+
+The repository now has one manifest, one freshly resolved pnpm lockfile with a root-only importer, and native pnpm patches.
+The role-based runtime, one-image Fly topology, root tooling, and CI/documentation changes are implemented without performing a production cutover.
+The baseline pg-boss pin is the intentional exception to selecting newer versions within the former dependency ranges.
+Development uses portable Node module watching; `.env` changes and newly introduced modules require restarting the watcher.
+Existing local env files and ignored legacy GeoIP caches were not overwritten or committed.
+
+Validation completed locally:
+
+- Root TypeScript, ESLint, and Knip checks pass.
+- Frozen pnpm installs, the frontend build, and installed/emitted Giscus patch verification pass.
+- Focused runtime/logger coverage passes, including real queue draining, stuck-handler termination, role-specific logging, and a client-source-free runtime layout.
+- A separate production-only frozen dependency installation successfully boots API, worker, and combined roles against disposable services.
+- Postgrator applies all 30 migrations to a disposable database, and a second run is a no-op.
+- The full Node suite finishes naturally with 416 tests: 413 pass, 3 fail, and none are skipped.
+- The three failures are existing GeoIP tests requiring unavailable `MAXMIND_ACCOUNT_ID` / `MAXMIND_LICENSE_KEY` values, not newly introduced runtime failures.
+- Docker image building remains unverified because the Docker daemon is unavailable; Fly platform validation requires authentication and was not completed.
+
+Pushes, production migrations, secret changes, deployments, and stopping the old worker app remain unauthorized and unperformed.
 
 ## References
 
