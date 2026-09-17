@@ -1,9 +1,9 @@
 /**
- * @import { TemplateFunction } from '@domstack/static'
+ * @import { AsyncTemplateFunction } from '@domstack/static/types.js'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
 
-/** @type {TemplateFunction<GlobalVars>} */
+/** @type {AsyncTemplateFunction<GlobalVars>} */
 export default async ({
   vars: {
     transport,

@@ -1,5 +1,5 @@
 /**
- * @import {TemplateAsyncIterator} from '@domstack/static'
+ * @import {TemplateAsyncIterator} from '@domstack/static/types.js'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
 

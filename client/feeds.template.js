@@ -1,8 +1,8 @@
 /**
- * @import { TemplateAsyncIterator } from '@domstack/static'
+ * @import { DataDeps, TemplateAsyncIterator } from '@domstack/static/types.js'
+ * @import { FeedData } from './globals/global.data.js'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
-import pMap from 'p-map'
 
 /** @type {(feed: any) => string} */
 // @ts-ignore - jsonfeed-to-atom has no type definitions
@@ -16,7 +16,10 @@ import jsonfeedToAtom from 'jsonfeed-to-atom'
  * }} FeedTemplateVars
  */
 
-/** @type {TemplateAsyncIterator<FeedTemplateVars>} */
+/** @satisfies {DataDeps<FeedData>} */
+export const dataDeps = ['feedPosts']
+
+/** @type {TemplateAsyncIterator<FeedTemplateVars, FeedData>} */
 export default async function * feedsTemplate (args) {
   const {
     vars: {
@@ -28,14 +31,8 @@ export default async function * feedsTemplate (args) {
       authorUrl,
       authorImgUrl,
     },
-    pages,
+    data: { feedPosts },
   } = args
-  const blogPosts = pages
-
-    .filter(page => page.vars['layout'] === 'article')
-    // @ts-ignore
-    .sort((a, b) => new Date(b.vars.publishDate) - new Date(a.vars.publishDate))
-    .slice(0, 10)
 
   const baseUrl = `${transport}://${host}`
 
@@ -50,15 +47,13 @@ export default async function * feedsTemplate (args) {
       url: authorUrl,
       avatar: authorImgUrl,
     },
-    items: await pMap(blogPosts, async (page) => {
-      return {
-        date_published: page.vars.publishDate,
-        title: page.vars.title,
-        url: `${baseUrl}/${page.pageInfo.path}/`,
-        id: `${baseUrl}/${page.pageInfo.path}/#${page.vars.publishDate}`,
-        content_html: await page.renderInnerPage({ pages }),
-      }
-    }, { concurrency: 4 }),
+    items: feedPosts.map(page => ({
+      date_published: page.publishDate,
+      title: page.title,
+      url: `${baseUrl}/${page.path}/`,
+      id: `${baseUrl}/${page.path}/#${page.publishDate}`,
+      content_html: page.content,
+    })),
   }
 
   yield {

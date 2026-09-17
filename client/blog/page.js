@@ -1,39 +1,28 @@
-/** @import { PageFunction } from '@domstack/static' */
+/** @import { DataDeps, PageFunction } from '@domstack/static/types.js' */
+/** @import { BlogIndexData } from '../globals/global.data.js' */
 /** @import { BlogIndexVars } from '../layouts/blog-index/blog-index.layout.js' */
 /** @import { PageReturn } from '../layouts/root/root.layout.js' */
 import { html } from 'htm/preact'
-import { dirname, basename } from 'node:path'
+import { basename } from 'node:path'
 
 export const vars = {
   title: 'Breadcrum.net Blog',
   layout: 'blog-index',
   noindex: true,
+  dataDeps: /** @satisfies {DataDeps<BlogIndexData>} */ (['blogPosts', 'blogArchives']),
 }
 
-/** @type {PageFunction<BlogIndexVars, PageReturn>} */
+/** @type {PageFunction<BlogIndexVars, PageReturn, BlogIndexData>} */
 export default function blogIndex2023 ({
-  pages,
-  page,
+  data: { blogPosts, blogArchives },
 }) {
-  const blogPosts = pages
-    .filter(page => /** @type {any} */(page.vars).layout === 'article')
-    // @ts-ignore
-    .sort((a, b) => new Date(b.vars.publishDate) - new Date(a.vars.publishDate))
-    .slice(0, 50)
-
-  const folderPages = pages.filter(folderPage => {
-    const dir = dirname(folderPage.pageInfo.path)
-    const path = page.path
-    return dir === path
-  })
-
   return html`
     <ul class="blog-index-list">
       ${blogPosts.map(p => {
-        const publishDate = p.vars.publishDate ? new Date(p.vars.publishDate) : null
+        const publishDate = p.publishDate ? new Date(p.publishDate) : null
         return html`
           <li class="blog-entry h-entry">
-            <a class="blog-entry-link u-url u-uid p-name" href="/${p.pageInfo.path}/">${p.vars.title}</a>
+            <a class="blog-entry-link u-url u-uid p-name" href="/${p.path}/">${p.title}</a>
             ${
               publishDate
                 ? html`<time class="blog-entry-date dt-published" datetime="${publishDate.toISOString()}">
@@ -47,9 +36,9 @@ export default function blogIndex2023 ({
     <footer class="blog-index-footer">
       <h4>Archive</h4>
       <ul class="archive-list">
-        ${folderPages.map(p => {
+        ${blogArchives.map(path => {
           return html`<li>
-            <a href="/${p.pageInfo.path}/">${basename(p.pageInfo.path)}</a>
+            <a href="/${path}/">${basename(path)}</a>
           </li>`
         })}
       </ul>
