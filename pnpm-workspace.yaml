@@ -28,7 +28,7 @@ catalog:
   "@opentelemetry/instrumentation-http": ^0.219.0
   "@opentelemetry/instrumentation-runtime-node": ^0.32.0
   "@opentelemetry/sdk-node": ^0.219.0
-  "@sentry/node": ^10.58.0
+  "@sentry/node": ^11.0.0
   "@types/node": ^26.1.0
   "@types/jsdom": ^30.0.0
   "@types/pg": ^8.23.1
