@@ -110,6 +110,47 @@ The scripts select `APP_ROLE=api`, and the app rejects consumer roles during CLI
 They still need valid API configuration, local services, and applicable built assets because they initialize the app rather than only reading source files.
 Do not point inspection at production resources.
 
+## Client builds and DOMStack v12
+
+The client uses `@domstack/static` pinned to `12.0.0-beta.10`.
+Keep the exact pin while using its preview manifest contract.
+Run `pnpm run build` for production output or `pnpm run watch:domstack` for asset-only watch mode; Fastify continues to serve the application.
+Breadcrum retains its custom Preact/HTM root layout and explicit browser target in `client/esbuild.settings.js`.
+
+### Progressive collections and generated archives
+
+`client/globals/global.data.js` is the sole source-page collection hook.
+It uses `previousState`, `changes`, and `setState` to update projections by stable source ID and reuse unchanged feed HTML.
+State must contain only cloneable data, never live page objects or render functions, and must not mutate the last successful snapshot when a build fails.
+Keep collection dependencies explicit through `dataDeps` and use the focused exported consumer types rather than reading collection values from `vars`.
+An unrelated docs edit must not render feed articles or rewrite feed outputs.
+
+`client/blog/archives.pages.js` owns the year archive outputs; do not recreate manual year `page.js` placeholders.
+Archives are derived from article paths, while the published 2023–2026 archive URLs remain available even when empty.
+The blog lists the newest 50 articles and feeds contain the newest 10; generated year pages remain `noindex`.
+Generated pages are not included in the source-page collection supplied to global data.
+
+### Layout registry and inheritance
+
+Register layouts in `client/layout-registry.d.ts` using their actual renderer, `parentLayout`, and default-vars export types.
+Declare parent layouts with the named `parentLayout` export instead of importing and calling the parent renderer.
+DOMStack handles parent rendering, inherited assets, and watch dependencies; do not also import parent CSS or wrap the parent manually.
+Each layout declares its own data subscriptions independently of pages and ancestors.
+Use `SitePage` from `#client/types/site-page.js` for JavaScript page renderer contracts and `SitePageVars` when validating supplied vars.
+`client/types/layout-contracts.js` contains compile-time checks for layout chains, required vars, content, and subscription isolation.
+
+### Service worker and manifests
+
+`client/service-worker.js` is the native worker entrypoint, emitted at the stable `/service-worker.js` URL and compatible with the existing classic registration.
+`client/manifest.webmanifest.template.js` separately owns the PWA webmanifest.
+The worker remains network-only: there is no fetch interception, precache, offline fallback, or lifecycle takeover.
+
+`client/domstack-manifest.settings.js` uses the finalized manifest hook to inject a versioned inventory of allowlisted public images/fonts and the favicon into the worker.
+It excludes documents, JavaScript bundles, source maps, page metadata, and API/authenticated routes, and does not publish `domstack-manifest.json`.
+Do not broaden this inventory or introduce caching of authenticated content without a separate security review.
+Watch mode has no finalized manifest, so the worker must also work without injected policy.
+Browser install/update lifecycle testing should use production output rather than watch output.
+
 ## Validation
 
 Check editor diagnostics before running unit tests.
@@ -125,6 +166,17 @@ node --test scripts/workflow-scripts.test.js
 Use `node --test path/to/file.test.js` for a specific colocated suite and `--test-name-pattern` to filter test names.
 Use `pnpm run test:eslint --fix` for automatic formatting and `pnpm run print-routes` / `pnpm run print-plugins` for inspection.
 Database-backed tests require isolated local resources and must clean up through test lifecycle hooks.
+
+Run client regression coverage without backend services:
+
+```sh
+pnpm run test:tsc
+node --test client scripts/client-build.test.js
+```
+
+`scripts/client-build.test.js` runs isolated full-site `testBuild()` and real watch suites using temporary source copies and sanitized subprocess environments.
+These check generated archive output, inherited layouts/assets, feeds, sitemap, worker policy, and edit/add/remove invalidation without modifying tracked sources or loading the local `.env`.
+These are correctness tests, not build benchmarks.
 
 ### Test service prerequisites
 

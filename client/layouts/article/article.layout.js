@@ -9,7 +9,7 @@ import { Breadcrumb } from '../../components/breadcrumb/index.js'
 import { ArticleHeader } from '../../components/article-header/index.js'
 import { tc } from '../../lib/typed-component.js'
 
-import defaultRootLayout from '../root/root.layout.js'
+export const parentLayout = 'root'
 
 /**
  * Article layout variables type - extends RootLayoutVars with article-specific properties
@@ -24,11 +24,8 @@ import defaultRootLayout from '../root/root.layout.js'
  * }} ArticleLayoutVars
  */
 
-/** @type {LayoutFunction<ArticleLayoutVars, PageReturn>} */
-export default function articleLayout (args) {
-  const { children, ...rest } = args
-  const page = rest.page
-  const vars = rest.vars
+/** @type {LayoutFunction<ArticleLayoutVars, PageReturn, PageReturn>} */
+export default function articleLayout ({ children, page, vars }) {
   const pathSegments = page.path.split(sep)
   const wrappedChildren = html`
     <${Breadcrumb} pathSegments=${pathSegments} />
@@ -73,5 +70,5 @@ export default function articleLayout (args) {
     <${Breadcrumb} pathSegments=${pathSegments} />
   `
 
-  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
+  return wrappedChildren
 }

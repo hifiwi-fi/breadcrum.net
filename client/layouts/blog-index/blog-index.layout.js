@@ -11,16 +11,15 @@ import { Breadcrumb } from '../../components/breadcrumb/index.js'
 /**
  * Blog index layout variables type - extends RootLayoutVars with blog-specific properties
  * @typedef {RootLayoutVars & {
- *  title: string,
- *  publishDate: string
+ *  title: string
  * }} BlogIndexVars
  */
 
-import defaultRootLayout from '../root/root.layout.js'
+export const parentLayout = 'root'
 
-/** @type {LayoutFunction<BlogIndexVars, PageReturn>} */
+/** @type {LayoutFunction<BlogIndexVars, PageReturn, PageReturn>} */
 export default function blogIndexLayout (args) {
-  const { children, ...rest } = args
+  const { children } = args
   const pathSegments = args.page.path.split(sep)
 
   const headerContent = html`
@@ -35,5 +34,5 @@ export default function blogIndexLayout (args) {
         ${children}
       `
 
-  return defaultRootLayout({ children: wrappedChildren, .../** @type {any} */(rest) })
+  return wrappedChildren
 }

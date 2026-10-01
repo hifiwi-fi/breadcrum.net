@@ -1,7 +1,6 @@
-/** @import { DataDeps, PageFunction } from '@domstack/static/types.js' */
+/** @import { DataDeps } from '@domstack/static/types.js' */
+/** @import { SitePage } from '#client/types/site-page.js' */
 /** @import { BlogIndexData } from '../globals/global.data.js' */
-/** @import { BlogIndexVars } from '../layouts/blog-index/blog-index.layout.js' */
-/** @import { PageReturn } from '../layouts/root/root.layout.js' */
 import { html } from 'htm/preact'
 import { basename } from 'node:path'
 
@@ -12,7 +11,7 @@ export const vars = {
   dataDeps: /** @satisfies {DataDeps<BlogIndexData>} */ (['blogPosts', 'blogArchives']),
 }
 
-/** @type {PageFunction<BlogIndexVars, PageReturn, BlogIndexData>} */
+/** @type {SitePage<'blog-index', typeof vars, BlogIndexData>} */
 export default function blogIndex2023 ({
   data: { blogPosts, blogArchives },
 }) {

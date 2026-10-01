@@ -1,12 +1,11 @@
-/** @import { AsyncPageFunction } from '@domstack/static/types.js' */
-/** @import { RootLayoutVars, PageReturn } from '../../layouts/root/root.layout.js' */
+/** @import { SitePage } from '#client/types/site-page.js' */
 import { html } from 'htm/preact'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 
 const execPromise = promisify(exec)
 
-/** @type {AsyncPageFunction<RootLayoutVars, PageReturn>} */
+/** @satisfies {SitePage<'root'>} */
 export default async () => {
   const ls = await npmList()
   return html`<div>

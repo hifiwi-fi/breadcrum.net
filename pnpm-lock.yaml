@@ -221,8 +221,8 @@ importers:
         specifier: 1.0.13
         version: 1.0.13
       '@domstack/static':
-        specifier: 12.0.0-beta.8
-        version: 12.0.0-beta.8(@types/markdown-it@14.2.0)(@types/node@26.6.1)
+        specifier: 12.0.0-beta.10
+        version: 12.0.0-beta.10(@types/markdown-it@14.2.0)(@types/node@26.6.1)
       '@fastify/type-provider-json-schema-to-ts':
         specifier: ^5.0.0
         version: 5.0.0
@@ -398,8 +398,8 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@domstack/static@12.0.0-beta.8':
-    resolution: {integrity: sha512-3qGs0PzUop59606IKCm9yw6NJILU1lsELmKEVXS9QupP7AcEynvITZEoq4svmAVmzOdc15hHh9cLLvu1w3Lpmg==}
+  '@domstack/static@12.0.0-beta.10':
+    resolution: {integrity: sha512-xj2WHoPKplye4X7+tBtKe/br1LNsOR+7ujb0czj3pwsDIgzO/YQobUSNPfqkWEl27yypEGu5Gp6LLv4Y/x6BtA==}
     engines: {node: ^22.18.0 || >=24.0.0}
     hasBin: true
 
@@ -3997,7 +3997,7 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@domstack/static@12.0.0-beta.8(@types/markdown-it@14.2.0)(@types/node@26.6.1)':
+  '@domstack/static@12.0.0-beta.10(@types/markdown-it@14.2.0)(@types/node@26.6.1)':
     dependencies:
       '@11ty/dependency-tree-typescript': 1.0.0
       '@domstack/sync': 0.0.8

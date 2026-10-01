@@ -1,12 +1,10 @@
 /**
- * @import {TemplateAsyncIterator} from '@domstack/static/types.js'
+ * @import { AsyncTemplateFunction } from '@domstack/static/types.js'
  * @import { GlobalVars } from './globals/global.vars.js'
  */
 
-import { stripIndent as js } from 'common-tags'
-
-/** @type {TemplateAsyncIterator<GlobalVars>} */
-export default async function * serviceWorkerTemplate ({
+/** @type {AsyncTemplateFunction<GlobalVars>} */
+export default async function webmanifestTemplate ({
   vars: {
     siteName,
     siteDescription,
@@ -14,17 +12,6 @@ export default async function * serviceWorkerTemplate ({
     backgroundColor
   }
 }) {
-  // First item
-  yield {
-    content: js`
-      self.addEventListener('install', (event) => {
-        console.log('Service worker installed')
-      })
-    `,
-    outputName: 'service-worker.js'
-  }
-
-  // Second item
   const manifestData = {
     id: '/bookmarks',
     name: siteName,
@@ -87,8 +74,5 @@ export default async function * serviceWorkerTemplate ({
     }
   }
 
-  yield {
-    content: JSON.stringify(manifestData, null, 2),
-    outputName: 'manifest.webmanifest'
-  }
+  return JSON.stringify(manifestData, null, 2)
 }

@@ -8,15 +8,15 @@ import { html } from 'htm/preact'
 
 import { render } from 'preact-render-to-string'
 
-import blogIndexLayout from './blog-index.layout.js'
+export const parentLayout = 'blog-index'
 
 export const vars = {
   dataDeps: /** @satisfies {DataDeps<BlogYearData>} */ (['blogYearPosts']),
 }
 
-/** @type {LayoutFunction<BlogIndexVars, PageReturn, string, BlogYearData>} */
+/** @type {LayoutFunction<BlogIndexVars, PageReturn, PageReturn, BlogYearData>} */
 export default function blogAutoIndexLayout (args) {
-  const { children, ...rest } = args
+  const { children } = args
 
   const folderPages = args.data.blogYearPosts[args.page.path] ?? []
 
@@ -46,5 +46,5 @@ export default function blogAutoIndexLayout (args) {
         ${children}
       `
 
-  return blogIndexLayout({ children: wrappedChildren, ...rest })
+  return wrappedChildren
 }

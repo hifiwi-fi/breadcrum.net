@@ -541,6 +541,24 @@ This pattern ensures:
 /// <reference lib="dom" />
 ```
 
+### DOMStack v12 contracts
+
+Keep `@domstack/static` exactly pinned while using the preview manifest API.
+Import public DOMStack types from `@domstack/static/types.js`.
+Register actual layout exports in `client/layout-registry.d.ts` and use `SitePage` / `SitePageVars` from `#client/types/site-page.js` for page contracts.
+Use the named `parentLayout` export for nesting, without duplicate manual parent calls or parent stylesheet imports.
+Keep each layout's `dataDeps` independent; DOMStack unions subscriptions across the resolved chain.
+
+`client/globals/global.data.js` owns source-page collation and progressive state through `previousState`, `changes`, and `setState`.
+Store cloneable projections keyed by source ID, preserve the last successful state on failure, and avoid feed rendering for unrelated edits.
+Keep focused consumer types and explicit `dataDeps`; derived data belongs in `data`, not `vars`.
+`client/blog/archives.pages.js` owns generated year indexes, including preserved published archive URLs; do not add manual year placeholders.
+
+Use the native `client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
+The worker remains network-only, with no offline caching or fetch interception.
+Manifest settings inject only an allowlisted public-asset inventory; do not publish page metadata or cache authenticated routes.
+Run `node --test client scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
+
 ## Preact/HTM Template Constraints
 
 HTM is JSX-like syntax in plain JavaScript with no transpiler necessary. It uses standard JavaScript Tagged Templates.

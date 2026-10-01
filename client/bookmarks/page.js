@@ -1,10 +1,9 @@
-/** @import { PageFunction } from '@domstack/static/types.js' */
-/** @import { RootLayoutVars, PageReturn } from '../layouts/root/root.layout.js' */
+/** @import { SitePage } from '#client/types/site-page.js' */
 import { html } from 'htm/preact'
 import { Page } from './client.js'
 import { QueryProvider } from '../lib/query-provider.js'
 
-/** @type {PageFunction<RootLayoutVars, PageReturn>} */
+/** @type {SitePage<'root'>} */
 export default () => {
   return html`<${QueryProvider}><${Page} /><//>`
 }
