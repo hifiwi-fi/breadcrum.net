@@ -9,6 +9,25 @@ import { parseEnv } from 'node:util'
 
 /** @import { TestContext } from 'node:test' */
 
+test('pnpm setup tracks major 12 and leaves dependency installation explicit', async () => {
+  const manifest = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
+  assert.equal(manifest.engines.pnpm, '12.x')
+  assert.equal(manifest.packageManager, undefined)
+  assert.equal(manifest.devEngines?.packageManager, undefined)
+
+  for (const name of ['tests', 'deploy', 'release', 'regenerate-lockfile']) {
+    const workflow = await readFile(new URL(`../.github/workflows/${name}.yml`, import.meta.url), 'utf8')
+    assert.match(workflow, /uses: pnpm\/setup@[a-f0-9]{40}[^\n]*\n\s+with:\n\s+version: 12\n\s+install: false\n/)
+    assert.doesNotMatch(workflow, /pnpm\/action-setup@/)
+    assert.match(workflow, /node-version-file: package\.json/)
+  }
+
+  const dockerfile = await readFile(new URL('../Dockerfile', import.meta.url), 'utf8')
+  assert.match(dockerfile, /RUN npm install --global pnpm@12\./)
+  const settings = await readFile(new URL('../pnpm-workspace.yaml', import.meta.url), 'utf8')
+  assert.match(settings, /^verifyDepsBeforeRun: error$/m)
+})
+
 /** @param {TestContext} t */
 async function fixture (t) {
   const dir = await mkdtemp(join(tmpdir(), 'breadcrum-scripts-'))

@@ -9,7 +9,8 @@ All code uses JSDoc comments for type annotations and is type-checked by TypeScr
 
 ## Package and runtime layout
 
-Use Node.js 26+ and pnpm 10.34.5 from the repository root.
+Use Node.js 26+ and pnpm 12.x from the repository root.
+GitHub Actions tracks pnpm major 12 through `pnpm/setup` with `install: false`; keep dependency installation explicit and do not add an exact `packageManager` pin.
 There is one private ESM package and one root lockfile; do not use workspace recursion or package filters.
 Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
 Install reproducibly with `pnpm install --frozen-lockfile`.

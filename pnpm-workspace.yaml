@@ -1,6 +1,9 @@
 # pnpm settings for a single root package; there are no workspace members.
 packages: []
 
+# Scripts must not trigger implicit dependency installation.
+verifyDepsBeforeRun: error
+
 minimumReleaseAgeExclude:
   - undici
   - mine.css

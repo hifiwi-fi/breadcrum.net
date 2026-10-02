@@ -12,8 +12,8 @@ RUN apk add --no-cache python3 py3-pip git protobuf && \
 WORKDIR /usr/src/app
 
 FROM base AS dependencies
-# Keep this pin aligned with packageManager and the GitHub Actions workflows.
-RUN npm install --global pnpm@10.34.5
+# Keep image builds pinned; GitHub Actions tracks the pnpm 12 major.
+RUN npm install --global pnpm@12.8.1
 COPY --link package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --link patches/ patches/
 

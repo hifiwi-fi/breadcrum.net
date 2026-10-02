@@ -9,7 +9,7 @@
 
 ## Development
 
-Breadcrum is one private ESM package using Node.js 26+ and pnpm 10.34.5.
+Breadcrum is one private ESM package using Node.js 26+ and pnpm 12.x.
 Install from the repository root with `pnpm install --frozen-lockfile`.
 Keep `pnpm-workspace.yaml`: it stores native dependency patches, package extensions, and install policies, not workspace packages.
 

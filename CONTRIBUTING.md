@@ -10,7 +10,12 @@
 
 ## Local development
 
-Use Node.js 26+ and pnpm 10.34.5, matching the root manifest, CI, and Dockerfile.
+Use Node.js 26+ and pnpm 12.x, matching the root manifest's engine range.
+GitHub Actions selects pnpm major 12 through `pnpm/setup`; Docker is pinned to pnpm 12.8.1.
+Keep `install: false` on the setup action so Node setup and explicit frozen installation remain separate steps.
+Do not add an exact `packageManager` pin that would override the selected pnpm version.
+`verifyDepsBeforeRun: error` prevents `pnpm run` and `pnpm exec` from silently installing dependencies; run `pnpm install --frozen-lockfile` when the installed tree is stale.
+Fresh dependency resolution uses pnpm 12's default one-day release-age policy with the exceptions in `pnpm-workspace.yaml`.
 All commands run from the repository root; there are no package workspaces or recursive/filter commands.
 `pnpm-workspace.yaml` remains the settings file for native patches, package extensions, release-age rules, and approved dependency build scripts.
 Do not replace it with npm configuration or introduce a `package-lock.json`.
