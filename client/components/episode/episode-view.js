@@ -15,6 +15,21 @@ import { ExpandText } from '../expand-text/index.js'
 import { tc } from '../../lib/typed-component.js'
 
 /**
+ * @param {string | null | undefined} value
+ * @param {string} domain
+ */
+function hasProviderDomain (value, domain) {
+  if (typeof value !== 'string') return false
+  try {
+    const url = new URL(value)
+    return (url.protocol === 'https:' || url.protocol === 'http:') &&
+      (url.hostname === domain || url.hostname.endsWith(`.${domain}`))
+  } catch {
+    return false
+  }
+}
+
+/**
  * @param {unknown} value
  * @returns {number | null}
  */
@@ -100,10 +115,10 @@ export const EpisodeView = ({
   const embedAspectRatio = getEmbedAspectRatio(e?.oembed)
   const embedStyle = embedAspectRatio ? { '--bc-embed-aspect': embedAspectRatio } : undefined
   const embedProviderName = typeof e?.oembed?.provider_name === 'string' ? e.oembed.provider_name.toLowerCase() : ''
-  const embedProviderUrl = typeof e?.oembed?.provider_url === 'string' ? e.oembed.provider_url.toLowerCase() : ''
-  const isSoundCloud = embedProviderName === 'soundcloud' || embedProviderUrl.includes('soundcloud.com')
-  const isTwitter = embedProviderName === 'twitter' || embedProviderUrl.includes('twitter.com') || embedProviderUrl.includes('x.com')
-  const isBluesky = embedProviderName === 'bluesky social' || embedProviderName === 'bluesky' || embedProviderUrl.includes('bsky.app')
+  const embedProviderUrl = e?.oembed?.provider_url
+  const isSoundCloud = embedProviderName === 'soundcloud' || hasProviderDomain(embedProviderUrl, 'soundcloud.com')
+  const isTwitter = embedProviderName === 'twitter' || hasProviderDomain(embedProviderUrl, 'twitter.com') || hasProviderDomain(embedProviderUrl, 'x.com')
+  const isBluesky = embedProviderName === 'bluesky social' || embedProviderName === 'bluesky' || hasProviderDomain(embedProviderUrl, 'bsky.app')
   const embedClassName = isSoundCloud
     ? 'bc-episode-embed bc-episode-embed--soundcloud'
     : isTwitter

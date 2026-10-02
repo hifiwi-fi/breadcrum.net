@@ -4,10 +4,9 @@
 
 import { JSDOM, VirtualConsole } from 'jsdom'
 
-const STYLE_TAG_RE = /<style[^>]*>[\s\S]*?<\/style>/gi
-
 /**
- * Create a jsdom Document from raw HTML while avoiding CSS parsing errors.
+ * Create a jsdom Document without style elements for Readability.
+ * This is not general-purpose HTML sanitization.
  *
  * @param {object} params
  * @param {string | null | undefined} params.html
@@ -15,16 +14,19 @@ const STYLE_TAG_RE = /<style[^>]*>[\s\S]*?<\/style>/gi
  * @returns {DOMWindow['document']}
  */
 export function createDocumentFromHtml ({ html, url }) {
-  // Strip <style> tags to prevent CSS parsing errors with modern CSS (custom properties, etc.)
-  // Readability doesn't need CSS to extract article content
-  const htmlWithoutStyles = (html || '').replace(STYLE_TAG_RE, '')
-
-  // Create a virtual console that suppresses remaining jsdom errors
+  // Suppress jsdom errors, including CSS parsing errors raised before style removal.
   const virtualConsole = new VirtualConsole()
   virtualConsole.forwardTo(console, { jsdomErrors: 'none' })
 
-  return (new JSDOM(htmlWithoutStyles, {
+  const document = (new JSDOM(html || '', {
     url: url.toString(),
     virtualConsole,
   })).window.document
+
+  // Readability doesn't need CSS; remove parsed elements without rewriting HTML text.
+  for (const style of document.querySelectorAll('style')) {
+    style.remove()
+  }
+
+  return document
 }
