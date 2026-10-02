@@ -544,7 +544,7 @@ This pattern ensures:
 
 ### DOMStack v12 contracts
 
-Keep `@domstack/static` exactly pinned while using the preview manifest API.
+Keep `@domstack/static` exactly pinned while using a prerelease.
 Import public DOMStack types from `@domstack/static/types.js`.
 Register actual layout exports in `client/layout-registry.d.ts` and use `SitePage` / `SitePageVars` from `#client/types/site-page.js` for page contracts.
 Use the named `parentLayout` export for nesting, without duplicate manual parent calls or parent stylesheet imports.
@@ -557,7 +557,7 @@ Keep focused consumer types and explicit `dataDeps`; derived data belongs in `da
 
 Use the native `client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
 The worker remains network-only, with no offline caching or fetch interception.
-Manifest settings inject only an allowlisted public-asset inventory; do not publish page metadata or cache authenticated routes.
+Do not enable the DOMStack manifest pipeline or generate an asset inventory; the existing PWA webmanifest is separate and remains enabled.
 Run `node --test client scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
 
 ## Preact/HTM Template Constraints

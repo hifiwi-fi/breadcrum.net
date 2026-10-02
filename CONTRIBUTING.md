@@ -118,7 +118,7 @@ Do not point inspection at production resources.
 ## Client builds and DOMStack v12
 
 The client uses `@domstack/static` pinned to `12.0.0-beta.10`.
-Keep the exact pin while using its preview manifest contract.
+Keep the exact pin while using a prerelease.
 Run `pnpm run build` for production output or `pnpm run watch:domstack` for asset-only watch mode; Fastify continues to serve the application.
 Breadcrum retains its custom Preact/HTM root layout and explicit browser target in `client/esbuild.settings.js`.
 
@@ -144,16 +144,15 @@ Each layout declares its own data subscriptions independently of pages and ances
 Use `SitePage` from `#client/types/site-page.js` for JavaScript page renderer contracts and `SitePageVars` when validating supplied vars.
 `client/types/layout-contracts.js` contains compile-time checks for layout chains, required vars, content, and subscription isolation.
 
-### Service worker and manifests
+### Service worker and PWA webmanifest
 
 `client/service-worker.js` is the native worker entrypoint, emitted at the stable `/service-worker.js` URL and compatible with the existing classic registration.
 `client/manifest.webmanifest.template.js` separately owns the PWA webmanifest.
 The worker remains network-only: there is no fetch interception, precache, offline fallback, or lifecycle takeover.
 
-`client/domstack-manifest.settings.js` uses the finalized manifest hook to inject a versioned inventory of allowlisted public images/fonts and the favicon into the worker.
-It excludes documents, JavaScript bundles, source maps, page metadata, and API/authenticated routes, and does not publish `domstack-manifest.json`.
-Do not broaden this inventory or introduce caching of authenticated content without a separate security review.
-Watch mode has no finalized manifest, so the worker must also work without injected policy.
+The DOMStack manifest pipeline is not enabled: no DOMStack manifest or asset inventory is generated, and no policy is injected into the worker.
+The worker only logs its installation, preserving its prior behavior.
+The existing PWA `manifest.webmanifest` is separate from the DOMStack manifest and remains enabled.
 Browser install/update lifecycle testing should use production output rather than watch output.
 
 ## Validation
@@ -180,7 +179,7 @@ node --test client scripts/client-build.test.js
 ```
 
 `scripts/client-build.test.js` runs isolated full-site `testBuild()` and real watch suites using temporary source copies and sanitized subprocess environments.
-These check generated archive output, inherited layouts/assets, feeds, sitemap, worker policy, and edit/add/remove invalidation without modifying tracked sources or loading the local `.env`.
+These check generated archive output, inherited layouts/assets, feeds, sitemap, the native worker without DOMStack manifest generation, and edit/add/remove invalidation without modifying tracked sources or loading the local `.env`.
 These are correctness tests, not build benchmarks.
 
 ### Test service prerequisites

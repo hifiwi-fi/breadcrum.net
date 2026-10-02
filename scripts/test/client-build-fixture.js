@@ -8,7 +8,7 @@ import { JSDOM } from 'jsdom'
 
 /** @import { TestContext } from 'node:test' */
 /** @import { Results } from '@domstack/static/lib/builder.js' */
-/** @import { ServiceWorkerPolicy } from '../../client/lib/service-worker-policy.js' */
+
 /**
  * @typedef {{ title: string, url: string, date_published: string, content_html: string }} FeedItem
  * @typedef {{ title: string, home_page_url: string, items: FeedItem[] }} Feed
@@ -140,52 +140,31 @@ export async function fullSite (t) {
     assert.ok(!sitemap.includes(`${origin}/blog/2026/2025-retrospective/`))
   })
 
-  await t.test('one stable native worker and webmanifest expose only the network-only public inventory', async () => {
+  await t.test('native worker and PWA webmanifest build without generating a DOMStack manifest', async () => {
     const files = await readdir(build.dest, { recursive: true })
     assert.deepEqual(files.filter(file => /(?:^|\/)service-worker[^/]*\.js$/.test(file)), ['service-worker.js'])
-    const manifest = build.results.domstackManifest
-    assert.ok(manifest)
-    assert.deepEqual(manifest.policy, { mode: 'network-only' })
-    assert.ok(manifest.entries.length > 0)
-    assert.ok(manifest.entries.some(entry => entry.url === '/favicon.ico'))
-    assert.ok(manifest.entries.some(entry => entry.url === '/static/breadcrum-512.png'))
-    for (const entry of manifest.entries) {
-      assert.match(entry.url, /^(?:\/favicon\.ico|\/static\/(?:[\w-]+\/)*[\w-]+\.(?:png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|otf))$/)
-      assert.ok(entry.kind === 'static' || entry.kind === 'copy')
-      assert.equal(entry.static, true)
-      assert.equal(entry.role, 'subresource')
-      assert.match(entry.revision ?? '', /^[a-f0-9]{64}$/)
-      assert.equal(entry.url, `/${entry.outputRelname}`)
-      for (const key of ['page', 'pagePath', 'pageUrl', 'templatePath', 'manifestVars']) {
-        assert.ok(!Object.hasOwn(entry, key), `${entry.url} must not contain ${key}`)
-      }
-      assert.ok(files.includes(entry.outputRelname))
-    }
+    assert.equal(build.results.domstackManifest, undefined, 'manifest generation is disabled, not just public JSON output')
     await assert.rejects(build.readOutput('domstack-manifest.json'), { code: 'ENOENT' })
     /** @type {{ name: string, start: () => void }[]} */
     const listeners = []
-    /** @type {unknown} */
-    let policy
+    /** @type {unknown[][]} */
+    const logs = []
     runInNewContext(await build.readOutput('service-worker.js'), {
       self: {
         /** @param {string} name @param {() => void} start */
         addEventListener (name, start) { listeners.push({ name, start }) },
       },
       console: {
-        /** @param {string} _message @param {unknown} value */
-        log (_message, value) { policy = value },
+        /** @param {unknown[]} args */
+        log (...args) { logs.push(args) },
       },
+      fetch: () => { assert.fail('Service worker must not fetch or precache') },
+      get caches () { return assert.fail('Service worker must not access CacheStorage') },
     }, { timeout: 1000 })
     assert.deepEqual(listeners.map(listener => listener.name), ['install'], 'no fetch interception or precaching')
     assert.ok(listeners[0])
     listeners[0].start()
-    assert.ok(policy)
-    const inventory = /** @type {ServiceWorkerPolicy} */ (JSON.parse(JSON.stringify(policy)))
-    assert.deepEqual(inventory, {
-      mode: 'network-only',
-      version: manifest.version,
-      publicAssets: manifest.entries.map(({ url, revision }) => ({ url, revision })),
-    })
+    assert.deepEqual(logs, [['Service worker installed']])
     const webmanifest = JSON.parse(await build.readOutput('manifest.webmanifest'))
     assert.equal(webmanifest.name, 'Breadcrum')
     assert.equal(webmanifest.start_url, '/bookmarks')
