@@ -10,7 +10,7 @@ import { envSchema, schemaForRole } from './env-schema.js'
 const isolated = /** @type {const} */ ({ dotEnvPath: false, processEnv: {} })
 
 test('runtime role is required with no schema default and the dotenv path is rooted at the repository', () => {
-  assert.equal(dotEnvPath, fileURLToPath(new URL('../../.env', import.meta.url)))
+  assert.equal(dotEnvPath, fileURLToPath(new URL('../.env', import.meta.url)))
   assert.equal('default' in envSchema.properties.APP_ROLE, false)
   for (const role of /** @type {const} */ (['api', 'worker', 'all'])) {
     assert.ok(schemaForRole(role).required.includes('APP_ROLE'))

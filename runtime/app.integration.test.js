@@ -21,7 +21,8 @@ import { loadConfig } from '#config/config.js'
 import { integrationFixture } from './integration-fixture.js'
 
 const execFileAsync = promisify(execFile)
-const cliStartArgs = ['--import', './src/otel.js', 'node_modules/fastify-cli/cli.js', 'start', '--config', './src/config/fastify-cli.cjs']
+const runtimeFiles = ['package.json', 'app.js', 'otel.js', 'api', 'config', 'plugins', 'resources', 'runtime', 'worker', 'public', 'migrations']
+const cliStartArgs = ['--import', './otel.js', 'node_modules/fastify-cli/cli.js', 'start', '--config', './config/fastify-cli.cjs']
 
 /** @param {RuntimeConfig} config @returns {NodeJS.ProcessEnv} */
 function subprocessEnvironment (config) {
@@ -97,17 +98,17 @@ test('unified role application integration', { timeout: 120000 }, async t => {
   await t.test('runtime image layout serves Swagger and built assets without client source', { timeout: 30000 }, async t => {
     const directory = await mkdtemp(join(tmpdir(), 'breadcrum-runtime-image-'))
     t.after(() => rm(directory, { recursive: true, force: true }))
-    const files = ['package.json', 'src', 'public', 'migrations']
-    await Promise.all(files.map(name => cp(new URL(`../../${name}`, import.meta.url), join(directory, name), { recursive: true })))
+    await Promise.all(runtimeFiles.map(name => cp(new URL(`../${name}`, import.meta.url), join(directory, name), { recursive: true })))
     // This tests source/asset packaging; production-only dependency installation is separate.
-    await symlink(fileURLToPath(new URL('../../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
-    assert.deepEqual((await readdir(directory)).sort(), [...files, 'node_modules'].sort())
+    await symlink(fileURLToPath(new URL('../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
+    assert.deepEqual((await readdir(directory)).sort(), [...runtimeFiles, 'node_modules'].sort())
     const config = loadConfig('api', { ...isolated, envData: { ...api, SWAGGER: true, PORT: 0, FASTIFY_LOG_LEVEL: 'silent' } })
     const { stdout } = await execFileAsync(process.execPath, ['--input-type=module', '--eval', `
       import assert from 'node:assert/strict'
       import { access, readFile } from 'node:fs/promises'
-      import { createApp } from './src/app.js'
+      import { createApp } from './app.js'
       await assert.rejects(access('client'), { code: 'ENOENT' })
+      await assert.rejects(access('src'), { code: 'ENOENT' })
       const logo = await readFile('public/static/bread.png')
       assert.ok(logo.length > 0)
       const app = await createApp({ role: 'api', dotEnvPath: false })
@@ -268,11 +269,16 @@ test('unified role application integration', { timeout: 120000 }, async t => {
         return id
       }
     `
+    // CLI config resolves dotenv beside the copied application, never in the user's checkout.
+    const directory = await mkdtemp(join(tmpdir(), 'breadcrum-runtime-stalled-'))
+    t.after(() => rm(directory, { recursive: true, force: true }))
+    await Promise.all(runtimeFiles.map(name => cp(new URL(`../${name}`, import.meta.url), join(directory, name), { recursive: true })))
+    await symlink(fileURLToPath(new URL('../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
     const child = spawn(process.execPath, [
       '--import', `data:text/javascript,${encodeURIComponent(stalledProcessor)}`,
-      ...cliStartArgs, 'src/app.js',
+      ...cliStartArgs, 'app.js',
     ], {
-      cwd: new URL('../../', import.meta.url),
+      cwd: directory,
       env: subprocessEnvironment(config),
       stdio: ['ignore', 'pipe', 'pipe'],
     })
@@ -352,9 +358,9 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
   const directory = await mkdtemp(join(tmpdir(), 'breadcrum-runtime-entrypoints-'))
   t.after(() => rm(directory, { recursive: true, force: true }))
   // Run the actual entrypoints without copying or inheriting the user's .env.
-  await Promise.all(['package.json', 'src', 'public', 'migrations'].map(name =>
-    cp(new URL(`../../${name}`, import.meta.url), join(directory, name), { recursive: true })))
-  await symlink(fileURLToPath(new URL('../../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
+  await Promise.all(runtimeFiles.map(name =>
+    cp(new URL(`../${name}`, import.meta.url), join(directory, name), { recursive: true })))
+  await symlink(fileURLToPath(new URL('../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
   const isolated = /** @type {const} */ ({ dotEnvPath: false, processEnv: {} })
   const common = /** @satisfies {Partial<RuntimeConfig>} */ ({
     DATABASE_URL: fixture.databaseUrl,
@@ -380,7 +386,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
   ])) {
     await t.test(`CLI starts APP_ROLE=${role} in ${environment} without role flags and shuts down cleanly`, { timeout: 30000 }, async t => {
       const config = loadConfig(role, { ...isolated, envData: { ...common, ENV: environment } })
-      const child = spawn(process.execPath, [...cliStartArgs, 'src/app.js'], {
+      const child = spawn(process.execPath, [...cliStartArgs, 'app.js'], {
         cwd: directory,
         env: { ...subprocessEnvironment(config), NODE_ENV: environment },
         stdio: ['ignore', 'pipe', 'pipe'],
@@ -429,14 +435,14 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
       envData: { ...common, ENV: 'development', METRICS: 1, METRICS_PORT: address.port },
     })
     // Observe the real preload state in both processes, without replacing the exporter.
-    await writeFile(join(directory, 'src/watch-observer.js'), `
+    await writeFile(join(directory, 'watch-observer.js'), `
       import { telemetryState } from './runtime/telemetry-state.js'
       console.log('WATCH_TELEMETRY', process.pid, Boolean(telemetryState.shutdown))
     `)
     const child = spawn(process.execPath, [
-      '--import', './src/otel.js', '--import', './src/watch-observer.js',
-      'node_modules/fastify-cli/cli.js', 'start', '--config', './src/config/fastify-cli.cjs',
-      '--watch', '--ignore-watch=client public data .tap', 'src/app.js',
+      '--import', './otel.js', '--import', './watch-observer.js',
+      'node_modules/fastify-cli/cli.js', 'start', '--config', './config/fastify-cli.cjs',
+      '--watch', '--ignore-watch=client public data .tap', 'app.js',
     ], {
       cwd: directory,
       env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },
@@ -478,7 +484,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
     assert.equal(metrics.status, 200)
     assert.match(await metrics.text(), /target_info/)
 
-    await appendFile(join(directory, 'src/app.js'), '\n')
+    await appendFile(join(directory, 'app.js'), '\n')
     const restartedOrigin = await t.waitFor(() => {
       assert.equal(child.exitCode, null, output)
       assert.equal(child.signalCode, null, output)
@@ -528,7 +534,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
       { mode: 'routes', patterns: [/health \(GET, HEAD\)/, /bookmarks \(GET, HEAD, PUT\)/, /user \(GET, HEAD, PUT\)/] },
       { mode: 'plugins', patterns: [/health/, /pgboss/, /redis/, /jwt/] },
     ]) {
-      const { stdout, stderr } = await execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'src/app.js'], {
+      const { stdout, stderr } = await execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'app.js'], {
         cwd: directory,
         env: { ...subprocessEnvironment(config), NODE_ENV: 'production' },
         timeout: 15000,
@@ -568,7 +574,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
       for (const mode of ['routes', 'plugins']) {
         await t.test(`APP_ROLE=${role} print-${mode}`, async t => {
           const before = connections
-          await assert.rejects(execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'src/app.js'], {
+          await assert.rejects(execFileAsync(process.execPath, ['node_modules/fastify-cli/cli.js', `print-${mode}`, 'app.js'], {
             cwd: directory,
             env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },
             timeout: 5000,

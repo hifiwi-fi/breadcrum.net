@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeEpisodeReadClient } from '../../src/api/routes/api/episodes/schemas/schema-episode-read.js'
+ * @import { TypeEpisodeReadClient } from '#api/routes/api/episodes/schemas/schema-episode-read.js'
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 

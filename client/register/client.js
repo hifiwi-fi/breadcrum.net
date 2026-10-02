@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeTokenWithUserClient } from '../../src/api/routes/api/user/schemas/user-base.js' */
+/** @import { TypeTokenWithUserClient } from '#api/routes/api/user/schemas/user-base.js' */
 /**
  * @typedef {{
  *   sitekey: string,

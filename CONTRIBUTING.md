@@ -27,7 +27,7 @@ pnpm run generate-default-env
 
 Use a local PostgreSQL database and Redis instance before running migrations or starting the app.
 Configure the root `.env` for these local services and any optional integrations.
-Both roles share the environment schemas, loader, role defaults, and application options in `src/config/` through the `#config/*` alias.
+Both roles share the environment schemas, loader, role defaults, and application options in `config/` through the `#config/*` alias.
 The generator uses that unified schema to create development cookie/JWT keys and defaults, but refuses to overwrite an existing file or symlink.
 It writes only the repository-root `.env`, regardless of the working directory.
 It omits `OTEL_SERVICE_NAME` and `METRICS_PORT` so each role can select its own telemetry defaults.
@@ -43,7 +43,7 @@ pnpm run watch
 
 `pnpm start` delegates to `watch`.
 The backend watcher runs API handlers and queue consumers in one application PID, alongside the separate domstack asset watcher.
-`watch:server` runs `APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' src/app.js`.
+`watch:server` runs `APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' app.js`.
 Fastify CLI watches backend changes, excluding `client`, `public`, `data`, and `.tap` in addition to its own default `.git` and `node_modules` exclusions.
 The watch parent skips telemetry, while its application child inherits the Node preload.
 Fastify CLI 8.0.2 uses a separate five-second deadline for file-change restarts, not `SHUTDOWN_TIMEOUT_MS`; long-running development jobs can be interrupted and retried.
@@ -51,7 +51,7 @@ Rapid consecutive file events can also overlap restarts; stop and restart the wa
 Use non-watching startup when verifying long-job shutdown behavior.
 PostgreSQL and Redis remain external services.
 `pnpm run build` creates the browser assets in `public/`.
-The Zed debug configurations launch `node_modules/fastify-cli/cli.js` with `runtimeArgs: ['--import', './src/otel.js']` and `args: ['start', '--config', './src/config/fastify-cli.cjs', 'src/app.js']`.
+The Zed debug configurations launch `node_modules/fastify-cli/cli.js` with `runtimeArgs: ['--import', './otel.js']` and `args: ['start', '--config', './config/fastify-cli.cjs', 'app.js']`.
 They set `APP_ROLE` in `env`, not command-line role arguments; build assets separately when debugging without the watcher.
 The combined debug configuration still rejects `ENV=production`, even with `NODE_ENV=development`.
 
@@ -86,7 +86,7 @@ The combined `all` role is rejected when either `NODE_ENV=production` or `ENV=pr
 `start:api` and `start:worker` prefix the following non-watching runtime command with `APP_ROLE=api` and `APP_ROLE=worker`, respectively:
 
 ```sh
-node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js
+node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js
 ```
 
 When running separate roles locally, use distinct listener ports, such as `PORT=3001 pnpm run start:worker`.
@@ -95,21 +95,21 @@ The combined role owns one exporter, not two telemetry initializations.
 
 ### Application composition and inspection
 
-`src/app.js` is the single Fastify application composition for runtime, tests, and inspection.
-It exports lazy CLI server options from `src/config/server-options.js`.
-Fastify CLI owns startup and graceful close through `src/config/fastify-cli.cjs`, which reads `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
-The Node preload `--import ./src/otel.js` initializes telemetry before Fastify loads.
+`app.js` is the single Fastify application composition for runtime, tests, and inspection.
+It exports lazy CLI server options from `config/server-options.js`.
+Fastify CLI owns startup and graceful close through `config/fastify-cli.cjs`, which reads `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+The Node preload `--import ./otel.js` initializes telemetry before Fastify loads.
 Ready-state signal shutdown drains jobs and closes pools before flushing telemetry.
 CLI startup failures before registration finishes exit nonzero but may bypass close hooks and telemetry flushing; they do not have the same cleanup guarantee as ready-state shutdown.
-There are no `src/api/app.js` or `src/worker/app.js` wrappers, custom `src/main.js` bootstrap, or custom inspector.
+There are no `api/app.js` or `worker/app.js` wrappers, custom `main.js` bootstrap, or custom inspector.
 Keep plugins in one root tree and use `#plugins/*` for cross-area imports:
 
-- `src/plugins/shared/`: env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry.
-- `src/plugins/api/`: auth, static serving, flags, and other API-only plugins.
-- `src/plugins/worker/`: pg-boss consumer registration.
+- `plugins/shared/`: env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry.
+- `plugins/api/`: auth, static serving, flags, and other API-only plugins.
+- `plugins/worker/`: pg-boss consumer registration.
 
-API routes/schemas remain in `src/api/`, processors in `src/worker/`, and shared domain/queue code in `src/resources/`.
-`pnpm run print-routes` runs `APP_ROLE=api fastify print-routes src/app.js`; `pnpm run print-plugins` runs `APP_ROLE=api fastify print-plugins src/app.js`.
+API routes/schemas remain in `api/`, processors in `worker/`, and shared domain/queue code in `resources/`.
+`pnpm run print-routes` runs `APP_ROLE=api fastify print-routes app.js`; `pnpm run print-plugins` runs `APP_ROLE=api fastify print-plugins app.js`.
 These CLI commands omit the telemetry preload, load the app, and close it and its pools without starting HTTP listeners or telemetry exporters.
 The scripts select `APP_ROLE=api`, and the app rejects consumer roles during CLI inspection before opening database or Redis connections.
 They still need valid API configuration, local services, and applicable built assets because they initialize the app rather than only reading source files.
@@ -190,7 +190,7 @@ For example, install `redis` with Homebrew on macOS, or `redis-server` with the 
 The runtime fixture spawns its own Redis process on a temporary localhost port, with persistence disabled, and stops it during cleanup.
 CI installs this executable separately from the shared Redis service container and masks the system service to avoid competing for port 6379.
 
-The fixture in `src/runtime/integration-fixture.js` connects to local PostgreSQL at `127.0.0.1:5432`, using user/password `postgres` / `postgres` and the `postgres` administration database.
+The fixture in `runtime/integration-fixture.js` connects to local PostgreSQL at `127.0.0.1:5432`, using user/password `postgres` / `postgres` and the `postgres` administration database.
 That local user must have permission to create and drop databases.
 Each fixture creates a uniquely named `breadcrum_runtime_*` database, applies root migrations, and drops it during cleanup.
 The fixture deliberately ignores `DATABASE_URL`, `PGHOST`, `REDIS_CACHE_URL`, and dotenv, so changing those settings does not redirect these integration tests.
@@ -224,14 +224,14 @@ Only the GeoIP database/cache is eligible for copying from local data into the i
 Deployment is an explicitly authorized operation, never part of install/build/test.
 The root image uses Node 26, a frozen pnpm installation with native patches, a root frontend build, and a separate production-dependency installation.
 It includes migrations and GeoIP assets, preserves the release identifier, and runs as the non-root `node` user.
-Its `CMD` is `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, with no implicit `APP_ROLE` default.
+Its `CMD` is `node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`, with no implicit `APP_ROLE` default.
 Callers must supply `APP_ROLE=api` or `APP_ROLE=worker`; running the image without a role fails, and its production environment rejects `all`.
 No workspace `pnpm deploy` step is used.
 
 The checked-in topology is one existing Fly app, `breadcrum`, with two process groups:
 
-- `app`: `env APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, the only group selected by public HTTP/HTTPS services.
-- `worker`: `env APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, internal health listener only, with an `always` restart policy.
+- `app`: `env APP_ROLE=api node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`, the only group selected by public HTTP/HTTPS services.
+- `worker`: `env APP_ROLE=worker node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`, internal health listener only, with an `always` restart policy.
 
 Set `APP_ROLE` in each process command, not in the global Fly `[env]` table or app-wide secrets.
 

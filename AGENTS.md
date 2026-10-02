@@ -15,18 +15,18 @@ There is one private ESM package and one root lockfile; do not use workspace rec
 Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
 Install reproducibly with `pnpm install --frozen-lockfile`.
 
-API routes/schemas live in `src/api/`, consumers/processors in `src/worker/`, shared domain/queue code in `src/resources/`, and browser code in `client/`.
-Use the single `src/app.js` application composition with Fastify CLI startup and graceful close, not a custom `src/main.js` bootstrap or inspector.
-The latest CLI contract supersedes the earlier instructions to retain `src/main.js` and remove the CLI helpers.
-Export lazy CLI server options from `src/config/server-options.js` through `src/app.js`.
-Keep `src/config/fastify-cli.cjs` as the shared CLI config, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
-Do not reintroduce `src/api/app.js`, `src/worker/app.js`, `src/main.js`, or `scripts/inspect-app.js`.
-Keep plugins under one root `src/plugins/` tree, imported across areas through `#plugins/*`.
-Use `src/plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `src/plugins/api/` for auth, static serving, flags, and other API-only plugins; and `src/plugins/worker/` for pg-boss consumer registration.
-Keep shared environment schemas, loading, role defaults, and application options in `src/config/`, imported across areas through `#config/*`.
+API routes/schemas live in `api/`, consumers/processors in `worker/`, shared domain/queue code in `resources/`, and browser code in `client/`.
+Use the single `app.js` application composition with Fastify CLI startup and graceful close, not a custom `main.js` bootstrap or inspector.
+The latest CLI contract supersedes the earlier instructions to retain `main.js` and remove the CLI helpers.
+Export lazy CLI server options from `config/server-options.js` through `app.js`.
+Keep `config/fastify-cli.cjs` as the shared CLI config, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+Do not reintroduce `api/app.js`, `worker/app.js`, `main.js`, or `scripts/inspect-app.js`.
+Keep plugins under one root `plugins/` tree, imported across areas through `#plugins/*`.
+Use `plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `plugins/api/` for auth, static serving, flags, and other API-only plugins; and `plugins/worker/` for pg-boss consumer registration.
+Keep shared environment schemas, loading, role defaults, and application options in `config/`, imported across areas through `#config/*`.
 Do not introduce separate API or worker config folders.
 Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
-Runtime uses `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`.
+Runtime uses `node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`.
 The Node preload initializes telemetry before Fastify loads; the watch parent skips telemetry and its application child inherits the preload.
 Development selects `APP_ROLE=all` for one backend application process; production explicitly selects `APP_ROLE=api` or `APP_ROLE=worker` from the same image.
 `APP_ROLE` is required and must be `api`, `worker`, or `all`; missing/unknown roles fail startup, and `--role` flags are unsupported.
@@ -752,20 +752,20 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.
-- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' src/app.js`.
+- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' app.js`.
 - `pnpm run start:api` / `pnpm run start:worker` - Prefix the runtime Node CLI command with `APP_ROLE=api` / `APP_ROLE=worker` without watching.
 - `pnpm run build` - Build root browser assets with @domstack/static.
 - `pnpm run migrate` - Run root Postgrator migrations without booting application roles.
 - `pnpm run generate-default-env` - Create root development defaults without replacing existing env files.
-- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api fastify print-routes src/app.js` / `APP_ROLE=api fastify print-plugins src/app.js`, without the telemetry preload or a custom inspector.
+- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api fastify print-routes app.js` / `APP_ROLE=api fastify print-plugins app.js`, without the telemetry preload or a custom inspector.
 - `pnpm run deploy` - Explicitly deploy the shared image to both Fly groups, only when authorized.
 - `node scripts/verify-giscus-patch.js --built` - Verify the installed and emitted native Giscus patch.
 
-Inspection loads and closes `src/app.js` and its pools without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
+Inspection loads and closes `app.js` and its pools without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
 CLI inspection omits exported application options; the app rejects `worker` and `all` without configured startup before opening connections.
 Keep this guard covered by real CLI tests.
 Fastify CLI watch ignores `client public data .tap` in addition to its own default `.git` and `node_modules` exclusions.
-Zed debug configurations launch `node_modules/fastify-cli/cli.js`, use `runtimeArgs: ['--import', './src/otel.js']` and `args: ['start', '--config', './src/config/fastify-cli.cjs', 'src/app.js']`, and select `APP_ROLE` through `env`, never role arguments.
+Zed debug configurations launch `node_modules/fastify-cli/cli.js`, use `runtimeArgs: ['--import', './otel.js']` and `args: ['start', '--config', './config/fastify-cli.cjs', 'app.js']`, and select `APP_ROLE` through `env`, never role arguments.
 Keep native pnpm patches enabled in frozen installs and production dependency installs.
 Do not introduce workspace `pnpm deploy`, package filters, or separate per-role images.
 

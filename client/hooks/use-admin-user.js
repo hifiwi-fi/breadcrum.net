@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-/** @import { SchemaTypeAdminUserReadClient } from '../../src/api/routes/api/admin/users/schemas/schema-admin-user-read.js' */
+/** @import { SchemaTypeAdminUserReadClient } from '#api/routes/api/admin/users/schemas/schema-admin-user-read.js' */
 
 import { useEffect, useState } from 'preact/hooks'
 import { useUser } from './useUser.js'

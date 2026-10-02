@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypePasskeyReadClient } from '../../src/api/routes/api/user/passkeys/schemas/schema-passkey-read.js'
+ * @import { TypePasskeyReadClient } from '#api/routes/api/user/passkeys/schemas/schema-passkey-read.js'
  */
 
 import { useEffect, useState, useCallback } from 'preact/hooks'

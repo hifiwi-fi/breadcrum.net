@@ -1,8 +1,8 @@
 /// <reference lib="dom" />
 
 /** @import { FunctionComponent } from 'preact' */
-/** @import { TypeEpisodeReadClient } from '../../src/api/routes/api/episodes/schemas/schema-episode-read.js' */
-/** @import { TypeFeedRead } from '../../src/api/routes/api/feeds/schemas/schema-feed-read.js' */
+/** @import { TypeEpisodeReadClient } from '#api/routes/api/episodes/schemas/schema-episode-read.js' */
+/** @import { TypeFeedRead } from '#api/routes/api/feeds/schemas/schema-feed-read.js' */
 
 import { html } from 'htm/preact'
 import { render } from 'preact'

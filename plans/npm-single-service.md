@@ -2,6 +2,9 @@
 
 ## Status and scope
 
+Layout follow-up: the contents of `src/` now live directly at the repository root (`app.js`, `otel.js`, `api/`, `config/`, `plugins/`, `resources/`, `runtime/`, and `worker/`).
+Paths under `src/` in the original plan and checkpoints below describe the earlier layout; current commands and paths are documented in `README.md` and `CONTRIBUTING.md`.
+
 The original consolidation was authorized with checkpoint commits, followed by a request for a draft PR.
 Draft PR [#918](https://github.com/hifiwi-fi/breadcrum.net/pull/918) tracks the implementation and follow-up configuration, `APP_ROLE`, and plugin-layout changes.
 The architecture below incorporates those follow-ups and the latest request to restore Fastify CLI instead of a custom bootstrap and inspector; production cutover still requires separate approval.

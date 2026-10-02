@@ -7,7 +7,7 @@ import { join } from 'path'
  */
 export default fp(async function (fastify, _opts) {
   const __dirname = import.meta.dirname
-  const pkg = JSON.parse(await readFile(join(__dirname, '../../../package.json'), 'utf8'))
+  const pkg = JSON.parse(await readFile(join(__dirname, '../../package.json'), 'utf8'))
 
   fastify.decorate('pkg', pkg)
 }, {

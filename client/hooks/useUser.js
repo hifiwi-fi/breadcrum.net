@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeUserReadClient } from '../../src/api/routes/api/user/schemas/schema-user-read.js'
+ * @import { TypeUserReadClient } from '#api/routes/api/user/schemas/schema-user-read.js'
  */
 
 /**

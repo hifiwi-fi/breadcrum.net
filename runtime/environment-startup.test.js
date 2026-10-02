@@ -2,7 +2,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { cp, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -12,12 +12,14 @@ async function startupFixture (t) {
   const directory = await mkdtemp(join(tmpdir(), 'breadcrum-environment-startup-'))
   t.after(() => rm(directory, { recursive: true, force: true }))
   // Keep the real CLI/preload/application graph, without inheriting the user's .env.
-  await Promise.all(['package.json', 'src'].map(name =>
-    cp(new URL(`../../${name}`, import.meta.url), join(directory, name), { recursive: true })))
-  await symlink(fileURLToPath(new URL('../../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
-  await writeFile(join(directory, 'src/runtime/telemetry.js'), "throw new Error('RESOURCE_IMPORT_REACHED')\n")
+  const files = ['package.json', 'app.js', 'otel.js', 'api', 'config', 'plugins', 'resources', 'runtime', 'worker']
+  await Promise.all(files.map(name =>
+    cp(new URL(`../${name}`, import.meta.url), join(directory, name), { recursive: true })))
+  await symlink(fileURLToPath(new URL('../node_modules', import.meta.url)), join(directory, 'node_modules'), 'dir')
+  assert.deepEqual((await readdir(directory)).sort(), [...files, 'node_modules'].sort())
+  await writeFile(join(directory, 'runtime/telemetry.js'), "throw new Error('RESOURCE_IMPORT_REACHED')\n")
   // A missed early guard must fail before any real database/cache plugin can run.
-  await writeFile(join(directory, 'src/plugins/shared/env.js'), "export default async function env () { throw new Error('RESOURCE_IMPORT_REACHED') }\n")
+  await writeFile(join(directory, 'plugins/shared/env.js'), "export default async function env () { throw new Error('RESOURCE_IMPORT_REACHED') }\n")
   return directory
 }
 
@@ -28,12 +30,12 @@ async function startupFixture (t) {
  */
 function runStartup (directory, environment, args = []) {
   return spawnSync(process.execPath, [
-    '--import', join(directory, 'src/otel.js'),
+    '--import', join(directory, 'otel.js'),
     join(directory, 'node_modules/fastify-cli/cli.js'), 'start',
-    '--config', join(directory, 'src/config/fastify-cli.cjs'),
-    join(directory, 'src/app.js'), ...args,
+    '--config', join(directory, 'config/fastify-cli.cjs'),
+    join(directory, 'app.js'), ...args,
   ], {
-    cwd: join(directory, 'src'),
+    cwd: join(directory, 'runtime'),
     env: environment,
     encoding: 'utf8',
     timeout: 10000,
@@ -69,7 +71,7 @@ test('CLI preload rejects missing/invalid roles, production all, and invalid ful
 test('CLI rejects role flags including plugin options rather than overriding APP_ROLE', async t => {
   const directory = await startupFixture(t)
   // Let the real application reject CLI plugin options without opening telemetry resources.
-  await writeFile(join(directory, 'src/runtime/telemetry.js'), 'export async function bootstrapTelemetry () { return { shutdown: async () => {} } }\n')
+  await writeFile(join(directory, 'runtime/telemetry.js'), 'export async function bootstrapTelemetry () { return { shutdown: async () => {} } }\n')
   for (const args of [
     ['--role=api'], ['--role=worker'], ['--role', 'all'],
     ['--', '--role=api'], ['--', '--role=worker'], ['--', '--role', 'all'],
@@ -107,7 +109,7 @@ test('telemetry preload skips both watch parent flags but validates and imports 
   for (const flag of ['--watch', '-w']) {
     /** @param {NodeJS.ProcessEnv} env */
     const runPreload = env => spawnSync(process.execPath, [
-      '--import', join(directory, 'src/otel.js'),
+      '--import', join(directory, 'otel.js'),
       '--eval', "console.log('WATCH_PARENT_REACHED')", '--', flag,
     ], {
       cwd: directory,

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
-import { cp, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises'
+import { cp, mkdtemp, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -15,12 +15,12 @@ for (const suite of ['fullSite', 'watchSite']) {
   test(`client build integration: ${suite}`, { timeout: 30_000 }, async t => {
     const dir = await mkdtemp(join(tmpdir(), 'breadcrum-client-build-'))
     t.after(() => rm(dir, { recursive: true, force: true }))
+    const files = ['client', 'api', 'config', 'plugins', 'resources', 'runtime', 'worker', 'app.js', 'otel.js', 'package.json']
     await Promise.all([
-      cp(join(root, 'client'), join(dir, 'client'), { recursive: true }),
-      cp(join(root, 'src'), join(dir, 'src'), { recursive: true }),
-      cp(join(root, 'package.json'), join(dir, 'package.json')),
+      ...files.map(name => cp(join(root, name), join(dir, name), { recursive: true })),
       symlink(join(root, 'node_modules'), join(dir, 'node_modules'), 'dir'),
     ])
+    assert.deepEqual((await readdir(dir)).sort(), [...files, 'node_modules'].sort())
 
     // A separate cwd isolates loadEnvFile(), package aliases, and all watch edits.
     // Do not inherit application credentials or NODE_OPTIONS preloads from the caller.

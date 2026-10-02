@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeBookmarkReadClient } from '../../src/api/routes/api/bookmarks/schemas/schema-bookmark-read.js';
+ * @import { TypeBookmarkReadClient } from '#api/routes/api/bookmarks/schemas/schema-bookmark-read.js';
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 

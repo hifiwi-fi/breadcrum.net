@@ -66,10 +66,10 @@ async function generatorFixture (t) {
   // Copy only the real generator and data-only schema graph, never local env files.
   const files = [
     'scripts/api/generate-default-env.js',
-    'src/config/env-schema.js',
-    'src/config/env-fragments.js',
-    'src/config/role.js',
-    'src/resources/fastify-common/env-schema.js',
+    'config/env-schema.js',
+    'config/env-fragments.js',
+    'config/role.js',
+    'resources/fastify-common/env-schema.js',
   ]
   for (const file of files) {
     const destination = join(dir, file)
@@ -79,8 +79,8 @@ async function generatorFixture (t) {
   await writeFile(join(dir, 'package.json'), JSON.stringify({
     type: 'module',
     imports: {
-      '#config/*': './src/config/*',
-      '#resources/*': './src/resources/*',
+      '#config/*': './config/*',
+      '#resources/*': './resources/*',
     },
   }))
   return dir
@@ -105,6 +105,7 @@ test('env generator uses unified defaults and writes only the root env without p
   await writeFile(join(dir, 'scripts', 'api', '.env'), 'CALLER_ENV=preserved\n')
   const result = runGenerator(dir)
   assert.equal(result.status, 0, result.stderr)
+  await assert.rejects(stat(join(dir, 'src')), { code: 'ENOENT' })
   const env = parseEnv(await readFile(join(dir, '.env'), 'utf8'))
   assert.equal(env['HOST'], 'localhost:3000')
   assert.equal(env['LISTEN_HOST'], '0.0.0.0')

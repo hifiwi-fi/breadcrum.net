@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeArchiveReadClient } from '../../src/api/routes/api/archives/schemas/schema-archive-read.js'
+ * @import { TypeArchiveReadClient } from '#api/routes/api/archives/schemas/schema-archive-read.js'
  * @import { UseQueryOptions, UseQueryResult } from '@tanstack/preact-query'
  */
 

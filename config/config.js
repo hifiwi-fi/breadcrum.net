@@ -9,7 +9,7 @@ import envSchema from 'env-schema'
 import { schemaForRole } from './env-schema.js'
 import { assertRole, parseRoleFromEnvironment } from './role.js'
 
-export const dotEnvPath = fileURLToPath(new URL('../../.env', import.meta.url))
+export const dotEnvPath = fileURLToPath(new URL('../.env', import.meta.url))
 
 /**
  * Read the root environment without mutating process.env (important for app factories/tests).

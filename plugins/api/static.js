@@ -17,7 +17,7 @@ export default fp(async function (fastify, _) {
 
   fastify.register(import('@fastify/static'), {
     logLevel: 'silent',
-    root: path.join(__dirname, '../../../public'),
+    root: path.join(__dirname, '../../public'),
     prefix: '/',
     ...staticOpts,
   })
@@ -32,7 +32,7 @@ export default fp(async function (fastify, _) {
     }))
     fastify.register(import('@fastify/static'), {
       logLevel: 'silent',
-      root: path.join(__dirname, '../../../public/admin'),
+      root: path.join(__dirname, '../../public/admin'),
       prefix: '/',
       ...staticOpts,
     })

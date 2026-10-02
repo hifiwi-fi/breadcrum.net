@@ -37,15 +37,15 @@ export async function integrationFixture (t) {
     }
   })
   await admin.query(`create database ${databaseName}`)
-  const migrations = new URL('../../migrations/', import.meta.url)
+  const migrations = new URL('../migrations/', import.meta.url)
   const files = (await readdir(migrations)).filter(name => /^\d+\.do\./.test(name)).sort()
   assert.ok(files.length > 0)
   // Exercise the root CLI against a fresh database, never the local config's database.
   const migrate = () => execFileAsync(process.execPath, [
-    fileURLToPath(new URL('../../node_modules/postgrator-cli/index.js', import.meta.url)),
+    fileURLToPath(new URL('../node_modules/postgrator-cli/index.js', import.meta.url)),
     '--no-config',
   ], {
-    cwd: new URL('../../', import.meta.url),
+    cwd: new URL('../', import.meta.url),
     env: {
       PGHOST: '127.0.0.1',
       PGPORT: '5432',

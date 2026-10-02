@@ -2,11 +2,11 @@
 
 This directory contains the queue consumer and job-processing portion of the single root Breadcrum package.
 It is not a separate package or independently built service.
-Shared queue/domain code lives in `src/resources/`.
-The single `src/app.js` composes all roles and exports lazy CLI server options from `src/config/server-options.js`, with no separate worker app wrapper or custom `src/main.js`.
-Fastify CLI owns startup and graceful close through `src/config/fastify-cli.cjs`, which reads `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
-Plugins live under the root `src/plugins/` tree, imported across areas through `#plugins/*`.
-Shared infrastructure lives in `src/plugins/shared/`, API-only plugins in `src/plugins/api/`, and pg-boss consumer registration in `src/plugins/worker/`.
+Shared queue/domain code lives in `resources/`.
+The single `app.js` composes all roles and exports lazy CLI server options from `config/server-options.js`, with no separate worker app wrapper or custom `main.js`.
+Fastify CLI owns startup and graceful close through `config/fastify-cli.cjs`, which reads `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+Plugins live under the root `plugins/` tree, imported across areas through `#plugins/*`.
+Shared infrastructure lives in `plugins/shared/`, API-only plugins in `plugins/api/`, and pg-boss consumer registration in `plugins/worker/`.
 
 Run commands from the repository root:
 
@@ -16,7 +16,7 @@ pnpm run start:worker
 ```
 
 `watch` runs API handlers and workers in one backend process for development using `APP_ROLE=all`.
-`start:worker` runs `APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js`, with an internal health listener and no public routes or frontend requirement.
+`start:worker` runs `APP_ROLE=worker node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`, with an internal health listener and no public routes or frontend requirement.
 The Node preload initializes telemetry before Fastify loads.
 The backend watcher adds `--watch --ignore-watch='client public data .tap'`; Fastify CLI also ignores `.git` and `node_modules` by default.
 The watch parent skips telemetry, while its application child inherits the preload.
@@ -26,7 +26,7 @@ Both use the root environment and the existing PostgreSQL-backed queues.
 Use a different `PORT` when running a separate API process locally.
 
 Production uses the root `Dockerfile` and `fly.toml`, with the `worker` process group in the `breadcrum` Fly app.
-The image runs `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.cjs src/app.js` without a default role, so callers must supply `APP_ROLE`.
+The image runs `node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js` without a default role, so callers must supply `APP_ROLE`.
 Fly prefixes that same command with `env APP_ROLE=worker`, not a global role environment setting.
 Only the `app` group has a public service.
 Worker health checks target `/health` on port 8080; metrics use port 9092 and the `breadcrum-worker` telemetry identity.
@@ -38,7 +38,7 @@ Set `SENTRY_WORKER_DSN` in the app-wide environment and keep the shared image's 
 Worker runtime selects that DSN, falling back to `SENTRY_DSN` if it is absent or empty.
 API and combined development roles select `SENTRY_API_DSN` with the same fallback.
 Initial worker cutover, credentials, capacity, shutdown validation, and rollback require separate approval.
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development, testing, and deployment details.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for development, testing, and deployment details.
 
 ## License
 

@@ -31,7 +31,7 @@ export default fp(async function (fastify, _) {
       routePrefix: '/openapi',
       logo: {
         type: 'image/png',
-        content: await fsp.readFile(path.join(import.meta.dirname, '../../../public/static/bread.png')),
+        content: await fsp.readFile(path.join(import.meta.dirname, '../../public/static/bread.png')),
       },
     })
   }

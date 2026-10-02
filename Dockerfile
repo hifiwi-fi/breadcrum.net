@@ -44,7 +44,13 @@ ENV NODE_ENV=production \
 
 COPY --from=production-dependencies --chown=node:node /usr/src/app/node_modules ./node_modules
 COPY --from=build --chown=node:node /usr/src/app/package.json ./package.json
-COPY --from=build --chown=node:node /usr/src/app/src ./src
+COPY --from=build --chown=node:node /usr/src/app/app.js /usr/src/app/otel.js ./
+COPY --from=build --chown=node:node /usr/src/app/api ./api
+COPY --from=build --chown=node:node /usr/src/app/config ./config
+COPY --from=build --chown=node:node /usr/src/app/plugins ./plugins
+COPY --from=build --chown=node:node /usr/src/app/resources ./resources
+COPY --from=build --chown=node:node /usr/src/app/runtime ./runtime
+COPY --from=build --chown=node:node /usr/src/app/worker ./worker
 COPY --from=build --chown=node:node /usr/src/app/public ./public
 COPY --from=build --chown=node:node /usr/src/app/migrations ./migrations
 COPY --from=build --chown=node:node /usr/src/app/.postgratorrc.json ./.postgratorrc.json
@@ -54,4 +60,4 @@ COPY --from=build --chown=node:node /usr/src/app/data/geoip ./data/geoip
 USER node
 EXPOSE 8080 9091 9092
 # Supply APP_ROLE=api or APP_ROLE=worker at runtime; there is no implicit role.
-CMD ["node", "--import", "./src/otel.js", "node_modules/fastify-cli/cli.js", "start", "--config", "./src/config/fastify-cli.cjs", "src/app.js"]
+CMD ["node", "--import", "./otel.js", "node_modules/fastify-cli/cli.js", "start", "--config", "./config/fastify-cli.cjs", "app.js"]

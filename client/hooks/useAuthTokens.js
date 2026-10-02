@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { TypeAuthTokenReadClient } from '../../src/api/routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
+ * @import { TypeAuthTokenReadClient } from '#api/routes/api/user/auth-tokens/schemas/schema-auth-token-read.js';
  */
 
 import { useEffect, useState } from 'preact/hooks'
