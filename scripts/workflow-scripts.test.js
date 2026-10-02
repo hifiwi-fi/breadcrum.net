@@ -28,6 +28,14 @@ test('pnpm setup tracks major 12 and leaves dependency installation explicit', a
   assert.match(settings, /^verifyDepsBeforeRun: error$/m)
 })
 
+test('pretty logging is enabled for development watch only', async () => {
+  const { scripts } = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'))
+  assert.match(scripts['watch:server'], /\s-P\s/)
+  for (const name of ['start:api', 'start:worker']) {
+    assert.doesNotMatch(scripts[name], /(?:^|\s)(?:-P|--pretty-logs)(?:\s|$)/)
+  }
+})
+
 /** @param {TestContext} t */
 async function fixture (t) {
   const dir = await mkdtemp(join(tmpdir(), 'breadcrum-scripts-'))

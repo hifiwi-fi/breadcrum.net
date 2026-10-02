@@ -1,3 +1,4 @@
+import { isMainThread } from 'node:worker_threads'
 import { loadEnvironment, loadRuntimeConfig } from '#config/config.js'
 import { telemetryState } from '#runtime/telemetry-state.js'
 
@@ -8,7 +9,8 @@ if (process.argv.some(arg => arg === '--role' || arg.startsWith('--role='))) {
 
 // The CLI watch parent does not serve requests; its fork inherits this Node preload.
 const watchParent = !process.env['childEvent'] && process.argv.some(arg => arg === '--watch' || arg === '-w')
-if (!watchParent) {
+// Pino transports inherit the preload in worker threads but must not start another exporter.
+if (isMainThread && !watchParent) {
   const environment = loadEnvironment()
   const config = loadRuntimeConfig({ dotEnvPath: false, processEnv: environment })
   for (const [key, value] of Object.entries(environment)) {

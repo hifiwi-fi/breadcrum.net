@@ -39,7 +39,7 @@ pnpm run watch
 `pnpm run watch:server` runs only the backend through Fastify CLI:
 
 ```sh
-APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' app.js
+APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch -P --ignore-watch='client public data .tap' app.js
 ```
 
 `app.js` is the single application composition, with startup and graceful close configured through `config/fastify-cli.cjs`.

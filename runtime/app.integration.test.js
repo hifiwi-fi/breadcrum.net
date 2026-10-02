@@ -423,7 +423,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
     })
   }
 
-  await t.test('CLI watch starts telemetry only in its fork and releases the exporter on restart and shutdown', { timeout: 40000 }, async t => {
+  await t.test('CLI pretty-log watch starts telemetry only in its application thread and releases the exporter on restart and shutdown', { timeout: 40000 }, async t => {
     const reservation = createServer()
     t.after(() => new Promise(resolve => reservation.close(resolve)))
     reservation.listen(0, '127.0.0.1')
@@ -442,7 +442,7 @@ test('environment-selected runtime entrypoints integration', { timeout: 120000 }
     const child = spawn(process.execPath, [
       '--import', './otel.js', '--import', './watch-observer.js',
       'node_modules/fastify-cli/cli.js', 'start', '--config', './config/fastify-cli.cjs',
-      '--watch', '--ignore-watch=client public data .tap', 'app.js',
+      '--watch', '-P', '--ignore-watch=client public data .tap', 'app.js',
     ], {
       cwd: directory,
       env: { ...subprocessEnvironment(config), NODE_ENV: 'development' },

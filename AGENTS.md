@@ -757,7 +757,7 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.
-- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' app.js`.
+- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch -P --ignore-watch='client public data .tap' app.js`.
 - `pnpm run start:api` / `pnpm run start:worker` - Prefix the runtime Node CLI command with `APP_ROLE=api` / `APP_ROLE=worker` without watching.
 - `pnpm run build` - Build root browser assets with @domstack/static.
 - `pnpm run migrate` - Run root Postgrator migrations without booting application roles.

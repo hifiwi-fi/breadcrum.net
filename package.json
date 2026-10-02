@@ -66,7 +66,7 @@
     "test:node": "node --experimental-test-coverage --test --test-reporter=dot --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test-concurrency=1 api config plugins resources runtime worker client scripts",
     "test:knip": "knip --dependencies",
     "watch": "run-s build && run-p watch:*",
-    "watch:server": "APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch --ignore-watch='client public data .tap' app.js",
+    "watch:server": "APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch -P --ignore-watch='client public data .tap' app.js",
     "watch:domstack": "dom watch --src client --dest public --no-serve --drafts",
     "build": "run-s clean build:*",
     "build:domstack": "dom build --src client --dest public",

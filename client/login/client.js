@@ -99,7 +99,8 @@ export const Page = () => {
     async function tryConditionalMediation () {
       try {
         setPasskeyAuthError(null)
-        // Check if conditional mediation is available
+        // The autocomplete probe assumes WebAuthn exists; unsupported browsers/insecure origins may omit it.
+        if (!client.isAvailable()) return
         const isAutocompleteAvailable = await client.isAutocompleteAvailable()
         if (!isAutocompleteAvailable) {
           return // Browser doesn't support conditional mediation
