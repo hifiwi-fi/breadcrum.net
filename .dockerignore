@@ -1,35 +1,24 @@
-**/.env*
-**/.git
-**/.idea
-**/.config
-**/.npm
-**/.github
-**/.DS_Store
-**/.gitignore
-**/.scannerwork
-**/.editorconfig
 **/certs
 **/nodemon.json
 **/node_modules
 **/npm-debug.log
 **/public
-**/.zed
-**/.claude
-**/.pnpm-store
-**/.npmrc
 **/coverage
-**/.nyc_output
 **/lcov.info
 **/tsconfig.tsbuildinfo
 packages
 plans
 dashboards
 deploy
+
 data/**
 !data/geoip/
 !data/geoip/*.mmdb
 !data/geoip/*.metadata.json
-# Secret files stay excluded even under the GeoIP allowlist.
-**/.env*
+
+# Exclude hidden files/directories even under the GeoIP allowlist.
+**/.*
+# The Dockerfile copies this migration configuration into the runtime image.
+!.postgratorrc.json
 **/*.pem
 **/*.key
