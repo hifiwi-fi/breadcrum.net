@@ -18,6 +18,7 @@ import { Client } from 'pg'
 const execFileAsync = promisify(execFile)
 
 /**
+ * Test-only services for app.integration.test.js: a disposable migrated database and Redis process.
  * Deliberately ignores DATABASE_URL, PGHOST, REDIS_CACHE_URL, and dotenv.
  * Requires a local postgres role allowed to create databases and the redis-server executable.
  * @param {TestContext} t

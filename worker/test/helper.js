@@ -4,7 +4,7 @@
  * @import { RuntimeConfig } from '#config/env-schema.js'
  * @import { AppOptions } from '#config/options.js'
  */
-import { createApp } from '../../app.js'
+import { createApp } from '#api/test/helper.js'
 
 /** @param {Partial<RuntimeConfig>} env @returns {AppOptions} */
 export function config (env) {

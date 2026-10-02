@@ -8,6 +8,6 @@
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
   },
-  "include": ["api/**/*", "config/**/*", "plugins/**/*", "resources/**/*", "runtime/**/*", "worker/**/*", "client/**/*", "scripts/**/*", "eslint.config.js", "otel.js", "app.js"],
+  "include": ["**/*"],
   "exclude": ["node_modules", "public", "coverage"],
 }

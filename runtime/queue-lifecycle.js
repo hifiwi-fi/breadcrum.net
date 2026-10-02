@@ -1,6 +1,8 @@
 /** @import { PgBoss } from 'pg-boss' */
 import { setTimeout as delay } from 'node:timers/promises'
 
+// Shared-role shutdown must keep database/cache dependencies alive until callbacks settle.
+// pg-boss expiration can finish its bookkeeping without stopping the underlying callback.
 export function createProcessorTracker () {
   /** @type {Set<Promise<unknown>>} */
   const inFlight = new Set()

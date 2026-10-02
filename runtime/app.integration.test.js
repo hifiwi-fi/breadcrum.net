@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { setTimeout as delay } from 'node:timers/promises'
 import { PgBoss } from 'pg-boss'
-import { createApp } from '../app.js'
+import { createApp } from '#api/test/helper.js'
 import { loadConfig } from '#config/config.js'
 import { integrationFixture } from './integration-fixture.js'
 
@@ -106,7 +106,7 @@ test('unified role application integration', { timeout: 120000 }, async t => {
     const { stdout } = await execFileAsync(process.execPath, ['--input-type=module', '--eval', `
       import assert from 'node:assert/strict'
       import { access, readFile } from 'node:fs/promises'
-      import { createApp } from './app.js'
+      import { createApp } from '#api/test/helper.js'
       await assert.rejects(access('client'), { code: 'ENOENT' })
       await assert.rejects(access('src'), { code: 'ENOENT' })
       const logo = await readFile('public/static/bread.png')

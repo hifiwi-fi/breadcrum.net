@@ -1,3 +1,5 @@
+// Fastify CLI requires this config synchronously and reads its top-level properties.
+// CommonJS supplies that shape directly; an ESM default export would not be unwrapped.
 const { loadRuntimeConfig } = require('./config.js')
 const config = loadRuntimeConfig()
 

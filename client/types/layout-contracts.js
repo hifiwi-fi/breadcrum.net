@@ -5,7 +5,9 @@
  * @import { SitePage, SitePageVars } from './site-page.js'
  */
 
-// These fixtures are checked by tsc; they are not browser entry points or generated assets.
+// Compile-time tests only; these fixtures are not browser entry points or generated assets.
+// Each @ts-expect-error asserts that invalid usage is rejected, rather than hiding an application error.
+// tsc fails if a type change makes one of these invalid examples acceptable.
 
 /** @type {LayoutChain<'blog-auto-index'>} */
 export const blogChain = ['root', 'blog-index', 'blog-auto-index']
