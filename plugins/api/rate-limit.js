@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 
-export { rateLimitEnvSchema } from '#config/env-fragments.js'
+export { rateLimitEnvSchema } from './rate-limit.env-schema.js'
 
 /**
  * This plugins adds fastify/fastify-rate-limit

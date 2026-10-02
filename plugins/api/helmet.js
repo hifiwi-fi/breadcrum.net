@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 
-export { helmetEnvSchema } from '#config/env-fragments.js'
+export { helmetEnvSchema } from './helmet.env-schema.js'
 
 /**
  * This plugin adds fastify/fastify-helmet

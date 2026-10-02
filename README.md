@@ -51,7 +51,7 @@ PostgreSQL-backed queues remain durable even when producer and consumer share a 
 - `api/`: API routes and schemas.
 - `worker/`: queue consumers and job processors.
 - `resources/`: shared domain and queue code.
-- `config/`: shared environment schemas, loading, role defaults, and application options.
+- `config/`: shared environment schema composition, loading, role defaults, and application options; plugin-owned fragments stay alongside their plugins.
 - `client/`: browser code and domstack content.
 - `migrations/`: database migrations.
 - `scripts/`: maintenance and deployment tooling.

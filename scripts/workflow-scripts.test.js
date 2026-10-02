@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { copyFile, mkdtemp, mkdir, readFile, readlink, rm, stat, symlink, writeFile } from 'node:fs/promises'
+import { copyFile, glob, mkdtemp, mkdir, readFile, readlink, rm, stat, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { test } from 'node:test'
@@ -67,9 +67,9 @@ async function generatorFixture (t) {
   const files = [
     'scripts/api/generate-default-env.js',
     'config/env-schema.js',
-    'config/env-fragments.js',
     'config/role.js',
     'resources/fastify-common/env-schema.js',
+    ...await Array.fromAsync(glob('plugins/**/*.env-schema.js', { cwd: new URL('../', import.meta.url) })),
   ]
   for (const file of files) {
     const destination = join(dir, file)
@@ -80,6 +80,7 @@ async function generatorFixture (t) {
     type: 'module',
     imports: {
       '#config/*': './config/*',
+      '#plugins/*': './plugins/*',
       '#resources/*': './resources/*',
     },
   }))
@@ -106,6 +107,7 @@ test('env generator uses unified defaults and writes only the root env without p
   const result = runGenerator(dir)
   assert.equal(result.status, 0, result.stderr)
   await assert.rejects(stat(join(dir, 'src')), { code: 'ENOENT' })
+  await assert.rejects(stat(join(dir, 'node_modules')), { code: 'ENOENT' })
   const env = parseEnv(await readFile(join(dir, '.env'), 'utf8'))
   assert.equal(env['HOST'], 'localhost:3000')
   assert.equal(env['LISTEN_HOST'], '0.0.0.0')

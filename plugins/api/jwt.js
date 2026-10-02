@@ -7,7 +7,7 @@ import SQL from '@nearform/sql'
  * @import { AuthTokenSource as AuthTokenSourceType } from '#api/routes/api/user/auth-tokens/schemas/auth-token-base.js'
  */
 
-export { jwtEnvSchema } from '#config/env-fragments.js'
+export { jwtEnvSchema } from './jwt.env-schema.js'
 
 /**
  * @typedef {object} JwtUser

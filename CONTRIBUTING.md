@@ -27,7 +27,9 @@ pnpm run generate-default-env
 
 Use a local PostgreSQL database and Redis instance before running migrations or starting the app.
 Configure the root `.env` for these local services and any optional integrations.
-Both roles share the environment schemas, loader, role defaults, and application options in `config/` through the `#config/*` alias.
+Both roles share environment schema composition, the loader, role defaults, and application options in `config/` through the `#config/*` alias.
+Plugin-owned schema fragments live beside their plugins in data-only `*.env-schema.js` files; `config/env-schema.js` composes them without loading plugin runtime dependencies.
+JSDoc type imports do not execute at runtime, and schema files are excluded from plugin autoload.
 The generator uses that unified schema to create development cookie/JWT keys and defaults, but refuses to overwrite an existing file or symlink.
 It writes only the repository-root `.env`, regardless of the working directory.
 It omits `OTEL_SERVICE_NAME` and `METRICS_PORT` so each role can select its own telemetry defaults.
@@ -164,10 +166,13 @@ Use the root checks and Node.js test runner:
 pnpm run build
 node scripts/verify-giscus-patch.js --built
 pnpm test
-node --test scripts/workflow-scripts.test.js
+node --test --test-reporter=dot scripts/workflow-scripts.test.js
 ```
 
-Use `node --test path/to/file.test.js` for a specific colocated suite and `--test-name-pattern` to filter test names.
+`pnpm test` and `pnpm run test:node` use the dot console reporter and write LCOV coverage to `lcov.info`.
+Use `node --test --test-reporter=dot path/to/file.test.js` for a specific colocated suite and `--test-name-pattern` to filter test names.
+Include the reporter flag in direct commands; plain `node --test` does not inherit package-script options.
+Keep machine-readable TAP output inside the client-build fixture because its parent test parses those results.
 Use `pnpm run test:eslint --fix` for automatic formatting and `pnpm run print-routes` / `pnpm run print-plugins` for inspection.
 Database-backed tests require isolated local resources and must clean up through test lifecycle hooks.
 
@@ -175,7 +180,7 @@ Run client regression coverage without backend services:
 
 ```sh
 pnpm run test:tsc
-node --test client scripts/client-build.test.js
+node --test --test-reporter=dot client scripts/client-build.test.js
 ```
 
 `scripts/client-build.test.js` runs isolated full-site `testBuild()` and real watch suites using temporary source copies and sanitized subprocess environments.

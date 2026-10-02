@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 
-export { cookieEnvSchema } from '#config/env-fragments.js'
+export { cookieEnvSchema } from './cookie.env-schema.js'
 
 /**
  * This plugins adds cookie support

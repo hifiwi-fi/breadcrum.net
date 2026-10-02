@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin'
 import { metrics } from '@opentelemetry/api'
 
-export { otelMetricsEnvSchema } from '#config/env-fragments.js'
+export { otelMetricsEnvSchema } from './otel-metrics.env-schema.js'
 
 /**
  * This plugin adds OpenTelemetry metrics under the 'otel' decorator.

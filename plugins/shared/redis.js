@@ -1,6 +1,6 @@
 import fp from 'fastify-plugin'
 
-export { redisEnvSchema } from '#config/env-fragments.js'
+export { redisEnvSchema } from './redis.env-schema.js'
 
 /**
  * This plugins adds a redis connection

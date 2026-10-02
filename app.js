@@ -18,7 +18,7 @@ import { telemetryState } from '#runtime/telemetry-state.js'
 
 export { options } from '#config/server-options.js'
 
-const ignorePattern = /(?:test|spec|\.no-load)\.(?:js|cjs|mjs)$/i
+const ignorePattern = /(?:test|spec|env-schema|\.no-load)\.(?:js|cjs|mjs)$/i
 
 /** @type {FastifyPluginAsync<Partial<AppOptions>>} */
 export default async function App (fastify, opts) {

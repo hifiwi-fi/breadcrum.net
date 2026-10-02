@@ -3,7 +3,7 @@ import { stripIndent } from 'common-tags'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 
-export { swaggerEnvSchema } from '#config/env-fragments.js'
+export { swaggerEnvSchema } from './swagger.env-schema.js'
 
 /**
  * This plugins adds fastify-swagger

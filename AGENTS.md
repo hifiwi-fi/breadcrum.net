@@ -23,7 +23,11 @@ Keep `config/fastify-cli.cjs` as the shared CLI config, reading `loadRuntimeConf
 Do not reintroduce `api/app.js`, `worker/app.js`, `main.js`, or `scripts/inspect-app.js`.
 Keep plugins under one root `plugins/` tree, imported across areas through `#plugins/*`.
 Use `plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `plugins/api/` for auth, static serving, flags, and other API-only plugins; and `plugins/worker/` for pg-boss consumer registration.
-Keep shared environment schemas, loading, role defaults, and application options in `config/`, imported across areas through `#config/*`.
+Keep shared environment schema composition, loading, role defaults, and application options in `config/`, imported across areas through `#config/*`.
+Co-locate plugin-owned environment schema fragments with their plugins in data-only `<plugin>.env-schema.js` files; do not consolidate their definitions into a central fragments file.
+`config/env-schema.js` imports and composes those fragments through `#plugins/*`, and plugin modules re-export their own fragment through a local sibling import.
+JSDoc `@import` declarations are type-only and do not load modules at runtime; they are not a reason to move schemas away from their owning plugins.
+Keep the early configuration graph free of plugin runtime imports, and exclude `*.env-schema.js` files from Fastify plugin autoload.
 Do not introduce separate API or worker config folders.
 Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
 Runtime uses `node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`.
@@ -513,11 +517,12 @@ This pattern ensures:
 ## Testing
 
 - Tests use Node.js built-in test runner, not Jest or other frameworks
-- Run specific test files directly: `node --test path/to/test.js`
-- Run multiple test files with glob: `node --test path/**/*.test.js`
+- Default to the dot reporter for console test output, including direct test commands; preserve machine-readable reporters used by test fixtures.
+- Run specific test files directly: `node --test --test-reporter=dot path/to/test.js`
+- Run multiple test files with glob: `node --test --test-reporter=dot path/**/*.test.js`
 - Tests are usually in the same directory as the code they test
 - All tests are written with the Node.js test runner
-- Cannot use `npm test -- --grep "pattern"` - that's for other test runners. Use `node --test --test-name-pattern="pattern"` to filter tests by name pattern
+- Cannot use `npm test -- --grep "pattern"` - that's for other test runners. Use `node --test --test-reporter=dot --test-name-pattern="pattern"` to filter tests by name pattern
 - Use the root package.json test scripts; select individual suites with the Node.js test runner
 - **Always check editor diagnostics before running unit tests** - fix any TypeScript/JSDoc errors first to avoid test failures
 - **Test resource cleanup**: Tests that create resources (users, tokens, etc.) should clean them up using appropriate test lifecycle hooks (`t.after()`)
@@ -558,7 +563,7 @@ Keep focused consumer types and explicit `dataDeps`; derived data belongs in `da
 Use the native `client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
 The worker remains network-only, with no offline caching or fetch interception.
 Do not enable the DOMStack manifest pipeline or generate an asset inventory; the existing PWA webmanifest is separate and remains enabled.
-Run `node --test client scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
+Run `node --test --test-reporter=dot client scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
 
 ## Preact/HTM Template Constraints
 
@@ -748,7 +753,7 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 ### Root scripts
 
 - `pnpm test` - Run root lint, type, Node.js test, and dependency checks.
-- `pnpm run test:node` - Run the Node.js suites with coverage.
+- `pnpm run test:node` - Run the Node.js suites with dot console output and LCOV coverage in `lcov.info`.
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.

@@ -2,6 +2,9 @@
 
 All Fastify plugins live in this tree and are composed by `app.js`.
 Cross-area imports use `#plugins/*`; nearby files in the same feature use relative imports.
+Environment schema fragments belong beside their owning plugins in data-only `<plugin>.env-schema.js` files, re-exported by the plugin and composed by `config/env-schema.js`.
+Keep JSDoc type imports in these files; they do not load runtime dependencies.
+Schema files are excluded from Fastify plugin autoload and must not import executable plugin modules.
 
 - `shared/` owns configuration, PostgreSQL, Redis, cache, metrics, health, Sentry, and queue producers for every role.
 - `api/` owns authentication, static serving, flags, email, and other API-only functionality for `api` and `all`.

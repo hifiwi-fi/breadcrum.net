@@ -5,36 +5,39 @@
  * @typedef {Omit<ApiConfig, 'COOKIE_SECRET' | 'JWT_SECRET'> & Partial<Pick<ApiConfig, 'COOKIE_SECRET' | 'JWT_SECRET'>>} RuntimeConfig
  */
 import { mergeEnvSchemas } from '#resources/fastify-common/env-schema.js'
-import * as fragments from './env-fragments.js'
+import { authEnvSchema } from '#plugins/api/auth.env-schema.js'
+import { cookieEnvSchema } from '#plugins/api/cookie.env-schema.js'
+import { emailEnvSchema } from '#plugins/api/email.env-schema.js'
+import { geoipEnvSchema } from '#plugins/api/geoip.env-schema.js'
+import { helmetEnvSchema } from '#plugins/api/helmet.env-schema.js'
+import { jwtEnvSchema } from '#plugins/api/jwt.env-schema.js'
+import { rateLimitEnvSchema } from '#plugins/api/rate-limit.env-schema.js'
+import { swaggerEnvSchema } from '#plugins/api/swagger.env-schema.js'
+import { ytDlpEnvSchema } from '#plugins/api/yt-dlp.env-schema.js'
+import { otelMetricsEnvSchema } from '#plugins/shared/otel-metrics.env-schema.js'
+import { pgEnvSchema } from '#plugins/shared/pg.env-schema.js'
+import { redisEnvSchema } from '#plugins/shared/redis.env-schema.js'
+import { sentryEnvSchema } from '#plugins/shared/sentry.env-schema.js'
+import { pgbossEnvSchema } from '#plugins/worker/pgboss.env-schema.js'
 import { roleDefaults } from './role.js'
 
-export const pgbossEnvSchema = /** @type {const} @satisfies {JSONSchema} */ ({
-  properties: {
-    EPISODE_WORKER_CONCURRENCY: { type: 'integer', minimum: 1, default: 2 },
-    ARCHIVE_WORKER_CONCURRENCY: { type: 'integer', minimum: 1, default: 2 },
-    BOOKMARK_WORKER_CONCURRENCY: { type: 'integer', minimum: 1, default: 2 },
-    AUTH_TOKEN_RETENTION_DAYS: { type: 'integer', minimum: 1, default: 365 },
-  },
-  required: [],
-})
-
 const common = mergeEnvSchemas(/** @type {const} */ ([
-  fragments.pgEnvSchema,
-  fragments.redisEnvSchema,
-  fragments.otelMetricsEnvSchema,
-  fragments.sentryEnvSchema,
-  fragments.ytDlpEnvSchema,
+  pgEnvSchema,
+  redisEnvSchema,
+  otelMetricsEnvSchema,
+  sentryEnvSchema,
+  ytDlpEnvSchema,
   pgbossEnvSchema,
 ]))
 const api = mergeEnvSchemas(/** @type {const} */ ([
-  fragments.authEnvSchema,
-  fragments.cookieEnvSchema,
-  fragments.emailEnvSchema,
-  fragments.geoipEnvSchema,
-  fragments.helmetEnvSchema,
-  fragments.jwtEnvSchema,
-  fragments.rateLimitEnvSchema,
-  fragments.swaggerEnvSchema,
+  authEnvSchema,
+  cookieEnvSchema,
+  emailEnvSchema,
+  geoipEnvSchema,
+  helmetEnvSchema,
+  jwtEnvSchema,
+  rateLimitEnvSchema,
+  swaggerEnvSchema,
 ]))
 
 export const envSchema = /** @type {const} @satisfies {JSONSchema} */ ({
