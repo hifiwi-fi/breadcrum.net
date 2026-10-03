@@ -1,0 +1,38 @@
+/**
+ * @import { LayoutFunction } from '@domstack/static/types.js'
+ * @import { RootLayoutVars, PageReturn } from '../root/root.layout.js'
+ */
+
+import { html } from 'htm/preact'
+import { sep } from 'node:path'
+import { render } from 'preact-render-to-string'
+import { Breadcrumb } from '../../components/breadcrumb/index.js'
+
+/**
+ * Blog index layout variables type - extends RootLayoutVars with blog-specific properties
+ * @typedef {RootLayoutVars & {
+ *  title: string
+ * }} BlogIndexVars
+ */
+
+export const parentLayout = 'root'
+
+/** @type {LayoutFunction<BlogIndexVars, PageReturn, PageReturn>} */
+export default function blogIndexLayout (args) {
+  const { children } = args
+  const pathSegments = args.page.path.split(sep)
+
+  const headerContent = html`
+     <${Breadcrumb} pathSegments=${pathSegments} />
+     <h1>${args.vars.title}</h1>
+   `
+
+  const wrappedChildren = typeof children === 'string'
+    ? render(headerContent) + children
+    : html`
+        ${headerContent}
+        ${children}
+      `
+
+  return wrappedChildren
+}

@@ -1,45 +1,29 @@
 #!/bin/bash
-# Symlinks .env files from the main worktree into all other worktrees
-
+# Link one root .env from the main worktree, preserving every existing target.
 set -euo pipefail
 
-# Main worktree is always the first entry in `git worktree list`
-MAIN_WORKTREE="$(git worktree list | head -1 | awk '{print $1}')"
-
-ENV_FILES=(
-  "packages/web/.env"
-  "packages/worker/.env"
-)
-
-# Get all worktrees except the main one
-while IFS= read -r line; do
-  WORKTREE_PATH=$(echo "$line" | awk '{print $1}')
-  if [ "$WORKTREE_PATH" = "$MAIN_WORKTREE" ]; then
+MAIN_WORKTREE=""
+# Porcelain's NUL-delimited paths also support spaces and newlines in worktree names.
+while IFS= read -r -d '' record; do
+  case "$record" in
+    'worktree '*) WORKTREE_PATH=${record#worktree } ;;
+    *) continue ;;
+  esac
+  if [ -z "$MAIN_WORKTREE" ]; then
+    MAIN_WORKTREE=$WORKTREE_PATH
     continue
   fi
 
-  echo "Setting up symlinks in: $WORKTREE_PATH"
-  for rel_path in "${ENV_FILES[@]}"; do
-    src="$MAIN_WORKTREE/$rel_path"
-    dst="$WORKTREE_PATH/$rel_path"
-
-    if [ ! -f "$src" ]; then
-      echo "  WARNING: source not found: $src"
-      continue
-    fi
-
-    mkdir -p "$(dirname "$dst")"
-
-    if [ -L "$dst" ]; then
-      echo "  Updating symlink: $rel_path"
-      ln -sf "$src" "$dst"
-    elif [ -f "$dst" ]; then
-      echo "  WARNING: regular file exists at $dst, skipping (remove it manually to symlink)"
-    else
-      echo "  Creating symlink: $rel_path"
-      ln -s "$src" "$dst"
-    fi
-  done
-done < <(git worktree list)
+  src="$MAIN_WORKTREE/.env"
+  dst="$WORKTREE_PATH/.env"
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    echo "Preserving existing .env file or symlink in: $WORKTREE_PATH"
+  elif [ -f "$src" ]; then
+    ln -s "$src" "$dst"
+    echo "Linked root .env in: $WORKTREE_PATH"
+  else
+    echo "No root .env in the main worktree; reconcile legacy env files manually."
+  fi
+done < <(git --no-pager worktree list --porcelain -z)
 
 echo "Done."

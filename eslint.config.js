@@ -1,12 +1,14 @@
+/** @import { Linter } from 'eslint' */
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 
 // Used for editors and canary testing
 
 const ignores = resolveIgnoresFromGitignore()
-const clientFiles = ['packages/web/client/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}']
-const clientPrefix = 'packages/web/client/'
+const clientFiles = ['client/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}']
+const clientPrefix = 'client/'
 const extraTsFiles = ['**/*.cts', '**/*.mts']
 
+/** @param {Linter.Config} config */
 const scopeToClient = (config) => {
   if (config.ignores && Object.keys(config).length === 1) {
     return config
@@ -15,7 +17,9 @@ const scopeToClient = (config) => {
   if (config.files) {
     return {
       ...config,
-      files: config.files.map((pattern) => `${clientPrefix}${pattern}`),
+      files: config.files.map((pattern) => Array.isArray(pattern)
+        ? pattern.map(part => `${clientPrefix}${part}`)
+        : `${clientPrefix}${pattern}`),
     }
   }
 
@@ -25,6 +29,7 @@ const scopeToClient = (config) => {
   }
 }
 
+/** @param {Linter.Config} config */
 const excludeClient = (config) => {
   if (config.ignores && Object.keys(config).length === 1) {
     return config
@@ -32,7 +37,7 @@ const excludeClient = (config) => {
 
   return {
     ...config,
-    ignores: [...(config.ignores || []), 'packages/web/client/**'],
+    ignores: [...(config.ignores || []), 'client/**'],
   }
 }
 

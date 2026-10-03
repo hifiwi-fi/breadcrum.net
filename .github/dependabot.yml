@@ -12,7 +12,7 @@ updates:
       default-days: 1
 
   - package-ecosystem: "npm"
-    directory: "/" # Covers all workspaces
+    directory: "/" # Single root package and pnpm lockfile
     open-pull-requests-limit: 20
     schedule:
       interval: "cron"
@@ -45,17 +45,9 @@ updates:
           - "jsdom"
           - "@types/jsdom"
 
-  # Worker
+  # Shared API/worker image
   - package-ecosystem: "docker"
-    directory: "/packages/worker"
-    schedule:
-      interval: "daily"
-    cooldown:
-      default-days: 1
-
-  # Server
-  - package-ecosystem: "docker"
-    directory: "/packages/web"
+    directory: "/"
     schedule:
       interval: "daily"
     cooldown:

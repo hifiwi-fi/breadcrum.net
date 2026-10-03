@@ -1,43 +1,18 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
-  "ignore": [],
-  "ignoreBinaries": ["eslint"],
-  "ignoreUnresolved": [],
-  "ignoreDependencies": [],
-  "ignoreWorkspaces": [],
-  "workspaces": {
-    ".": {
-      "entry": ["eslint.config.js"]
-    },
-    "packages/web": {
-      "entry": [
-        "app.js",
-        "client/**/*.js",
-        "plugins/**/*.js",
-        "routes/**/{routes,autohooks}.js",
-        "scripts/**/*.js",
-        "test/**/*.js",
-        "otel.js"
-      ],
-      "ignoreDependencies": ["highlight.js", "mine.css"],
-      "ignoreBinaries": [],
-      "project": ["**/*.js"]
-    },
-    "packages/worker": {
-      "entry": [
-        "app.js",
-        "plugins/**/*.js",
-        "routes/**/index.js",
-        "scripts/**/*.js",
-        "test/**/*.js",
-        "workers/bookmarks/ua.js",
-        "otel.js"
-      ],
-      "project": ["**/*.js"]
-    },
-    "packages/*": {
-      "entry": ["**/*.js"],
-      "project": ["**/*.js"]
-    }
-  }
+  "entry": [
+    "app.js",
+    "config/fastify-cli.cjs",
+    "plugins/**/*.js",
+    "api/routes/**/{routes,autohooks}.js",
+
+    "client/**/*.js",
+    "scripts/**/*.js",
+    "{api,config,plugins,resources,runtime,worker}/**/test/**/*.js",
+    "{api,config,plugins,resources,runtime,worker}/**/*.test.js",
+    "worker/workers/bookmarks/ua.js"
+  ],
+  "project": ["{app,otel}.js", "{api,config,plugins,resources,runtime,worker}/**/*.{js,cjs,ts}", "client/**/*.js", "scripts/**/*.js"],
+  "ignoreDependencies": ["highlight.js", "mine.css"],
+  "ignoreBinaries": ["redis-server"]
 }
