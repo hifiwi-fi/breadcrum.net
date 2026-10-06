@@ -28,7 +28,7 @@ pnpm run generate-default-env
 
 Configure the root `.env` for local PostgreSQL and Redis; the generator preserves existing files and symlinks.
 Never use production services or credentials for development or tests.
-`pnpm run migrate` uses root `.postgratorrc.json` and PostgreSQL environment variables, not `.env` or `DATABASE_URL`; configure those separately before migrating.
+`pnpm run migrate` loads PostgreSQL connection variables from the root `.env` when present, while CI and Fly provide their own `PG*` environment variables.
 
 ```sh
 pnpm run migrate

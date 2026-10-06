@@ -2,7 +2,6 @@
 import { NodeSDK } from '@opentelemetry/sdk-node'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
-import { FastifyOtelInstrumentation } from '@fastify/otel'
 import { RuntimeNodeInstrumentation } from '@opentelemetry/instrumentation-runtime-node'
 import { HostMetrics } from '@opentelemetry/host-metrics'
 import { metrics } from '@opentelemetry/api'
@@ -43,13 +42,12 @@ export async function bootstrapTelemetry (config) {
       // skipOpenTelemetrySetup leaves context ownership here; Sentry needs its scope-aware ALS manager.
       ...(Sentry ? { contextManager: new Sentry.SentryContextManager() } : {}),
       metricReaders: exporter ? [exporter] : [],
+      // Metrics are explicit; empty processor lists prevent SDK OTLP defaults for traces and logs.
+      spanProcessors: [],
+      logRecordProcessors: [],
       instrumentations: [
         new HttpInstrumentation(),
         new RuntimeNodeInstrumentation({ monitoringPrecision: 5000 }),
-        new FastifyOtelInstrumentation({
-          registerOnInitialization: true,
-          ignorePaths: options => options.url === '/health' || options.url === '/*',
-        }),
       ],
     })
     sdk.start()
