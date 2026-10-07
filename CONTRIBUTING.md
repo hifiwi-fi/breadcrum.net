@@ -17,7 +17,7 @@
 
 ## Local development
 
-Use Node.js 26+ and pnpm 12.x, and run commands from the repository root.
+Use Node.js 26+ and pnpm 10.34.6, pinned in `package.json` because [Dependabot currently supports pnpm through v10](https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories), and run commands from the repository root.
 There is one private ESM package and one root lockfile; `pnpm-workspace.yaml` holds dependency patches and install policies, not workspace packages.
 API routes live in `api/`, consumers in `worker/`, shared code in `resources/`, plugins in `plugins/`, browser sources in `client/`, and database migrations in `migrations/`.
 

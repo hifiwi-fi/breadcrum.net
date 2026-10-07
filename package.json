@@ -3,13 +3,14 @@
   "description": "Breadcrum internet newspaper clippigns",
   "version": "2026.7.27",
   "type": "module",
+  "packageManager": "pnpm@10.34.6",
   "author": "Bret Comnes <bcomnes@gmail.com> (https://bret.io)",
   "bugs": {
     "url": "https://github.com/hifiwi-fi/breadcrum.net/issues"
   },
   "engines": {
     "node": ">=26.0.0",
-    "pnpm": "12.x"
+    "pnpm": "10.x"
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "1.0.13",
