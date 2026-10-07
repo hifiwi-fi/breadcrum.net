@@ -10,7 +10,7 @@ All code uses JSDoc comments for type annotations and is type-checked by TypeScr
 ## Package and runtime layout
 
 Use Node.js 26+ and pnpm 10.x from the repository root.
-`package.json` pins pnpm 10.34.6 in `packageManager` because [Dependabot currently supports pnpm through v10](https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories); GitHub Actions pins that exact version through `pnpm/setup` with `install: false`, and dependency installation stays explicit.
+`package.json` pins pnpm 10.34.6 in `packageManager` because [Dependabot currently supports pnpm through v10](https://docs.github.com/en/code-security/dependabot/ecosystems-supported-by-dependabot/supported-ecosystems-and-repositories); GitHub Actions reads the exact version through `pnpm/action-setup` with `run_install: false`, and dependency installation stays explicit.
 There is one private ESM package and one root lockfile; do not use workspace recursion or package filters.
 Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
 Install reproducibly with `pnpm install --frozen-lockfile`.
