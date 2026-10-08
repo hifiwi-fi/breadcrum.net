@@ -9,6 +9,27 @@ import { useFlags } from '../../hooks/useFlags.js'
 import { useBilling } from '../../hooks/useBilling.js'
 import { useSearchParams } from '../../hooks/useQuery.js'
 
+/**
+ * @param {string} apiUrl
+ * @param {ReturnType<typeof useBilling>['refetch']} refetch
+ * @returns {Promise<string>}
+ */
+export async function syncCheckoutBilling (apiUrl, refetch) {
+  const response = await fetch(`${apiUrl}/billing/sync`, {
+    method: 'post',
+    signal: AbortSignal.timeout(5000),
+  })
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+  }
+  const result = await refetch({ throwOnError: true })
+  if (result.isError) throw result.error
+  if (!result.data) throw new Error('Unable to refresh subscription status.')
+  return result.data.active
+    ? 'Subscription activated.'
+    : 'Checkout completed. Paid access is pending confirmation.'
+}
+
 /** @type {FunctionComponent} */
 export const BillingField = () => {
   const state = useLSP()
@@ -17,7 +38,7 @@ export const BillingField = () => {
   const { searchParams, replaceState } = useSearchParams(/** @type {{ billing?: string } | null} */ (null))
   const billingParam = searchParams?.billing ?? null
   const { data: billing, isPending: billingLoading, error: billingError, refetch } = useBilling({
-    enabled: billingEnabled,
+    enabled: true,
   })
 
   const [error, setError] = useState(/** @type {Error | null} */(null))
@@ -34,22 +55,19 @@ export const BillingField = () => {
   }, [billingParam, replaceState])
 
   useEffect(() => {
-    if (!billingEnabled || !billingParam) return
+    if (!billingParam) return
 
     const load = async () => {
       try {
         if (billingParam === 'success') {
-          // Best-effort sync; the webhook will reconcile if this times out.
-          await fetch(`${state.apiUrl}/billing/sync`, {
-            method: 'post',
-            signal: AbortSignal.timeout(5000),
-          })
-          await refetch()
-          setNotice('Subscription activated.')
+          setError(null)
+          setNotice(null)
+          setNotice(await syncCheckoutBilling(state.apiUrl, refetch))
         } else if (billingParam === 'cancel') {
           setNotice('Checkout canceled.')
         }
       } catch (err) {
+        setNotice('Checkout returned, but subscription activation could not be confirmed. Please refresh to check your billing status.')
         setError(/** @type {Error} */(err))
       }
       clearBillingParam()
@@ -101,9 +119,14 @@ export const BillingField = () => {
     }
   }, [state.apiUrl])
 
-  if (!billingEnabled) return null
-  if (billingLoading) return html`<dt>Billing</dt><dd>Loading...</dd>`
-  if (!billing) return html`<dt>Billing</dt><dd>Unavailable</dd>`
+  const feedback = html`
+    ${notice ? html`<div class="bc-help-text">${notice}</div>` : null}
+    ${error || billingError ? html`<div class="error-box">${(error || billingError)?.message}</div>` : null}
+  `
+  if (!billingEnabled && billingLoading) return null
+  if (billingLoading) return html`<dt>Billing</dt><dd>${feedback}Loading...</dd>`
+  if (!billing) return billingEnabled ? html`<dt>Billing</dt><dd>${feedback}Unavailable</dd>` : null
+  if (!billingEnabled && !billing.subscription.provider) return null
 
   const isActive = billing?.active ?? false
   const isCanceling = isActive && billing?.subscription?.cancel_at_period_end
@@ -113,6 +136,8 @@ export const BillingField = () => {
     !isActive
   const isStripe = billing?.subscription?.provider === 'stripe'
   const isCustom = billing?.subscription?.provider === 'custom'
+  const needsStripeManagement = isStripe && Boolean(subscriptionStatus) &&
+    !['canceled', 'incomplete_expired'].includes(/** @type {string} */ (subscriptionStatus))
   const pm = billing?.subscription?.payment_method
   const displayName = billing?.subscription?.display_name
 
@@ -127,8 +152,7 @@ export const BillingField = () => {
   return html`
     <dt>Billing</dt>
     <dd>
-      ${notice ? html`<div class="bc-help-text">${notice}</div>` : null}
-      ${error || billingError ? html`<div class="error-box">${(error || billingError)?.message}</div>` : null}
+      ${feedback}
 
       <div>
         <strong>Plan:</strong> ${planLabel}
@@ -203,6 +227,13 @@ export const BillingField = () => {
 
       ${!isActive
 ? html`
+        ${needsStripeManagement && !isPendingSettlement
+? html`
+          <div class="button-cluster">
+            <button type="button" disabled=${actionLoading} onClick=${handlePortal}>Manage billing</button>
+          </div>
+        `
+: null}
         ${billing?.usage
 ? html`
           <div>
@@ -210,7 +241,7 @@ export const BillingField = () => {
           </div>
         `
 : null}
-        ${!isPendingSettlement
+        ${billingEnabled && !isPendingSettlement && !needsStripeManagement
 ? html`
           <div class="button-cluster">
             <button type="button" disabled=${actionLoading} onClick=${handleCheckout}>Subscribe</button>

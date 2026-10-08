@@ -143,6 +143,7 @@ export async function syncStripeSubscriptionToDb ({ pg, data }) {
       values (${data.userId}, 'stripe')
       on conflict (user_id)
       do update set provider = excluded.provider
+      where subscriptions.provider = 'stripe'
       returning id
     ),
     deleted_custom_subscription as (
@@ -242,7 +243,7 @@ export async function cancelStaleStripeSubscription ({ pg, userId }) {
  * Creates a custom (non-Stripe) subscription for a user.
  *
  * @param {{ pg: PgClient, subscription: CustomSubscriptionParams }} params
- * @returns {Promise<string>} The subscription id
+ * @returns {Promise<string | undefined>} The subscription id, or undefined when a Stripe subscription exists
  */
 export async function createCustomSubscription ({ pg, subscription }) {
   const query = SQL`
@@ -251,6 +252,12 @@ export async function createCustomSubscription ({ pg, subscription }) {
       values (${subscription.userId}, 'custom')
       on conflict (user_id)
       do update set provider = excluded.provider
+      where not exists (
+        select 1
+        from stripe_subscriptions ss
+        where ss.subscription_id = subscriptions.id
+          and ss.status not in ('canceled', 'incomplete_expired')
+      )
       returning id
     ),
     deleted_stripe_subscription as (
@@ -290,11 +297,7 @@ export async function createCustomSubscription ({ pg, subscription }) {
 
   /** @type {QueryResult<{ id: string }>} */
   const results = await pg.query(query)
-  const row = results.rows[0]
-  if (!row?.id) {
-    throw new Error('Failed to create custom subscription')
-  }
-  return row.id
+  return results.rows[0]?.id
 }
 
 /**

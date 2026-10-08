@@ -108,6 +108,7 @@ describe('billing-queries', () => {
     assert.equal(queries.length, 1)
     const queryText = getQueryText(queries[0])
     assert.match(queryText, /delete from custom_subscriptions cs/)
+    assert.match(queryText, /where subscriptions\.provider = 'stripe'/)
     assert.doesNotMatch(queryText, /delete from subscriptions/)
   })
 
@@ -134,6 +135,7 @@ describe('billing-queries', () => {
     assert.equal(queries.length, 1)
     const queryText = getQueryText(queries[0])
     assert.match(queryText, /delete from stripe_subscriptions ss/)
+    assert.match(queryText, /ss\.status not in \('canceled', 'incomplete_expired'\)/)
     assert.doesNotMatch(queryText, /delete from subscriptions/)
   })
 

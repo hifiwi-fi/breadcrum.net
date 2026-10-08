@@ -29,15 +29,6 @@ export async function postBillingSync (fastify, _opts) {
       },
     },
     async function postBillingSyncHandler (request, reply) {
-      const { billing_enabled: billingEnabled } = await fastify.getFlags({
-        frontend: true,
-        backend: false,
-      })
-
-      if (!billingEnabled) {
-        return reply.notFound()
-      }
-
       const stripe = fastify.billing.stripe
       if (!stripe) {
         return reply.internalServerError('Billing is not configured.')
@@ -57,6 +48,7 @@ export async function postBillingSync (fastify, _opts) {
         stripe,
         pg: fastify.pg,
         customerId,
+        lookupKey: fastify.config.STRIPE_PRICE_LOOKUP_KEY,
       })
 
       return reply.code(200).send({ synced: true })

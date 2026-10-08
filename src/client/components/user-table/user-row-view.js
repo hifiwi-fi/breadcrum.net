@@ -48,6 +48,13 @@ export const UserRowView = ({
   const registrationUserAgent = formatUserAgent(u.registration_user_agent)
   const latestGeoip = formatGeoip(u.geoip)
   const registrationGeoip = formatGeoip(u.registration_geoip)
+  const hasSubscription = Boolean(u.subscription_provider)
+  const expired = Boolean(u.subscription_period_end && new Date(u.subscription_period_end).getTime() <= Date.now())
+  const activeStatus = u.subscription_status === 'active' || u.subscription_status === 'trialing'
+  const customActive = hasSubscription && activeStatus && !expired && u.subscription_provider === 'custom'
+  // The admin response does not include Stripe settlement or cancel_at data.
+  const stripeUnverified = hasSubscription && activeStatus && !expired && u.subscription_provider === 'stripe'
+  const subscriptionLabel = customActive ? 'Paid access' : stripeUnverified ? 'Paid access unverified' : 'No paid access'
 
   return html`
     <article class="bc-user-card" role="listitem">
@@ -102,12 +109,12 @@ export const UserRowView = ({
         </span>
         <span class="${cn({
           'bc-user-badge': true,
-          'bc-user-badge-true': u.subscription_status === 'active' || u.subscription_status === 'trialing',
-          'bc-user-badge-warning': u.subscription_status === 'past_due',
-          'bc-user-badge-false': !u.subscription_status || u.subscription_status === 'canceled',
+          'bc-user-badge-true': customActive,
+          'bc-user-badge-warning': stripeUnverified || u.subscription_status === 'past_due',
+          'bc-user-badge-false': !customActive && !stripeUnverified && u.subscription_status !== 'past_due',
         })}">
-          ${u.subscription_plan
-            ? `${u.subscription_plan} (${u.subscription_provider}${u.subscription_display_name ? ': ' + u.subscription_display_name : ''}, ${u.subscription_status}${u.subscription_cancel_at_period_end ? ', canceling' : ''})`
+          ${hasSubscription
+            ? `${subscriptionLabel}: ${u.subscription_plan || 'Subscription'} (${u.subscription_provider}${u.subscription_display_name ? ': ' + u.subscription_display_name : ''}, ${u.subscription_status || 'unknown'}${expired ? ', expired' : ''}${u.subscription_cancel_at_period_end ? ', canceling' : ''})`
             : 'Free plan'}
         </span>
       </div>

@@ -15,9 +15,6 @@ import { defaultQueueOptions } from '../pgboss/default-job-options.js'
 
 export const syncSubscriptionQName = 'sync-subscription'
 
-/** @type {number} */
-const THROTTLE_SECONDS = 30
-
 /**
  * Request shape for sending a sync subscription job
  *
@@ -45,10 +42,8 @@ const THROTTLE_SECONDS = 30
 /**
  * Factory function to create a typed queue wrapper for subscription sync.
  *
- * Uses sendThrottled with customerId as the singleton key so that
- * multiple webhook events for the same customer within the throttle
- * window result in a single sync job. Since syncStripeSubscription
- * always fetches the latest state from Stripe, one job is sufficient.
+ * Every event gets a durable job because changes can arrive after an earlier
+ * synchronization has already read Stripe's state.
  *
  * @param {Object} params
  * @param {PgBoss} params.boss - PgBoss instance
@@ -74,13 +69,10 @@ export async function createSyncSubscriptionQ ({
   return {
     name: syncSubscriptionQName,
 
-    send: (request) =>
-      boss.sendThrottled(
-        syncSubscriptionQName,
-        request.data,
-        request.options ?? {},
-        THROTTLE_SECONDS,
-        request.data.customerId
-      ),
+    send: request => boss.send(
+      syncSubscriptionQName,
+      request.data,
+      request.options ?? {}
+    ),
   }
 }

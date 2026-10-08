@@ -33,6 +33,7 @@ export function makeSyncSubscriptionP ({ fastify }) {
           stripe,
           pg: fastify.pg,
           customerId,
+          lookupKey: fastify.config.STRIPE_PRICE_LOOKUP_KEY,
         })
         log.info('Subscription synced')
       } catch (err) {

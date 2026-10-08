@@ -13,7 +13,7 @@ export async function postBillingPortal (fastify, _opts) {
   fastify.post(
     '/portal',
     {
-      preHandler: fastify.auth([fastify.verifyJWT, fastify.notDisabled], {
+      preHandler: fastify.auth([fastify.verifyJWT], {
         relation: 'and',
       }),
       schema: {
@@ -24,15 +24,6 @@ export async function postBillingPortal (fastify, _opts) {
       },
     },
     async function postBillingPortalHandler (request, reply) {
-      const { billing_enabled: billingEnabled } = await fastify.getFlags({
-        frontend: true,
-        backend: false,
-      })
-
-      if (!billingEnabled) {
-        return reply.notFound()
-      }
-
       const stripe = fastify.billing.stripe
       if (!stripe) {
         return reply.internalServerError('Billing is not configured.')

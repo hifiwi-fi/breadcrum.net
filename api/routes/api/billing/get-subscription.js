@@ -30,16 +30,11 @@ export async function getBillingSubscription (fastify, _opts) {
     },
     async function getBillingSubscriptionHandler (request, reply) {
       const {
-        billing_enabled: billingEnabled,
         free_bookmarks_per_month: freeBookmarksPerMonth,
       } = await fastify.getFlags({
         frontend: true,
         backend: false,
       })
-
-      if (!billingEnabled) {
-        return reply.notFound()
-      }
 
       const userId = request.user.id
 

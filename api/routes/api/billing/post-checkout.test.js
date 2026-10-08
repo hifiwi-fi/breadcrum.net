@@ -5,6 +5,7 @@ import {
   createTestUser,
   enableBillingFlags,
   disableBillingFlag,
+  insertCustomSubscription,
 } from './billing-test-utils.js'
 
 const STRIPE_TEST_ENV = {
@@ -60,6 +61,25 @@ await suite('POST /api/billing/checkout', async () => {
 
   // Each Stripe integration test gets its own outer test() so build(t) cleanup
   // ordering is correct (subtest cleanups run before outer test's app.close).
+  await test('active custom grants cannot open a Stripe checkout', async (t) => {
+    const app = await build(t, STRIPE_TEST_ENV)
+
+    await t.test('returns 409 before contacting Stripe', async (t) => {
+      await enableBillingFlags(app, t)
+      const user = await createTestUser(app, t)
+      await insertCustomSubscription(app, t, { userId: user.userId })
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/billing/checkout',
+        headers: { authorization: `Bearer ${user.token}` },
+      })
+
+      assert.equal(response.statusCode, 409)
+      assert.match(response.payload, /custom subscription/)
+    })
+  })
+
   await test('attempts Stripe price lookup and returns error with fake key', async (t) => {
     if (hasLiveStripeKey) {
       t.skip('Using live Stripe key; skipping fake-key error path test')

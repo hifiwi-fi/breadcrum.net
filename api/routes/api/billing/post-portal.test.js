@@ -1,3 +1,4 @@
+/** @import { Stripe } from 'stripe' */
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
 import { build } from '../../../test/helper.js'
@@ -22,7 +23,7 @@ await suite('POST /api/billing/portal', async () => {
   await test('flag and auth gating', async (t) => {
     const app = await build(t, STRIPE_TEST_ENV)
 
-    await t.test('returns 404 when billing_enabled flag is false', async (t) => {
+    await t.test('returns 404 when no customer mapping exists while billing UI is disabled', async (t) => {
       await disableBillingFlag(app)
       const user = await createTestUser(app, t)
 
@@ -69,6 +70,34 @@ await suite('POST /api/billing/portal', async () => {
       })
 
       assert.strictEqual(res.statusCode, 404, 'Should return 404 when no Stripe customer found')
+    })
+  })
+
+  await test('disabled user with an existing customer can manage billing', async (t) => {
+    const app = await build(t, STRIPE_TEST_ENV)
+    await t.test('opens a portal using the disabled user customer mapping', async (t) => {
+      await enableBillingFlags(app, t)
+      await disableBillingFlag(app)
+      const user = await createTestUser(app, t)
+      const { stripeCustomerId } = await insertStripeCustomer(app, t, { userId: user.userId })
+      await app.pg.query('update users set disabled = true where id = $1', [user.userId])
+      assert.ok(app.billing.stripe)
+      let portalCustomer
+      const create = t.mock.method(app.billing.stripe.billingPortal.sessions, 'create', async (/** @type {Stripe.BillingPortal.SessionCreateParams} */ params) => {
+        portalCustomer = params.customer
+        return { url: 'https://billing.stripe.com/test-session' }
+      })
+
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/billing/portal',
+        headers: { authorization: `Bearer ${user.token}` },
+      })
+
+      assert.strictEqual(res.statusCode, 200)
+      assert.deepStrictEqual(res.json(), { url: 'https://billing.stripe.com/test-session' })
+      assert.strictEqual(create.mock.callCount(), 1)
+      assert.strictEqual(portalCustomer, stripeCustomerId)
     })
   })
 

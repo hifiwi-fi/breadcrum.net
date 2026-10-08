@@ -1,8 +1,9 @@
 /**
  * @import { Stripe as StripeType } from 'stripe'
- * @import { PgClient } from '../types/pg-client.js'
+ * @import { FastifyInstance } from 'fastify'
  */
 
+import SQL from '@nearform/sql'
 import {
   getUserIdByStripeCustomerId,
   syncStripeSubscriptionToDb,
@@ -12,8 +13,9 @@ import {
 /**
  * @typedef {object} SyncParams
  * @property {StripeType} stripe
- * @property {PgClient} pg
+ * @property {FastifyInstance['pg']} pg
  * @property {string} customerId
+ * @property {string} lookupKey
  */
 
 /**
@@ -31,80 +33,85 @@ import {
  * @param {SyncParams} params
  * @returns {Promise<void>}
  */
-export async function syncStripeSubscription ({ stripe, pg, customerId }) {
-  const userId = await getUserIdByStripeCustomerId({
-    pg,
-    stripeCustomerId: customerId,
-  })
+export async function syncStripeSubscription ({ stripe, pg, customerId, lookupKey }) {
+  await pg.transact(async client => {
+    // Hold the customer lock across the Stripe read and database write so every sync entry point is ordered.
+    await client.query(SQL`select pg_advisory_xact_lock(hashtextextended(${customerId}, 0))`)
 
-  if (!userId) {
-    // Stripe can have customers that predate the integration or come from test scenarios.
-    // No local user mapping exists; skip sync silently.
-    return
-  }
+    const userId = await getUserIdByStripeCustomerId({
+      pg: client,
+      stripeCustomerId: customerId,
+    })
 
-  const subscriptions = await stripe.subscriptions.list({
-    customer: customerId,
-    // Stripe dashboard setting: "Limit customers to one subscription" must be enabled.
-    // With that constraint, fetching one row here is safe and deterministic.
-    limit: 1,
-    // Expand gives us card details on default_payment_method and payment settlement status
-    // on latest_invoice in the same request.
-    expand: ['data.default_payment_method', 'data.latest_invoice'],
-  })
+    if (!userId) {
+      return
+    }
 
-  const subscription = subscriptions.data[0]
+    await client.query(SQL`select pg_advisory_xact_lock(1, hashtext(${userId}))`)
 
-  if (!subscription) {
-    // No active Stripe subscription found; mark any existing local record as canceled.
-    await cancelStaleStripeSubscription({ pg, userId })
-    return
-  }
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: 'all',
+      limit: 100,
+      expand: ['data.default_payment_method', 'data.latest_invoice'],
+    })
 
-  const item = subscription.items?.data?.[0]
-  const priceId = item?.price?.id ?? null
-  // Use lookup_key only — nickname is not safe to store after migration 031 added the
-  // subscription_plan_code enum constraint. An unknown nickname would cause the upsert to throw.
-  const planCode = item?.price?.lookup_key ?? null
-  const currentPeriodStart = toDate(item?.current_period_start)
-  const currentPeriodEnd = toDate(item?.current_period_end)
-  const latestInvoice = subscription.latest_invoice && typeof subscription.latest_invoice === 'object'
-    ? subscription.latest_invoice
-    : null
-  const latestInvoiceStatus = latestInvoice?.status ?? null
-  const latestInvoicePaidAt = toDate(latestInvoice?.status_transitions?.paid_at)
-  const latestInvoiceSettled = latestInvoiceStatus === 'paid'
+    const subscription = subscriptions.data.find(candidate =>
+      !['canceled', 'incomplete_expired'].includes(candidate.status) &&
+      candidate.items.data.some(item => item.price.lookup_key === lookupKey)
+    )
 
-  /** @type {string | null} */
-  let paymentMethodBrand = null
-  /** @type {string | null} */
-  let paymentMethodLast4 = null
+    if (!subscription) {
+      await cancelStaleStripeSubscription({ pg: client, userId })
+      return
+    }
 
-  const pm = subscription.default_payment_method
-  if (pm && typeof pm === 'object' && 'card' in pm && pm.card) {
-    paymentMethodBrand = pm.card.brand ?? null
-    paymentMethodLast4 = pm.card.last4 ?? null
-  }
+    const item = subscription.items.data.find(item => item.price.lookup_key === lookupKey)
+    if (!item) {
+      throw new Error(`Stripe subscription ${subscription.id} has no configured billing price`)
+    }
+    const priceId = item.price.id
+    const planCode = 'yearly_paid'
+    const currentPeriodStart = toDate(item?.current_period_start)
+    const currentPeriodEnd = toDate(item?.current_period_end)
+    const latestInvoice = subscription.latest_invoice && typeof subscription.latest_invoice === 'object'
+      ? subscription.latest_invoice
+      : null
+    const latestInvoiceStatus = latestInvoice?.status ?? null
+    const latestInvoicePaidAt = toDate(latestInvoice?.status_transitions?.paid_at)
+    const latestInvoiceSettled = latestInvoiceStatus === 'paid'
 
-  await syncStripeSubscriptionToDb({
-    pg,
-    data: {
-      userId,
-      stripeSubscriptionId: subscription.id,
-      status: subscription.status,
-      planCode,
-      priceId,
-      currentPeriodStart,
-      currentPeriodEnd,
-      cancelAt: toDate(subscription.cancel_at),
-      cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
-      trialEnd: toDate(subscription.trial_end),
-      paymentMethodBrand,
-      paymentMethodLast4,
-      latestInvoiceStatus,
-      latestInvoicePaidAt,
-      latestInvoiceSettled,
-    },
+    /** @type {string | null} */
+    let paymentMethodBrand = null
+    /** @type {string | null} */
+    let paymentMethodLast4 = null
+
+    const pm = subscription.default_payment_method
+    if (pm && typeof pm === 'object' && 'card' in pm && pm.card) {
+      paymentMethodBrand = pm.card.brand ?? null
+      paymentMethodLast4 = pm.card.last4 ?? null
+    }
+
+    await syncStripeSubscriptionToDb({
+      pg: client,
+      data: {
+        userId,
+        stripeSubscriptionId: subscription.id,
+        status: subscription.status,
+        planCode,
+        priceId,
+        currentPeriodStart,
+        currentPeriodEnd,
+        cancelAt: toDate(subscription.cancel_at),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+        trialEnd: toDate(subscription.trial_end),
+        paymentMethodBrand,
+        paymentMethodLast4,
+        latestInvoiceStatus,
+        latestInvoicePaidAt,
+        latestInvoiceSettled,
+      },
+    })
   })
 }
 

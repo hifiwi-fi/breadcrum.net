@@ -1,10 +1,7 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
 import { build } from '../../../../test/helper.js'
-import {
-  enableBillingFlags,
-  disableBillingFlag,
-} from '../billing-test-utils.js'
+import { enableBillingFlags, disableBillingFlag } from '../billing-test-utils.js'
 
 const STRIPE_WEBHOOK_SECRET = process.env['STRIPE_WEBHOOK_SECRET'] ?? 'whsec_fakesecretfortesting000000000000'
 
@@ -46,10 +43,10 @@ function signWebhookPayload (app, payload) {
 }
 
 await suite('POST /api/billing/webhook', async () => {
-  await test('flag gating', async (t) => {
+  await test('webhook processing remains active when billing UI is disabled', async (t) => {
     const app = await build(t, STRIPE_TEST_ENV)
 
-    await t.test('returns 404 when billing_enabled flag is false', async () => {
+    await t.test('accepts valid events when billing_enabled flag is false', async () => {
       await disableBillingFlag(app)
       const payload = buildStripeEventPayload('customer.subscription.updated', { customer: 'cus_test123' })
       const signature = signWebhookPayload(/** @type {any} */ (app), payload)
@@ -64,7 +61,7 @@ await suite('POST /api/billing/webhook', async () => {
         payload,
       })
 
-      assert.strictEqual(res.statusCode, 404, 'Should return 404 when billing disabled')
+      assert.strictEqual(res.statusCode, 200, 'Should accept valid events when billing UI is disabled')
     })
   })
 

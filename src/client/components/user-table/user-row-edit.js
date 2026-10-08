@@ -13,6 +13,27 @@ import cn from 'classnames'
 import { formatUserAgent } from './format-user-agent.js'
 
 /**
+ * Convert an inclusive UTC calendar date to the exclusive expiry boundary.
+ * @param {string | null} date
+ * @returns {string | null}
+ */
+export function subscriptionDateToPeriodEnd (date) {
+  if (!date) return null
+  const end = new Date(`${date}T00:00:00.000Z`)
+  end.setUTCDate(end.getUTCDate() + 1)
+  return end.toISOString()
+}
+
+/**
+ * @param {string | null | undefined} periodEnd
+ * @returns {string}
+ */
+export function subscriptionPeriodEndToDate (periodEnd) {
+  if (!periodEnd) return ''
+  return new Date(new Date(periodEnd).getTime() - 1).toISOString().split('T')[0] ?? ''
+}
+
+/**
  * @typedef {object} UserRowEditProps
  * @property {SchemaTypeAdminUserReadClient} user
  * @property {(formState: SchemaTypeAdminUserUpdateClient) => Promise<void>} [onSave]
@@ -182,7 +203,7 @@ export const UserRowEdit = ({
 
     const body = {
       display_name: displayName,
-      current_period_end: periodEndValue ? new Date(periodEndValue).toISOString() : null,
+      current_period_end: subscriptionDateToPeriodEnd(periodEndValue),
     }
 
     try {
@@ -353,7 +374,7 @@ export const UserRowEdit = ({
                             <span>Unlimited plan (no expiration)</span>
                           </label>
                           <label class="bc-user-field">
-                            <span class="bc-user-label">Period end</span>
+                            <span class="bc-user-label">Access through (UTC)</span>
                             <input type="date" name="sub_period_end" disabled=${subLoading || grantUnlimited} />
                           </label>
                           <div class="button-cluster">
@@ -392,11 +413,11 @@ export const UserRowEdit = ({
                         <span>Unlimited plan (no expiration)</span>
                       </label>
                       <label class="bc-user-field">
-                        <span class="bc-user-label">Period end</span>
+                        <span class="bc-user-label">Access through (UTC)</span>
                         <input
                           type="date"
                           name="sub_period_end"
-                          defaultValue="${u.subscription_period_end ? new Date(u.subscription_period_end).toISOString().split('T')[0] : ''}"
+                          defaultValue="${subscriptionPeriodEndToDate(u.subscription_period_end)}"
                           disabled=${subLoading || customUnlimited}
                         />
                       </label>

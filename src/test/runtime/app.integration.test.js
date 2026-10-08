@@ -66,7 +66,7 @@ test('unified role application integration', { timeout: 120000 }, async t => {
     assert.equal((await app.inject('/')).statusCode, 404)
     assert.equal(app.hasDecorator('jwt'), false)
     assert.equal(app.hasReplyDecorator('sendFile'), false)
-    assert.equal(Object.keys(app.pgboss.workers).length, 6)
+    assert.equal(Object.keys(app.pgboss.workers).length, 5)
     await app.close()
     await fixture.assertDisconnected()
   })
@@ -146,7 +146,7 @@ test('unified role application integration', { timeout: 120000 }, async t => {
     const config = loadConfig('all', { ...isolated, envData: api })
     const app = await createApp({ role: 'all', config, serverOptions: { logger: false } })
     t.after(() => app.close())
-    assert.equal(Object.keys(app.pgboss.workers).length, 6)
+    assert.equal(Object.keys(app.pgboss.workers).length, 5)
     /** @type {QueryResult<{id: string}>} */
     const users = await app.pg.query("insert into users (username, email, password) values ('runtime', 'runtime@example.invalid', 'not-a-login-password') returning id")
     const user = users.rows[0]

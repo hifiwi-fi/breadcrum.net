@@ -47,14 +47,6 @@ export default async function billingWebhookRoute (fastify, _opts) {
     },
     async function postBillingWebhookHandler (request, reply) {
       const requestWithRawBody = /** @type {typeof request & { rawBody?: Buffer }} */ (request)
-      const { billing_enabled: billingEnabled } = await fastify.getFlags({
-        frontend: true,
-        backend: false,
-      })
-
-      if (!billingEnabled) {
-        return reply.notFound()
-      }
 
       const stripe = fastify.billing.stripe
       if (!stripe) {
@@ -94,7 +86,7 @@ export default async function billingWebhookRoute (fastify, _opts) {
           : null
 
         if (customerId) {
-          // Queue wrapper uses sendThrottled(customerId) for retry/idempotency burst control.
+          // Reconcile every event; customer-level advisory locks serialize the Stripe read and write.
           await fastify.pgboss.queues.syncSubscriptionQ.send({
             data: { customerId },
           })

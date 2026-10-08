@@ -1,5 +1,6 @@
 /** @import { TestContext } from 'node:test' */
 /** @import { ErrorEvent } from '@sentry/node' */
+/** @import { Stripe } from 'stripe' */
 /** @import { RuntimeConfig } from '#config/env-schema.js' */
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -37,9 +38,16 @@ async function workerHarness (t, envData) {
     offWork: t.mock.method(queueBoss, 'offWork', async () => {}),
     stop: t.mock.method(queueBoss, 'stop', async () => {}),
   }
+  const config = loadConfig('worker', { dotEnvPath: false, processEnv: {}, envData })
   await app.register(fp(async fastify => {
     fastify.decorate('config', config)
   }, { name: 'env' }))
+  await app.register(fp(async fastify => {
+    fastify.decorate('billing', {
+      provider: 'stripe',
+      stripe: config.STRIPE_SECRET_KEY ? /** @type {Stripe} */ ({}) : null,
+    })
+  }, { name: 'billing' }))
   await app.register(fp(async () => {}, { name: 'pg' }))
   await app.register(fp(async fastify => {
     fastify.decorate('ytdlpCache', {
@@ -76,7 +84,7 @@ async function workerHarness (t, envData) {
 }
 
 test('workers activate only at ready with shared decorators and original schedules/concurrency', async t => {
-  const { app, boss } = await workerHarness(t)
+  const { app, boss } = await workerHarness(t, { STRIPE_SECRET_KEY: 'sk_test_worker' })
   assert.equal(boss.work.mock.callCount(), 0)
   assert.equal(boss.schedule.mock.callCount(), 0)
   await app.ready()
@@ -86,6 +94,14 @@ test('workers activate only at ready with shared decorators and original schedul
   await app.close()
   assert.equal(boss.offWork.mock.callCount(), 6)
   assert.equal(boss.stop.mock.callCount(), 1)
+})
+
+test('billing worker stays inactive when Stripe is not configured', async t => {
+  const { app, boss } = await workerHarness(t)
+  await app.ready()
+  assert.equal(boss.work.mock.callCount(), 8)
+  assert.equal(app.pgboss.workers['sync-subscription'], undefined)
+  await app.close()
 })
 
 test('job errors carry isolated user/job scopes without leaking into the surrounding request', async t => {

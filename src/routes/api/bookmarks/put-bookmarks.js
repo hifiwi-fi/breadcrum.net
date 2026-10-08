@@ -4,6 +4,7 @@
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
+import SQL from '@nearform/sql'
 import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
@@ -157,6 +158,19 @@ export async function putBookmarks (fastify, _opts) {
         const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log }) : submittedUrl
         const workingUrlString = shouldNormalize ? workingUrl.toString() : submittedUrlString
 
+        const {
+          subscriptions_required,
+          free_bookmarks_per_month: freeBookmarksPerMonth,
+        } = await fastify.getFlags({
+          pgClient: client,
+          frontend: true,
+          backend: false,
+        })
+
+        if (subscriptions_required) {
+          await client.query(SQL`select pg_advisory_xact_lock(1, hashtext(${userId}))`)
+        }
+
         const maybeResult = await getBookmark({
           fastify,
           pg: client,
@@ -179,14 +193,6 @@ export async function putBookmarks (fastify, _opts) {
             })
           }
         }
-
-        const {
-          subscriptions_required,
-          free_bookmarks_per_month: freeBookmarksPerMonth,
-        } = await fastify.getFlags({
-          frontend: true,
-          backend: false,
-        })
 
         if (subscriptions_required) {
           const subscription = await getLatestSubscription({

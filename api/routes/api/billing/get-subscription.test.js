@@ -20,7 +20,7 @@ await suite('GET /api/billing', async () => {
   await test('flag and auth gating', async (t) => {
     const app = await build(t, STRIPE_TEST_ENV)
 
-    await t.test('returns 404 when billing_enabled flag is false', async (t) => {
+    await t.test('returns current subscription state when the billing UI flag is false', async (t) => {
       await disableBillingFlag(app)
       const user = await createTestUser(app, t)
 
@@ -30,7 +30,8 @@ await suite('GET /api/billing', async () => {
         headers: { authorization: `Bearer ${user.token}` },
       })
 
-      assert.strictEqual(res.statusCode, 404, 'Should return 404 when billing disabled')
+      assert.strictEqual(res.statusCode, 200, 'Existing billing status remains readable when the UI is disabled')
+      assert.strictEqual(res.json().active, false)
     })
 
     await t.test('returns 401 when unauthenticated', async (t) => {

@@ -78,6 +78,24 @@ await suite('PUT /api/bookmarks/ — quota enforcement', async () => {
     })
   })
 
+  await test('subscriptions_required: true — concurrent requests cannot exceed quota', async (t) => {
+    const app = await build(t, STRIPE_TEST_ENV)
+
+    await t.test('only one concurrent create succeeds at the limit', async (t) => {
+      await enableBillingFlags(app, t, { subscriptionsRequired: true, freeBookmarksPerMonth: 1 })
+      const user = await createTestUser(app, t)
+
+      const responses = await Promise.all(
+        Array.from({ length: 4 }, (_value, index) =>
+          createBookmark(app, user.token, `https://example.com/concurrent-${Date.now()}-${index}`)
+        )
+      )
+
+      assert.equal(responses.filter(response => response.statusCode === 201).length, 1)
+      assert.equal(responses.filter(response => response.statusCode === 402).length, 3)
+    })
+  })
+
   await test('subscriptions_required: true — free user quota', async (t) => {
     const app = await build(t, STRIPE_TEST_ENV)
 

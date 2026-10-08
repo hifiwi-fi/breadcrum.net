@@ -51,6 +51,7 @@ export async function postAdminBillingSync (fastify, _opts) {
         stripe,
         pg: fastify.pg,
         customerId,
+        lookupKey: fastify.config.STRIPE_PRICE_LOOKUP_KEY,
       })
 
       return { status: 'synced' }

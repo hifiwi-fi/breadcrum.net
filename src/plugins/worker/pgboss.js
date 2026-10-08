@@ -81,12 +81,16 @@ export default fp(async function workerPlugin (fastify) {
     workers[cleanupAuthTokensQName].push(cleanupAuthTokensWorker)
     workers[cleanupStaleResolutionsQName].push(cleanupStaleResolutionsWorker)
 
-    workers[syncSubscriptionQName] = []
-    const syncSubscriptionWorker = await boss.work(
-      syncSubscriptionQName,
-      track(maybeWrapWorker(syncSubscriptionQName, makeSyncSubscriptionP({ fastify })))
-    )
-    workers[syncSubscriptionQName].push(syncSubscriptionWorker)
+    if (fastify.billing.stripe) {
+      workers[syncSubscriptionQName] = []
+      const syncSubscriptionWorker = await boss.work(
+        syncSubscriptionQName,
+        track(maybeWrapWorker(syncSubscriptionQName, makeSyncSubscriptionP({ fastify })))
+      )
+      workers[syncSubscriptionQName].push(syncSubscriptionWorker)
+    } else {
+      fastify.log.warn('Stripe is not configured; billing sync worker will not start')
+    }
   })
 
   // Register batch observable callback for pg-boss queue metrics
