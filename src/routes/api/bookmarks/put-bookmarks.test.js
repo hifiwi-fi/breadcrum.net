@@ -126,6 +126,5 @@ await suite('PUT /api/bookmarks/ — quota enforcement', async () => {
         `Subscribed user should not be blocked by quota, got ${second.statusCode}: ${second.payload}`
       )
     })
-
   })
 })

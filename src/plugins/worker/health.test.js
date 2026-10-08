@@ -13,5 +13,5 @@ test('healthcheck baseline test', { concurrency: false, timeout: 30000 }, async 
   assert.strictEqual((await app.inject({ url: '/' })).statusCode, 404)
   assert.strictEqual(app.hasDecorator('jwt'), false)
   assert.strictEqual(app.hasDecorator('sendMail'), false)
-  assert.strictEqual(Object.keys(app.pgboss.workers).length, 5)
+  assert.strictEqual(Object.keys(app.pgboss.workers).length, 6)
 })

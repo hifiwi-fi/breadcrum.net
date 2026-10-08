@@ -62,6 +62,7 @@ async function workerHarness (t, envData) {
         resolveEpisodeQ: { name: 'resolveEpisode', send: unexpectedSend, insert: unexpectedSend },
         resolveArchiveQ: { name: 'resolveArchive', send: unexpectedSend, insert: unexpectedSend },
         resolveBookmarkQ: { name: 'resolveBookmark', send: unexpectedSend, insert: unexpectedSend },
+        syncSubscriptionQ: { name: 'syncSubscription', send: unexpectedSend },
         cleanupAuthTokensQ: { name: 'cleanupAuthTokens' },
         cleanupStaleResolutionsQ: { name: 'cleanupStaleResolutions' },
       },
@@ -79,11 +80,11 @@ test('workers activate only at ready with shared decorators and original schedul
   assert.equal(boss.work.mock.callCount(), 0)
   assert.equal(boss.schedule.mock.callCount(), 0)
   await app.ready()
-  assert.equal(boss.work.mock.callCount(), 8)
+  assert.equal(boss.work.mock.callCount(), 9)
   assert.deepEqual(boss.schedule.mock.calls.map(call => call.arguments[1]), ['0 3 * * *', '0 4 * * *'])
-  assert.deepEqual(Object.values(app.pgboss.workers).map(workers => workers.length), [2, 2, 2, 1, 1])
+  assert.deepEqual(Object.values(app.pgboss.workers).map(workers => workers.length), [2, 2, 2, 1, 1, 1])
   await app.close()
-  assert.equal(boss.offWork.mock.callCount(), 5)
+  assert.equal(boss.offWork.mock.callCount(), 6)
   assert.equal(boss.stop.mock.callCount(), 1)
 })
 

@@ -10,7 +10,6 @@ export { billingEnvSchema } from './billing.env-schema.js'
  * @property {StripeType | null} stripe
  */
 
-
 /**
  * Billing provider client for the worker process.
  * Initializes Stripe when STRIPE_SECRET_KEY is configured.
