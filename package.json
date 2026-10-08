@@ -118,7 +118,7 @@
     "@opentelemetry/sdk-node": "^0.219.0",
     "@passwordless-id/webauthn": "^2.3.1",
     "@preact/signals": "^2.3.2",
-    "@sentry/browser": "^10.58.0",
+    "@sentry/browser": "^11.4.0",
     "@sentry/node": "^11.4.0",
     "@tanstack/preact-query": "^5.100.5",
     "abstract-cache-redis": "^2.0.0",
