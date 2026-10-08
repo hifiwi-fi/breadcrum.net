@@ -41,7 +41,7 @@
     "npm-run-all2": "^9.0.2",
     "p-map": "^7.0.0",
     "releasearoni": "^0.2.0",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "xmlbuilder": "^15.1.1"
   },
   "funding": {
