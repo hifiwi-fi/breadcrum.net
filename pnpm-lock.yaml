@@ -181,8 +181,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       nodemailer:
-        specifier: ^9.0.1
-        version: 9.1.1
+        specifier: ^10.0.15
+        version: 10.0.15
       pg:
         specifier: ^8.23.0
         version: 8.23.0
@@ -2957,9 +2957,9 @@ packages:
     peerDependencies:
       eslint: ^9.22.0 || ^10.0.0
 
-  nodemailer@9.1.1:
-    resolution: {integrity: sha512-izw9mVKFix6YSnC9eLgV6g1opl9DUlRio9ZNcq+Wu9Ujn2UwF+8Nl0B8nz22kEC+CTZCvinkxwJ0DeFbb6NwcQ==}
-    engines: {node: '>=6.0.0'}
+  nodemailer@10.0.15:
+    resolution: {integrity: sha512-EUqp5PhtcsYXs9Fq/lS7s/8zlTrnBqmzZWzFFROrNikMiz+om/YRKMwqN907t+0A1KKyT8jd39CBUbFZmaZmcA==}
+    engines: {node: '>=20.0.0'}
 
   non-error@0.1.0:
     resolution: {integrity: sha512-TMB1uHiGsHRGv1uYclfhivcnf0/PdFp2pNqRxXjncaAsjYMoisaQJI+SSZCqRq+VliwRTC8tsMQfmrWjDMhkPQ==}
@@ -6616,7 +6616,7 @@ snapshots:
       - ts-declaration-location
       - typescript
 
-  nodemailer@9.1.1: {}
+  nodemailer@10.0.15: {}
 
   non-error@0.1.0: {}
 
