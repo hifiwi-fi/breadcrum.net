@@ -30,22 +30,13 @@ await suite('list auth tokens', async () => {
       return
     }
 
-    const accountId = process.env['MAXMIND_ACCOUNT_ID']
-    const licenseKey = process.env['MAXMIND_LICENSE_KEY']
-
-    assert.ok(accountId, 'MAXMIND_ACCOUNT_ID must be set for GeoIP tests')
-    assert.ok(licenseKey, 'MAXMIND_LICENSE_KEY must be set for GeoIP tests')
-
-    const app = await build(t, {
-      MAXMIND_ACCOUNT_ID: accountId,
-      MAXMIND_LICENSE_KEY: licenseKey,
-    })
+    const app = await build(t)
     if (!app.hasDecorator('geoip')) {
       if (process.env['CI']) {
         t.skip('GeoIP database not available in CI; skipping enrichment checks.')
         return
       }
-      assert.fail('GeoIP plugin should decorate fastify')
+      assert.fail('GeoIP plugin should decorate Fastify')
     }
 
     await t.test('returns paginated list of tokens', async (t) => {
@@ -140,22 +131,13 @@ await suite('list auth tokens', async () => {
       return
     }
 
-    const accountId = process.env['MAXMIND_ACCOUNT_ID']
-    const licenseKey = process.env['MAXMIND_LICENSE_KEY']
-
-    assert.ok(accountId, 'MAXMIND_ACCOUNT_ID must be set for GeoIP tests')
-    assert.ok(licenseKey, 'MAXMIND_LICENSE_KEY must be set for GeoIP tests')
-
-    const app = await build(t, {
-      MAXMIND_ACCOUNT_ID: accountId,
-      MAXMIND_LICENSE_KEY: licenseKey,
-    })
+    const app = await build(t)
     if (!app.hasDecorator('geoip')) {
       if (process.env['CI']) {
         t.skip('GeoIP database not available in CI; skipping enrichment checks.')
         return
       }
-      assert.fail('GeoIP plugin should decorate fastify')
+      assert.fail('GeoIP plugin should decorate Fastify')
     }
 
     await t.test('handles before cursor correctly', async (t) => {
