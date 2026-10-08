@@ -33,14 +33,13 @@ export async function bootstrapTelemetry (config) {
       dsn: config.SENTRY_DSN,
       environment: config.SENTRY_ENVIRONMENT ?? config.ENV,
       release: config.SENTRY_RELEASE,
-      skipOpenTelemetrySetup: true,
+      enableOpenTelemetrySetup: false,
     })
+    Sentry?.setOpenTelemetryContextAsyncContextStrategy()
     exporter = config.METRICS === 1
       ? new PrometheusExporter({ port: config.METRICS_PORT, preventServerStart: true })
       : undefined
     sdk = new NodeSDK({
-      // skipOpenTelemetrySetup leaves context ownership here; Sentry needs its scope-aware ALS manager.
-      ...(Sentry ? { contextManager: new Sentry.SentryContextManager() } : {}),
       metricReaders: exporter ? [exporter] : [],
       // Metrics are explicit; empty processor lists prevent SDK OTLP defaults for traces and logs.
       spanProcessors: [],

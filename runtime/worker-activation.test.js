@@ -92,7 +92,7 @@ test('job errors carry isolated user/job scopes without leaking into the surroun
   Sentry.init({
     dsn,
     defaultIntegrations: false,
-    skipOpenTelemetrySetup: true,
+    enableOpenTelemetrySetup: false,
     beforeSend (event) {
       events.push(event)
       return null
@@ -106,8 +106,7 @@ test('job errors carry isolated user/job scopes without leaking into the surroun
     Sentry.setUser(null)
     await Sentry.close(1000)
   })
-  const contextManager = new Sentry.SentryContextManager().enable()
-  assert.equal(context.setGlobalContextManager(contextManager), true)
+  Sentry.setOpenTelemetryContextAsyncContextStrategy()
   t.after(() => context.disable())
   Sentry.setUser({ id: 'request-user' })
   const { app, boss } = await workerHarness(t, { SENTRY_WORKER_DSN: dsn })
