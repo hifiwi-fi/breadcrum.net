@@ -3,7 +3,8 @@
 app = "breadcrum"
 primary_region = "lax"
 kill_signal = "SIGINT"
-kill_timeout = "120s"
+# Fly allows at most 300s; give Fastify 270s to drain before Fly's hard kill.
+kill_timeout = "300s"
 swap_size_mb = 1024
 
 [experimental]
@@ -23,8 +24,8 @@ swap_size_mb = 1024
   release_command = "node --run migrate -- --no-config"
 
 [processes]
-  app = "env APP_ROLE=api node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js"
-  worker = "env APP_ROLE=worker node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js"
+  app = "env APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js src/app.js"
+  worker = "env APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js src/app.js"
 
 # Select APP_ROLE per process above, never as an app-wide default.
 [env]
@@ -33,8 +34,8 @@ swap_size_mb = 1024
   FASTIFY_LOG_LEVEL = "info"
   HOST = "breadcrum.net"
   NODE_ENV = "production"
-  NODE_OPTIONS = "--max-old-space-size=512"
   PORT = "8080"
+  SHUTDOWN_TIMEOUT_MS = "270000"
   PQUEUE_CONCURRENCY = "2"
   TRANSPORT = "https"
   METRICS = "1"
@@ -106,9 +107,4 @@ swap_size_mb = 1024
 [[metrics]]
   port = 9091
   path = "/metrics"
-  processes = ["app"]
-
-[[metrics]]
-  port = 9092
-  path = "/metrics"
-  processes = ["worker"]
+  processes = ["app", "worker"]

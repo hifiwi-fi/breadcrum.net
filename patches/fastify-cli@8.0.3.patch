@@ -1,0 +1,185 @@
+diff --git a/README.md b/README.md
+index a18971cd..1b6e81b4 100644
+--- a/README.md
++++ b/README.md
+@@ -171,7 +171,7 @@ You can pass the following options via CLI arguments. You can also use `--config
+ | Set the prefix                                                                                                                          | `-x`          | `--prefix`         | `FASTIFY_PREFIX`         |
+ | Set the plugin timeout                                                                                                                  | `-T`          | `--plugin-timeout` | `FASTIFY_PLUGIN_TIMEOUT` |
+ | Defines the maximum payload, in bytes,<br>that the server is allowed to accept                                                               |               | `--body-limit`     | `FASTIFY_BODY_LIMIT`     |
+-| Set the maximum ms delay before forcefully closing pending requests after receiving SIGTERM or SIGINT signals; and uncaughtException or unhandledRejection errors (default: 500)                                                           | `-g`         | `--close-grace-delay`     | `FASTIFY_CLOSE_GRACE_DELAY`     |
++| Set the maximum ms delay for graceful shutdown after SIGTERM, SIGINT, uncaughtException, or unhandledRejection, and for watch-mode restarts (default: 500)                                                           | `-g`         | `--close-grace-delay`     | `FASTIFY_CLOSE_GRACE_DELAY`     |
+ | Set the boolean value for `trustProxy` (1st precedence)                                                                                 |               | `--trust-proxy-enabled` | `FASTIFY_TRUST_PROXY_ENABLED`         |
+ | Set the IP/CIDR value for `trustProxy` (2nd precedence)                                                                                 |               | `--trust-proxy-ips` | `FASTIFY_TRUST_PROXY_IPS`             |
+ | Set the nth hop value for `trustProxy` (3rd precedence)                                                                                 |               | `--trust-proxy-hop` | `FASTIFY_TRUST_PROXY_HOP`             |
+diff --git a/lib/watch/constants.js b/lib/watch/constants.js
+index 742c31bc..07879fb8 100644
+--- a/lib/watch/constants.js
++++ b/lib/watch/constants.js
+@@ -2,6 +2,5 @@
+ 
+ module.exports = {
+   GRACEFUL_SHUT: 'GRACEFUL SHUTDOWN',
+-  READY: 'ready',
+-  TIMEOUT: 5000
++  READY: 'ready'
+ }
+diff --git a/lib/watch/fork.js b/lib/watch/fork.js
+index d2827dd2..454d477e 100644
+--- a/lib/watch/fork.js
++++ b/lib/watch/fork.js
+@@ -2,11 +2,13 @@
+ 
+ const chalk = require('chalk').default
+ const { runFastify } = require('../../start')
++const parseArgs = require('../../args')
++const args = process.argv.slice(2)
++const { closeGraceDelay } = parseArgs(args)
+ 
+ const {
+   GRACEFUL_SHUT,
+   READY,
+-  TIMEOUT
+ } = require('./constants.js')
+ 
+ let fastify
+@@ -19,7 +21,7 @@ function exit () {
+ process.on('message', function (event) {
+   if (event === GRACEFUL_SHUT) {
+     const message = chalk.red('[fastify-cli] process forced end')
+-    setTimeout(exit.bind({ message }), TIMEOUT).unref()
++    setTimeout(exit.bind({ message }), closeGraceDelay).unref()
+     if (fastify) {
+       fastify.close(() => {
+         process.exit(0)
+@@ -37,7 +39,7 @@ process.on('uncaughtException', (err) => {
+ })
+ 
+ const main = async () => {
+-  fastify = await runFastify(process.argv.splice(2))
++  fastify = await runFastify(args)
+   const type = process.env.childEvent
+ 
+   process.send({ type, err: null })
+diff --git a/lib/watch/index.js b/lib/watch/index.js
+index db58786f..7650c90b 100644
+--- a/lib/watch/index.js
++++ b/lib/watch/index.js
+@@ -5,6 +5,7 @@ const cp = require('node:child_process')
+ const chalk = require('chalk').default
+ const { arrayToRegExp, logWatchVerbose } = require('./utils')
+ const { GRACEFUL_SHUT } = require('./constants.js')
++const parseArgs = require('../../args')
+ 
+ const EventEmitter = require('node:events')
+ const chokidar = require('chokidar')
+@@ -12,11 +13,69 @@ const { loadEnvQuitely } = require('../../env-loader.js')
+ const forkPath = path.join(__dirname, './fork.js')
+ 
+ const watch = function (args, ignoreWatch, verboseWatch, followWatch) {
++  const { closeGraceDelay } = parseArgs(args)
+   const emitter = new EventEmitter()
+   let allStop = false
+   let childs = []
++  // Restart requests remove children from childs before their cleanup completes.
++  const liveChildren = new Set()
++  let stopping
++
++  function removeListeners () {
++    process.removeListener('SIGINT', onSigint)
++    process.removeListener('SIGTERM', onSigterm)
++    process.removeListener('uncaughtException', onUncaughtException)
++  }
++
++  function shutdown (signal) {
++    if (stopping) return stopping
++    allStop = true
++    const childrenClosed = Array.from(liveChildren, closeChild)
++    stopping = finishShutdown(signal, childrenClosed)
++    return stopping
++  }
++
++  async function finishShutdown (signal, childrenClosed) {
++    const results = await Promise.allSettled([
++      closeWatcher(),
++      ...childrenClosed
++    ])
++    removeListeners()
++    const failure = results.find(result => result.status === 'rejected')
++    if (failure) {
++      console.error(failure.reason)
++      process.exitCode = 1
++    } else {
++      process.exitCode = signal === 'SIGINT' ? 130 : 143
++    }
++  }
++
++  async function closeWatcher () {
++    await watcher.close()
++  }
++
++  function closeChild (child) {
++    return new Promise(resolve => {
++      // Give the child's own deadline time to fire, but also bound failed IPC
++      // and children whose event loop cannot process the shutdown request.
++      const timer = setTimeout(() => child.kill('SIGKILL'), Number(closeGraceDelay) + 1000)
++      child.once('close', () => {
++        clearTimeout(timer)
++        resolve()
++      })
++      // IPC avoids a second signal when terminal Ctrl-C also reaches the child.
++      // If delivery fails, the deadline above still terminates the child.
++      try {
++        if (child.connected) child.send(GRACEFUL_SHUT, () => {})
++      } catch {
++        // The IPC channel can close between checking connected and sending.
++      }
++    })
++  }
++  const onSigint = () => { shutdown('SIGINT') }
++  const onSigterm = () => { shutdown('SIGTERM') }
+   const stop = (watcher = null, err = null) => {
+-    childs.forEach(function (child) {
++    liveChildren.forEach(function (child) {
+       child.kill()
+     })
+ 
+@@ -26,14 +85,19 @@ const watch = function (args, ignoreWatch, verboseWatch, followWatch) {
+     }
+     if (watcher) {
+       allStop = true
++      removeListeners()
+       return watcher.close()
+     }
+   }
+ 
+-  process.on('uncaughtException', () => {
++  const onUncaughtException = () => {
++    if (allStop) return
+     stop()
+     childs.push(run('restart'))
+-  })
++  }
++  process.on('uncaughtException', onUncaughtException)
++  process.on('SIGINT', onSigint)
++  process.on('SIGTERM', onSigterm)
+ 
+   let readyEmitted = false
+ 
+@@ -47,6 +111,9 @@ const watch = function (args, ignoreWatch, verboseWatch, followWatch) {
+       encoding: 'utf8'
+     })
+ 
++    liveChildren.add(_child)
++    _child.once('close', () => liveChildren.delete(_child))
++
+     _child.on('exit', function (code, signal) {
+       if (childs.length === 0 && !allStop) {
+         childs.push(run('restart'))
+@@ -83,6 +150,7 @@ const watch = function (args, ignoreWatch, verboseWatch, followWatch) {
+   const watcher = chokidar.watch(watchDir, { ignored: ignoredPattern })
+   watcher.on('ready', function () {
+     watcher.on('all', function (event, filepath) {
++      if (allStop) return
+       if (verboseWatch) {
+         logWatchVerbose(event, filepath)
+       }

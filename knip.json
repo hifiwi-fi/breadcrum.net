@@ -1,18 +1,18 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "entry": [
-    "app.js",
-    "config/fastify-cli.cjs",
-    "plugins/**/*.js",
-    "api/routes/**/{routes,autohooks}.js",
+    "src/app.js",
+    "src/config/fastify-cli.js",
+    "src/plugins/**/*.js",
+    "src/routes/**/{routes,autohooks}.js",
 
-    "client/**/*.js",
-    "scripts/**/*.js",
-    "{api,config,plugins,resources,runtime,worker}/**/test/**/*.js",
-    "{api,config,plugins,resources,runtime,worker}/**/*.test.js",
-    "worker/workers/bookmarks/ua.js"
+    "src/client/**/*.js",
+    "src/scripts/**/*.js",
+
+    "src/{config,lib,plugins,resources,routes,test,types,workers}/**/*.test.js",
+    "src/workers/bookmarks/ua.js"
   ],
-  "project": ["{app,otel}.js", "{api,config,plugins,resources,runtime,worker}/**/*.{js,cjs,ts}", "client/**/*.js", "scripts/**/*.js"],
+  "project": ["src/**/*.{js,cjs,ts}"],
   "ignoreDependencies": ["highlight.js", "mine.css"],
   "ignoreBinaries": ["redis-server"]
 }

@@ -1,12 +1,12 @@
 /** @import { Linter } from 'eslint' */
+import { globalIgnores } from 'eslint/config'
 import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
 
 // Used for editors and canary testing
 
 const ignores = resolveIgnoresFromGitignore()
-const clientFiles = ['client/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}']
-const clientPrefix = 'client/'
-const extraTsFiles = ['**/*.cts', '**/*.mts']
+const clientFiles = ['src/client/**/*.{js,jsx,mjs,cjs}']
+const clientPrefix = 'src/client/'
 
 /** @param {Linter.Config} config */
 const scopeToClient = (config) => {
@@ -37,19 +37,14 @@ const excludeClient = (config) => {
 
   return {
     ...config,
-    ignores: [...(config.ignores || []), 'client/**'],
+    ignores: [...(config.ignores || []), 'src/client/**'],
   }
 }
 
 export default [
-  { ignores },
+  globalIgnores(ignores),
+  ...neostandard().map(excludeClient),
   ...neostandard({
-    ts: true,
-    filesTs: extraTsFiles,
-  }).map(excludeClient),
-  ...neostandard({
-    ts: true,
     env: ['browser'],
-    filesTs: extraTsFiles,
   }).map(scopeToClient),
 ]
