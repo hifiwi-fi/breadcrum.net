@@ -1,4 +1,7 @@
+import { bookmarklet } from '../bookmarks/bookmarklets/bookmarklet.js'
+
 export default {
   title: '🔰 Tutorial',
-  layout: 'docs'
+  layout: 'docs',
+  bookmarklet,
 }

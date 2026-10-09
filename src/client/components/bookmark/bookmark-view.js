@@ -10,7 +10,7 @@ import { ToRead } from '../toread/index.js'
 import { Star } from '../star/index.js'
 import { Sensitive } from '../sensitive/index.js'
 import { useWindow } from '../../hooks/useWindow.js'
-import { useQuery } from '../../hooks/useQuery.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 import { ExpandText } from '../expand-text/index.js'
 import { ResolveStatus } from '../resolve-status/index.js'
 import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
@@ -38,7 +38,7 @@ export const BookmarkView = ({
   expandSummary = false,
 }) => {
   const window = useWindow()
-  const { pushState } = useQuery()
+  const { pushState } = useSearchParams([])
   const isResolving = Boolean(
     withinResolvingWindow(b?.created_at) && (
       b?.done === false ||
@@ -98,7 +98,7 @@ export const BookmarkView = ({
           ? html`
             <div class="bc-tags-display">
               🏷
-              ${b.tags.map(tag => html` <a onClick="${onPageNav}" href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
+              ${b.tags.map(tag => html` <a onClick=${onPageNav} href=${`/bookmarks/?tag=${tag}`}>${tag}</a> `)}
             </div>`
           : null
         }

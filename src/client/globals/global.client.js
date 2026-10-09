@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/browser'
 import { html } from 'htm/preact'
 import { render } from 'preact'
 import { Header } from '../components/header/index.js'
+import { QueryProvider } from '../lib/query-provider.js'
 import { isSkippedViewTransitionAbortError } from './sentry-filters.js'
 
 const sentryDsn = process.env['SENTRY_BROWSER_DSN']
@@ -28,7 +29,7 @@ if (sentryDsn) {
 if (typeof window !== 'undefined') {
   const container = document.querySelector('.bc-header')
   if (container) {
-    render(html`<${Header} />`, container)
+    render(html`<${QueryProvider}><${Header} /><//>`, container)
   }
 }
 

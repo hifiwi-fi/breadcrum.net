@@ -3,18 +3,19 @@
  * @import { StateType } from './state.js'
  */
 
-import { useEffect } from 'preact/hooks'
+import { useState, useEffect, useCallback } from 'preact/hooks'
 import { state } from './state.js'
-import { useReload } from './useReload.js'
 
 /**
  * @returns {StateType}
  */
 export function useLSP () {
-  const { reload } = useReload()
+  const [, setTick] = useState(0)
+  const forceUpdate = useCallback(() => setTick(t => t + 1), [])
+
   useEffect(() => {
     /** @param {Event} _ev */
-    const listener = (_ev) => { reload() }
+    const listener = (_ev) => { forceUpdate() }
     state.addEventListener('update', listener)
     return () => {
       state.removeEventListener('update', listener)

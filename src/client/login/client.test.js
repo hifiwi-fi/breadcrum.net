@@ -3,6 +3,7 @@
 import { test, suite } from 'node:test'
 import assert from 'node:assert'
 import { Page } from './client.js'
+import { QueryProvider } from '../lib/query-provider.js'
 import { html } from 'htm/preact'
 import { render } from 'preact-render-to-string'
 import { render as renderDOM } from 'preact'
@@ -13,7 +14,7 @@ suite('Login Page Tests', () => {
   test('Login page component renders without errors', async () => {
     let rendered
     assert.doesNotThrow(() => {
-      rendered = render(html`<${Page}/>`)
+      rendered = render(html`<${QueryProvider}><${Page}/><//>`)
     }, 'page renders without error')
     assert.strictEqual(typeof rendered, 'string', 'page renders to string')
   })
@@ -43,7 +44,7 @@ suite('Login Page Tests', () => {
     const fetchMock = t.mock.method(globalThis, 'fetch', async () => new Response(null, { status: 401 }))
     const errorMock = t.mock.method(console, 'error', () => {})
 
-    await act(async () => { renderDOM(html`<${Page}/>`, container) })
+    await act(async () => { renderDOM(html`<${QueryProvider}><${Page}/><//>`, container) })
 
     assert.ok(fetchMock.mock.callCount() > 0, 'checks the existing login session')
     assert.ok(fetchMock.mock.calls.every(call => call.arguments[0] === '/api/user'), 'does not request a passkey challenge')

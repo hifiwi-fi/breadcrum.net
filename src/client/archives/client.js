@@ -3,26 +3,25 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-import { render } from 'preact'
 import { useCallback } from 'preact/hooks'
 import { useUser } from '../hooks/useUser.js'
 import { useWindow } from '../hooks/useWindow.js'
-import { useQuery } from '../hooks/useQuery.js'
+import { useSearchParamsAll } from '../hooks/useSearchParams.js'
 import { ArchiveList } from '../components/archive/archive-list.js'
 import { Search } from '../components/search/index.js'
 import { PaginationButtons } from '../components/pagination-buttons/index.js'
 import { useResolvePolling } from '../hooks/useResolvePolling.js'
 import { withinResolvingWindow } from '../hooks/resolve-timeout.js'
 import { useArchives } from '../hooks/useArchives.js'
-import { QueryProvider } from '../lib/query-provider.js'
 import { tc } from '../lib/typed-component.js'
 import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
+import { mountPage } from '../lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
   const { user } = useUser()
   const window = useWindow()
-  const { query, pushState } = useQuery()
+  const { searchParamsAll, pushState } = useSearchParamsAll()
 
   const {
     archives,
@@ -56,7 +55,7 @@ export const Page = () => {
     }
   }, [window])
 
-  const dateParams = new URLSearchParams(query || '')
+  const dateParams = new URLSearchParams(searchParamsAll || '')
   const formatDateValue = (/** @type {Date | null} */ date) => {
     if (!date || Number.isNaN(date.valueOf())) return ''
     const year = date.getFullYear()
@@ -136,8 +135,7 @@ export const Page = () => {
               <${ArchiveList}
                 key=${ar.id}
                 archive=${ar}
-                reload=${reloadArchives}
-                onDelete=${reloadArchives}
+                onInvalidate=${reloadArchives}
                 clickForPreview=${true}
               />
             `)
@@ -161,9 +159,4 @@ export const Page = () => {
   `
 }
 
-if (typeof window !== 'undefined') {
-  const container = document.querySelector('.bc-main')
-  if (container) {
-    render(html`<${QueryProvider}><${Page} /><//>`, container)
-  }
-}
+mountPage(Page)
