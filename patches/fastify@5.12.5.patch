@@ -1,0 +1,165 @@
+diff --git a/lib/four-oh-four.js b/lib/four-oh-four.js
+index d994fd4309..c4f2875cea 100644
+--- a/lib/four-oh-four.js
++++ b/lib/four-oh-four.js
+@@ -12,6 +12,7 @@ const {
+   kFourOhFourContext,
+   kHooks,
+   kErrorHandler,
++  kRequestRawResponse,
+   kLogController
+ } = require('./symbols.js')
+ const { lifecycleHooks } = require('./hooks')
+@@ -167,6 +168,7 @@ function fourOhFour (options) {
+     const childLogger = createChildLogger(fourOhFourContext, logger, req, id)
+ 
+     const request = new Request(id, null, req, null, childLogger, fourOhFourContext)
++    request[kRequestRawResponse] = res
+     const reply = new Reply(res, request, childLogger)
+ 
+     fourOhFourContext.server[kLogController].incomingRequest(request, reply)
+diff --git a/lib/reply.js b/lib/reply.js
+index c87c1b888f..c4f78a0da4 100644
+--- a/lib/reply.js
++++ b/lib/reply.js
+@@ -137,10 +137,7 @@ Reply.prototype.hijack = function () {
+   if (this.request[kRequestSignal]) {
+     clearTimeout(this.request[kTimeoutTimer])
+     this.request[kTimeoutTimer] = null
+-    if (this.request[kOnAbort]) {
+-      this.request.raw.removeListener('close', this.request[kOnAbort])
+-      this.request[kOnAbort] = null
+-    }
++    this.request[kOnAbort]?.(false)
+   }
+   // Clear socket._meta so hijacked replies (e.g. WebSocket upgrades) do not
+   // retain request/reply objects for the lifetime of the keep-alive socket
+@@ -981,10 +978,7 @@ function setupResponseListeners (reply) {
+     if (reply.request[kRequestSignal]) {
+       clearTimeout(reply.request[kTimeoutTimer])
+       reply.request[kTimeoutTimer] = null
+-      if (reply.request[kOnAbort]) {
+-        reply.request.raw.removeListener('close', reply.request[kOnAbort])
+-        reply.request[kOnAbort] = null
+-      }
++      reply.request[kOnAbort]?.(false)
+     }
+ 
+     // Fix: release socket._meta so request/reply objects are not retained
+diff --git a/lib/request.js b/lib/request.js
+index 0d706403f8..c9d45d8611 100644
+--- a/lib/request.js
++++ b/lib/request.js
+@@ -14,6 +14,7 @@ const {
+   kRouteContext,
+   kRequestOriginalUrl,
+   kRequestSignal,
++  kRequestRawResponse,
+   kOnAbort
+ } = require('./symbols')
+ const { FST_ERR_REQ_INVALID_VALIDATION_INVOCATION, FST_ERR_DEC_UNDECLARED } = require('./errors')
+@@ -225,11 +226,33 @@ Object.defineProperties(Request.prototype, {
+       if (ac) return ac.signal
+       ac = new AbortController()
+       this[kRequestSignal] = ac
+-      const onAbort = () => {
+-        if (!ac.signal.aborted) ac.abort()
++      const request = this
++      const raw = this.raw
++      const response = this[kRequestRawResponse]
++
++      const onRequestClose = () => {
++        if (raw.aborted) cleanup(true)
++      }
++
++      const onResponseClose = () => {
++        cleanup(response.writableFinished === false)
++      }
++
++      function cleanup (abort = false) {
++        raw.removeListener('close', onRequestClose)
++        response.removeListener('close', onResponseClose)
++        request[kOnAbort] = null
++        if (abort && !ac.signal.aborted) ac.abort()
++      }
++
++      raw.on('close', onRequestClose)
++      response.on('close', onResponseClose)
++      this[kOnAbort] = cleanup
++      if (raw.aborted || (response.destroyed && !response.writableFinished)) {
++        cleanup(true)
++      } else if (response.writableFinished) {
++        cleanup()
+       }
+-      this.raw.on('close', onAbort)
+-      this[kOnAbort] = onAbort
+       return ac.signal
+     }
+   },
+diff --git a/lib/route.js b/lib/route.js
+index 076f2b1bfc..94ad28379e 100644
+--- a/lib/route.js
++++ b/lib/route.js
+@@ -51,6 +51,7 @@ const {
+   kRouteByFastify,
+   kRouteContext,
+   kRequestSignal,
++  kRequestRawResponse,
+   kTimeoutTimer,
+   kOnAbort,
+   kLogController
+@@ -520,6 +521,7 @@ function buildRouting (options) {
+     }
+ 
+     const request = new context.Request(id, params, req, query, childLogger, context)
++    request[kRequestRawResponse] = res
+     const reply = new context.Reply(res, request, childLogger)
+ 
+     context.server[kLogController].incomingRequest(request, reply)
+@@ -539,14 +541,28 @@ function buildRouting (options) {
+         }
+       }, handlerTimeout)
+ 
+-      const onAbort = () => {
+-        if (!ac.signal.aborted) {
+-          ac.abort()
+-        }
++      const onRequestClose = () => {
++        if (req.aborted) cleanup(true)
++      }
++
++      const onResponseClose = () => {
++        cleanup(res.writableFinished === false)
++      }
++
++      function cleanup (abort = false) {
++        req.removeListener('close', onRequestClose)
++        res.removeListener('close', onResponseClose)
++        request[kOnAbort] = null
++
+         clearTimeout(request[kTimeoutTimer])
++        request[kTimeoutTimer] = null
++
++        if (abort && !ac.signal.aborted) ac.abort()
+       }
+-      req.on('close', onAbort)
+-      request[kOnAbort] = onAbort
++
++      req.on('close', onRequestClose)
++      res.on('close', onResponseClose)
++      request[kOnAbort] = cleanup
+     }
+ 
+     if (hasLogger === true || context.onResponse !== null || handlerTimeout > 0) {
+diff --git a/lib/symbols.js b/lib/symbols.js
+index 507af35e7c..2a89976170 100644
+--- a/lib/symbols.js
++++ b/lib/symbols.js
+@@ -34,6 +34,7 @@ const keys = {
+   kRequestContentType: Symbol('fastify.request.contentType'),
+   kRequestOriginalUrl: Symbol('fastify.request.originalUrl'),
+   kRequestSignal: Symbol('fastify.request.signal'),
++  kRequestRawResponse: Symbol('fastify.request.rawResponse'),
+   kHandlerTimeout: Symbol('fastify.handlerTimeout'),
+   kTimeoutTimer: Symbol('fastify.request.timeoutTimer'),
+   kOnAbort: Symbol('fastify.request.onAbort'),

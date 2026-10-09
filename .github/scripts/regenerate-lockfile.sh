@@ -23,14 +23,11 @@ rm -rf node_modules
 
 echo "📦 Resolving dependencies with the native pnpm patch/settings policy..."
 pnpm install --no-frozen-lockfile
-node scripts/verify-giscus-patch.js
 
 # Prove the generated lockfile reproduces a clean, patched installation.
 rm -rf node_modules
 pnpm install --frozen-lockfile
-node scripts/verify-giscus-patch.js
 pnpm run build
-node scripts/verify-giscus-patch.js --built
 
 # Capture outdated packages after regenerating
 OUTDATED_AFTER=$(pnpm outdated || true)

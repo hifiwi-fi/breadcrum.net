@@ -7,14 +7,21 @@ verifyDepsBeforeRun: error
 minimumReleaseAgeExclude:
   - undici
   - mine.css
-  - neostandard@0.14.0-next
+
 
 packageExtensions:
   htm:
     peerDependencies:
       preact: "*"
 
+peerDependencyRules:
+  allowedVersions:
+    # Neostandard's TypeScript lint support is disabled; this repo uses TS 7 for tsc only.
+    typescript: '7'
+
 patchedDependencies:
+  fastify@5.12.5: patches/fastify@5.12.5.patch
+  fastify-cli@8.0.3: patches/fastify-cli@8.0.3.patch
   giscus@1.6.0: patches/giscus@1.6.0.patch
 
 allowBuilds:

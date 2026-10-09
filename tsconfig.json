@@ -1,5 +1,5 @@
 {
-  "extends": "@voxpelli/tsconfig/node24.json",
+  "extends": "@voxpelli/tsconfig/node26.json",
   "compilerOptions": {
     "noEmit": true,
     "skipLibCheck": true,
@@ -8,6 +8,6 @@
     "rewriteRelativeImportExtensions": true,
     "verbatimModuleSyntax": true,
   },
-  "include": ["**/*"],
+
   "exclude": ["node_modules", "public", "coverage"],
 }

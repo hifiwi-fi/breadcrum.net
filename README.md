@@ -4,8 +4,8 @@
 
 [Breadcrum.net](https://breadcrum.net): Hyper/multimedia (Text, audio, video) bookmarking 💿!
 
-![](./client/static/screenshots/bookmark-window-dark.png#gh-dark-mode-only)
-![](./client/static/screenshots/bookmark-window-light.png#gh-light-mode-only)
+![](./src/client/static/screenshots/bookmark-window-dark.png#gh-dark-mode-only)
+![](./src/client/static/screenshots/bookmark-window-light.png#gh-light-mode-only)
 
 ## License
 

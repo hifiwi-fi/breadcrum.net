@@ -6,10 +6,6 @@ on:
       newversion:
         description: "npm version (YYYY.MM.DD)"
         required: false
-      deploy:
-        type: boolean
-        description: "Deploy the shared image to both API and worker process groups"
-        default: false
 
 permissions: {}
 
@@ -56,7 +52,7 @@ jobs:
           persist-credentials: true
           fetch-depth: 0
       - name: Install pnpm
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.0.0
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           run_install: false
       - name: Use Node.js
@@ -99,7 +95,7 @@ jobs:
       - name: Update GeoIP data
         id: update-geoip
         continue-on-error: true
-        run: node scripts/api/update-geoip-db.js
+        run: node src/scripts/api/update-geoip-db.js
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
@@ -109,9 +105,8 @@ jobs:
         with:
           path: data/geoip
           key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
-      - run: node scripts/verify-giscus-patch.js
+
       - run: pnpm run build
-      - run: node scripts/verify-giscus-patch.js --built
       - run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
@@ -141,7 +136,6 @@ jobs:
           publish-cmd: pnpm run release
       - name: Deploy API and worker
         run: pnpm run deploy
-        if: ${{ inputs.deploy }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

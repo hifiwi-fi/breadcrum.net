@@ -15,22 +15,22 @@ There is one private ESM package and one root lockfile; do not use workspace rec
 Keep `pnpm-workspace.yaml` for native patches, package extensions, release-age rules, and approved build-script policy.
 Install reproducibly with `pnpm install --frozen-lockfile`.
 
-API routes/schemas live in `api/`, consumers/processors in `worker/`, shared domain/queue code in `resources/`, and browser code in `client/`.
-Use the single `app.js` application composition with Fastify CLI startup and graceful close, not a custom `main.js` bootstrap or inspector.
+Application and browser source live under root `src/`: routes in `src/routes/`, utilities in `src/lib/`, workers in `src/workers/`, shared domain/queue code in `src/resources/`, and browser code in `src/client/`.
+Use the single `src/app.js` application composition with Fastify CLI startup and graceful close, not a custom `main.js` bootstrap or inspector.
 The latest CLI contract supersedes the earlier instructions to retain `main.js` and remove the CLI helpers.
-Export lazy CLI server options from `config/server-options.js` through `app.js`.
-Keep `config/fastify-cli.cjs` as the shared CLI config, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
-Do not reintroduce `api/app.js`, `worker/app.js`, `main.js`, or `scripts/inspect-app.js`.
-Keep plugins under one root `plugins/` tree, imported across areas through `#plugins/*`.
-Use `plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `plugins/api/` for auth, static serving, flags, and other API-only plugins; and `plugins/worker/` for pg-boss consumer registration.
-Keep shared environment schema composition, loading, role defaults, and application options in `config/`, imported across areas through `#config/*`.
+Export lazy CLI server options from `src/config/server-options.js` through `src/app.js`.
+Keep `src/config/fastify-cli.js` as the shared CLI config, reading `loadRuntimeConfig` for `address`, `port`, and `closeGraceDelay`, with `options: true`.
+Do not reintroduce `api/`, `api/app.js`, `worker/app.js`, `main.js`, or `scripts/inspect-app.js`.
+Keep plugins under `src/plugins/`, imported across areas through `#plugins/*`.
+Use `src/plugins/shared/` for env, PostgreSQL, Redis, cache, metrics, health, queues, sensible, and Sentry; `src/plugins/api/` for auth, static serving, flags, and other API-only plugins; and `src/plugins/worker/` for pg-boss consumer registration.
+Keep shared environment schema composition, loading, role defaults, and application options in `src/config/`, imported across areas through `#config/*`.
 Co-locate plugin-owned environment schema fragments with their plugins in data-only `<plugin>.env-schema.js` files; do not consolidate their definitions into a central fragments file.
-`config/env-schema.js` imports and composes those fragments through `#plugins/*`, and plugin modules re-export their own fragment through a local sibling import.
+`src/config/env-schema.js` imports and composes those fragments through `#plugins/*`, and plugin modules re-export their own fragment through a local sibling import.
 JSDoc `@import` declarations are type-only and do not load modules at runtime; they are not a reason to move schemas away from their owning plugins.
 Keep the early configuration graph free of plugin runtime imports, and exclude `*.env-schema.js` files from Fastify plugin autoload.
 Do not introduce separate API or worker config folders.
-Migrations, maintenance scripts, and generated assets live in root `migrations/`, `scripts/`, and `public/` respectively.
-Runtime uses `node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs app.js`.
+SQL migrations stay in root `migrations/`; maintenance scripts live in `src/scripts/`; generated assets stay in root `public/`.
+Runtime uses `node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js src/app.js`.
 The Node preload initializes telemetry before Fastify loads; the watch parent skips telemetry and its application child inherits the preload.
 Development selects `APP_ROLE=all` for one backend application process; production explicitly selects `APP_ROLE=api` or `APP_ROLE=worker` from the same image.
 `APP_ROLE` is required and must be `api`, `worker`, or `all`; missing/unknown roles fail startup, and `--role` flags are unsupported.
@@ -41,7 +41,7 @@ Only the `app` Fly process group is publicly routed; the worker group stays inte
 
 Use one root local `.env` and never automatically overwrite existing files or env symlink targets.
 Deployments, production migrations, secret changes, and worker cutover require explicit authorization.
-Do not run `scripts/deploy-with-sentry.sh` to validate configuration: it performs real external writes.
+Do not run `src/scripts/deploy-with-sentry.sh` to validate configuration: it performs real external writes.
 
 ## JSDoc Typing Patterns
 
@@ -188,9 +188,9 @@ Common aliases:
 
 ```javascript
 // ✅ Cross-area imports use package aliases
-import { build } from '#api/test/helper.js'
+import { build } from '#test/helper.js'
 import { defaultFrontendFlags } from '#plugins/api/flags/frontend-flags.js'
-/** @import { TypeUserRead } from '#api/routes/api/user/schemas/schema-user-read.js' */
+/** @import { TypeUserRead } from '#routes/api/user/schemas/schema-user-read.js' */
 
 // ✅ Local sibling imports stay relative
 import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
@@ -199,7 +199,7 @@ import { getSearchBookmarksQuery } from './get-search-bookmarks-query.js'
 When a package import maps to a TypeScript source file, import it with its runtime `.js` specifier, and let `package.json#imports` map it to the `.ts` source for type checking:
 
 ```javascript
-/** @import { ExtractKnownResponseType } from '#api/types/fastify-utils.js' */
+/** @import { ExtractKnownResponseType } from '#types/fastify-utils.js' */
 ```
 
 ### Preact Component Type Import Syntax
@@ -551,19 +551,19 @@ This pattern ensures:
 
 Keep `@domstack/static` exactly pinned while using a prerelease.
 Import public DOMStack types from `@domstack/static/types.js`.
-Register actual layout exports in `client/layout-registry.d.ts` and use `SitePage` / `SitePageVars` from `#client/types/site-page.js` for page contracts.
+Register actual layout exports in `src/client/layout-registry.d.ts` and use `SitePage` / `SitePageVars` from `#client/types/site-page.js` for page contracts.
 Use the named `parentLayout` export for nesting, without duplicate manual parent calls or parent stylesheet imports.
 Keep each layout's `dataDeps` independent; DOMStack unions subscriptions across the resolved chain.
 
-`client/globals/global.data.js` owns source-page collation and progressive state through `previousState`, `changes`, and `setState`.
+`src/client/globals/global.data.js` owns source-page collation and progressive state through `previousState`, `changes`, and `setState`.
 Store cloneable projections keyed by source ID, preserve the last successful state on failure, and avoid feed rendering for unrelated edits.
 Keep focused consumer types and explicit `dataDeps`; derived data belongs in `data`, not `vars`.
-`client/blog/archives.pages.js` owns generated year indexes, including preserved published archive URLs; do not add manual year placeholders.
+`src/client/blog/archives.pages.js` owns generated year indexes, including preserved published archive URLs; do not add manual year placeholders.
 
-Use the native `client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
+Use the native `src/client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
 The worker remains network-only, with no offline caching or fetch interception.
 Do not enable the DOMStack manifest pipeline or generate an asset inventory; the existing PWA webmanifest is separate and remains enabled.
-Run `node --test --test-reporter=dot client scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
+Run `node --test --test-reporter=dot src/client src/scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
 
 ## Preact/HTM Template Constraints
 
@@ -757,20 +757,20 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.
-- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./otel.js node_modules/fastify-cli/cli.js start --config ./config/fastify-cli.cjs --watch -P --ignore-watch='client public data .tap' app.js`.
+- `pnpm run watch:server` - Run `APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js --watch -P --ignore-watch='src/client public data .tap' src/app.js`.
 - `pnpm run start:api` / `pnpm run start:worker` - Prefix the runtime Node CLI command with `APP_ROLE=api` / `APP_ROLE=worker` without watching.
 - `pnpm run build` - Build root browser assets with @domstack/static.
 - `pnpm run migrate` - Run root Postgrator migrations without booting application roles.
 - `pnpm run generate-default-env` - Create root development defaults without replacing existing env files.
-- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api fastify print-routes app.js` / `APP_ROLE=api fastify print-plugins app.js`, without the telemetry preload or a custom inspector.
+- `pnpm run print-routes` / `pnpm run print-plugins` - Run `APP_ROLE=api fastify print-routes src/app.js` / `APP_ROLE=api fastify print-plugins src/app.js`, without the telemetry preload or a custom inspector.
 - `pnpm run deploy` - Explicitly deploy the shared image to both Fly groups, only when authorized.
-- `node scripts/verify-giscus-patch.js --built` - Verify the installed and emitted native Giscus patch.
 
-Inspection loads and closes `app.js` and its pools without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
+
+Inspection loads and closes `src/app.js` and its pools without starting HTTP listeners or exporting telemetry, but still initializes configured dependencies; use local services, valid API configuration, and applicable built assets.
 CLI inspection omits exported application options; the app rejects `worker` and `all` without configured startup before opening connections.
 Keep this guard covered by real CLI tests.
-Fastify CLI watch ignores `client public data .tap` in addition to its own default `.git` and `node_modules` exclusions.
-Zed debug configurations launch `node_modules/fastify-cli/cli.js`, use `runtimeArgs: ['--import', './otel.js']` and `args: ['start', '--config', './config/fastify-cli.cjs', 'app.js']`, and select `APP_ROLE` through `env`, never role arguments.
+Fastify CLI watch ignores `src/client public data .tap` in addition to its own default `.git` and `node_modules` exclusions.
+Zed debug configurations launch `node_modules/fastify-cli/cli.js`, use `runtimeArgs: ['--import', './src/otel.js']` and `args: ['start', '--config', './src/config/fastify-cli.js', 'src/app.js']`, and select `APP_ROLE` through `env`, never role arguments.
 Keep native pnpm patches enabled in frozen installs and production dependency installs.
 Do not introduce workspace `pnpm deploy`, package filters, or separate per-role images.
 
