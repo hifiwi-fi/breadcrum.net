@@ -29,4 +29,19 @@ export const defaultFrontendFlags = /** @type {const} */ {
     default: '',
     description: 'Background color for the service notice banner (dismissible). Leave empty for default.',
   },
+  billing_enabled: {
+    type: 'boolean',
+    default: false,
+    description: 'Show billing and subscription UI to users',
+  },
+  subscriptions_required: {
+    type: 'boolean',
+    default: false,
+    description: 'Enforce paid subscriptions or free tier quotas',
+  },
+  free_bookmarks_per_month: {
+    type: 'number',
+    default: 10,
+    description: 'Monthly bookmark quota for free tier users',
+  },
 }

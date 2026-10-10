@@ -1,0 +1,45 @@
+/**
+ * @import { FastifyInstance } from 'fastify'
+ * @import { WorkHandler } from '#resources/pgboss/types.js'
+ * @import { SyncSubscriptionData } from '#resources/billing/sync-subscription-queue.js'
+ */
+
+import { syncStripeSubscription } from '#resources/billing/sync.js'
+
+/**
+ * pg-boss compatible subscription sync processor.
+ * Receives a customerId and syncs their subscription state from Stripe.
+ *
+ * @param {object} params
+ * @param {FastifyInstance} params.fastify
+ * @return {WorkHandler<SyncSubscriptionData>} pg-boss handler
+ */
+export function makeSyncSubscriptionP ({ fastify }) {
+  const logger = fastify.log
+
+  /** @type {WorkHandler<SyncSubscriptionData>} */
+  return async function syncSubscriptionP (jobs) {
+    for (const job of jobs) {
+      const { customerId } = job.data
+      const log = logger.child({ jobId: job.id, customerId })
+
+      const { stripe } = fastify.billing
+      if (!stripe) {
+        throw new Error('Billing is not configured')
+      }
+
+      try {
+        await syncStripeSubscription({
+          stripe,
+          pg: fastify.pg,
+          customerId,
+          lookupKey: fastify.config.STRIPE_PRICE_LOOKUP_KEY,
+        })
+        log.info('Subscription synced')
+      } catch (err) {
+        log.error({ err }, 'Failed to sync subscription')
+        throw err
+      }
+    }
+  }
+}

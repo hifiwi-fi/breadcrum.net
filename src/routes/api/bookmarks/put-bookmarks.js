@@ -4,10 +4,13 @@
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
+import SQL from '@nearform/sql'
 import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '#resources/bookmarks/normalize-url.js'
+import { getLatestSubscription, isSubscriptionActive } from '../billing/subscriptions.js'
+import { getMonthlyBookmarkUsage } from './bookmark-usage.js'
 
 export const maxBookmarkTitleLength = 255
 
@@ -107,6 +110,12 @@ export async function putBookmarks (fastify, _opts) {
               },
             },
           },
+          402: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
         },
       }),
     },
@@ -149,6 +158,19 @@ export async function putBookmarks (fastify, _opts) {
         const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log }) : submittedUrl
         const workingUrlString = shouldNormalize ? workingUrl.toString() : submittedUrlString
 
+        const {
+          subscriptions_required,
+          free_bookmarks_per_month: freeBookmarksPerMonth,
+        } = await fastify.getFlags({
+          pgClient: client,
+          frontend: true,
+          backend: false,
+        })
+
+        if (subscriptions_required) {
+          await client.query(SQL`select pg_advisory_xact_lock(1, hashtext(${userId}))`)
+        }
+
         const maybeResult = await getBookmark({
           fastify,
           pg: client,
@@ -169,6 +191,26 @@ export async function putBookmarks (fastify, _opts) {
               site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
               data: maybeResult,
             })
+          }
+        }
+
+        if (subscriptions_required) {
+          const subscription = await getLatestSubscription({
+            pg: client,
+            userId,
+          })
+          const activeSubscription = isSubscriptionActive(subscription)
+          if (!activeSubscription) {
+            const usage = await getMonthlyBookmarkUsage({
+              pg: client,
+              userId,
+              limit: freeBookmarksPerMonth,
+            })
+            if (usage.count >= usage.limit) {
+              return reply.code(402).send({
+                error: 'Free tier limit reached. Upgrade to add more bookmarks this month.',
+              })
+            }
           }
         }
 

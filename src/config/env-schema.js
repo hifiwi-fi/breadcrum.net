@@ -18,6 +18,7 @@ import { otelMetricsEnvSchema } from '#plugins/shared/otel-metrics.env-schema.js
 import { pgEnvSchema } from '#plugins/shared/pg.env-schema.js'
 import { redisEnvSchema } from '#plugins/shared/redis.env-schema.js'
 import { sentryEnvSchema } from '#plugins/shared/sentry.env-schema.js'
+import { billingEnvSchema } from '#plugins/shared/billing.env-schema.js'
 import { pgbossEnvSchema } from '#plugins/worker/pgboss.env-schema.js'
 import { roleDefaults } from './role.js'
 
@@ -26,6 +27,7 @@ const common = mergeEnvSchemas(/** @type {const} */ ([
   redisEnvSchema,
   otelMetricsEnvSchema,
   sentryEnvSchema,
+  billingEnvSchema,
   ytDlpEnvSchema,
   pgbossEnvSchema,
 ]))

@@ -14,6 +14,7 @@ import { resolveArchiveQName } from '#resources/archives/resolve-archive-queue.j
 import { resolveBookmarkQName } from '#resources/bookmarks/resolve-bookmark-queue.js'
 import { cleanupAuthTokensQName } from '#resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { cleanupStaleResolutionsQName } from '#resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
+import { syncSubscriptionQName } from '#resources/billing/sync-subscription-queue.js'
 import { getSentryUserFromPgBossJobData } from '#plugins/shared/sentry-user-context.js'
 
 import { makeEpisodePgBossP } from '#workers/episodes/index.js'
@@ -21,6 +22,7 @@ import { makeArchivePgBossP } from '#workers/archives/index.js'
 import { makeBookmarkPgBossP } from '#workers/bookmarks/index.js'
 import { makeAuthTokenCleanupP } from '#workers/auth-tokens/index.js'
 import { makeStaleResolutionCleanupP } from '#workers/stale-resolutions/index.js'
+import { makeSyncSubscriptionP } from '#workers/billing/sync-subscription.js'
 
 export { pgbossEnvSchema } from './pgboss.env-schema.js'
 
@@ -78,6 +80,17 @@ export default fp(async function workerPlugin (fastify) {
 
     workers[cleanupAuthTokensQName].push(cleanupAuthTokensWorker)
     workers[cleanupStaleResolutionsQName].push(cleanupStaleResolutionsWorker)
+
+    if (fastify.billing.stripe) {
+      workers[syncSubscriptionQName] = []
+      const syncSubscriptionWorker = await boss.work(
+        syncSubscriptionQName,
+        track(maybeWrapWorker(syncSubscriptionQName, makeSyncSubscriptionP({ fastify })))
+      )
+      workers[syncSubscriptionQName].push(syncSubscriptionWorker)
+    } else {
+      fastify.log.warn('Stripe is not configured; billing sync worker will not start')
+    }
   })
 
   // Register batch observable callback for pg-boss queue metrics

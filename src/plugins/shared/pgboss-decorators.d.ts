@@ -3,6 +3,7 @@ import type { createProcessorTracker } from '#resources/pgboss/queue-lifecycle.j
 import type { ResolveEpisodePgBossQ } from '#resources/episodes/resolve-episode-queue.js'
 import type { ResolveArchivePgBossQ } from '#resources/archives/resolve-archive-queue.js'
 import type { ResolveBookmarkPgBossQ } from '#resources/bookmarks/resolve-bookmark-queue.js'
+import type { SyncSubscriptionPgBossQ } from '#resources/billing/sync-subscription-queue.js'
 import type { CleanupAuthTokensPgBossQ } from '#resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import type { CleanupStaleResolutionsPgBossQ } from '#resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 
@@ -17,6 +18,7 @@ declare module 'fastify' {
         resolveEpisodeQ: ResolveEpisodePgBossQ
         resolveArchiveQ: ResolveArchivePgBossQ
         resolveBookmarkQ: ResolveBookmarkPgBossQ
+        syncSubscriptionQ: SyncSubscriptionPgBossQ
         cleanupAuthTokensQ: CleanupAuthTokensPgBossQ
         cleanupStaleResolutionsQ: CleanupStaleResolutionsPgBossQ
       }

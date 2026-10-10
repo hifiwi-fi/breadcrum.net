@@ -48,6 +48,13 @@ export const UserRowView = ({
   const registrationUserAgent = formatUserAgent(u.registration_user_agent)
   const latestGeoip = formatGeoip(u.geoip)
   const registrationGeoip = formatGeoip(u.registration_geoip)
+  const hasSubscription = Boolean(u.subscription_provider)
+  const expired = Boolean(u.subscription_period_end && new Date(u.subscription_period_end).getTime() <= Date.now())
+  const activeStatus = u.subscription_status === 'active' || u.subscription_status === 'trialing'
+  const customActive = hasSubscription && activeStatus && !expired && u.subscription_provider === 'custom'
+  // The admin response does not include Stripe settlement or cancel_at data.
+  const stripeUnverified = hasSubscription && activeStatus && !expired && u.subscription_provider === 'stripe'
+  const subscriptionLabel = customActive ? 'Paid access' : stripeUnverified ? 'Paid access unverified' : 'No paid access'
 
   return html`
     <article class="bc-user-card" role="listitem">
@@ -100,6 +107,16 @@ export const UserRowView = ({
         })}">
           ${u.disabled ? 'Account disabled' : 'Account active'}
         </span>
+        <span class="${cn({
+          'bc-user-badge': true,
+          'bc-user-badge-true': customActive,
+          'bc-user-badge-warning': stripeUnverified || u.subscription_status === 'past_due',
+          'bc-user-badge-false': !customActive && !stripeUnverified && u.subscription_status !== 'past_due',
+        })}">
+          ${hasSubscription
+            ? `${subscriptionLabel}: ${u.subscription_plan || 'Subscription'} (${u.subscription_provider}${u.subscription_display_name ? ': ' + u.subscription_display_name : ''}, ${u.subscription_status || 'unknown'}${expired ? ', expired' : ''}${u.subscription_cancel_at_period_end ? ', canceling' : ''})`
+            : 'Free plan'}
+        </span>
       </div>
 
       <div class="bc-user-grid">
@@ -132,6 +149,55 @@ export const UserRowView = ({
             ${internalNote || 'None'}
           </div>
         </div>
+        ${u.subscription_provider
+          ? html`
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription provider</div>
+              <div class="bc-user-value">${u.subscription_provider}</div>
+            </div>
+            ${u.subscription_display_name
+              ? html`
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Subscription label</div>
+                  <div class="bc-user-value">${u.subscription_display_name}</div>
+                </div>
+              `
+              : null
+            }
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription period end</div>
+              <div class="${cn({
+                'bc-user-value': true,
+                'bc-user-value-empty': !u.subscription_period_end && u.subscription_provider !== 'custom',
+              })}">
+                ${u.subscription_period_end
+                  ? (new Date(u.subscription_period_end)).toLocaleString()
+                  : u.subscription_provider === 'custom'
+                    ? 'Lifetime'
+                    : 'N/A'}
+              </div>
+            </div>
+            ${u.subscription_provider === 'stripe' && u.stripe_customer_id
+              ? html`
+                <div class="bc-user-field">
+                  <div class="bc-user-label">Stripe</div>
+                  <div class="bc-user-value">
+                    <a href="https://dashboard.stripe.com/customers/${u.stripe_customer_id}" target="_blank" rel="noopener">
+                      View in Stripe
+                    </a>
+                  </div>
+                </div>
+              `
+              : null
+            }
+          `
+          : html`
+            <div class="bc-user-field">
+              <div class="bc-user-label">Subscription</div>
+              <div class="bc-user-value bc-user-value-empty">None</div>
+            </div>
+          `
+        }
       </div>
 
       <div class="bc-user-meta">

@@ -4,6 +4,7 @@ import fp from 'fastify-plugin'
 import { createResolveEpisodeQ } from '#resources/episodes/resolve-episode-queue.js'
 import { createResolveArchiveQ } from '#resources/archives/resolve-archive-queue.js'
 import { createResolveBookmarkQ } from '#resources/bookmarks/resolve-bookmark-queue.js'
+import { createSyncSubscriptionQ } from '#resources/billing/sync-subscription-queue.js'
 import { createCleanupAuthTokensQ } from '#resources/auth-tokens/cleanup-auth-tokens-queue.js'
 import { createCleanupStaleResolutionsQ } from '#resources/stale-resolutions/cleanup-stale-resolutions-queue.js'
 import { startPGBoss } from '#resources/pgboss/start-pgboss.js'
@@ -36,6 +37,7 @@ async function queuePlugin (fastify, opts) {
     resolveEpisodeQ: await createResolveEpisodeQ({ boss }),
     resolveArchiveQ: await createResolveArchiveQ({ boss }),
     resolveBookmarkQ: await createResolveBookmarkQ({ boss }),
+    syncSubscriptionQ: await createSyncSubscriptionQ({ boss }),
     cleanupAuthTokensQ: await createCleanupAuthTokensQ({ boss }),
     cleanupStaleResolutionsQ: await createCleanupStaleResolutionsQ({ boss }),
   }
