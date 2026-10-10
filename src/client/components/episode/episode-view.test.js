@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { render } from 'preact-render-to-string'
 import { EpisodeView } from './episode-view.js'
-import { tc } from '../../lib/typed-component.js'
+import { tc } from '#client/lib/typed-component.js'
 
 /**
  * @param {string | null | undefined} providerUrl

@@ -9,7 +9,7 @@ import { html } from 'htm/preact'
 import { ArchiveTitle } from '../archive-title/index.js'
 import { ExpandText } from '../expand-text/index.js'
 import { ResolveStatus } from '../resolve-status/index.js'
-import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { withinResolvingWindow } from '#hooks/resolve-timeout.js'
 
 /** @typedef {{ label: string, value: ComponentChild }} ArchiveMetaItem */
 

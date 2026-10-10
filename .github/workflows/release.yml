@@ -133,7 +133,8 @@ jobs:
           git-username: ${{ github.actor }}
           new-version: ${{ env.NEW_VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          publish-cmd: pnpm run release
+          # npm-bump changes package.json before publish; refresh pnpm's verified install state first.
+          publish-cmd: pnpm install --frozen-lockfile && pnpm run release
       - name: Deploy API and worker
         run: pnpm run deploy
         env:

@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { formatRelativeTime } from '../../lib/format-relative-time.js'
+import { formatRelativeTime } from '#client/lib/format-relative-time.js'
 
 /**
  * @typedef {Object} PasskeyItemProps

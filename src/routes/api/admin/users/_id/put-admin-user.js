@@ -4,9 +4,15 @@
 import SQL from '@nearform/sql'
 // import { fullSerializedUserProps } from '#routes/api/user/user-props.js'
 import { schemaAdminUserUpdate } from '../schemas/schema-admin-user-update.js'
+import { schemaAdminUserRead } from '../schemas/schema-admin-user-read.js'
+import { getAdminUser } from '../get-admin-users-query.js'
 
 /**
- * @type {FastifyPluginAsyncJsonSchemaToTs}
+ * @type {FastifyPluginAsyncJsonSchemaToTs<{
+ *   SerializerSchemaOptions: {
+ *     deserialize: [{ pattern: { type: 'string'; format: 'date-time'; }; output: Date | null; }]
+ *   }
+ * }>}
  * @returns {Promise<void>}
  */
 export async function putAdminUser (fastify, _opts) {
@@ -22,6 +28,9 @@ export async function putAdminUser (fastify, _opts) {
       schema: {
         hide: true,
         body: schemaAdminUserUpdate,
+        response: {
+          202: schemaAdminUserRead,
+        },
         params: {
           type: 'object',
           properties: {
@@ -107,11 +116,10 @@ export async function putAdminUser (fastify, _opts) {
 
         await client.query('commit')
 
-        reply.status(202)
+        const updatedUser = await getAdminUser({ fastify, userId: targetUserId })
+        if (!updatedUser) return reply.notFound(`target user ${targetUserId} not found`)
 
-        return {
-          status: 'updated',
-        }
+        return reply.code(202).send(updatedUser)
       })
     }
   )

@@ -6,7 +6,7 @@
 import { html } from 'htm/preact'
 import { sep } from 'node:path'
 import { render } from 'preact-render-to-string'
-import { Breadcrumb } from '../../components/breadcrumb/index.js'
+import { Breadcrumb } from '#components/breadcrumb/index.js'
 
 /**
  * Blog index layout variables type - extends RootLayoutVars with blog-specific properties

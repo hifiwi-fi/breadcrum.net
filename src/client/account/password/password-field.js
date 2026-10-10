@@ -4,7 +4,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { useLSP } from '../../hooks/useLSP.js'
+import { useLSP } from '#hooks/useLSP.js'
 import { PasswordEdit } from './password-edit.js'
 import { PasswordView } from './password-view.js'
 

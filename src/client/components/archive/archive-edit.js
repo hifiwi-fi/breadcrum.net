@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 /**
- * @import { FunctionComponent, ComponentChild, JSX } from 'preact'
+ * @import { FunctionComponent, ComponentChild } from 'preact'
  * @import { TypeArchiveReadClient } from '#routes/api/archives/schemas/schema-archive-read.js'
  */
 
@@ -30,7 +30,7 @@ export const ArchiveEdit = ({
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */ (null))
 
   const handleInitiateDelete = useCallback(() => {
     setDeleteConfirm(true)
@@ -40,7 +40,7 @@ export const ArchiveEdit = ({
     setDeleteConfirm(false)
   }, [setDeleteConfirm])
 
-  const handleDeleteArchive = useCallback(/** @param {JSX.TargetedEvent} ev */ async (ev) => {
+  const handleDeleteArchive = useCallback(/** @param {Event} ev */ async (ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)
@@ -52,7 +52,7 @@ export const ArchiveEdit = ({
     }
   }, [setDisabled, setError, onDeleteArchive])
 
-  const handleSave = useCallback(/** @param {JSX.TargetedEvent} ev */ async (ev) => {
+  const handleSave = useCallback(/** @param {Event} ev */ async (ev) => {
     ev.preventDefault()
     setDisabled(true)
     setError(null)

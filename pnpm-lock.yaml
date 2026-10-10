@@ -113,7 +113,7 @@ importers:
         version: 2.4.1
       '@preact/signals':
         specifier: ^2.3.2
-        version: 2.11.3(preact@10.29.8)
+        version: 2.11.3(preact@11.0.1)
       '@sentry/browser':
         specifier: ^11.4.0
         version: 11.6.0
@@ -122,7 +122,7 @@ importers:
         version: 11.6.0
       '@tanstack/preact-query':
         specifier: ^5.100.5
-        version: 5.104.1(preact@10.29.8)
+        version: 5.104.1(preact@11.0.1)
       abstract-cache-redis:
         specifier: ^2.0.0
         version: 2.0.0
@@ -164,7 +164,7 @@ importers:
         version: 1.4.2
       htm:
         specifier: ^3.1.1
-        version: 3.1.1(preact@10.29.8)
+        version: 3.1.1(preact@11.0.1)
       hyperid:
         specifier: ^4.0.0
         version: 4.0.0
@@ -199,11 +199,11 @@ importers:
         specifier: ^10.0.0
         version: 10.0.0(pg@8.23.1)
       preact:
-        specifier: ^10.29.2
-        version: 10.29.8(preact-render-to-string@6.8.0)
+        specifier: ^11.0.1
+        version: 11.0.1(preact-render-to-string@6.8.0)
       preact-render-to-string:
-        specifier: ^6.6.3
-        version: 6.8.0(preact@10.29.8)
+        specifier: ^6.8.0
+        version: 6.8.0(preact@11.0.1)
       resolve-email:
         specifier: ^4.0.45
         version: 4.0.82
@@ -3445,10 +3445,10 @@ packages:
     peerDependencies:
       preact: '>=10 || >= 11.0.0-0'
 
-  preact@10.29.8:
-    resolution: {integrity: sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q==}
+  preact@11.0.1:
+    resolution: {integrity: sha512-TNNwEq++jYNHy747LziCjPRVgEwnLSOIOAw/oYcjI3Tdnubx2EXtt76I0an8PATvUWtx/DX1kFIg1eFN+O/fkw==}
     peerDependencies:
-      preact-render-to-string: '>=5'
+      preact-render-to-string: '>=6.7.0'
     peerDependenciesMeta:
       preact-render-to-string:
         optional: true
@@ -5161,10 +5161,10 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@preact/signals@2.11.3(preact@10.29.8)':
+  '@preact/signals@2.11.3(preact@11.0.1)':
     dependencies:
       '@preact/signals-core': 1.14.4
-      preact: 10.29.8(preact-render-to-string@6.8.0)
+      preact: 11.0.1(preact-render-to-string@6.8.0)
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -5316,10 +5316,10 @@ snapshots:
     dependencies:
       acorn: 8.19.0
 
-  '@tanstack/preact-query@5.104.1(preact@10.29.8)':
+  '@tanstack/preact-query@5.104.1(preact@11.0.1)':
     dependencies:
       '@tanstack/query-core': 5.104.1
-      preact: 10.29.8(preact-render-to-string@6.8.0)
+      preact: 11.0.1(preact-render-to-string@6.8.0)
 
   '@tanstack/query-core@5.104.1': {}
 
@@ -6418,9 +6418,9 @@ snapshots:
 
   hookified@2.2.0: {}
 
-  htm@3.1.1(preact@10.29.8):
+  htm@3.1.1(preact@11.0.1):
     dependencies:
-      preact: 10.29.8(preact-render-to-string@6.8.0)
+      preact: 11.0.1(preact-render-to-string@6.8.0)
 
   html-encoding-sniffer@7.0.0:
     dependencies:
@@ -7229,13 +7229,13 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
-  preact-render-to-string@6.8.0(preact@10.29.8):
+  preact-render-to-string@6.8.0(preact@11.0.1):
     dependencies:
-      preact: 10.29.8(preact-render-to-string@6.8.0)
+      preact: 11.0.1(preact-render-to-string@6.8.0)
 
-  preact@10.29.8(preact-render-to-string@6.8.0):
+  preact@11.0.1(preact-render-to-string@6.8.0):
     optionalDependencies:
-      preact-render-to-string: 6.8.0(preact@10.29.8)
+      preact-render-to-string: 6.8.0(preact@11.0.1)
 
   prelude-ls@1.2.1: {}
 

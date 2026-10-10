@@ -18,7 +18,7 @@ import { useState, useRef, useCallback } from 'preact/hooks'
 export const PasswordEdit = ({ onSave, onCancelEdit }) => {
   const [error, setError] = useState(/** @type {Error | null} */(null))
   const [disabled, setDisabled] = useState(false)
-  const formRef = useRef()
+  const formRef = useRef(/** @type {HTMLFormElement | null} */ (null))
 
   const handleSave = useCallback(async (/** @type {Event} */ev) => {
     ev.preventDefault()

@@ -37,7 +37,7 @@ export const Search = ({
   return html`
     <div class="bc-search-container">
       <search role="search">
-        <form onSubmit="${handleSearch}" class="search-form">
+        <form onSubmit=${handleSearch} class="search-form">
           <input
             defaultValue="${resolvedValue}"
             class="search-bar"

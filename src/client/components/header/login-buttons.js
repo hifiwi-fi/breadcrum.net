@@ -2,7 +2,7 @@
  * @import { FunctionComponent } from 'preact'
  */
 import { html } from 'htm/preact'
-import { useWindow } from '../../hooks/useWindow.js'
+import { useWindow } from '#hooks/useWindow.js'
 
 /** @type{FunctionComponent<{}>} */
 export const LoginButtons = () => {

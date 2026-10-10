@@ -5,7 +5,7 @@
 
 import { html } from 'htm/preact'
 import { PasskeyItem } from './passkey-item.js'
-import { tc } from '../../lib/typed-component.js'
+import { tc } from '#client/lib/typed-component.js'
 
 /**
  * @typedef {Object} PasskeyListProps
