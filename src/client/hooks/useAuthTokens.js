@@ -77,16 +77,16 @@ export function useAuthTokens () {
     }
   }))
 
-  const { data, error, isPending } = authTokensQuery
+  const { data, error, isPending, isPlaceholderData } = authTokensQuery
 
   // Cursor cleanup: when the server signals we're at the first page, remove stale
   // before/after params from the URL. Runs in an effect (not queryFn) to keep
   // queryFn pure. setParams is idempotent — no-op if params already absent.
   useEffect(() => {
-    if (data?.top) {
+    if (!isPlaceholderData && data?.top) {
       setParams({ before: null, after: null })
     }
-  }, [data, setParams])
+  }, [data, isPlaceholderData, setParams])
 
   const tokens = data?.tokens ?? null
   const before = data?.before ?? null

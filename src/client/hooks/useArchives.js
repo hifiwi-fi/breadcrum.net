@@ -91,16 +91,16 @@ export function useArchives (options = {}) {
     }
   }))
 
-  const { data, error, isPending, refetch } = archivesQuery
+  const { data, error, isPending, isPlaceholderData, refetch } = archivesQuery
 
   // Cursor cleanup: when the server signals we're at the first page, remove stale
   // before/after params from the URL. Runs in an effect (not queryFn) to keep
   // queryFn pure. setParams is idempotent — no-op if params already absent.
   useEffect(() => {
-    if (data?.top) {
+    if (!isPlaceholderData && data?.top) {
       setParams({ before: null, after: null })
     }
-  }, [data, setParams])
+  }, [data, isPlaceholderData, setParams])
 
   const reloadArchives = useCallback(async () => {
     await refetch()

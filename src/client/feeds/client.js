@@ -5,7 +5,7 @@
 /** @import { TypeFeedRead } from '#routes/api/feeds/schemas/schema-feed-read.js' */
 
 import { html } from 'htm/preact'
-import { useMemo, useCallback } from 'preact/hooks'
+import { useMemo, useCallback, useEffect } from 'preact/hooks'
 import { keepPreviousData, useQuery as useTanstackQuery, useQueryClient } from '@tanstack/preact-query'
 import { tc } from '#client/lib/typed-component.js'
 import { useUser } from '#hooks/useUser.js'
@@ -46,7 +46,7 @@ export const Page = () => {
     queryString,
   ]), [queryString, state.apiUrl, state.sensitive])
 
-  const { data: episodesData, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
+  const { data: episodesData, isPending: episodesLoading, isPlaceholderData, error: episodesError } = useTanstackQuery({
     queryKey: episodesQueryKey,
     queryFn: async ({ signal }) => {
       const requestParams = new URLSearchParams(queryString)
@@ -73,10 +73,6 @@ export const Page = () => {
       if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
         const body = await response.json()
 
-        if (body?.pagination?.top) {
-          setParams({ before: null, after: null })
-        }
-
         return body
       }
 
@@ -85,6 +81,12 @@ export const Page = () => {
     enabled: Boolean(user),
     placeholderData: keepPreviousData,
   })
+
+  useEffect(() => {
+    if (!isPlaceholderData && episodesData?.pagination?.top) {
+      setParams({ before: null, after: null })
+    }
+  }, [episodesData, isPlaceholderData, setParams])
 
   const feedQueryKey = useMemo(() => ([
     'feed-details',

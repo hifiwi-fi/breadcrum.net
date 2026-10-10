@@ -86,16 +86,16 @@ export function useEpisodes (options = {}) {
     }
   }))
 
-  const { data, error, isPending, refetch } = episodesQuery
+  const { data, error, isPending, isPlaceholderData, refetch } = episodesQuery
 
   // Cursor cleanup: when the server signals we're at the first page, remove stale
   // before/after params from the URL. Runs in an effect (not queryFn) to keep
   // queryFn pure. setParams is idempotent — no-op if params already absent.
   useEffect(() => {
-    if (data?.top) {
+    if (!isPlaceholderData && data?.top) {
       setParams({ before: null, after: null })
     }
-  }, [data, setParams])
+  }, [data, isPlaceholderData, setParams])
 
   const reloadEpisodes = useCallback(async () => {
     await refetch()

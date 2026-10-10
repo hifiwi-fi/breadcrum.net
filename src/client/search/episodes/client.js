@@ -53,7 +53,7 @@ export const Page = () => {
     queryParams.toString(),
   ]), [queryParams, state.apiUrl, user?.id])
 
-  const { data, isPending: episodesLoading, error: episodesError } = useTanstackQuery({
+  const { data, isPending: episodesLoading, isPlaceholderData, error: episodesError } = useTanstackQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/search/episodes?${queryParams.toString()}`, {
@@ -78,10 +78,10 @@ export const Page = () => {
   // id/rank/reverse params from the URL. Runs in an effect (not queryFn) to keep
   // queryFn pure. setParams is idempotent — no-op if params already absent.
   useEffect(() => {
-    if (data?.pagination?.top) {
+    if (!isPlaceholderData && data?.pagination?.top) {
       setParams({ id: null, rank: null, reverse: null })
     }
-  }, [data, setParams])
+  }, [data, isPlaceholderData, setParams])
 
   const body = /** @type {{ data?: TypeEpisodeReadClient[], pagination?: { next?: any, prev?: any } } | undefined} */ (data)
   const episodes = body?.data

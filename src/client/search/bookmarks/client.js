@@ -53,7 +53,7 @@ export const Page = () => {
     queryParams.toString(),
   ]), [queryParams, state.apiUrl, user?.id])
 
-  const { data, isPending: bookmarksLoading, error: bookmarksError } = useTanstackQuery({
+  const { data, isPending: bookmarksLoading, isPlaceholderData, error: bookmarksError } = useTanstackQuery({
     queryKey,
     queryFn: async ({ signal }) => {
       const response = await fetch(`${state.apiUrl}/search/bookmarks?${queryParams.toString()}`, {
@@ -78,10 +78,10 @@ export const Page = () => {
   // id/rank/reverse params from the URL. Runs in an effect (not queryFn) to keep
   // queryFn pure. setParams is idempotent — no-op if params already absent.
   useEffect(() => {
-    if (data?.pagination?.top) {
+    if (!isPlaceholderData && data?.pagination?.top) {
       setParams({ id: null, rank: null, reverse: null })
     }
-  }, [data, setParams])
+  }, [data, isPlaceholderData, setParams])
 
   const body = /** @type {{ data?: TypeBookmarkReadClient[], pagination?: { next?: any, prev?: any } } | undefined} */ (data)
   const bookmarks = body?.data
