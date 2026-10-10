@@ -12,12 +12,12 @@ import { useState, useRef, useCallback, useEffect } from 'preact/hooks'
 import { useQuery } from '@tanstack/preact-query'
 import cn from 'classnames'
 import format from 'format-duration'
-import { useWindow } from '../../hooks/useWindow.js'
+import { useWindow } from '#hooks/useWindow.js'
 import { EpisodeTitle } from '../episode-title/index.js'
-import { useLSP } from '../../hooks/useLSP.js'
+import { useLSP } from '#hooks/useLSP.js'
 import { ArchiveTitle } from '../archive-title/index.js'
 import { ResolveStatus } from '../resolve-status/index.js'
-import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
+import { withinResolvingWindow } from '#hooks/resolve-timeout.js'
 
 /**
  * @typedef {object} BookmarkEditProps
@@ -68,9 +68,9 @@ export const BookmarkEdit = ({
     if (b?.archive_urls?.length) {
       setArchiveURLs([...b.archive_urls])
     }
-  // join(',') produces a stable string dep — prevents re-running if the array
-  // reference changes but content is the same (e.g. new array from re-render).
-  }, [b?.archive_urls?.join(',')])
+  // A spread here would make the dependency list length vary when archive URLs change.
+  // JSON serialization gives React a stable, single dependency for the array contents.
+  }, [JSON.stringify(b?.archive_urls ?? [])])
 
   useEffect(() => {
     // Keyboard handler for ctl-enter saving

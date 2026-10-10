@@ -1,6 +1,6 @@
 /**
  * @import { GlobalDataFunctionParams } from '@domstack/static/types.js'
- * @import { PageReturn } from '../layouts/root/root.layout.js'
+ * @import { PageReturn } from '#layouts/root/root.layout.js'
  */
 import { posix } from 'node:path'
 import pMap from 'p-map'

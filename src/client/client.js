@@ -3,9 +3,9 @@
 /** @import { FunctionComponent } from 'preact' */
 
 import { html } from 'htm/preact'
-// import { useUser } from './hooks/useUser.js'
-import { Badge } from './components/badge/badge.js'
-import { mountPage } from './lib/mount-page.js'
+// import { useUser } from '#hooks/useUser.js'
+import { Badge } from '#components/badge/badge.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

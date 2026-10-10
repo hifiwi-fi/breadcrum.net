@@ -5,12 +5,12 @@
 import { html } from 'htm/preact'
 import { useMemo } from 'preact/hooks'
 import { useQuery as useTanstackQuery } from '@tanstack/preact-query'
-import { useUser } from '../hooks/useUser.js'
-import { useSearchParamsAll } from '../hooks/useSearchParams.js'
-import { useLSP } from '../hooks/useLSP.js'
-import { LoadingPlaceholder } from '../components/loading-placeholder/index.js'
-import { tc } from '../lib/typed-component.js'
-import { mountPage } from '../lib/mount-page.js'
+import { useUser } from '#hooks/useUser.js'
+import { useSearchParamsAll } from '#hooks/useSearchParams.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { LoadingPlaceholder } from '#components/loading-placeholder/index.js'
+import { tc } from '#client/lib/typed-component.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

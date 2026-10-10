@@ -1,6 +1,6 @@
 /**
  * @import { CollectionChanges, CollectionPage, CollectionState, CollectionVars } from './global.data.js'
- * @import { PageReturn } from '../layouts/root/root.layout.js'
+ * @import { PageReturn } from '#layouts/root/root.layout.js'
  */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'

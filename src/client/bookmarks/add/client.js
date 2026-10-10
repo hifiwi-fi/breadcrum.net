@@ -5,17 +5,17 @@
 
 import { html } from 'htm/preact'
 import { useEffect, useState, useCallback } from 'preact/hooks'
-import { useUser } from '../../hooks/useUser.js'
+import { useUser } from '#hooks/useUser.js'
 // @ts-ignore - version is a string from bookmarklet package
 import { version } from '@breadcrum/bookmarklet/dist/version.js'
-import { useLSP } from '../../hooks/useLSP.js'
-import { useSearchParamsAll } from '../../hooks/useSearchParams.js'
-import { BookmarkEdit } from '../../components/bookmark/bookmark-edit.js'
-import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
-import { useResolvePolling } from '../../hooks/useResolvePolling.js'
-import { withinResolvingWindow } from '../../hooks/resolve-timeout.js'
-import { tc } from '../../lib/typed-component.js'
-import { mountPage } from '../../lib/mount-page.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { useSearchParamsAll } from '#hooks/useSearchParams.js'
+import { BookmarkEdit } from '#components/bookmark/bookmark-edit.js'
+import { diffUpdate, arraySetEqual } from '#client/lib/diff-update.js'
+import { useResolvePolling } from '#hooks/useResolvePolling.js'
+import { withinResolvingWindow } from '#hooks/resolve-timeout.js'
+import { tc } from '#client/lib/typed-component.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

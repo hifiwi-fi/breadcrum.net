@@ -4,9 +4,9 @@
 
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
-import { useLSP } from '../hooks/useLSP.js'
-import { useSearchParams } from '../hooks/useSearchParams.js'
-import { mountPage } from '../lib/mount-page.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { useSearchParams } from '#hooks/useSearchParams.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

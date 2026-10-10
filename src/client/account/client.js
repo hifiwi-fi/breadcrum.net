@@ -8,8 +8,8 @@
 import { html } from 'htm/preact'
 import { useCallback, useMemo } from 'preact/hooks'
 import { useQueryClient } from '@tanstack/preact-query'
-import { useUser } from '../hooks/useUser.js'
-import { useLSP } from '../hooks/useLSP.js'
+import { useUser } from '#hooks/useUser.js'
+import { useLSP } from '#hooks/useLSP.js'
 import { UsernameField } from './username/username-field.js'
 import { PasswordField } from './password/password-field.js'
 import { NewsletterField } from './newsletter/newsletter-field.js'
@@ -17,7 +17,7 @@ import { EmailField } from './email/email-field.js'
 import { DisabledField } from './disabled/disabled-field.js'
 import { AuthTokens } from './auth-tokens/auth-tokens-field.js'
 import { PasskeysField } from './passkeys/passkeys-field.js'
-import { mountPage } from '../lib/mount-page.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

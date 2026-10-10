@@ -19,10 +19,10 @@
 
 import { html } from 'htm/preact'
 import { useEffect, useState } from 'preact/hooks'
-import { useUser } from '../hooks/useUser.js'
-import { useLSP } from '../hooks/useLSP.js'
-import { useFlags } from '../hooks/useFlags.js'
-import { mountPage } from '../lib/mount-page.js'
+import { useUser } from '#hooks/useUser.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { useFlags } from '#hooks/useFlags.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

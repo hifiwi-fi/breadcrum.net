@@ -4,10 +4,10 @@
 
 import { html } from 'htm/preact'
 import { render } from 'preact-render-to-string'
-import { Header } from '../../components/header/index.js'
-import { Footer } from '../../components/footer/index.js'
-import { tc } from '../../lib/typed-component.js'
-import { QueryProvider } from '../../lib/query-provider.js'
+import { Header } from '#components/header/index.js'
+import { Footer } from '#components/footer/index.js'
+import { tc } from '#client/lib/typed-component.js'
+import { QueryProvider } from '#client/lib/query-provider.js'
 
 /*
 

@@ -4,16 +4,17 @@
  * @import { FunctionComponent } from 'preact'
  * @import { SchemaTypeAdminUserReadClient } from '#routes/api/admin/users/schemas/schema-admin-user-read.js'
  * @import { SchemaTypeAdminUserUpdateClient } from '#routes/api/admin/users/schemas/schema-admin-user-update.js'
+ * @import { SchemaTypeAdminUsersReadClient } from '#routes/api/admin/users/schemas/schema-admin-user-read.js'
  */
 
 import { html } from 'htm/preact'
 import { useState, useCallback, useMemo } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
+import { useLSP } from '#hooks/useLSP.js'
 import { UserRowEdit } from './user-row-edit.js'
 import { UserRowView } from './user-row-view.js'
-import { diffUpdate } from '../../lib/diff-update.js'
-import { tc } from '../../lib/typed-component.js'
+import { diffUpdate } from '#client/lib/diff-update.js'
+import { tc } from '#client/lib/typed-component.js'
 
 /**
  * @typedef {object} UserRowProps
@@ -46,7 +47,7 @@ export const UserRow = ({ user, onDelete }) => {
   const saveMutation = useMutation({
     mutationFn: async (/** @type {SchemaTypeAdminUserUpdateClient} */newUser) => {
       const payload = diffUpdate(user, newUser)
-      if (Object.keys(payload).length === 0) return
+      if (Object.keys(payload).length === 0) return user
 
       const response = await fetch(`${state.apiUrl}/admin/users/${user.id}`, {
         method: 'put',
@@ -57,11 +58,27 @@ export const UserRow = ({ user, onDelete }) => {
       if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText} ${await response.text()}`)
       }
+
+      return /** @type {SchemaTypeAdminUserReadClient} */ (await response.json())
     },
-    onSuccess: () => {
+    onSuccess: updatedUser => {
       setEditing(false)
-      queryClient.invalidateQueries({ queryKey: adminUsersQueryKeyPrefix })
-      queryClient.invalidateQueries({ queryKey: ['admin-user', user.id, state.apiUrl] })
+      queryClient.setQueriesData(
+        { queryKey: adminUsersQueryKeyPrefix },
+        (/** @type {SchemaTypeAdminUsersReadClient | undefined} */ cachedUsers) => {
+          if (!cachedUsers) return cachedUsers
+          return {
+            ...cachedUsers,
+            data: cachedUsers.data.map(cachedUser => (
+              cachedUser.id === updatedUser.id ? updatedUser : cachedUser
+            )),
+          }
+        }
+      )
+      queryClient.setQueriesData(
+        { queryKey: ['admin-user', user.id, state.apiUrl] },
+        updatedUser
+      )
     },
   })
 
@@ -90,7 +107,7 @@ export const UserRow = ({ user, onDelete }) => {
       : editing
         ? tc(UserRowEdit, {
             user,
-            onSave: saveMutation.mutateAsync,
+            onSave: async formState => { await saveMutation.mutateAsync(formState) },
             onDelete: deleteMutation.mutateAsync,
             onCancelEdit: handleCancelEdit,
           })

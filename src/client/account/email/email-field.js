@@ -6,7 +6,7 @@
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
+import { useLSP } from '#hooks/useLSP.js'
 import { EmailEdit } from './email-edit.js'
 import { EmailView } from './email-view.js'
 

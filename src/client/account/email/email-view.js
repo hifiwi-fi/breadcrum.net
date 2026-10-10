@@ -6,7 +6,7 @@
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
+import { useLSP } from '#hooks/useLSP.js'
 
 /**
  * @typedef {{

@@ -10,7 +10,7 @@ import { useTitle } from '#hooks/useTitle.js'
 import { UserTable } from '#components/user-table/user-table.js'
 import { useAdminUser } from '#hooks/use-admin-user.js'
 import { tc } from '#client/lib/typed-component.js'
-import { mountPage } from '../../../lib/mount-page.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

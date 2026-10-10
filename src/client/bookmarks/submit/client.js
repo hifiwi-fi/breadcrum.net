@@ -4,10 +4,10 @@
 
 import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
-import { tc } from '../../lib/typed-component.js'
-import { useWindow } from '../../hooks/useWindow.js'
-import { BookmarkQuickAdd } from '../../components/bookmark/bookmark-quick-add.js'
-import { mountPage } from '../../lib/mount-page.js'
+import { tc } from '#client/lib/typed-component.js'
+import { useWindow } from '#hooks/useWindow.js'
+import { BookmarkQuickAdd } from '#components/bookmark/bookmark-quick-add.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

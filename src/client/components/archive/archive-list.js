@@ -9,12 +9,12 @@
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
-import { tc } from '../../lib/typed-component.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { tc } from '#client/lib/typed-component.js'
 
 import { ArchiveEdit } from './archive-edit.js'
 import { ArchiveView } from './archive-view.js'
-import { diffUpdate } from '../../lib/diff-update.js'
+import { diffUpdate } from '#client/lib/diff-update.js'
 
 /** @type {FunctionComponent<{
  * archive: TypeArchiveReadClient,

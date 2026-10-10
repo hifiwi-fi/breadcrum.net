@@ -5,9 +5,9 @@
 
 import { html } from 'htm/preact'
 import { useQuery } from '@tanstack/preact-query'
-import { useUser } from '../../hooks/useUser.js'
-import { useLSP } from '../../hooks/useLSP.js'
-import { mountPage } from '../../lib/mount-page.js'
+import { useUser } from '#hooks/useUser.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 const countFormatter = new Intl.NumberFormat('en-US')
 

@@ -9,8 +9,8 @@
 import { html } from 'htm/preact'
 import { useRef, useState, useCallback, useMemo } from 'preact/hooks'
 import { useMutation, useQueryClient } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
-import { tc } from '../../lib/typed-component.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { tc } from '#client/lib/typed-component.js'
 import { AuthTokenEdit } from './auth-token-edit.js'
 
 /**

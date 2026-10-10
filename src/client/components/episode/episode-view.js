@@ -12,7 +12,7 @@ import { TextIcon } from '../text-icon/index.js'
 import { EpisodeTitle } from '../episode-title/index.js'
 import { CorsMedia } from '../cors-media/cors-media.js'
 import { ExpandText } from '../expand-text/index.js'
-import { tc } from '../../lib/typed-component.js'
+import { tc } from '#client/lib/typed-component.js'
 
 /**
  * @param {string | null | undefined} value

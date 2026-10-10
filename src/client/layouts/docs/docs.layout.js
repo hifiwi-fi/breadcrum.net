@@ -5,9 +5,9 @@
 
 import { html } from 'htm/preact'
 import { sep, relative } from 'node:path'
-import { Breadcrumb } from '../../components/breadcrumb/index.js'
-import { ArticleHeader } from '../../components/article-header/index.js'
-import { tc } from '../../lib/typed-component.js'
+import { Breadcrumb } from '#components/breadcrumb/index.js'
+import { ArticleHeader } from '#components/article-header/index.js'
+import { tc } from '#client/lib/typed-component.js'
 
 export const parentLayout = 'root'
 

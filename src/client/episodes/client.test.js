@@ -3,7 +3,7 @@ import assert from 'node:assert'
 import { Page } from './client.js'
 import { html } from 'htm/preact'
 import { render } from 'preact-render-to-string'
-import { QueryProvider } from '../lib/query-provider.js'
+import { QueryProvider } from '#client/lib/query-provider.js'
 
 suite('Episodes Page Tests', () => {
   test('Episodes listing page renders without errors', async () => {

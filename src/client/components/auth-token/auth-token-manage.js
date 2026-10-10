@@ -6,7 +6,7 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { tc } from '../../lib/typed-component.js'
+import { tc } from '#client/lib/typed-component.js'
 import { ManageAuthTokenCreateField } from './auth-token-manage-create.js'
 
 /**

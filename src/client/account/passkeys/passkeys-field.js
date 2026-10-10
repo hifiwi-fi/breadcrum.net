@@ -4,10 +4,10 @@
 
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
-import { usePasskeys } from '../../hooks/usePasskeys.js'
-import { PasskeyList } from '../../components/passkey/passkey-list.js'
-import { PasskeyRegisterForm } from '../../components/passkey/passkey-register-form.js'
-import { tc } from '../../lib/typed-component.js'
+import { usePasskeys } from '#hooks/usePasskeys.js'
+import { PasskeyList } from '#components/passkey/passkey-list.js'
+import { PasskeyRegisterForm } from '#components/passkey/passkey-register-form.js'
+import { tc } from '#client/lib/typed-component.js'
 
 /**
  * @typedef {{}} PasskeysFieldProps

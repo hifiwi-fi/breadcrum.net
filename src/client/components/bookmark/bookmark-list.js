@@ -8,11 +8,11 @@
 import { html } from 'htm/preact'
 import { useState, useCallback } from 'preact/hooks'
 import { useMutation } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
-import { tc } from '../../lib/typed-component.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { tc } from '#client/lib/typed-component.js'
 import { BookmarkEdit } from './bookmark-edit.js'
 import { BookmarkView } from './bookmark-view.js'
-import { diffUpdate, arraySetEqual } from '../../lib/diff-update.js'
+import { diffUpdate, arraySetEqual } from '#client/lib/diff-update.js'
 
 /**
  * @typedef {object} BookmarkListProps

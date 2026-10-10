@@ -4,13 +4,13 @@
 
 import { html } from 'htm/preact'
 import { useCallback } from 'preact/hooks'
-import { useSearchParams } from '../../hooks/useSearchParams.js'
-import { useWindow } from '../../hooks/useWindow.js'
-import { UserTable } from '../../components/user-table/user-table.js'
-import { useAdminUsers } from '../../hooks/use-admin-users.js'
-import { tc } from '../../lib/typed-component.js'
-import { PaginationButtons } from '../../components/pagination-buttons/index.js'
-import { mountPage } from '../../lib/mount-page.js'
+import { useSearchParams } from '#hooks/useSearchParams.js'
+import { useWindow } from '#hooks/useWindow.js'
+import { UserTable } from '#components/user-table/user-table.js'
+import { useAdminUsers } from '#hooks/use-admin-users.js'
+import { tc } from '#client/lib/typed-component.js'
+import { PaginationButtons } from '#components/pagination-buttons/index.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {

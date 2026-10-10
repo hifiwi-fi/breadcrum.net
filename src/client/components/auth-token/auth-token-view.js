@@ -6,7 +6,7 @@
  */
 
 import { html } from 'htm/preact'
-import { formatRelativeTime } from '../../lib/format-relative-time.js'
+import { formatRelativeTime } from '#client/lib/format-relative-time.js'
 import cn from 'classnames'
 
 /**

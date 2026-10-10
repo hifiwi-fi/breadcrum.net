@@ -4,9 +4,9 @@
 
 import { html } from 'htm/preact'
 import { useMutation } from '@tanstack/preact-query'
-import { useLSP } from '../../hooks/useLSP.js'
-import { useUser } from '../../hooks/useUser.js'
-import { mountPage } from '../../lib/mount-page.js'
+import { useLSP } from '#hooks/useLSP.js'
+import { useUser } from '#hooks/useUser.js'
+import { mountPage } from '#client/lib/mount-page.js'
 
 /** @type {FunctionComponent} */
 export const Page = () => {
