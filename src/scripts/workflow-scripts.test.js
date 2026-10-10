@@ -223,10 +223,11 @@ test('env linker handles spaced paths and preserves existing links', async t => 
  * @param {TestContext} t
  * @param {number} exitCode
  */
-async function mockDeployment (t, exitCode) {
+async function mockDeployment (t, exitCode, geoipExitCode = 0) {
   const { dir, bin } = await fixture(t)
   const log = join(dir, 'commands.log')
   await stub(bin, 'git', 'printf "test-sha\\n"')
+  await stub(bin, 'node', 'printf "node %s\\n" "$*" >> "$TRACE_FILE"\nexit "$GEOIP_EXIT"')
   await stub(bin, 'pnpm', 'printf "pnpm %s\\n" "$*" >> "$TRACE_FILE"')
   await stub(bin, 'flyctl', 'printf "flyctl %s\\n" "$*" >> "$TRACE_FILE"\nexit "$FLY_EXIT"')
   // No inherited PATH, credentials, or real CLI can reach an external service.
@@ -234,6 +235,7 @@ async function mockDeployment (t, exitCode) {
     PATH: bin,
     TRACE_FILE: log,
     FLY_EXIT: String(exitCode),
+    GEOIP_EXIT: String(geoipExitCode),
     SENTRY_RELEASE: 'test-release',
     SENTRY_DEPLOY_NAME: 'test-deploy',
     SENTRY_BROWSER_DSN: 'https://public@example.invalid/1',
@@ -242,8 +244,12 @@ async function mockDeployment (t, exitCode) {
   })
   assert.equal(result.status, exitCode, result.stderr)
   const commands = (await readFile(log, 'utf8')).trim().split('\n')
+  const geoipUpdates = commands.filter(line => line === 'node src/scripts/api/update-geoip-db.js')
+  assert.equal(geoipUpdates.length, 1)
+  const geoipUpdate = geoipUpdates[0] ?? ''
   const deploys = commands.filter(line => line.startsWith('flyctl deploy '))
   assert.equal(deploys.length, 1)
+  assert.ok(commands.indexOf(geoipUpdate) < commands.indexOf(deploys[0] ?? ''), 'refresh GeoIP before building the image')
   assert.match(deploys[0] ?? '', /--config fly.toml --dockerfile Dockerfile --build-arg SENTRY_RELEASE=test-release/)
   assert.match(deploys[0] ?? '', /--ha=false(?:\s|$)/)
   assert.match(deploys[0] ?? '', /--build-arg SENTRY_BROWSER_DSN=https:\/\/public@example.invalid\/1/)
@@ -257,13 +263,50 @@ async function mockDeployment (t, exitCode) {
 
 test('deploy helper associates both projects and records success after one deployment', async t => {
   const commands = await mockDeployment(t, 0)
-  assert.match(commands.at(-1) ?? '', /releases deploys test-release new/)
-  assert.match(commands.at(-2) ?? '', /releases finalize test-release/)
+  assert.match(commands[commands.length - 1] ?? '', /releases deploys test-release new/)
+  assert.match(commands[commands.length - 2] ?? '', /releases finalize test-release/)
 })
 
 test('deploy helper does not finalize a failed deployment', async t => {
   const commands = await mockDeployment(t, 1)
   assert.equal(commands.some(line => line.includes('releases finalize ')), false)
   assert.equal(commands.some(line => line.includes('releases deploys ')), false)
-  assert.match(commands.at(-1) ?? '', /^flyctl deploy /)
+  assert.match(commands[commands.length - 1] ?? '', /^flyctl deploy /)
+})
+
+test('deploy helper continues with existing GeoIP data if the refresh fails', async t => {
+  const commands = await mockDeployment(t, 0, 1)
+  assert.ok(commands.some(line => line === 'node src/scripts/api/update-geoip-db.js'))
+  assert.ok(commands.some(line => line.startsWith('flyctl deploy ')))
+})
+
+test('deploy entrypoint loads .env for the shell helper', async t => {
+  const { dir, bin } = await fixture(t)
+  const scripts = join(dir, 'src', 'scripts')
+  await mkdir(scripts, { recursive: true })
+  await copyFile(new URL('./deploy-with-sentry.sh', import.meta.url), join(scripts, 'deploy-with-sentry.sh'))
+  await writeFile(join(dir, '.env'), [
+    'SENTRY_BROWSER_DSN=https://public@example.invalid/1',
+    'SENTRY_RELEASE=env-release',
+    'SENTRY_DEPLOY_NAME=env-deploy',
+    '',
+  ].join('\n'))
+  const log = join(dir, 'commands.log')
+  await stub(bin, 'git', 'printf "test-sha\\n"')
+  await stub(bin, 'node', 'printf "node %s\\n" "$*" >> "$TRACE_FILE"')
+  await stub(bin, 'pnpm', 'printf "pnpm %s\\n" "$*" >> "$TRACE_FILE"')
+  await stub(bin, 'flyctl', 'printf "flyctl %s\\n" "$*" >> "$TRACE_FILE"')
+
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('./deploy.js', import.meta.url))], {
+    cwd: dir,
+    env: { PATH: bin, TRACE_FILE: log },
+    encoding: 'utf8',
+    timeout: 10_000,
+  })
+  assert.equal(result.status, 0, result.stderr)
+  const commands = (await readFile(log, 'utf8')).trim().split('\n')
+  const deploy = commands.find(line => line.startsWith('flyctl deploy ')) ?? ''
+  assert.match(deploy, /--build-arg SENTRY_RELEASE=env-release/)
+  assert.ok(deploy.includes('--build-arg SENTRY_BROWSER_DSN=https://public@example.invalid/1'))
+  assert.ok(commands.some(line => line.startsWith('pnpm exec sentry-cli releases deploys env-release new')))
 })

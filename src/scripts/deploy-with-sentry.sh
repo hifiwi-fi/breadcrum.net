@@ -47,6 +47,11 @@ if ! pnpm exec sentry-cli info --no-defaults --quiet >/dev/null; then
   exit 1
 fi
 
+# Refresh the local image input like CI; the updater loads credentials from the root .env.
+if ! node src/scripts/api/update-geoip-db.js; then
+  echo "GeoIP database update failed; deploying with existing data if available." >&2
+fi
+
 # Repeating 'new' updates an existing release, including its project membership.
 echo "Preparing shared Sentry release ${SENTRY_RELEASE} for ${SENTRY_API_PROJECT} and ${SENTRY_WORKER_PROJECT}"
 pnpm exec sentry-cli releases new "${SENTRY_RELEASE}" \

@@ -76,7 +76,7 @@
     "start": "pnpm run watch",
     "start-api": "APP_ROLE=api node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js src/app.js",
     "start-worker": "APP_ROLE=worker node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js src/app.js",
-    "deploy": "./src/scripts/deploy-with-sentry.sh",
+    "deploy": "node src/scripts/deploy.js",
     "sentry:login": "sentry-cli login",
     "knip": "knip --dependencies",
     "new-blogpost": "node src/scripts/create-blogpost.js --title",
