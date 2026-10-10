@@ -38,7 +38,6 @@ async function workerHarness (t, envData) {
     offWork: t.mock.method(queueBoss, 'offWork', async () => {}),
     stop: t.mock.method(queueBoss, 'stop', async () => {}),
   }
-  const config = loadConfig('worker', { dotEnvPath: false, processEnv: {}, envData })
   await app.register(fp(async fastify => {
     fastify.decorate('config', config)
   }, { name: 'env' }))

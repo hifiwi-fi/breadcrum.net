@@ -8,7 +8,7 @@ import { act } from 'preact/test-utils'
 import { JSDOM } from 'jsdom'
 import { tc } from '#client/lib/typed-component.js'
 
-/** @import { SchemaTypeAdminUserReadClient } from '#api/routes/api/admin/users/schemas/schema-admin-user-read.js' */
+/** @import { SchemaTypeAdminUserReadClient } from '#routes/api/admin/users/schemas/schema-admin-user-read.js' */
 
 test('custom subscription dates grant access through the entire selected UTC day', () => {
   for (const [date, end] of [

@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { useLSP } from '../../hooks/useLSP.js'
 import { useFlags } from '../../hooks/useFlags.js'
 import { useBilling } from '../../hooks/useBilling.js'
-import { useSearchParams } from '../../hooks/useQuery.js'
+import { useSearchParams } from '../../hooks/useSearchParams.js'
 
 /**
  * @param {string} apiUrl
@@ -35,8 +35,8 @@ export const BillingField = () => {
   const state = useLSP()
   const { flags } = useFlags()
   const billingEnabled = Boolean(flags?.['billing_enabled'])
-  const { searchParams, replaceState } = useSearchParams(/** @type {{ billing?: string } | null} */ (null))
-  const billingParam = searchParams?.billing ?? null
+  const { params, setParams } = useSearchParams(['billing'])
+  const billingParam = params['billing']
   const { data: billing, isPending: billingLoading, error: billingError, refetch } = useBilling({
     enabled: true,
   })
@@ -47,12 +47,8 @@ export const BillingField = () => {
 
   const clearBillingParam = useCallback(() => {
     if (typeof window === 'undefined' || !billingParam) return
-    const params = new URLSearchParams(window.location.search)
-    params.delete('billing')
-    const qs = params.toString()
-    const nextUrl = `${window.location.origin}${window.location.pathname}${qs ? `?${qs}` : ''}`
-    replaceState(nextUrl)
-  }, [billingParam, replaceState])
+    setParams({ billing: null })
+  }, [billingParam, setParams])
 
   useEffect(() => {
     if (!billingParam) return

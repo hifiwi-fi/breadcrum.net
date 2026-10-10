@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-/** @import { TypeBillingSubscriptionReadClient } from '#api/routes/api/billing/schemas/schema-billing-subscription-read.js' */
+/** @import { TypeBillingSubscriptionReadClient } from '#routes/api/billing/schemas/schema-billing-subscription-read.js' */
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { QueryClient, QueryObserver } from '@tanstack/preact-query'

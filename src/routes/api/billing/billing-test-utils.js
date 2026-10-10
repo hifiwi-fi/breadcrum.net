@@ -188,7 +188,7 @@ export async function insertStripeCustomer (app, t, { userId, stripeCustomerId =
 /**
  * Asserts the shape of the billing subscription response body.
  *
- * @param {import('node:assert')} assert
+ * @param {typeof import('node:assert/strict')} assert
  * @param {Record<string, unknown>} body
  */
 export function assertBillingShape (assert, body) {

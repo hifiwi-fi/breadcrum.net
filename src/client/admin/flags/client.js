@@ -12,19 +12,20 @@ import { useLSP } from '#hooks/useLSP.js'
 import { mountPage } from '#client/lib/mount-page.js'
 
 /**
- * @typedef {'boolean' | 'string'} FlagType
+ * @typedef {'boolean' | 'string' | 'number'} FlagType
  * @typedef {{ type: 'boolean', default: boolean, description: string }} BooleanFlagMeta
  * @typedef {{ type: 'string', default: string, description: string }} StringFlagMeta
- * @typedef {BooleanFlagMeta | StringFlagMeta} FlagMeta
+ * @typedef {{ type: 'number', default: number, description: string }} NumberFlagMeta
+ * @typedef {BooleanFlagMeta | StringFlagMeta | NumberFlagMeta} FlagMeta
  * @typedef {Record<string, FlagMeta>} FlagDefinitions
- * @typedef {Record<string, boolean | string>} FlagValues
+ * @typedef {Record<string, boolean | string | number>} FlagValues
  */
 
 /** @type {FlagDefinitions} */
-const defaultFlags = /** @type {FlagDefinitions} */ ({
+const defaultFlags = /** @type {FlagDefinitions} */ (/** @type {unknown} */ ({
   ...defaultFrontendFlags,
   ...defaultBackendFlags,
-})
+}))
 
 const noticeMessageFlagConfig = /** @type {const} */ ({
   service_notice_message: {
@@ -129,6 +130,13 @@ export const Page = () => {
 
       if (flagMeta.type === 'boolean') {
         payload[flag] = formElement.checked
+      } else if (flagMeta.type === 'number') {
+        const rawValue = formElement.value.trim()
+        const parsed = Number(rawValue)
+        if (rawValue === '' || !Number.isFinite(parsed)) {
+          throw new Error(`Invalid numeric value for flag "${flag}"`)
+        }
+        payload[flag] = parsed
       } else {
         payload[flag] = formElement.value
       }
@@ -194,7 +202,7 @@ export const Page = () => {
  * @typedef {{
  *   flag: string,
  *   flagMeta: FlagMeta,
- *   serverValue?: boolean | string,
+ *   serverValue?: boolean | string | number,
  *   disabled: boolean
  * }} FlagEntryProps
  */
@@ -226,7 +234,7 @@ const FlagEntry = ({ flag, flagMeta, serverValue, disabled }) => {
  * @typedef {{
  *   flag: string,
  *   flagMeta: FlagMeta,
- *   serverValue?: boolean | string,
+ *   serverValue?: boolean | string | number,
  *   disabled: boolean,
  *   colorFlag: string,
  *   colorLabel: string,
@@ -341,8 +349,8 @@ const NoticeMessageEntry = ({
  *   type: FlagType,
  *   disabled: boolean,
  *   flag: string,
- *   serverValue?: boolean | string,
- *   defaultValue: boolean | string
+ *   serverValue?: boolean | string | number,
+ *   defaultValue: boolean | string | number
  * }} TypeMapProps
  */
 
@@ -353,6 +361,9 @@ const TypeMap = ({ type, disabled, flag, serverValue, defaultValue }) => {
   switch (type) {
     case 'boolean': {
       return html`<input class="bc-admin-flags-checkbox" id=${flag} disabled=${disabled} type='checkbox' name=${flag} checked=${serverValue ?? defaultValue} />`
+    }
+    case 'number': {
+      return html`<input class="bc-admin-flags-input" id=${flag} disabled=${disabled} type='number' name=${flag} defaultValue=${serverValue ?? defaultValue} />`
     }
     default: {
       return html`<input class="bc-admin-flags-input" id=${flag} disabled=${disabled} name=${flag} defaultValue=${serverValue ?? defaultValue} />`
