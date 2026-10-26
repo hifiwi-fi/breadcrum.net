@@ -107,8 +107,6 @@ export const Page = () => {
           return // Browser doesn't support conditional mediation
         }
 
-        setPasskeyAuthInProgress(true)
-
         // Get challenge from server (no user required for conditional mediation)
         const challengeResponse = await fetch(`${state.apiUrl}/user/passkeys/authenticate/challenge`, {
           method: 'GET',
@@ -130,7 +128,8 @@ export const Page = () => {
           userVerification: 'required',
         })
 
-        // Verify and login
+        // Only lock the form once the user has supplied a passkey.
+        setPasskeyAuthInProgress(true)
         const verifyResponse = await fetch(`${state.apiUrl}/user/passkeys/authenticate/verify`, {
           method: 'POST',
           headers: {
@@ -172,9 +171,6 @@ export const Page = () => {
 
   async function login (/** @type {Event & {currentTarget: HTMLFormElement}} */ ev) {
     ev.preventDefault()
-    setLoggingIn(true)
-    setLoginError(null)
-
     const form = /** @type {HTMLFormElement} */ (ev.currentTarget)
     const userElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('user'))
     const passwordElement = /** @type {HTMLInputElement | null} */ (form.elements.namedItem('password'))
@@ -183,6 +179,9 @@ export const Page = () => {
 
     const user = userElement.value
     const password = passwordElement.value
+
+    setLoggingIn(true)
+    setLoginError(null)
 
     try {
       const response = await fetch(`${state.apiUrl}/login`, {
