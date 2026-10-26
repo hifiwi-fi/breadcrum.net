@@ -187,8 +187,8 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2
       nodemailer:
-        specifier: ^10.0.15
-        version: 10.0.16
+        specifier: ^10.1.4
+        version: 10.1.4
       pg:
         specifier: ^8.23.0
         version: 8.23.1
@@ -1000,6 +1000,7 @@ packages:
   '@opentelemetry/propagator-jaeger@2.12.0':
     resolution: {integrity: sha512-Kz2Vz+NILW7S1WtN4rV1wr76fMtT/RRWvAMFBc91uTIi2dDMXxrfBKNe2KH7yaCfFp1X0xfAuabzuFczvoPB6A==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Package no longer supported. See https://github.com/open-telemetry/opentelemetry-js/pull/7077
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -1030,12 +1031,14 @@ packages:
   '@opentelemetry/sdk-trace-base@2.12.0':
     resolution: {integrity: sha512-JOERgZCxRM06FEJ5kEWxlSRChah6MmXDx3KwCruqEv/iEyLkTokCSemf2y1w8oIHtfrr8EVTpzebq/31vn2Cpg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
   '@opentelemetry/sdk-trace-node@2.12.0':
     resolution: {integrity: sha512-9DufH1IlmQMoKAfot5y/FhTP1RnmhLb5K6eKmJO/bvzPjYwPAazoiAUbTZFdPbqxOXN0FEbhZx/e6SB1Og4jmg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -3174,8 +3177,8 @@ packages:
     peerDependencies:
       eslint: ^9.22.0 || ^10.0.0
 
-  nodemailer@10.0.16:
-    resolution: {integrity: sha512-VL9xKErxN+el77o8eBOuYKUPMyEx7F9hfnDCuiUKJRp9v3wnWMOudYgP/SWbwSHy8rUL4cylobuXtki1LpQS7A==}
+  nodemailer@10.1.4:
+    resolution: {integrity: sha512-EsMnOR2oRv4LGnWvHgcVYkkQ4O2j8KO4WTw6l+PHR4sOXo8SAgIraxtEnGDmotjbhv0hDsu3IuDIFZm8iXwO4A==}
     engines: {node: '>=20.0.0'}
 
   non-error@0.1.0:
@@ -6903,7 +6906,7 @@ snapshots:
       - ts-declaration-location
       - typescript
 
-  nodemailer@10.0.16: {}
+  nodemailer@10.1.4: {}
 
   non-error@0.1.0: {}
 
