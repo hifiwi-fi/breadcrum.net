@@ -60,7 +60,7 @@ suite('Login Page Tests', () => {
     t.mock.method(console, 'debug', () => {})
     t.mock.method(console, 'error', () => {})
     t.mock.method(console, 'log', () => {})
-    const fetchMock = t.mock.method(globalThis, 'fetch', /** @param {RequestInfo | URL} url */ async url => {
+    const fetchMock = t.mock.method(globalThis, 'fetch', async (/** @type {Parameters<typeof fetch>[0]} */ url) => {
       switch (url) {
         case '/api/user': return new Response(null, { status: 401 })
         case '/api/user/passkeys/authenticate/challenge':
