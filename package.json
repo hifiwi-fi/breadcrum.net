@@ -149,7 +149,7 @@
     "preact-render-to-string": "^6.8.0",
     "resolve-email": "^4.0.45",
     "type-fest": "^5.7.0",
-    "undici": "^8.10.0",
+    "undici": "^8.12.2",
     "user-agents": "^2.1.43",
     "useragent": "^2.3.0"
   },
