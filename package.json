@@ -141,7 +141,7 @@
     "jsonfeed-to-atom": "^1.2.5",
     "jsonfeed-to-rss": "^3.0.8",
     "mime-types": "^3.0.2",
-    "nodemailer": "^10.0.15",
+    "nodemailer": "^10.1.4",
     "pg": "^8.23.0",
     "pg-boss": "12.37.1",
     "postgrator-cli": "^10.0.0",
