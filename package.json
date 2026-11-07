@@ -136,7 +136,7 @@
     "htm": "^3.1.1",
     "hyperid": "^4.0.0",
     "ipaddr.js": "^2.3.0",
-    "jsdom": "^30.0.1",
+    "jsdom": "^31.0.0",
     "json-schema-to-ts": "^3.1.1",
     "jsonfeed-to-atom": "^1.2.5",
     "jsonfeed-to-rss": "^3.0.8",
