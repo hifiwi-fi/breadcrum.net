@@ -8,7 +8,6 @@ minimumReleaseAgeExclude:
   - undici
   - mine.css
 
-
 packageExtensions:
   htm:
     peerDependencies:
@@ -20,7 +19,8 @@ peerDependencyRules:
     typescript: '7'
 
 patchedDependencies:
-  fastify@5.12.5: patches/fastify@5.12.5.patch
+  '@domstack/static@12.0.0': patches/@domstack__static@12.0.0.patch
+  fastify@5.12.8: patches/fastify@5.12.8.patch
   fastify-cli@8.0.3: patches/fastify-cli@8.0.3.patch
   giscus@1.6.0: patches/giscus@1.6.0.patch
 

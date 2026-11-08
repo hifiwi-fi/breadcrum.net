@@ -1,0 +1,177 @@
+diff --git a/lib/reply.js b/lib/reply.js
+index a82f0e671cb0116d4558b0c2ab83867ce8c38f19..0e4ad7b5a84a70ef11db75ea847e3466731e7f12 100644
+--- a/lib/reply.js
++++ b/lib/reply.js
+@@ -24,6 +24,7 @@ const {
+   kTimeoutTimer,
+   kOnAbort,
+   kRequestSignal,
++  kRequestRawResponse,
+   kLogController
+ } = require('./symbols.js')
+ const {
+@@ -70,6 +71,7 @@ function Reply (res, request, log) {
+   this[kReplyIsError] = false
+   this[kReplyIsRunningOnErrorHook] = false
+   this.request = request
++  request[kRequestRawResponse] = res
+   this[kReplyHeaders] = {}
+   this[kReplyTrailers] = null
+   this[kReplyHasStatusCode] = false
+@@ -137,10 +139,7 @@ Reply.prototype.hijack = function () {
+   if (this.request[kRequestSignal]) {
+     clearTimeout(this.request[kTimeoutTimer])
+     this.request[kTimeoutTimer] = null
+-    if (this.request[kOnAbort]) {
+-      this.request.raw.removeListener('close', this.request[kOnAbort])
+-      this.request[kOnAbort] = null
+-    }
++    this.request[kOnAbort]?.(false)
+   }
+   // Clear socket._meta so hijacked replies (e.g. WebSocket upgrades) do not
+   // retain request/reply objects for the lifetime of the keep-alive socket
+@@ -986,10 +985,7 @@ function setupResponseListeners (reply) {
+     if (reply.request[kRequestSignal]) {
+       clearTimeout(reply.request[kTimeoutTimer])
+       reply.request[kTimeoutTimer] = null
+-      if (reply.request[kOnAbort]) {
+-        reply.request.raw.removeListener('close', reply.request[kOnAbort])
+-        reply.request[kOnAbort] = null
+-      }
++      reply.request[kOnAbort]?.(false)
+     }
+ 
+     // Fix: release socket._meta so request/reply objects are not retained
+@@ -1030,6 +1026,7 @@ function buildReply (R) {
+     this[kReplyHijacked] = false
+     this[kReplySerializer] = null
+     this.request = request
++    request[kRequestRawResponse] = res
+     this[kReplyHeaders] = {}
+     this[kReplyTrailers] = null
+     this[kReplyStartTime] = undefined
+diff --git a/lib/request-signal.js b/lib/request-signal.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..d182c5fd9f3150ed0e067d82d798581a8dad7898
+--- /dev/null
++++ b/lib/request-signal.js
+@@ -0,0 +1,35 @@
++'use strict'
++
++const { kOnAbort } = require('./symbols')
++
++function setupRequestSignal (request, response, ac, onCleanup) {
++  const raw = request.raw
++
++  const onRequestClose = () => {
++    if (raw.aborted) cleanup(true)
++  }
++
++  const onResponseClose = () => {
++    cleanup(response.writableFinished === false)
++  }
++
++  function cleanup (abort = false) {
++    raw.removeListener('close', onRequestClose)
++    response.removeListener('close', onResponseClose)
++    request[kOnAbort] = null
++    if (onCleanup) onCleanup()
++    if (abort && !ac.signal.aborted) ac.abort()
++  }
++
++  raw.on('close', onRequestClose)
++  response.on('close', onResponseClose)
++  request[kOnAbort] = cleanup
++
++  if (raw.aborted || (response.destroyed && !response.writableFinished)) {
++    cleanup(true)
++  } else if (response.writableFinished) {
++    cleanup()
++  }
++}
++
++module.exports = { setupRequestSignal }
+diff --git a/lib/request.js b/lib/request.js
+index 3de718543d17cde127fe241bf6d1ce625f3b5658..75b3e8adb9002fd00c5ef641b481116c98f6f1fc 100644
+--- a/lib/request.js
++++ b/lib/request.js
+@@ -1,6 +1,7 @@
+ 'use strict'
+ 
+ const proxyAddr = require('@fastify/proxy-addr')
++const { setupRequestSignal } = require('./request-signal')
+ const {
+   kHasBeenDecorated,
+   kSchemaBody,
+@@ -14,7 +15,7 @@ const {
+   kRouteContext,
+   kRequestOriginalUrl,
+   kRequestSignal,
+-  kOnAbort
++  kRequestRawResponse
+ } = require('./symbols')
+ const { FST_ERR_REQ_INVALID_VALIDATION_INVOCATION, FST_ERR_DEC_UNDECLARED } = require('./errors')
+ const decorators = require('./decorate')
+@@ -223,11 +224,7 @@ Object.defineProperties(Request.prototype, {
+       if (ac) return ac.signal
+       ac = new AbortController()
+       this[kRequestSignal] = ac
+-      const onAbort = () => {
+-        if (!ac.signal.aborted) ac.abort()
+-      }
+-      this.raw.on('close', onAbort)
+-      this[kOnAbort] = onAbort
++      setupRequestSignal(this, this[kRequestRawResponse], ac)
+       return ac.signal
+     }
+   },
+diff --git a/lib/route.js b/lib/route.js
+index 045123a939adc51a12fa3db6fe030df5d1a8fa12..9a6c951d1da487617b08e86d13428f106a0854d5 100644
+--- a/lib/route.js
++++ b/lib/route.js
+@@ -7,6 +7,7 @@ const { onRequestAbortHookRunner, lifecycleHooks, preParsingHookRunner, onTimeou
+ const { normalizeSchema } = require('./schemas')
+ const { parseHeadOnSendHandlers } = require('./head-route.js')
+ const { defaultInitOptions } = require('./initial-config-validation.js')
++const { setupRequestSignal } = require('./request-signal')
+ 
+ const {
+   compileSchemasForValidation,
+@@ -52,7 +53,6 @@ const {
+   kRouteContext,
+   kRequestSignal,
+   kTimeoutTimer,
+-  kOnAbort,
+   kLogController
+ } = require('./symbols.js')
+ const { buildErrorHandler } = require('./error-handler')
+@@ -571,14 +571,10 @@ function buildRouting (options) {
+         reply.send(err)
+       }, handlerTimeout)
+ 
+-      const onAbort = () => {
+-        if (!ac.signal.aborted) {
+-          ac.abort()
+-        }
++      setupRequestSignal(request, res, ac, () => {
+         clearTimeout(request[kTimeoutTimer])
+-      }
+-      req.on('close', onAbort)
+-      request[kOnAbort] = onAbort
++        request[kTimeoutTimer] = null
++      })
+     }
+ 
+     if (hasLogger === true || context.onResponse !== null || handlerTimeout > 0) {
+diff --git a/lib/symbols.js b/lib/symbols.js
+index 507af35e7c03026373dfa704edd5ab3912705a16..2a8997617016fd6488f553667f5052b072f73b28 100644
+--- a/lib/symbols.js
++++ b/lib/symbols.js
+@@ -34,6 +34,7 @@ const keys = {
+   kRequestContentType: Symbol('fastify.request.contentType'),
+   kRequestOriginalUrl: Symbol('fastify.request.originalUrl'),
+   kRequestSignal: Symbol('fastify.request.signal'),
++  kRequestRawResponse: Symbol('fastify.request.rawResponse'),
+   kHandlerTimeout: Symbol('fastify.handlerTimeout'),
+   kTimeoutTimer: Symbol('fastify.request.timeoutTimer'),
+   kOnAbort: Symbol('fastify.request.onAbort'),

@@ -1,0 +1,37 @@
+
+diff --git a/lib/build-esbuild/index.d.ts b/lib/build-esbuild/index.d.ts
+index 3df7b8d3efc7f49cf7a1868280dc0b8fa2a72b49..dd80146618ea3749290dc1883f25d12bffa772ec 100644
+--- a/lib/build-esbuild/index.d.ts
++++ b/lib/build-esbuild/index.d.ts
+@@ -20,7 +20,7 @@ export type EsbuildReport = {
+     buildOpts?: EsbuildBuildOptions;
+     outputMap?: OutputMap;
+ };
+-export type EsBuildStep = BuildStep<*          'esbuild', EsbuildReport>;
++export type EsBuildStep = BuildStep<'esbuild', EsbuildReport>;
+ export type EsBuildStepResults = Awaited<ReturnType<EsBuildStep>>;
+ export declare function serializeEsbuildError(value: unknown): Error;
+ export declare function extractOutputMap(metafile: esbuild.Metafile, src: string, dest: string): OutputMap;
+diff --git a/lib/build-pages/index.d.ts b/lib/build-pages/index.d.ts
+index 514c5d7f12f08c39ff2e61e3346dcfce309caefb..850522441398abbd463b8bc536a740c667a3cbd4 100644
+--- a/lib/build-pages/index.d.ts
++++ b/lib/build-pages/index.d.ts
+@@ -54,7 +54,7 @@ export type GeneratedPageDefinition<T extends Record<string, any> = Record<strin
+ };
+ export type PagesFunction<T extends Record<string, any> = Record<string, any>, U = string, V extends Record<string, any> = Record<string, any>, D extends object = Record<string, unknown>, P extends object = D> = (params: PagesFunctionParams<V, D>) => PagesFunctionResult<T, U, P> | Promise<PagesFunctionResult<T, U, P>>;
+ export type PagesFunctionResult<T extends Record<string, any>, U, D extends object> = GeneratedPageDefinition<T, U, D> | GeneratedPageDefinition<T, U, D>[] | AsyncIterable<GeneratedPageDefinition<T, U, D>> | null | undefined;
+-export type PageBuildStep = BuildStep<*          'page', PageBuilderReport, BuildPagesOptions>;
++export type PageBuildStep = BuildStep<'page', PageBuilderReport, BuildPagesOptions>;
+ export type PageBuildStepResult = Awaited<ReturnType<PageBuildStep>>;
+ export type WorkerErrorData = ProtocolWorkerErrorData;
+ export type WorkerBuildStepResult = ProtocolWorkerBuildStepResult;
+diff --git a/lib/helpers/domstack-warning.d.ts b/lib/helpers/domstack-warning.d.ts
+index 5caa8aca91b7d55be039537b86da60e84daefef4..c1efdd9cc1b32e6bbb39c453b8b166ef98eef7fb 100644
+--- a/lib/helpers/domstack-warning.d.ts
++++ b/lib/helpers/domstack-warning.d.ts
+@@ -1,4 +1,4 @@
+-export type DomStackWarningCode = 'DOM_STACK_WARNING_DUPLICATE_LAYOUT' | *  'DOM_STACK_WARNING_DUPLICATE_LAYOUT_STYLE' | *  'DOM_STACK_WARNING_ORPHANED_LAYOUT_STYLE' | *  'DOM_STACK_WARNING_DUPLICATE_LAYOUT_CLIENT' | *  'DOM_STACK_WARNING_ORPHANED_LAYOUT_CLIENT' | *  'DOM_STACK_WARNING_NO_ROOT_LAYOUT' | *  'DOM_STACK_WARNING_UNKNOWN_PAGE_BUILDER' | *  'DOM_STACK_WARNING_DUPLICATE_GLOBAL_STYLE' | *  'DOM_STACK_WARNING_DUPLICATE_GLOBAL_CLIENT' | *  'DOM_STACK_WARNING_DUPLICATE_ESBUILD_SETTINGS' | *  'DOM_STACK_WARNING_DUPLICATE_MARKDOWN_IT_SETTINGS' | *  'DOM_STACK_WARNING_DUPLICATE_DOMSTACK_MANIFEST_SETTINGS' | *  'DOM_STACK_WARNING_CONFLICTING_MANIFEST_OUTPUT' | *  'DOM_STACK_WARNING_DUPLICATE_OUTPUT' | *  'DOM_STACK_WARNING_DUPLICATE_PAGE_OUTPUTS_PROVIDER' | *  'DOM_STACK_WARNING_DUPLICATE_GLOBAL_VARS' | *  'DOM_STACK_WARNING_DUPLICATE_GLOBAL_DATA' | *  'DOM_STACK_WARNING_PAGE_MD_SHADOWS_README';
++export type DomStackWarningCode = 'DOM_STACK_WARNING_DUPLICATE_LAYOUT' | 'DOM_STACK_WARNING_DUPLICATE_LAYOUT_STYLE' | 'DOM_STACK_WARNING_ORPHANED_LAYOUT_STYLE' | 'DOM_STACK_WARNING_DUPLICATE_LAYOUT_CLIENT' | 'DOM_STACK_WARNING_ORPHANED_LAYOUT_CLIENT' | 'DOM_STACK_WARNING_NO_ROOT_LAYOUT' | 'DOM_STACK_WARNING_UNKNOWN_PAGE_BUILDER' | 'DOM_STACK_WARNING_DUPLICATE_GLOBAL_STYLE' | 'DOM_STACK_WARNING_DUPLICATE_GLOBAL_CLIENT' | 'DOM_STACK_WARNING_DUPLICATE_ESBUILD_SETTINGS' | 'DOM_STACK_WARNING_DUPLICATE_MARKDOWN_IT_SETTINGS' | 'DOM_STACK_WARNING_DUPLICATE_DOMSTACK_MANIFEST_SETTINGS' | 'DOM_STACK_WARNING_CONFLICTING_MANIFEST_OUTPUT' | 'DOM_STACK_WARNING_DUPLICATE_OUTPUT' | 'DOM_STACK_WARNING_DUPLICATE_PAGE_OUTPUTS_PROVIDER' | 'DOM_STACK_WARNING_DUPLICATE_GLOBAL_VARS' | 'DOM_STACK_WARNING_DUPLICATE_GLOBAL_DATA' | 'DOM_STACK_WARNING_PAGE_MD_SHADOWS_README';
+ export type DomStackWarning = {
+     code: DomStackWarningCode;
+     message: string;
