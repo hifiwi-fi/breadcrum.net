@@ -1,8 +1,10 @@
 # Agent Development Notes
 
-Write Markdown prose with one sentence per source line.
+Write Markdown prose in markdown files with one sentence per source line.
 Use one newline between sentences to keep them in the same paragraph.
 Use two newlines to start a new paragraph.
+
+When writing github comments or pr descriptions in markdown, do NOT write with one sentence per line since github treats markdown in these contexts differently than it does in markdown files.
 
 This is a TypeScript-in-JavaScript type checked codebase.
 All code uses JSDoc comments for type annotations and is type-checked by TypeScript without requiring .ts files.
