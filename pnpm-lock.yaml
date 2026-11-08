@@ -7,6 +7,9 @@ settings:
 packageExtensionsChecksum: sha256-BB8lJ1cuuI+V6WIk1yUT0aLCHA23N4qdCBWVumCWJiI=
 
 patchedDependencies:
+  '@domstack/static@12.0.0':
+    hash: 5e4bd0ba685c80031379b54e3cfb398a80483b3fa26d7a257a2b86a992a9ebf9
+    path: patches/@domstack__static@12.0.0.patch
   fastify-cli@8.0.3:
     hash: 81ee4d51bc63f6b97d81db4e043bd34b5620fe7472a13d1f9c750d3948e465f7
     path: patches/fastify-cli@8.0.3.patch
@@ -225,7 +228,7 @@ importers:
         version: 1.0.13
       '@domstack/static':
         specifier: 12.0.0
-        version: 12.0.0(@types/markdown-it@14.2.0)(@types/node@26.6.6)
+        version: 12.0.0(patch_hash=5e4bd0ba685c80031379b54e3cfb398a80483b3fa26d7a257a2b86a992a9ebf9)(@types/markdown-it@14.2.0)(@types/node@26.6.6)
       '@fastify/type-provider-json-schema-to-ts':
         specifier: ^5.0.1
         version: 5.0.1
@@ -4100,7 +4103,7 @@ snapshots:
       hashery: 1.5.1
       keyv: 5.6.0
 
-  '@domstack/static@12.0.0(@types/markdown-it@14.2.0)(@types/node@26.6.6)':
+  '@domstack/static@12.0.0(patch_hash=5e4bd0ba685c80031379b54e3cfb398a80483b3fa26d7a257a2b86a992a9ebf9)(@types/markdown-it@14.2.0)(@types/node@26.6.6)':
     dependencies:
       '@11ty/dependency-tree': 5.0.0-alpha.3
       '@domstack/sync': 0.0.8
