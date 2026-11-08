@@ -37,7 +37,7 @@ export async function bootstrapTelemetry (config) {
     })
     Sentry?.setOpenTelemetryContextAsyncContextStrategy()
     exporter = config.METRICS === 1
-      ? new PrometheusExporter({ port: config.METRICS_PORT, preventServerStart: true })
+      ? new PrometheusExporter({ host: config.LISTEN_HOST, port: config.METRICS_PORT, preventServerStart: true })
       : undefined
     sdk = new NodeSDK({
       metricReaders: exporter ? [exporter] : [],
