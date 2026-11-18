@@ -148,7 +148,7 @@
     "preact": "^11.2.0",
     "preact-render-to-string": "^6.8.2",
     "resolve-email": "^4.0.84",
-    "type-fest": "^5.10.0",
+    "type-fest": "^6.0.0",
     "undici": "^8.12.4",
     "user-agents": "^2.1.237",
     "useragent": "^2.3.0"
