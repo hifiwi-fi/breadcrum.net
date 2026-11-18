@@ -211,8 +211,8 @@ importers:
         specifier: ^4.0.84
         version: 4.0.84
       type-fest:
-        specifier: ^5.10.0
-        version: 5.10.0
+        specifier: ^6.0.0
+        version: 6.0.0
       undici:
         specifier: ^8.12.4
         version: 8.12.4
@@ -3777,6 +3777,7 @@ packages:
 
   tldts-core@7.4.20:
     resolution: {integrity: sha512-C630TWXZCZmLq0F2bW4QqwnaaxCQ/svpAqvJwnC4JvgEM5ohhBnGsEzTLSOXcN+xjz+kEaHS5uoWIw2klnqd0A==}
+    deprecated: Partial release, see https://github.com/remusao/tldts/issues/2735. Use >=7.4.22.
 
   tldts@7.4.19:
     resolution: {integrity: sha512-48dH6aSpQnpbzDUc4vIQZ1VjB8tkK+e8c1yx05/SZK+rkssgjEOlxDd/yU8/a4vGYQ9vRgJr9dwMq9TJ0b3X2Q==}
@@ -3842,6 +3843,10 @@ packages:
   type-fest@5.10.0:
     resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
     engines: {node: '>=20'}
+
+  type-fest@6.0.0:
+    resolution: {integrity: sha512-cFOr1/4SZf98P0WMLb1X+RJNZrZI9Wf4xT0bjdH8OP2tJmUcuJ6jyLE8i10ecq1m/7ObGbXNa7QEF2LCXKVLqg==}
+    engines: {node: '>=22'}
 
   type-is@2.1.0:
     resolution: {integrity: sha512-faYHw0anBbc/kWF3zFTEnxSFOAGUX9GFbOBthvDdLsIlEoWOFOtS0zgCiQYwIskL9iGXZL3kAXD8OoZ4GmMATA==}
@@ -7563,6 +7568,10 @@ snapshots:
       prelude-ls: 1.2.1
 
   type-fest@5.10.0:
+    dependencies:
+      tagged-tag: 1.0.0
+
+  type-fest@6.0.0:
     dependencies:
       tagged-tag: 1.0.0
 
