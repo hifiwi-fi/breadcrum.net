@@ -198,3 +198,57 @@ Retaining a retired cursor key allows existing pages and cursors to survive a si
 Incrementing the account’s cursor generation requires a fresh bootstrap without removing retained receipts.
 
 See the [sync integration suite](../src/routes/api/delta/sync.test.js) for executable examples of paging, conflicts, receipt replay, rollback, and cascades.
+
+## Design alternatives and tradeoffs
+
+### Change detection and ordering
+
+- **Timestamp cursor with an ID tie-breaker.** This could reuse `updated_at` and a composite index.
+  The tie-breaker orders equal timestamps but cannot account for transactions that commit after a client has passed their timestamp.
+  Hard deletes and changes to associated rows would still need explicit capture.
+- **Commit-ordered revisions per account (chosen).** A client can advance without a time overlap, and concurrent publishers for different accounts can proceed independently.
+  Triggers and a deferred publisher add database logic, and a busy account can contend on its revision head.
+- **Append-only change log.** An event per write preserves intermediate values for replay, audit, or other consumers.
+  It costs more storage and sends more changes to clients that need only the current library.
+  The current index coalesces updates and reconstructs the latest projection from the live rows.
+- **PostgreSQL logical decoding.** The database stream can provide commit ordering with fewer domain triggers.
+  A consumer would need durable offsets, replication-slot monitoring, and logic to translate row changes into account-scoped bookmark projections.
+
+### Scope of the cursor and payload
+
+- **Bookmark projections (chosen).** One cursor carries tag membership and archive and episode metadata alongside the parent.
+  This simplifies bootstrap and lets a replacement list represent child removal.
+  A child-only update still resends the bookmark and its other summaries.
+- **Separate streams for each resource.** Independent cursors and compact payloads could help if child collections become large or clients subscribe to different resources.
+  The client would need to coordinate bootstrap, parent-child ordering, joins, and cascades across streams.
+  Library-wide tag management would also need stable tag IDs.
+- **Separate flag ID sets.** Compact sets of starred or unread bookmark IDs can make frequent flag-only refreshes cheap.
+  Each set introduces another sync boundary to reconcile with bookmark deletion, visibility, and the pending queue.
+
+### Write routing and retries
+
+- **Existing resource routes with `Idempotency-Key` (chosen).** Clients keep using the established resource URLs and a single place for the operation ID, including on bodyless deletes.
+  Each participating route needs an explicit receipt path that commits with the resource change.
+  Edit-specific starting values belong in the request body under `sync.base`.
+- **Dedicated mutation endpoint.** A single command envelope can simplify batching and make the offline protocol explicit.
+  It adds a second write entry point and needs shared domain logic to keep validation, authorization, and side effects aligned.
+- **Operation ID in the body.** A self-contained edit document can carry its ID alongside its starting and requested values.
+  Bodyless deletes would need a separate convention or a request body of their own.
+- **Ordinary requests with client retries.** This uses the existing API with minimal server changes.
+  A lost response leaves the client uncertain whether a capture or another side effect already happened, and a retry can apply an edit over newer server data.
+
+### Concurrent edits
+
+- **Last write wins.** This keeps the server and client simple and avoids prompting for review.
+  A late offline edit can overwrite a newer change to the same field.
+- **Whole-bookmark precondition.** A revision or ETag makes it easy to reject writes based on an older snapshot.
+  A change to an unrelated field, such as a star, can block a note edit that could otherwise have applied safely.
+- **Field-level comparison (chosen).** Independent scalar edits and tag memberships can apply while a genuinely conflicting value waits for review.
+  The client must retain starting values and handle partial receipts, and the server must compare and apply in one transaction.
+
+### Retention and recovery
+
+- **Account-lifetime tombstones and receipts (chosen).** A device can return after a long offline period and recover its deletes and write outcomes.
+  Storage grows with hard deletes and keyed operations, so retained rows carry compact metadata.
+- **Time-limited retention.** Expiry caps storage and may suit a service with a defined offline support window.
+  An expired cursor would require bootstrap, and an expired receipt would need an explicit recovery response so an uncertain old write cannot silently execute again.
