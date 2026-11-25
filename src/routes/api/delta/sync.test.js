@@ -5,7 +5,7 @@ import { Client } from 'pg'
 import { config, createApp } from '#test/helper.js'
 import { integrationFixture } from '#test/integration-fixture.js'
 import { syncEdit } from '../bookmarks/sync-edit.js'
-import { withBookmarkReceipt } from '../bookmarks/sync-receipt.js'
+import { withSyncReceipt } from '#resources/sync/sync-receipt.js'
 
 /**
  * @import { TestContext } from 'node:test'
@@ -289,6 +289,7 @@ test('delta sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
       path('/api/bookmarks')?.put,
       path('/api/bookmarks/{id}')?.put,
       path('/api/bookmarks/{id}')?.delete,
+      path('/api/archives/{archive_id}')?.delete,
     ]) {
       assert.ok(route?.description, `OpenAPI paths: ${Object.keys(paths ?? {}).filter(url => url.includes('bookmark')).join(', ')}`)
       assert.doesNotMatch(route.description, /alpha/i)
@@ -464,7 +465,7 @@ test('delta sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
       const rolledBack = randomUUID()
       await assert.rejects(app.pg.transact(async client => {
         const update = { note: 'rollback', sync: { base: { note: 'web note' } } }
-        const receipt = await withBookmarkReceipt(
+        const receipt = await withSyncReceipt(
           client, app.httpErrors, account.id, rolledBack, ['edit', first, update],
           id => syncEdit(client, app.httpErrors, account.id, id, first, update)
         )
@@ -493,6 +494,140 @@ test('delta sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
       assert.equal(afterDelete.json().sync.outcome, 'bookmark_missing')
       assert.deepEqual((await mutate(payload, operationId)).json(), { sync: expected })
       assert.ok((await tombstones(db, account.id)).some(row => row.resource_id === first))
+    })
+
+    await t.test('retains archive capture and delete receipts with one capture job', async t => {
+      const bookmarkId = await addBookmark(db, account.id)
+      const captureUrl = `/api/bookmarks/${bookmarkId}?exact_url=true`
+      const archiveURL = 'https://example.com/archive-source'
+      const payload = { createArchive: { url: archiveURL } }
+      const captureKey = randomUUID()
+      /** @param {string} [key] @param {typeof headers} [authorization] */
+      const capture = (key = captureKey, authorization = headers) => app.inject({
+        method: 'PUT', url: captureUrl, headers: { ...authorization, 'Idempotency-Key': key }, payload,
+      })
+      const queue = app.pgboss.queues.resolveArchiveQ
+      const originalSend = queue.send
+      let rolledBackJob
+      const mock = t.mock.method(queue, 'send', /** @type {typeof originalSend} */ (async request => {
+        rolledBackJob = await originalSend.call(queue, request)
+        throw new Error('injected failure after archive enqueue')
+      }))
+      const headBefore = await head(db, account.id)
+      const failure = await capture()
+      assert.equal(failure.statusCode, 500, failure.body)
+      assert.ok(rolledBackJob)
+      mock.mock.restore()
+      const jobs = () => app.pgboss.boss.findJobs(queue.name, { data: { url: archiveURL } })
+      assert.deepEqual(await jobs(), [])
+      assert.equal(await head(db, account.id), headBefore)
+      assert.equal((await db.query('select 1 from archives where bookmark_id = $1', [bookmarkId])).rowCount, 0)
+      assert.equal((await db.query('select 1 from sync_mutation_receipts where operation_id = $1', [captureKey])).rowCount, 0)
+
+      const [first, retry] = await Promise.all([capture(), capture()])
+      assert.equal(first.statusCode, 200, first.body)
+      assert.equal(retry.statusCode, 200, retry.body)
+      const receipt = first.json().sync
+      const archiveId = receipt.archive_id
+      assert.ok(archiveId)
+      assert.deepEqual(receipt, {
+        operation_id: captureKey,
+        bookmark_id: bookmarkId,
+        archive_id: archiveId,
+        outcome: 'archive_created',
+      })
+      assert.deepEqual(retry.json(), { sync: receipt })
+      assert.equal(first.headers['cache-control'], 'private, no-store')
+      assert.equal((await jobs()).length, 1)
+      assert.deepEqual((await db.query('select url from archives where bookmark_id = $1', [bookmarkId])).rows, [{ url: archiveURL }])
+      const collision = await app.inject({
+        method: 'PUT',
+        url: captureUrl,
+        headers: { ...headers, 'Idempotency-Key': captureKey },
+        payload: { createArchive: true },
+      })
+      assert.equal(collision.statusCode, 409, collision.body)
+      const mixed = await app.inject({
+        method: 'PUT',
+        url: captureUrl,
+        headers: { ...headers, 'Idempotency-Key': randomUUID() },
+        payload: { ...payload, starred: true },
+      })
+      assert.equal(mixed.statusCode, 400, mixed.body)
+      const foreignCapture = await capture(captureKey, foreignHeaders)
+      assert.equal(foreignCapture.statusCode, 200, foreignCapture.body)
+      assert.deepEqual(foreignCapture.json().sync, {
+        operation_id: captureKey,
+        bookmark_id: bookmarkId,
+        archive_id: null,
+        outcome: 'bookmark_missing',
+      })
+
+      const deleteUrl = `/api/archives/${archiveId}`
+      /** @param {string} key @param {typeof headers} [authorization] */
+      const remove = (key, authorization = headers) => app.inject({
+        method: 'DELETE', url: deleteUrl, headers: { ...authorization, 'Idempotency-Key': key },
+      })
+      assert.equal((await remove(captureKey)).statusCode, 409)
+      const foreignDelete = await remove(randomUUID(), foreignHeaders)
+      assert.equal(foreignDelete.statusCode, 200, foreignDelete.body)
+      assert.equal(foreignDelete.json().sync.bookmark_id, null)
+      assert.equal(foreignDelete.json().sync.outcome, 'archive_missing')
+
+      const snapshot = await app.inject({ url: `${base}/bootstrap`, headers })
+      /** @type {SyncBootstrap} */
+      const initial = snapshot.json()
+      assert.deepEqual(initial.bookmarks.find(row => row.id === bookmarkId)?.archives.map(row => row.id), [archiveId])
+      const deleteKey = randomUUID()
+      const deleted = await remove(deleteKey)
+      assert.equal(deleted.statusCode, 200, deleted.body)
+      assert.deepEqual(deleted.json().sync, {
+        operation_id: deleteKey,
+        bookmark_id: bookmarkId,
+        archive_id: archiveId,
+        outcome: 'archive_deleted',
+      })
+      assert.deepEqual((await remove(deleteKey)).json(), deleted.json())
+      assert.equal((await remove(randomUUID())).json().sync.outcome, 'archive_missing')
+      assert.deepEqual((await capture()).json(), { sync: receipt })
+      assert.equal((await jobs()).length, 1)
+      assert.equal((await tombstones(db, account.id)).filter(row => row.resource_id === archiveId).length, 1)
+      const next = await app.inject({ url: `${base}/changes?cursor=${initial.cursor}`, headers })
+      /** @type {SyncChanges} */
+      const delta = next.json()
+      const refreshedBookmark = delta.changes.find(change => change.op === 'upsert' && change.bookmark.id === bookmarkId)
+      assert.ok(refreshedBookmark?.op === 'upsert')
+      assert.deepEqual(refreshedBookmark.bookmark.archives, [])
+
+      const defaultCapture = await app.inject({
+        method: 'PUT',
+        url: captureUrl,
+        headers: { ...headers, 'Idempotency-Key': randomUUID() },
+        payload: { createArchive: true },
+      })
+      assert.equal(defaultCapture.statusCode, 200, defaultCapture.body)
+      const defaultArchiveId = defaultCapture.json().sync.archive_id
+      assert.deepEqual((await db.query('select url from archives where id = $1', [defaultArchiveId])).rows, [
+        { url: `https://example.com/${bookmarkId}` },
+      ])
+      assert.equal((await app.inject({
+        method: 'DELETE', url: `/api/archives/${defaultArchiveId}`, headers,
+      })).statusCode, 202)
+
+      const ordinaryCapture = await app.inject({
+        method: 'PUT', url: captureUrl, headers, payload: { createArchive: true },
+      })
+      assert.equal(ordinaryCapture.statusCode, 200, ordinaryCapture.body)
+      assert.equal(ordinaryCapture.json().status, 'updated')
+      assert.equal(ordinaryCapture.json().sync, undefined)
+      /** @type {QueryResult<{id: string}>} */
+      const remaining = await db.query('select id from archives where bookmark_id = $1', [bookmarkId])
+      const ordinaryArchive = remaining.rows[0]
+      assert.ok(ordinaryArchive)
+      const ordinaryDeleteUrl = `/api/archives/${ordinaryArchive.id}`
+      const ordinaryDelete = await app.inject({ method: 'DELETE', url: ordinaryDeleteUrl, headers })
+      assert.equal(ordinaryDelete.statusCode, 202, ordinaryDelete.body)
+      assert.equal((await app.inject({ method: 'DELETE', url: ordinaryDeleteUrl, headers })).statusCode, 404)
     })
 
     await t.test('recovers canonical create and delete receipts and queues resolution once', async t => {

@@ -26,13 +26,6 @@ const editValues = /** @type {const} @satisfies {JSONSchema} */ ({
   properties: scalarProperties,
 })
 
-export const bookmarkSyncHeaders = /** @type {const} @satisfies {JSONSchema} */ ({
-  type: 'object',
-  properties: {
-    'idempotency-key': { ...id, description: '**Alpha (unstable).** Opt in to a retained sync receipt. Retry with the same operation UUID and request.' },
-  },
-})
-
 export const bookmarkSyncUpdate = /** @type {const} @satisfies {JSONSchema} */ ({
   type: 'object',
   additionalProperties: false,
@@ -42,6 +35,10 @@ export const bookmarkSyncUpdate = /** @type {const} @satisfies {JSONSchema} */ (
     title: { ...schemaBookmarkUpdate.properties.title, nullable: true },
     note: { ...schemaBookmarkUpdate.properties.note, nullable: true },
     summary: { ...schemaBookmarkUpdate.properties.summary, nullable: true },
+    createArchive: {
+      ...schemaBookmarkUpdate.properties.createArchive,
+      description: 'Request a snapshot. **Alpha (unstable):** Include Idempotency-Key to capture once and return the archive ID. Send the keyed capture as its own edit.',
+    },
     sync: {
       type: 'object',
       description: '**Alpha (unstable).** Include with Idempotency-Key to compare starting values and apply independent changes.',

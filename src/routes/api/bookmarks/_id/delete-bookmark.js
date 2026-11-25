@@ -1,6 +1,7 @@
 import SQL from '@nearform/sql'
-import { bookmarkSyncHeaders, bookmarkSyncReceipt } from '../schemas/bookmark-sync.js'
-import { bookmarkReceipt, withBookmarkReceipt } from '../sync-receipt.js'
+import { syncReceiptHeaders, withSyncReceipt } from '#resources/sync/sync-receipt.js'
+import { bookmarkSyncReceipt } from '../schemas/bookmark-sync.js'
+import { bookmarkReceipt } from '../sync-receipt.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
@@ -16,7 +17,7 @@ export async function deleteBookmark (fastify, _opts) {
     schema: {
       tags: ['bookmarks'],
       description: 'Delete a bookmark.',
-      headers: bookmarkSyncHeaders,
+      headers: syncReceiptHeaders,
       params: {
         type: 'object',
         properties: {
@@ -55,7 +56,7 @@ export async function deleteBookmark (fastify, _opts) {
     const operationId = request.headers['idempotency-key']
     if (operationId) {
       reply.header('Cache-Control', 'private, no-store')
-      const sync = await fastify.pg.transact(client => withBookmarkReceipt(
+      const sync = await fastify.pg.transact(client => withSyncReceipt(
         client, fastify.httpErrors, userId, operationId, ['delete', bookmarkId], async id => {
           const result = await client.query(query)
           return bookmarkReceipt(id, bookmarkId, result.rowCount ? 'deleted' : 'bookmark_missing')

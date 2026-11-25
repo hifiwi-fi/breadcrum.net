@@ -8,8 +8,9 @@ import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '#resources/bookmarks/normalize-url.js'
-import { bookmarkSyncHeaders, bookmarkSyncReceipt } from './schemas/bookmark-sync.js'
-import { bookmarkReceipt, withBookmarkReceipt } from './sync-receipt.js'
+import { syncReceiptHeaders, withSyncReceipt } from '#resources/sync/sync-receipt.js'
+import { bookmarkSyncReceipt } from './schemas/bookmark-sync.js'
+import { bookmarkReceipt } from './sync-receipt.js'
 
 export const maxBookmarkTitleLength = 255
 
@@ -46,7 +47,7 @@ export async function putBookmarks (fastify, _opts) {
       schema: ({
         tags: ['bookmarks'],
         description: 'Create or find a bookmark.',
-        headers: bookmarkSyncHeaders,
+        headers: syncReceiptHeaders,
         body: /** @type {SchemaBookmarkCreate} */ (fastify.getSchema('schema:breadcrum:bookmark:create')),
         querystring: {
           type: 'object',
@@ -195,7 +196,7 @@ export async function putBookmarks (fastify, _opts) {
         reply.header('Cache-Control', 'private, no-store')
         if (update) return reply.badRequest('Sync creates do not support the update redirect.')
         let created = false
-        const sync = await fastify.pg.transact(client => withBookmarkReceipt(
+        const sync = await fastify.pg.transact(client => withSyncReceipt(
           client, fastify.httpErrors, userId, operationId, ['create', request.body, request.query], async id => {
             const result = await storeBookmark(client)
             created = result.created

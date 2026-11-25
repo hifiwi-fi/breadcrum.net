@@ -6,8 +6,10 @@ import { createEpisode } from '#resources/episodes/episode-query-create.js'
 import { youtubeRetryOptions } from '#resources/episodes/resolve-episode-queue.js'
 import { createArchive } from '#resources/archives/archive-query-create.js'
 import { getBookmark } from '../get-bookmarks-query.js'
-import { bookmarkSyncHeaders, bookmarkSyncReceipt, bookmarkSyncUpdate } from '../schemas/bookmark-sync.js'
-import { withBookmarkReceipt } from '../sync-receipt.js'
+import { syncReceiptHeaders, withSyncReceipt } from '#resources/sync/sync-receipt.js'
+import { archiveSyncReceipt } from '#routes/api/archives/schemas/schema-archive-sync-receipt.js'
+import { syncArchiveCapture } from '#routes/api/archives/sync-capture.js'
+import { bookmarkSyncReceipt, bookmarkSyncUpdate } from '../schemas/bookmark-sync.js'
 import { syncEdit } from '../sync-edit.js'
 
 /**
@@ -42,7 +44,7 @@ export async function putBookmark (fastify, _opts) {
     schema: {
       tags: ['bookmarks'],
       description: 'Update a bookmark.',
-      headers: bookmarkSyncHeaders,
+      headers: syncReceiptHeaders,
       querystring: {
         type: 'object',
         properties: {
@@ -72,7 +74,7 @@ export async function putBookmark (fastify, _opts) {
           type: 'object',
           description: 'Returns the updated bookmark or a sync receipt.',
           properties: {
-            sync: bookmarkSyncReceipt,
+            sync: { anyOf: [bookmarkSyncReceipt, archiveSyncReceipt] },
             status: { type: 'string', enum: ['updated'] },
             site_url: { type: 'string' },
             data: {
@@ -89,7 +91,26 @@ export async function putBookmark (fastify, _opts) {
       reply.header('Cache-Control', 'private, no-store')
       const bookmarkId = request.params.id.toLowerCase()
       const ownerId = request.user.id
-      const sync = await fastify.pg.transact(client => withBookmarkReceipt(
+      const { createArchive: capture } = request.body
+      if (capture) {
+        if (Object.keys(request.body).length !== 1) {
+          return reply.badRequest('Send archive capture separately from other keyed bookmark edits.')
+        }
+        const archiveURL = capture === true ? undefined : capture.url
+        const normalize = request.query.normalize && !request.query.exact_url
+        let created = false
+        const sync = await fastify.pg.transact(client => withSyncReceipt(
+          client, fastify.httpErrors, ownerId, operationId,
+          ['archive_capture', bookmarkId, request.body, request.query], async id => {
+            const receipt = await syncArchiveCapture(client, fastify, request, bookmarkId, id, archiveURL, normalize)
+            created = receipt.outcome === 'archive_created'
+            return receipt
+          }
+        ))
+        if (created) fastify.otel.archiveCounter.add(1)
+        return reply.code(200).send({ sync })
+      }
+      const sync = await fastify.pg.transact(client => withSyncReceipt(
         client, fastify.httpErrors, ownerId, operationId, ['edit', bookmarkId, request.body, request.query],
         id => syncEdit(client, fastify.httpErrors, ownerId, id, bookmarkId, request.body)
       ))
