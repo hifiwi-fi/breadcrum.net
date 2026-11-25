@@ -1,13 +1,15 @@
-/* eslint-disable camelcase */
 /**
  * @import { SchemaBookmarkCreate } from './schemas/schema-bookmark-create.js'
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
  * @import { SchemaBookmarkRead } from './schemas/schema-bookmark-read.js'
+ * @import { PoolClient } from 'pg'
  */
 import { oneLineTrim } from 'common-tags'
 import { getBookmark } from './get-bookmarks-query.js'
 import { createBookmark } from './put-bookmark-query.js'
 import { normalizeURL } from '#resources/bookmarks/normalize-url.js'
+import { bookmarkSyncHeaders, bookmarkSyncReceipt } from './schemas/bookmark-sync.js'
+import { bookmarkReceipt, withBookmarkReceipt } from './sync-receipt.js'
 
 export const maxBookmarkTitleLength = 255
 
@@ -43,6 +45,8 @@ export async function putBookmarks (fastify, _opts) {
       }),
       schema: ({
         tags: ['bookmarks'],
+        description: 'Create or find a bookmark.',
+        headers: bookmarkSyncHeaders,
         body: /** @type {SchemaBookmarkCreate} */ (fastify.getSchema('schema:breadcrum:bookmark:create')),
         querystring: {
           type: 'object',
@@ -85,6 +89,7 @@ export async function putBookmarks (fastify, _opts) {
           }
         },
         response: {
+          409: { $ref: 'HttpError' },
           201: {
             type: 'object',
             description: 'Newly created bookmarks are returned in full',
@@ -98,8 +103,9 @@ export async function putBookmarks (fastify, _opts) {
           },
           200: {
             type: 'object',
-            description: 'Existing bookmarks are returned unmodified',
+            description: 'Returns the existing bookmark or a sync receipt.',
             properties: {
+              sync: bookmarkSyncReceipt,
               status: { enum: ['nochange'] },
               site_url: { type: 'string' },
               data: {
@@ -111,129 +117,107 @@ export async function putBookmarks (fastify, _opts) {
       }),
     },
     async function createBookmarkHandler (request, reply) {
-      return fastify.pg.transact(async client => {
-        const userId = request.user.id
+      const userId = request.user.id
+      const operationId = request.headers['idempotency-key']
+      const { update, meta, episode, archive, normalize, exact_url: exactUrl } = request.query
 
+      /** @param {PoolClient} client */
+      async function storeBookmark (client) {
         const {
-          note,
-          toread,
-          sensitive,
-          tags = [],
-          archive_urls = [],
-          summary,
+          url: submittedUrlString, title: submittedTitle, note, toread, sensitive,
+          starred, tags = [], archive_urls: archiveUrls = [], summary,
         } = request.body
-
-        const submittedUrlString = request.body.url
-        const submittedTitle = request.body.title
-
+        const shouldNormalize = exactUrl ? false : normalize
         let submittedUrl
         try {
           submittedUrl = new URL(submittedUrlString)
-        } catch (err) {
-          return reply.badRequest('Invalid URL format')
+        } catch {
+          throw fastify.httpErrors.badRequest('Invalid URL format')
         }
 
-        const {
-          update,
-          meta,
-          episode,
-          archive,
-          normalize,
-          exact_url: exactUrl,
-        } = request.query
-
-        const shouldNormalize = exactUrl ? false : normalize
-
-        // This will be the one possibly slow step
-        // This needs to happen on create for de-dupe behavior
-        const workingUrl = shouldNormalize ? await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log }) : submittedUrl
-        const workingUrlString = shouldNormalize ? workingUrl.toString() : submittedUrlString
-
-        const maybeResult = await getBookmark({
-          fastify,
-          pg: client,
-          ownerId: userId,
-          url: workingUrlString,
-          sensitive: true,
-          perPage: 1,
-        })
-
-        if (maybeResult) {
-          if (update) {
-            reply.redirect(`/api/bookmarks/${maybeResult.id}`, 308)
-            return
-          } else {
-            reply.status(200)
-            return /** @type {const} */ ({
-              status: 'nochange',
-              site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${maybeResult.id}`,
-              data: maybeResult,
-            })
-          }
-        }
-
-        // Title will fallback to just being the URL on create
-        const workingTitle = getBookmarkCreateTitle(submittedTitle, workingUrlString)
+        const workingUrl = shouldNormalize
+          ? await normalizeURL(submittedUrl, { cache: fastify.cache, logger: request.log })
+          : submittedUrl
+        const url = shouldNormalize ? workingUrl.toString() : submittedUrlString
+        const lookup = { fastify, pg: client, ownerId: userId, url, sensitive: true, perPage: 1 }
+        const existing = await getBookmark(lookup)
+        if (existing) return /** @type {const} */ ({ created: false, bookmark: existing })
 
         const bookmark = await createBookmark({
           fastify,
           pg: client,
-          url: workingUrlString,
-          title: workingTitle,
+          url,
+          title: getBookmarkCreateTitle(submittedTitle, url),
           note,
           toread,
           sensitive,
-          archiveUrls: archive_urls,
+          starred: operationId ? starred : undefined,
+          archiveUrls,
           summary,
           userId,
-          originalUrl: shouldNormalize && workingUrlString !== submittedUrlString ? submittedUrlString : null,
+          originalUrl: shouldNormalize && url !== submittedUrlString ? submittedUrlString : null,
           meta,
-          tags
+          tags,
+          keepExisting: Boolean(operationId),
         })
+        if (!bookmark) {
+          const winner = await getBookmark(lookup)
+          if (!winner) throw fastify.httpErrors.serviceUnavailable('The bookmark changed during creation. Retry this request.')
+          return /** @type {const} */ ({ created: false, bookmark: winner })
+        }
 
-        // Commit bookmark create for background job lookup
-        await client.query('commit')
-        fastify.otel.bookmarkCreatedCounter.add(1)
-
+        // Legacy writes become visible before submitting their background job.
+        if (!operationId) {
+          await client.query('commit')
+          fastify.otel.bookmarkCreatedCounter.add(1)
+        }
         if (meta || episode || archive) {
-          await fastify.pgboss.queues.resolveBookmarkQ.send({
+          const jobId = await fastify.pgboss.queues.resolveBookmarkQ.send({
             data: {
               userId,
-              url: workingUrlString,
+              url,
               bookmarkId: bookmark.id,
               resolveBookmark: meta,
               resolveEpisode: episode,
               resolveArchive: archive,
               parentRequestId: request.id,
-              userProvidedMeta: {
-                // If submittedTitle is null, this is treated as a signal
-                // to resolve it when resolveBookmark is true.
-                title: submittedTitle,
-                tags,
-                summary,
-              }
-            }
+              userProvidedMeta: { title: submittedTitle, tags, summary },
+            },
+            // Receipt, bookmark, and queue insert commit together for a sync create.
+            ...(operationId ? { options: { db: { executeSql: (sql, values) => client.query(sql, values) } } } : {}),
           })
+          if (operationId && !jobId) throw fastify.httpErrors.serviceUnavailable('Could not enqueue bookmark resolution.')
+        }
+        return /** @type {const} */ ({ created: true, bookmark })
+      }
+
+      if (operationId) {
+        reply.header('Cache-Control', 'private, no-store')
+        if (update) return reply.badRequest('Sync creates do not support the update redirect.')
+        let created = false
+        const sync = await fastify.pg.transact(client => withBookmarkReceipt(
+          client, fastify.httpErrors, userId, operationId, ['create', request.body, request.query], async id => {
+            const result = await storeBookmark(client)
+            created = result.created
+            return bookmarkReceipt(id, result.bookmark.id, created ? 'created' : 'existing')
+          }
+        ))
+        if (created) fastify.otel.bookmarkCreatedCounter.add(1)
+        return reply.code(200).send({ sync })
+      }
+
+      return fastify.pg.transact(async client => {
+        const result = await storeBookmark(client)
+        const bookmarkId = result.bookmark.id
+        const siteUrl = `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmarkId}`
+        if (!result.created) {
+          if (update) return reply.redirect(`/api/bookmarks/${bookmarkId}`, 308)
+          return reply.code(200).send({ status: 'nochange', site_url: siteUrl, data: result.bookmark })
         }
 
-        // Look up the newly created bookmark instead of trying to re-assemble it here.
-        const createdBookmark = await getBookmark({
-          fastify,
-          ownerId: userId,
-          bookmarkId: bookmark.id,
-          sensitive: true,
-          perPage: 1,
-        })
-
-        if (!createdBookmark) {
-          throw new Error('Bookmark was not created')
-        }
-
-        await reply.status(201).send(/** @type {const} */ ({
-          status: 'created',
-          site_url: `${fastify.config.TRANSPORT}://${fastify.config.HOST}/bookmarks/b?id=${bookmark.id}`,
-          data: createdBookmark,
-        }))
+        const bookmark = await getBookmark({ fastify, ownerId: userId, bookmarkId, sensitive: true, perPage: 1 })
+        if (!bookmark) throw new Error('Bookmark was not created')
+        return reply.code(201).send({ status: 'created', site_url: siteUrl, data: bookmark })
       })
     }
   )
