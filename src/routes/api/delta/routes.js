@@ -8,6 +8,7 @@ import { bootstrapQuery, changesQuery, bootstrapSchema, changesSchema, cursorErr
 export default async function deltaRoutes (fastify) {
   fastify.addHook('onRequest', async (_request, reply) => {
     reply.header('Cache-Control', 'private, no-store')
+    reply.header('Breadcrum-Sync-Writes', 'bookmark-edit, archive-capture, archive-delete')
   })
   fastify.setErrorHandler((error, _request, reply) => {
     if (error instanceof SyncCursorError) {

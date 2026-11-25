@@ -307,6 +307,7 @@ test('delta sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
     const initialResponse = await app.inject({ url: `${base}/bootstrap?per_page=1`, headers })
     assert.equal(initialResponse.statusCode, 200, initialResponse.body)
     assert.equal(initialResponse.headers['cache-control'], 'private, no-store')
+    assert.equal(initialResponse.headers['breadcrum-sync-writes'], 'bookmark-edit, archive-capture, archive-delete')
     /** @type {SyncBootstrap} */
     const initial = initialResponse.json()
     const initialBookmark = initial.bookmarks[0]
