@@ -7,6 +7,10 @@
 ![](./src/client/static/screenshots/bookmark-window-dark.png#gh-dark-mode-only)
 ![](./src/client/static/screenshots/bookmark-window-light.png#gh-light-mode-only)
 
+## API
+
+The [sync API specification](docs/sync-api.md) covers library bootstrap, incremental changes, and retry-safe bookmark and archive writes.
+
 ## License
 
 AGPL-3.0-or-later
