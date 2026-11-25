@@ -1,6 +1,8 @@
 import { readSyncState, readBootstrapPage, readChangesPage } from './sync-read.js'
 import { readCursor, signCursor, SyncCursorError } from './sync-cursor.js'
 import { bootstrapQuery, changesQuery, bootstrapSchema, changesSchema, cursorErrorSchema } from './sync-schemas.js'
+import { bookmarkEditSchema, mutationReceiptSchema } from './mutation-schemas.js'
+import { syncEdit } from './sync-edit.js'
 
 /** @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts' */
 
@@ -17,6 +19,29 @@ export default async function deltaRoutes (fastify) {
   })
 
   const preHandler = fastify.auth([fastify.verifyJWT])
+
+  fastify.post('/mutations', {
+    preHandler: fastify.auth([fastify.verifyJWT, fastify.notDisabled], { relation: 'and' }),
+    schema: {
+      tags: ['sync'],
+      description: '**Alpha (unstable).** Submit a bookmark edit and receive its retained operation receipt. Retry with the same operation ID and intent to recover the original result.',
+      body: bookmarkEditSchema,
+      response: {
+        200: mutationReceiptSchema,
+        400: { $ref: 'HttpError' },
+        401: { $ref: 'HttpError' },
+        409: { $ref: 'HttpError' },
+      },
+    },
+  }, async function mutate (request, reply) {
+    const result = await fastify.pg.transact(client => syncEdit(client, request.user.id, request.body))
+    switch (result.kind) {
+      case 'account_missing': return reply.unauthorized()
+      case 'duplicate_tag': return reply.badRequest('Each tag membership may be edited only once per operation.')
+      case 'operation_id_reused': return reply.conflict('This operation ID already belongs to a different intent.')
+      case 'receipt': return reply.code(200).send(result.receipt)
+    }
+  })
 
   fastify.get('/bootstrap', {
     preHandler,

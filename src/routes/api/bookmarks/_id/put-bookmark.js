@@ -1,5 +1,6 @@
 import SQL from '@nearform/sql'
 import { normalizeURL } from '#resources/bookmarks/normalize-url.js'
+import { bookmarkScalarAssignments } from '#resources/bookmarks/bookmark-scalar-assignments.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { createEpisode } from '#resources/episodes/episode-query-create.js'
 import { youtubeRetryOptions } from '#resources/episodes/resolve-episode-queue.js'
@@ -164,12 +165,7 @@ export async function putBookmark (fastify, _opts) {
         }
       }
 
-      if (bookmark.title != null) updates.push(SQL`title = ${bookmark.title}`)
-      if (bookmark.note != null) updates.push(SQL`note = ${bookmark.note}`)
-      if (bookmark.summary != null) updates.push(SQL`summary = ${bookmark.summary}`)
-      if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
-      if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
-      if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
+      updates.push(...bookmarkScalarAssignments(bookmark))
 
       if (updates.length > 0) {
         const query = SQL`
@@ -183,6 +179,15 @@ export async function putBookmark (fastify, _opts) {
       }
 
       if (Array.isArray(bookmark.tags)) {
+        if (updates.length === 0) {
+          // Serialize tag-only replacements with native edits on this bookmark.
+          const locked = await client.query(SQL`
+            select id from bookmarks where id = ${bookmarkId} and owner_id = ${userId} for no key update
+          `)
+          if (locked.rowCount === 0) {
+            return reply.notFound(`bookmark ${bookmarkId} not found for user ${userId}`)
+          }
+        }
         if (bookmark.tags.length > 0) {
           const createTags = SQL`
           INSERT INTO tags (name, owner_id)

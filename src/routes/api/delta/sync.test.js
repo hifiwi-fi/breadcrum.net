@@ -4,11 +4,13 @@ import { test } from 'node:test'
 import { Client } from 'pg'
 import { config, createApp } from '#test/helper.js'
 import { integrationFixture } from '#test/integration-fixture.js'
+import { syncEdit } from './sync-edit.js'
 
 /**
  * @import { TestContext } from 'node:test'
  * @import { QueryResult } from 'pg'
  * @import { SyncBootstrap, SyncChanges } from './sync-schemas.js'
+ * @import { BookmarkEdit } from './mutation-schemas.js'
  */
 
 /** @param {Client} db */
@@ -100,7 +102,7 @@ async function backendId (client) {
   return row.pid
 }
 
-test('read-only sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
+test('delta sync against migrated PostgreSQL', { timeout: 45000 }, async t => {
   const fixture = await integrationFixture(t)
 
   await t.test('captures tag membership, renames, and prune-on-empty', async t => {
@@ -373,5 +375,119 @@ test('read-only sync against migrated PostgreSQL', { timeout: 45000 }, async t =
       assert.equal(reset.statusCode, 410, reset.body)
       assert.equal(reset.json().code, 'sync_reset_required')
     }
+
+    await t.test('retains edit receipts and applies independent fields and tags', async () => {
+      const url = `${base}/mutations`
+      /** @param {BookmarkEdit} payload @param {typeof headers} [authorization] */
+      const mutate = (payload, authorization = headers) => app.inject({
+        method: 'POST', url, headers: authorization, payload,
+      })
+      const editUrl = `/api/bookmarks/${first}`
+      const web = await app.inject({
+        method: 'PUT', url: editUrl, headers, payload: { note: 'web note' },
+      })
+      assert.equal(web.statusCode, 200, web.body)
+      const webTags = await app.inject({
+        method: 'PUT', url: editUrl, headers, payload: { tags: ['Reading', 'Web'] },
+      })
+      assert.equal(webTags.statusCode, 200, webTags.body)
+      const before = await head(db, account.id)
+      /** @type {BookmarkEdit} */
+      const payload = {
+        kind: 'bookmark_edit',
+        operation_id: randomUUID(),
+        bookmark_id: first,
+        fields: {
+          note: { base: 'original note', value: 'offline note' },
+          starred: { base: false, value: true },
+          summary: { base: null, value: null },
+        },
+        tags: [{ name: 'Offline', present: true }, { name: 'reading', present: false }],
+      }
+      assert.equal((await app.inject({ method: 'POST', url, payload })).statusCode, 401)
+      // Two concurrent attempts with the same ID return the same committed result.
+      const [firstAttempt, replay] = await Promise.all([mutate(payload), mutate(payload)])
+      const expected = {
+        operation_id: payload.operation_id,
+        bookmark_id: first,
+        outcome: 'processed',
+        fields: { note: 'conflict', starred: 'applied', summary: 'already_applied' },
+        tags: ['applied', 'applied'],
+      }
+      for (const response of [firstAttempt, replay]) {
+        assert.equal(response.statusCode, 200, response.body)
+        assert.equal(response.headers['cache-control'], 'private, no-store')
+        assert.deepEqual(response.json(), expected)
+      }
+      // One bookmark projection and one tombstone for the pruned Reading tag.
+      const afterEdit = await head(db, account.id)
+      assert.equal(afterEdit, before + 2n)
+      assert.deepEqual(await refreshed(db, account.id, before), [first])
+      const libraryResponse = await app.inject({ url: `${base}/bootstrap`, headers })
+      /** @type {SyncBootstrap} */
+      const library = libraryResponse.json()
+      const bookmark = library.bookmarks.find(bookmark => bookmark.id === first)
+      assert.ok(bookmark)
+      assert.equal(bookmark.note, 'web note')
+      assert.equal(bookmark.starred, true)
+      assert.deepEqual(bookmark.tags, ['Offline', 'Web'])
+
+      const already = await mutate({
+        ...payload,
+        operation_id: randomUUID(),
+        fields: { starred: { base: false, value: true } },
+        tags: [{ name: 'offline', present: true }],
+      })
+      assert.equal(already.statusCode, 200, already.body)
+      assert.deepEqual(already.json().tags, ['already_applied'])
+      assert.equal(await head(db, account.id), afterEdit)
+      assert.equal((await mutate({ ...payload, fields: { note: { base: 'web note', value: null } } })).statusCode, 409)
+      assert.equal((await mutate({
+        ...payload,
+        operation_id: randomUUID(),
+        tags: [{ name: 'Offline', present: true }, { name: 'offline', present: false }],
+      })).statusCode, 400)
+
+      const rolledBack = randomUUID()
+      await assert.rejects(app.pg.transact(async client => {
+        const result = await syncEdit(client, account.id, {
+          kind: 'bookmark_edit',
+          operation_id: rolledBack,
+          bookmark_id: first,
+          fields: { note: { base: 'web note', value: 'rollback' } },
+        })
+        assert.equal(result.kind, 'receipt')
+        assert.equal(result.receipt.fields.note, 'applied')
+        throw new Error('fixture rollback')
+      }), /fixture rollback/)
+      assert.equal((await db.query('select 1 from sync_mutation_receipts where operation_id = $1', [rolledBack])).rowCount, 0)
+      assert.equal(await head(db, account.id), afterEdit)
+
+      const [clear, replace] = await Promise.all([null, 'new note'].map(value => mutate({
+        kind: 'bookmark_edit',
+        operation_id: randomUUID(),
+        bookmark_id: first,
+        fields: { note: { base: 'web note', value } },
+      })))
+      assert.ok(clear && replace)
+      for (const response of [clear, replace]) assert.equal(response.statusCode, 200, response.body)
+      assert.deepEqual([clear.json().fields.note, replace.json().fields.note].sort(), ['applied', 'conflict'])
+      assert.deepEqual((await mutate(payload)).json(), expected)
+
+      const foreignAttempt = await mutate(payload, foreignHeaders)
+      assert.equal(foreignAttempt.statusCode, 200, foreignAttempt.body)
+      assert.equal(foreignAttempt.json().outcome, 'bookmark_missing')
+      const deleted = await app.inject({ method: 'DELETE', url: editUrl, headers })
+      assert.equal(deleted.statusCode, 202, deleted.body)
+      const afterDelete = await mutate({ ...payload, operation_id: randomUUID() })
+      assert.equal(afterDelete.statusCode, 200, afterDelete.body)
+      assert.deepEqual(afterDelete.json().fields, {})
+      assert.equal(afterDelete.json().outcome, 'bookmark_missing')
+      assert.deepEqual((await mutate(payload)).json(), expected)
+      assert.ok((await tombstones(db, account.id)).some(row => row.resource_id === first))
+
+      await db.query('delete from users where id = $1', [account.id])
+      assert.equal((await db.query('select 1 from sync_mutation_receipts where owner_id = $1', [account.id])).rowCount, 0)
+    })
   })
 })
