@@ -565,7 +565,7 @@ Keep focused consumer types and explicit `dataDeps`; derived data belongs in `da
 Use the native `src/client/service-worker.js` entrypoint and keep the webmanifest in its separate template.
 The worker remains network-only, with no offline caching or fetch interception.
 Do not enable the DOMStack manifest pipeline or generate an asset inventory; the existing PWA webmanifest is separate and remains enabled.
-Run `node --test --test-reporter=dot src/client src/scripts/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
+Run `node --test --test-reporter=dot src/client src/test/client-build.test.js` for isolated collection, full-build, and watch regression coverage.
 
 ## Preact/HTM Template Constraints
 

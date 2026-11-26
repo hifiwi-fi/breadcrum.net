@@ -58,7 +58,7 @@ export default function defaultRootLayout ({
   children,
   page,
 }) {
-  const resolvedURL = `${baseUrl}/${page.path}${page.path.endsWith('.html') ? '' : '/'}`
+  const resolvedURL = `${baseUrl}/${page.path}${page.path && !page.path.endsWith('.html') ? '/' : ''}`
 
   // Build head content as string to handle void elements properly
   const headContent = `
@@ -69,7 +69,7 @@ export default function defaultRootLayout ({
     <meta name="referrer" content="no-referrer">
     <meta name="description" content="${description ?? `${siteName} internet newspaper clippings and bookmarks. Podcast anything.`}">
     <meta itemprop="publisher" content="${siteName}">
-    ${noindex ? '<meta name="robots" content="noindex,nofollow">' : ''}
+    ${noindex ? '<meta name="robots" content="noindex,nofollow">' : `<link rel="canonical" href="${resolvedURL}">`}
 
     <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/json" href="/feed.json">
     <link rel="alternate" title="${siteName} Blog (JSON Feed)" type="application/feed+json" href="/feed.json">

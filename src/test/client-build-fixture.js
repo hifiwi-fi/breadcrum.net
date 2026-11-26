@@ -65,6 +65,25 @@ export async function fullSite (t) {
   assert.ok(report)
   const feed = parseFeed(await build.readOutput('feed.json'))
 
+  await t.test('indexable pages declare one clean canonical URL in the head', async () => {
+    const sitemap = xmlText(await build.readOutput('sitemap.xml'), 'url > loc')
+    const pages = /** @type {const} */ ([['index.html', '/'], ['docs/index.html', '/docs/']])
+    for (const [output, path] of pages) {
+      const dom = new JSDOM(await build.readOutput(output))
+      try {
+        const { document } = dom.window
+        const links = document.querySelectorAll('link[rel="canonical"]')
+        assert.equal(links.length, 1, output)
+        assert.equal(links[0]?.parentElement, document.head, output)
+        assert.equal(links[0]?.getAttribute('href'), `${origin}${path}`)
+        assert.equal(document.head.querySelector('meta[property="og:url"]')?.getAttribute('content'), `${origin}${path}`)
+        assert.ok(sitemap.includes(`${origin}${path}`), output)
+      } finally {
+        dom.window.close()
+      }
+    }
+  })
+
   await t.test('generated archives retain URLs, titles, noindex, entries and one parent/root', async () => {
     const generated = report.report.pages.filter(page => page.pagesFilePath?.endsWith('/blog/archives.pages.js'))
     assert.equal(generated.length, 4)
@@ -79,6 +98,7 @@ export async function fullSite (t) {
       assert.equal(archive.querySelectorAll('h1').length, 1)
       assert.equal(archive.querySelector('h1')?.textContent, `All ${year} Blog Posts`)
       assert.equal(archive.querySelector('meta[name="robots"]')?.getAttribute('content'), 'noindex,nofollow')
+      assert.equal(archive.querySelectorAll('link[rel="canonical"]').length, 0)
       assert.equal(archive.querySelectorAll('link[href*="blog-index.layout"]').length, 1)
       assert.equal(blog.querySelectorAll(`.archive-list a[href="/blog/${year}/"]`).length, 1)
       const expectedEntries = report.report.pages

@@ -9,7 +9,7 @@ import { promisify } from 'node:util'
 
 const exec = promisify(execFile)
 const root = fileURLToPath(new URL('../../', import.meta.url))
-const helper = new URL('./test/client-build-fixture.js', import.meta.url).href
+const helper = new URL('./client-build-fixture.js', import.meta.url).href
 
 test('client build integration: fullSite', { timeout: 30_000 }, async t => {
   const dir = await mkdtemp(join(tmpdir(), 'breadcrum-client-build-'))
