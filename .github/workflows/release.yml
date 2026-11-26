@@ -107,6 +107,8 @@ jobs:
           key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
 
       - run: pnpm run build
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps --only-shell chromium
       - run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
