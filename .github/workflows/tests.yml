@@ -58,7 +58,7 @@ jobs:
           node-version-file: package.json
           cache: "pnpm"
 
-      - name: Install Redis executable for isolated runtime tests
+      - name: Install Redis executable for isolated runtime and browser tests
         run: |
           sudo apt-get update
           # The shared Redis service container already owns port 6379.
@@ -102,12 +102,22 @@ jobs:
           key: geoip-root-${{ runner.os }}-${{ hashFiles('data/geoip/**') }}
 
       - run: pnpm run build
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps --only-shell chromium
       - name: Test
         run: pnpm test
         env:
           MAXMIND_ACCOUNT_ID: ${{ secrets.MAXMIND_ACCOUNT_ID }}
           MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
           SKIP_GEOIP_TESTS: ${{ steps.update-geoip.outcome != 'success' && '1' || '0' }}
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-test-results
+          path: test-results/
+          if-no-files-found: ignore
 
       - name: Coveralls
         uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2

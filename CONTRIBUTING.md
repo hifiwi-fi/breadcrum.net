@@ -49,6 +49,11 @@ Use `pnpm run start:api` or `pnpm run start:worker` for non-watching startup wit
 
 Build `src/client/` into root `public/` with `pnpm run build`, and run checks with `pnpm test`.
 Check editor diagnostics before running unit tests; use `node --test --test-reporter=dot path/to/file.test.js` for an individual suite.
+Install the Playwright browser once with `pnpm exec playwright install --only-shell chromium` before running `pnpm test`; on Linux, add `--with-deps` if system dependencies are missing.
+Run `pnpm run test:playwright` to run the browser tests in `playwright/` against a temporary build served by Fastify with `APP_ROLE=all`.
+The suite needs a local PostgreSQL server and `redis-server` on `PATH`.
+Set `PLAYWRIGHT_DATABASE_URL` to override `DATABASE_URL` for the browser suite; use a local PostgreSQL role that can create databases.
+The suite creates, migrates, and drops its own PostgreSQL database and starts and stops its own Redis instance, without using the development database or Redis.
 
 ## Releasing
 

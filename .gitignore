@@ -2,6 +2,8 @@ node_modules
 sandbox.js
 .nyc_output
 coverage
+/test-results/
+/playwright-report/
 lcov.info
 public
 ./yt-dlp

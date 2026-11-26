@@ -19,15 +19,12 @@ import { loadConfig } from '#config/config.js'
 const execFileAsync = promisify(execFile)
 
 /**
- * Test-only services for app.integration.test.js: a disposable migrated database and Redis process.
- * Derives its PostgreSQL endpoint from validated application config, replacing only the database name.
- * Requires that configured PostgreSQL role to create databases and the redis-server executable.
- * @param {TestContext} t
+ * Provision a disposable migrated database and Redis process for an integration suite.
+ * @param {{ after: (callback: () => Promise<void>) => void, signal: AbortSignal }} lifecycle
+ * @param {URL} defaultDatabaseUrl PostgreSQL endpoint with permission to create a database
  */
-export async function integrationFixture (t) {
+export async function startIntegrationServices ({ after, signal }, defaultDatabaseUrl) {
   const databaseName = `breadcrum_runtime_${randomUUID().replaceAll('-', '')}`
-  // Use the same validated endpoint as the app, but target a disposable database.
-  const defaultDatabaseUrl = new URL(loadConfig('worker').DATABASE_URL)
   const databaseUrl = new URL(defaultDatabaseUrl)
   databaseUrl.pathname = `/${databaseName}`
   const adminDatabaseUrl = new URL(defaultDatabaseUrl)
@@ -35,8 +32,8 @@ export async function integrationFixture (t) {
   const databaseUrlString = databaseUrl.toString()
   const admin = new Client({ connectionString: adminDatabaseUrl.toString(), ssl: false, connectionTimeoutMillis: 2000 })
   await admin.connect()
-  // This hook is scoped to the parent suite, after all child application cleanup.
-  t.after(async () => {
+  // The caller must shut down the application before running service cleanup.
+  after(async () => {
     try {
       await admin.query(`drop database if exists ${databaseName} with (force)`)
     } finally {
@@ -63,7 +60,7 @@ export async function integrationFixture (t) {
     },
     timeout: 30000,
     killSignal: 'SIGKILL',
-    signal: t.signal,
+    signal,
   })
   await migrate()
   const client = new Client({ connectionString: databaseUrlString, ssl: false })
@@ -94,10 +91,13 @@ export async function integrationFixture (t) {
   const exited = once(redis, 'exit')
   // Observe spawn errors immediately, even if startup fails before cleanup begins.
   exited.catch(() => {})
-  t.after(async () => {
-    redis.kill('SIGTERM')
-    await exited
-    await rm(directory, { recursive: true, force: true })
+  after(async () => {
+    try {
+      redis.kill('SIGTERM')
+      await exited
+    } finally {
+      await rm(directory, { recursive: true, force: true })
+    }
   })
   let output = ''
   await new Promise((resolve, reject) => {
@@ -124,11 +124,18 @@ export async function integrationFixture (t) {
     databaseUrl: databaseUrlString,
     redisUrl: `redis://127.0.0.1:${address.port}/0`,
     async assertDisconnected () {
-      await t.waitFor(async () => {
-        /** @type {QueryResult<{connections: number}>} */
-        const result = await admin.query('select count(*)::integer as connections from pg_stat_activity where datname = $1', [databaseName])
-        assert.equal(result.rows[0]?.connections, 0, 'All application and boss pool connections must be closed')
-      }, { timeout: 2000, interval: 25 })
+      /** @type {QueryResult<{connections: number}>} */
+      const result = await admin.query('select count(*)::integer as connections from pg_stat_activity where datname = $1', [databaseName])
+      assert.equal(result.rows[0]?.connections, 0, 'All application and boss pool connections must be closed')
     },
+  }
+}
+
+/** @param {TestContext} t */
+export async function integrationFixture (t) {
+  const services = await startIntegrationServices({ after: callback => t.after(callback), signal: t.signal }, new URL(loadConfig('worker').DATABASE_URL))
+  return {
+    ...services,
+    assertDisconnected: () => t.waitFor(services.assertDisconnected, { timeout: 2000, interval: 25 }),
   }
 }

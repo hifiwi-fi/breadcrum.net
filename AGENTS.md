@@ -518,14 +518,14 @@ This pattern ensures:
 
 ## Testing
 
-- Tests use Node.js built-in test runner, not Jest or other frameworks
+- Unit and integration tests use the built-in Node.js test runner.
 - Default to the dot reporter for console test output, including direct test commands; preserve machine-readable reporters used by test fixtures.
 - Run specific test files directly: `node --test --test-reporter=dot path/to/test.js`
 - Run multiple test files with glob: `node --test --test-reporter=dot path/**/*.test.js`
 - Tests are usually in the same directory as the code they test
-- All tests are written with the Node.js test runner
-- Cannot use `npm test -- --grep "pattern"` - that's for other test runners. Use `node --test --test-reporter=dot --test-name-pattern="pattern"` to filter tests by name pattern
-- Use the root package.json test scripts; select individual suites with the Node.js test runner
+- Browser tests use the Playwright test runner and live in `playwright/` as `*.spec.js` files.
+- Use `node --test --test-reporter=dot --test-name-pattern="pattern"` to filter Node.js tests by name.
+- Use the root `package.json` test scripts, or pass a file to the appropriate runner to select an individual suite.
 - **Always check editor diagnostics before running unit tests** - fix any TypeScript/JSDoc errors first to avoid test failures
 - **Test resource cleanup**: Tests that create resources (users, tokens, etc.) should clean them up using appropriate test lifecycle hooks (`t.after()`)
 - **Database cascade deletes**: Resources should be designed with proper foreign key constraints and cascade deletes to automatically clean up dependent resources
@@ -754,8 +754,9 @@ Scripts use `npm-run-all2` (run-s for sequential, run-p for parallel). Scripts w
 
 ### Root scripts
 
-- `pnpm test` - Run root lint, type, Node.js test, and dependency checks.
+- `pnpm test` - Run root lint, type, Node.js tests, dependency checks, and Playwright browser tests.
 - `pnpm run test:node` - Run the Node.js suites with dot console output and LCOV coverage in `lcov.info`.
+- `pnpm run test:playwright` - Run the Chromium suites in `playwright/` against the real Fastify app with a temporary build, disposable PostgreSQL database, and isolated Redis process.
 - `pnpm run test:eslint` - Run ESLint.
 - `pnpm run test:tsc` - Run the TypeScript/JSDoc check.
 - `pnpm run watch` / `pnpm start` - Run the combined development backend and asset watcher.

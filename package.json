@@ -14,8 +14,9 @@
   },
   "devDependencies": {
     "@breadcrum/bookmarklet": "1.0.13",
-    "@domstack/static": "12.0.0",
+    "@domstack/static": "12.4.0",
     "@fastify/type-provider-json-schema-to-ts": "^5.0.1",
+    "@playwright/test": "^1.65.1",
     "@sentry/cli": "^3.8.2",
     "@types/common-tags": "^1.8.4",
     "@types/concat-stream": "^2.0.3",
@@ -57,7 +58,6 @@
     "url": "https://github.com/hifiwi-fi/breadcrum.net.git"
   },
   "scripts": {
-    "clean": "rm -rf public && mkdir -p public",
     "prepublishOnly": "releasearoni --no-npm-check --no-build",
     "release": "releasearoni --no-npm-check --no-build",
     "version": "releasearoni version",
@@ -66,10 +66,11 @@
     "test:tsc": "tsc",
     "test:node": "node --experimental-test-coverage --test --test-reporter=dot --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info --test-concurrency=1",
     "test:knip": "knip --dependencies",
+    "test:playwright": "playwright test",
     "watch": "run-p watch:*",
     "watch:server": "APP_ROLE=all node --import ./src/otel.js node_modules/fastify-cli/cli.js start --config ./src/config/fastify-cli.js --watch -P --ignore-watch='src/client public data .tap' src/app.js",
     "watch:domstack": "dom watch --src src/client --dest public --no-serve --drafts",
-    "build": "run-s clean build:*",
+    "build": "run-s build:*",
     "build:domstack": "dom build --src src/client --dest public",
     "migrate": "node --env-file-if-exists=.env node_modules/postgrator-cli/index.js",
     "generate-default-env": "node src/scripts/api/generate-default-env.js",
