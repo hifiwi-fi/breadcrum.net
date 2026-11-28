@@ -1,10 +1,9 @@
-// @ts-nocheck
 import SQL from '@nearform/sql'
 import { putTagsQuery } from '#resources/tags/put-tags-query.js'
 
 /**
  * @import { FastifyInstance } from 'fastify'
- * @import { PoolClient } from 'pg'
+ * @import { PoolClient, QueryResult } from 'pg'
  * @import { TypeBookmarkRead } from './schemas/schema-bookmark-read.js'
  */
 
@@ -25,14 +24,16 @@ import { putTagsQuery } from '#resources/tags/put-tags-query.js'
  * @param {string | undefined} [params.note] - Optional note associated with the bookmark.
  * @param {boolean | undefined} [params.toread=false] - Flag indicating if the bookmark is marked to read later.
  * @param {boolean | undefined} [params.sensitive=false] - Flag indicating if the bookmark is marked as sensitive.
+ * @param {boolean | undefined} [params.starred=false] - Flag indicating if the bookmark is starred.
  * @param {Array<string>} [params.archiveUrls=[]] - List of archived URLs, defaults to an empty array.
  * @param {string | undefined} [params.summary] - Optional summary of the bookmark.
  * @param {string} params.userId - UUID of the user creating the bookmark (must be provided).
  * @param {string | null | undefined} [params.originalUrl] - The originally submitted URL prior to normalization, if it differs
  * @param {boolean | undefined} [params.meta=false] - Metadata flag for the bookmark, defaults to false.
  * @param {Array<string> | undefined} [params.tags] - List of tags to associate with the bookmark.
+ * @param {boolean | undefined} [params.keepExisting=false] - Return no row if a concurrent create won the URL.
  * @throws {Error} Throws an error if userId is not provided.
- * @returns {Promise<CreatedBookmark>} The created bookmark object.
+ * @returns {Promise<CreatedBookmark | undefined>} The created bookmark, if inserted.
  */
 export async function createBookmark ({
   fastify,
@@ -42,12 +43,14 @@ export async function createBookmark ({
   note,
   toread,
   sensitive,
-  archiveUrls,
+  starred,
+  archiveUrls = [],
   summary,
   userId,
   originalUrl,
   meta,
-  tags
+  tags,
+  keepExisting = false,
 }) {
   const createBookmarkQuery = SQL`
     insert into bookmarks (
@@ -56,6 +59,7 @@ export async function createBookmark ({
       note,
       toread,
       sensitive,
+      starred,
       archive_urls,
       summary,
       owner_id,
@@ -68,22 +72,24 @@ export async function createBookmark ({
       ${note ?? null} as note,
       ${toread ?? false} as toread,
       ${sensitive ?? false} as sensitive,
+      ${starred ?? false} as starred,
       ${archiveUrls.length > 0 ? archiveUrls : SQL`'{}'`} as archive_urls,
       ${summary ?? null} as summary,
       ${userId} as owner_id,
       ${originalUrl ?? null} as original_url,
       ${meta === false} as done
+    ${keepExisting ? SQL`on conflict (owner_id, url) do nothing` : SQL``}
     returning
       id,
       url,
       title;
   `
 
+  /** @type {QueryResult<CreatedBookmark>} */
   const results = await pg.query(createBookmarkQuery)
-  /** @type {CreatedBookmark} */
   const bookmark = results.rows[0]
 
-  if (tags?.length > 0) {
+  if (bookmark && tags?.length) {
     await putTagsQuery({
       fastify,
       pg,

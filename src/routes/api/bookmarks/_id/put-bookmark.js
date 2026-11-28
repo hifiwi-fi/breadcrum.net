@@ -1,24 +1,24 @@
 import SQL from '@nearform/sql'
 import { normalizeURL } from '#resources/bookmarks/normalize-url.js'
+import { bookmarkScalarAssignments } from '#resources/bookmarks/bookmark-scalar-assignments.js'
 import { isYouTubeUrl } from '@bret/is-youtube-url'
 import { createEpisode } from '#resources/episodes/episode-query-create.js'
 import { youtubeRetryOptions } from '#resources/episodes/resolve-episode-queue.js'
 import { createArchive } from '#resources/archives/archive-query-create.js'
 import { getBookmark } from '../get-bookmarks-query.js'
+import { syncReceiptHeaders, withSyncReceipt } from '#resources/sync/sync-receipt.js'
+import { archiveSyncReceipt } from '#routes/api/archives/schemas/schema-archive-sync-receipt.js'
+import { syncArchiveCapture } from '#routes/api/archives/sync-capture.js'
+import { bookmarkSyncReceipt, bookmarkSyncUpdate } from '../schemas/bookmark-sync.js'
+import { syncEdit } from '../sync-edit.js'
 
 /**
  * @import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts'
- * @import { SchemaBookmarkUpdate } from '../schemas/schema-bookmark-update.js'
  * @import { SchemaBookmarkRead } from '../schemas/schema-bookmark-read.js'
  */
 
 /**
  * @type {FastifyPluginAsyncJsonSchemaToTs<{
- * ValidatorSchemaOptions: {
- * references: [
- *       SchemaBookmarkUpdate
- *  ]
- }
  * SerializerSchemaOptions: {
  *    references: [
  *       SchemaBookmarkRead
@@ -43,6 +43,8 @@ export async function putBookmark (fastify, _opts) {
     }),
     schema: {
       tags: ['bookmarks'],
+      description: 'Update a bookmark.',
+      headers: syncReceiptHeaders,
       querystring: {
         type: 'object',
         properties: {
@@ -65,16 +67,14 @@ export async function putBookmark (fastify, _opts) {
         },
         required: ['id'],
       },
-      body: {
-        type: 'object',
-        $ref: 'schema:breadcrum:bookmark:update',
-        minProperties: 1,
-      },
+      body: bookmarkSyncUpdate,
       response: {
+        409: { $ref: 'HttpError' },
         200: {
           type: 'object',
-          description: 'Existing bookmarks are returned unmodified',
+          description: 'Returns the updated bookmark or a sync receipt.',
           properties: {
+            sync: { anyOf: [bookmarkSyncReceipt, archiveSyncReceipt] },
             status: { type: 'string', enum: ['updated'] },
             site_url: { type: 'string' },
             data: {
@@ -86,6 +86,38 @@ export async function putBookmark (fastify, _opts) {
     },
   },
   async function putBookmarkHandler (request, reply) {
+    const operationId = request.headers['idempotency-key']
+    if (operationId) {
+      reply.header('Cache-Control', 'private, no-store')
+      const bookmarkId = request.params.id.toLowerCase()
+      const ownerId = request.user.id
+      const { createArchive: capture } = request.body
+      if (capture) {
+        if (Object.keys(request.body).length !== 1) {
+          return reply.badRequest('Send archive capture separately from other keyed bookmark edits.')
+        }
+        const archiveURL = capture === true ? undefined : capture.url
+        const normalize = request.query.normalize && !request.query.exact_url
+        let created = false
+        const sync = await fastify.pg.transact(client => withSyncReceipt(
+          client, fastify.httpErrors, ownerId, operationId,
+          ['archive_capture', bookmarkId, request.body, request.query], async id => {
+            const receipt = await syncArchiveCapture(client, fastify, request, bookmarkId, id, archiveURL, normalize)
+            created = receipt.outcome === 'archive_created'
+            return receipt
+          }
+        ))
+        if (created) fastify.otel.archiveCounter.add(1)
+        return reply.code(200).send({ sync })
+      }
+      const sync = await fastify.pg.transact(client => withSyncReceipt(
+        client, fastify.httpErrors, ownerId, operationId, ['edit', bookmarkId, request.body, request.query],
+        id => syncEdit(client, fastify.httpErrors, ownerId, id, bookmarkId, request.body)
+      ))
+      return reply.code(200).send({ sync })
+    }
+    if (request.body.sync) return reply.badRequest('Sync edits require Idempotency-Key.')
+
     return fastify.pg.transact(async client => {
       const userId = request.user.id
       const bookmarkId = request.params.id
@@ -164,12 +196,7 @@ export async function putBookmark (fastify, _opts) {
         }
       }
 
-      if (bookmark.title != null) updates.push(SQL`title = ${bookmark.title}`)
-      if (bookmark.note != null) updates.push(SQL`note = ${bookmark.note}`)
-      if (bookmark.summary != null) updates.push(SQL`summary = ${bookmark.summary}`)
-      if (bookmark.starred != null) updates.push(SQL`starred = ${bookmark.starred}`)
-      if (bookmark.toread != null) updates.push(SQL`toread = ${bookmark.toread}`)
-      if (bookmark.sensitive != null) updates.push(SQL`sensitive = ${bookmark.sensitive}`)
+      updates.push(...bookmarkScalarAssignments(bookmark))
 
       if (updates.length > 0) {
         const query = SQL`
@@ -183,6 +210,15 @@ export async function putBookmark (fastify, _opts) {
       }
 
       if (Array.isArray(bookmark.tags)) {
+        if (updates.length === 0) {
+          // Serialize tag-only replacements with native edits on this bookmark.
+          const locked = await client.query(SQL`
+            select id from bookmarks where id = ${bookmarkId} and owner_id = ${userId} for no key update
+          `)
+          if (locked.rowCount === 0) {
+            return reply.notFound(`bookmark ${bookmarkId} not found for user ${userId}`)
+          }
+        }
         if (bookmark.tags.length > 0) {
           const createTags = SQL`
           INSERT INTO tags (name, owner_id)
